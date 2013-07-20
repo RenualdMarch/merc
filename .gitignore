@@ -13,3 +13,6 @@ project/project/target
 # Scala-IDE specific
 .project
 .settings
+.cache
+.classpath
+/bin

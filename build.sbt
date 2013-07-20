@@ -15,3 +15,7 @@ libraryDependencies += "org.scalafx" % "scalafx_2.10" % "1.0.0-M4"
 //libraryDependencies += "joda-time" % "joda-time" % "2.1"
 
 //libraryDependencies += "org.joda" % "joda-convert" % "1.1"
+
+unmanagedJars in Compile += Attributed.blank(file(System.getenv("JAVA_HOME") + "/jre/lib/jfxrt.jar"))
+
+mainClass := Some("mr.merc.main.Main")
