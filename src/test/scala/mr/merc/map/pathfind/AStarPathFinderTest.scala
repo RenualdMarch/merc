@@ -10,22 +10,22 @@ class AStarPathFinderTest extends FunSuite{
   
 	test("pathfinding sanity check") {
 		val grid = new HexField(5, 5)
-		val from = grid.hex(1, 0)
-		val to = grid.hex(3, 0)
-		val connector = grid.hex(2, 0)
+		val from = grid.hex(0, 1)
+		val to = grid.hex(0, 3)
+		val connector = grid.hex(0, 2)
 		val result = finder.findPath(grid, from, to)
 		assert(result.get === List(from, connector, to))
 	}
 	
 	test ("pathfinding with blocked path") {
 	  val grid = new HexField(5, 5) {
-	    override def isBlocked(hex:Hex) = hex.x == 2 && hex.y == 0
+	    override def isBlocked(hex:Hex) = hex.x == 0 && hex.y == 2
 	  }
 	  
-	  val from = grid.hex(1, 0)
-	  val to = grid.hex(3, 0)
+	  val from = grid.hex(0, 1)
+	  val to = grid.hex(0, 3)
 	  val connector1 = grid.hex(1, 1)
-	  val connector2 = grid.hex(2, 1)
+	  val connector2 = grid.hex(1, 2)
 	  
 	  val result = finder.findPath(grid, from, to)
 	  assert(result.get === List(from, connector1, connector2, to))
@@ -33,11 +33,11 @@ class AStarPathFinderTest extends FunSuite{
 	
 	test("pathfinding with no path") {
 	   val grid = new HexField(5, 5) {
-	    override def isBlocked(hex:Hex) = hex.y == 1
+	    override def isBlocked(hex:Hex) = hex.x == 1
 	  }
 	   
-	  val from = grid.hex(1, 0)
-	  val to = grid.hex(3, 4)
+	  val from = grid.hex(0, 1)
+	  val to = grid.hex(4, 3)
 	   
 	  val result = finder.findPath(grid, from, to)
 	  assert(result.isEmpty)

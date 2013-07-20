@@ -12,11 +12,11 @@ class HexFieldTest extends FunSuite {
 	  assert(field.isLegalCoords(2, 0))
 	  assert(field.isLegalCoords(0, 1))
 	  assert(field.isLegalCoords(1, 1))
-	  assert(!field.isLegalCoords(2, 1))
+	  assert(!field.isLegalCoords(1, 3))
 	  assert(field.isLegalCoords(2, 2))
-	  assert(!field.isLegalCoords(2, 3))
+	  assert(!field.isLegalCoords(2, 4))
 	  assert(!field.isLegalCoords(1, 4))
-	  assert(!field.isLegalCoords(4, 2))
+	  assert(!field.isLegalCoords(3, 0))
 	}
 	
 	test("hex retrieval") {
@@ -27,7 +27,7 @@ class HexFieldTest extends FunSuite {
 	
 	test("illegal hex retrieval") {
 	  intercept[IllegalArgumentException]{ 
-		  field.hex(2, 1)
+		  field.hex(1, 3)
 	  }
 	}
 	
@@ -35,34 +35,34 @@ class HexFieldTest extends FunSuite {
 	  val set = bigField.neighbours(1, 1)
 
 	  assert(set.size === 6)
-	  assertContainsHex(set, 1, 0)
-	  assertContainsHex(set, 2, 0)
 	  assertContainsHex(set, 0, 1)
+	  assertContainsHex(set, 1, 0)
 	  assertContainsHex(set, 2, 1)
+	  assertContainsHex(set, 0, 2)
 	  assertContainsHex(set, 1, 2)
 	  assertContainsHex(set, 2, 2)
 	  
 	}
 	
 	test("neighbours in the middle on odd row") {
-	  val set = bigField.neighbours(1, 2)
+	  val set = bigField.neighbours(2, 2)
 	  
 	  assert(set.size === 6)
-	  assertContainsHex(set, 0, 1)
 	  assertContainsHex(set, 1, 1)
-	  assertContainsHex(set, 0, 2)
-	  assertContainsHex(set, 2, 2)
-	  assertContainsHex(set, 0, 3)
-	  assertContainsHex(set, 1, 3)
+	  assertContainsHex(set, 2, 1)
+	  assertContainsHex(set, 3, 1)
+	  assertContainsHex(set, 1, 2)
+	  assertContainsHex(set, 2, 3)
+	  assertContainsHex(set, 3, 2)
 	  
 	}
 	
 	test("neighbours on the edges") {
-	  val set = field.neighbours(1, 0)
+	  val set = field.neighbours(0, 1)
 	  assert(set.size === 4)
 	  assertContainsHex(set, 0, 0)
-	  assertContainsHex(set, 2, 0)
-	  assertContainsHex(set, 0, 1)
+	  assertContainsHex(set, 0, 2)
+	  assertContainsHex(set, 1, 0)
 	  assertContainsHex(set, 1, 1)
 	}
 	

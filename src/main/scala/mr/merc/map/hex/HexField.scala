@@ -12,7 +12,7 @@ class HexField(val width:Int, val height:Int) extends Grid[Hex] {
 	}
 	
 	def isLegalCoords(x:Int, y:Int):Boolean = {
-	  if (y % 2 == 1 && x == width - 1) {
+	  if (x % 2 == 1 && y == height - 1) {
 	    return false
 	  }
 	  
@@ -31,8 +31,8 @@ class HexField(val width:Int, val height:Int) extends Grid[Hex] {
 	def neighbours(hex:Hex):Set[Hex] = neighbours(hex.x, hex.y)
 	
 	def neighbours(x:Int, y:Int):Set[Hex] = {
-		// y % 2 == 1 is even because we start from zero
-		val corrections = correctionsSet(y % 2 == 1)
+		// x % 2 == 1 is even because we start from zero
+		val corrections = correctionsSet(x % 2 == 1)
 		val allNeighboursCoords = corrections.map(h => (h._1 + x, h._2 + y))
 		val correctCoords = allNeighboursCoords.filter(h => isLegalCoords(h._1, h._2))
 		correctCoords.map(h => hex(h._1, h._2))
@@ -40,8 +40,8 @@ class HexField(val width:Int, val height:Int) extends Grid[Hex] {
 	
 	private def correctionsSet(even:Boolean):Set[(Int, Int)] = {
 	  even match {
-	    case true => Set((0, -1), (1, -1), (-1, 0), (1, 0), (0, 1), (1, 1))
-	    case false => Set((-1,-1), (0, -1), (-1, 0), (1, 0), (-1, 1), (0, 1))
+	    case true => Set((-1, 0), (0, -1), (1, 0), (1, 1), (0, 1), (-1, 1))
+	    case false => Set((-1, -1), (0, -1), (1, -1), (1, 0), (0, 1), (-1, 0))
 	  }
 	}
 	
