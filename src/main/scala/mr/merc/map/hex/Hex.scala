@@ -1,5 +1,9 @@
 package mr.merc.map.hex
 
+object Hex {
+  def hexInit(x:Int, y:Int) = new Hex(x, y)
+}
+
 class Hex(val x:Int, val y:Int) {
 
   override def toString() = s"Hex($x,$y)"

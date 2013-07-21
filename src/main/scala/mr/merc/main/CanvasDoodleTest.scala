@@ -16,25 +16,21 @@ import scalafx.scene.Group
 import scalafx.scene.Scene
 import scalafx.stage.Stage
 import scalafx.application.JFXApp.PrimaryStage
-import scalafx.stage.Screen
-import mr.merc.map.hex.TerrainHexView
-import mr.merc.map.hex.TerrainHex
-import mr.merc.map.terrain.Grass
-import mr.merc.map.hex.TerrainHexField
-import mr.merc.map.hex.TerrainHexFieldView
-import scalafx.scene.image.Image
 
+/**
+ * Example adapted from code showed in [[http://docs.oracle.com/javafx/2/canvas/jfxpub-canvas.htm]].
+ * 
+ * Taken from here: http://code.google.com/p/scalafx/source/browse/demo/scalafx/canvas/CanvasDoodleTest.scala?r=106c0f37cb89d7844d04a6b398265e5755918ce9
+ * 
+ */
+object CanvasDoodleTest extends JFXApp {
 
-object Main extends JFXApp {
-  val map = new TerrainHexFieldView(new TerrainHexField(5, 5, TerrainHex.grassInit))
-  
-  val screenRect = Screen.primary.visualBounds
-  val canvas = new Canvas(screenRect.width, screenRect.height)
+  val canvas = new Canvas(200, 200)
 
   // Draw background with gradient
   val rect = new Rectangle {
-    height = screenRect.height
-    width = screenRect.width
+    height = 400
+    width = 400
     fill = new LinearGradient(0, 0, 1, 1, true, CycleMethod.REFLECT, List(Stop(0, Color.RED), Stop(1, Color.YELLOW)))
   }
 
@@ -43,11 +39,14 @@ object Main extends JFXApp {
 
   stage = new PrimaryStage {
     title = "Canvas Doodle Test"
-    scene = new Scene(screenRect.width, screenRect.height) {
+    scene = new Scene(400, 400) {
       root = rootPane
     }
   }
-  
+
+  canvas.translateX = 100
+  canvas.translateY = 100
+
   val gc = canvas.graphicsContext2D
 
   reset(Color.BLUE)
@@ -73,10 +72,6 @@ object Main extends JFXApp {
   private def reset(color: Color) {
     gc.fill = color
     gc.fillRect(0, 0, canvas.width.get, canvas.height.get);
-    map.hexes.foreach(h => {
-      h.drawItself(gc)
-    })
   }
-
 
 }

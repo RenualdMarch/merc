@@ -3,8 +3,8 @@ package mr.merc.map.hex
 import org.scalatest.FunSuite
 
 class HexFieldTest extends FunSuite {
-	val field = new HexField(3, 4)
-	val bigField = new HexField(6, 5)
+	val field = new HexField[Hex](3, 4, Hex.hexInit)
+	val bigField = new HexField[Hex](6, 5, Hex.hexInit)
   
 	test("legal coords") {
 	  assert(field.isLegalCoords(0, 0))
@@ -66,7 +66,7 @@ class HexFieldTest extends FunSuite {
 	  assertContainsHex(set, 1, 1)
 	}
 	
-	def assertContainsHex(set:Set[Hex], x:Int, y:Int) {
+	def assertContainsHex(set:Traversable[Hex], x:Int, y:Int) {
 	  val result = set.exists(h => h.x == x && h.y == y)
 	  assert(result, s"$set doesn't contain hex ($x, $y)")
 	}
@@ -86,5 +86,22 @@ class HexFieldTest extends FunSuite {
 	  
 	  val third = bigField.hex(3, 3)
 	  assert(bigField.distance(first, third) === 2)
+	}
+	
+	test("hexes") {
+	  val hexes = field.hexes
+	  
+	  assertContainsHex(hexes, 0, 0)
+	  assertContainsHex(hexes, 1, 0)
+	  assertContainsHex(hexes, 2, 0)
+	  assertContainsHex(hexes, 0, 1)
+	  assertContainsHex(hexes, 1, 1)
+	  assertContainsHex(hexes, 2, 1)
+	  assertContainsHex(hexes, 0, 2)
+	  assertContainsHex(hexes, 1, 2)
+	  assertContainsHex(hexes, 2, 2)
+	  assertContainsHex(hexes, 0, 3)
+	  assertContainsHex(hexes, 2, 3)
+	  assert(hexes.size === 11)
 	}
 }

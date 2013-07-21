@@ -1,15 +1,14 @@
 package mr.merc.map.pathfind
 
 import org.scalatest.FunSuite
-import mr.merc.map.hex.HexField
-import mr.merc.map.hex.HexField
 import mr.merc.map.hex.Hex
+import mr.merc.map.hex.HexField
 
 class AStarPathFinderTest extends FunSuite{
 	val finder = new AStarPathFinder()
   
 	test("pathfinding sanity check") {
-		val grid = new HexField(5, 5)
+		val grid = new HexField[Hex](5, 5, Hex.hexInit)
 		val from = grid.hex(0, 1)
 		val to = grid.hex(0, 3)
 		val connector = grid.hex(0, 2)
@@ -18,7 +17,7 @@ class AStarPathFinderTest extends FunSuite{
 	}
 	
 	test ("pathfinding with blocked path") {
-	  val grid = new HexField(5, 5) {
+	  val grid = new HexField[Hex](5, 5, Hex.hexInit) {
 	    override def isBlocked(hex:Hex) = hex.x == 0 && hex.y == 2
 	  }
 	  
@@ -32,7 +31,7 @@ class AStarPathFinderTest extends FunSuite{
 	}
 	
 	test("pathfinding with no path") {
-	   val grid = new HexField(5, 5) {
+	   val grid = new HexField[Hex](5, 5, Hex.hexInit) {
 	    override def isBlocked(hex:Hex) = hex.x == 1
 	  }
 	   

@@ -3,12 +3,20 @@ package mr.merc.map.hex
 import scala.math._
 import mr.merc.map.Grid
 
-class HexField(val width:Int, val height:Int) extends Grid[Hex] {
-	private val arr = Array.ofDim[Hex](width, height)
+class HexField[T <: Hex : ClassManifest](val width:Int, val height:Int, init:(Int, Int) => T) extends Grid[T] {
+	private val arr = Array.ofDim[T](width, height)
 	for (x <- 0 until width; y <- 0 until height) {
 	  if (isLegalCoords(x, y)) { 
-		  arr(x)(y) = new Hex(x, y)
+		  arr(x)(y) = init(x, y)
 	  }
+	}
+	
+	def hexes:Seq[T] = {
+	  val indices = for (x <- 0 until width; y <- 0 until height) yield {
+		  (x, y)
+	  }
+	  
+	  indices.filter(i => isLegalCoords(i._1, i._2)).map(i => hex(i._1, i._2))
 	}
 	
 	def isLegalCoords(x:Int, y:Int):Boolean = {
@@ -28,9 +36,9 @@ class HexField(val width:Int, val height:Int) extends Grid[Hex] {
 	  arr(x)(y)
 	}
 	
-	def neighbours(hex:Hex):Set[Hex] = neighbours(hex.x, hex.y)
+	def neighbours(hex:T):Set[T] = neighbours(hex.x, hex.y)
 	
-	def neighbours(x:Int, y:Int):Set[Hex] = {
+	def neighbours(x:Int, y:Int):Set[T] = {
 		// x % 2 == 1 is even because we start from zero
 		val corrections = correctionsSet(x % 2 == 1)
 		val allNeighboursCoords = corrections.map(h => (h._1 + x, h._2 + y))
@@ -45,7 +53,7 @@ class HexField(val width:Int, val height:Int) extends Grid[Hex] {
 	  }
 	}
 	
-	def distance(from:Hex, to:Hex):Int = {
+	def distance(from:T, to:T):Int = {
 	  val fromCube = from.toCubeHex
 	  val toCube = to.toCubeHex
 	  (scala.math.abs(fromCube.x - toCube.x) + abs(fromCube.y - toCube.y) + abs(fromCube.z - toCube.z)) / 2;
