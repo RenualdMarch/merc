@@ -15,8 +15,8 @@ class MImageCacheTest extends FunSuite with BeforeAndAfter with MockFactory {
   
 	test("can load image") {
 	  val image = MImageCache.get("/testImages/testImage.png")
-	  assert(image.getWidth() === 97)
-	  assert(image.getHeight() === 19)
+	  assert(image.width.value === 97)
+	  assert(image.height.value === 19)
 	}
 	
 	test("doesn't load image for the second time") {
@@ -28,7 +28,7 @@ class MImageCacheTest extends FunSuite with BeforeAndAfter with MockFactory {
 	
 	test("throw exception when image doesn't exist") {
 	  intercept[IllegalArgumentException] {
-	    val image = MImageCache.get("/testImages/testImage2.png")
+	    val image = MImageCache.get("/testImages/noExistingImage.png")
 	  }
 	}
 }

@@ -5,7 +5,7 @@ import javafx.embed.swing.SwingFXUtils
 import scalafx.scene.image.WritableImage
 import mr.merc.image.MImage
 
-class TerrainHexView(val hex:TerrainHex) {
+class TerrainHexView(val hex:TerrainHex, val neighbours:Map[Directions.Value, TerrainHex]) {
 	val side = 72
 	val x = findX
 	val y = findY

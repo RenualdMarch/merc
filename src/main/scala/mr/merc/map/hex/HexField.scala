@@ -38,21 +38,36 @@ class HexField[T <: Hex : ClassManifest](val width:Int, val height:Int, init:(In
 	
 	def neighbours(hex:T):Set[T] = neighbours(hex.x, hex.y)
 	
-	def neighbours(x:Int, y:Int):Set[T] = {
-		// x % 2 == 1 is even because we start from zero
-		val corrections = correctionsSet(x % 2 == 1)
-		val allNeighboursCoords = corrections.map(h => (h._1 + x, h._2 + y))
+	def neighbours(x:Int, y:Int):Set[T] = neighboursList(x, y).toSet
+	
+	private def neighboursList(x:Int, y:Int):List[T] = {
+		val allNeighboursCoords = neighboursListWithInvalid(x, y)
 		val correctCoords = allNeighboursCoords.filter(h => isLegalCoords(h._1, h._2))
 		correctCoords.map(h => hex(h._1, h._2))
 	}
 	
-	private def correctionsSet(even:Boolean):Set[(Int, Int)] = {
+	private def neighboursListWithInvalid(x:Int, y:Int):List[(Int, Int)] = {
+	  	// x % 2 == 1 is even because we start from zero
+		val corrections = correctionsList(x % 2 == 1)
+		corrections.map(h => (h._1 + x, h._2 + y))
+	}
+		
+	def neighboursWithDirections(hex:T):Map[Directions.Direction, T] = neighboursWithDirections(hex.x, hex.y)
+	
+	def neighboursWithDirections(x:Int, y:Int):Map[Directions.Direction, T] = {
+	  val resultList = (directionsList zip neighboursListWithInvalid(x, y)).filter(dh => isLegalCoords(dh._2._1, dh._2._2))
+	  resultList.map(df => (df._1, hex(df._2._1, df._2._2))).toMap
+	}
+		
+	private def correctionsList(even:Boolean):List[(Int, Int)] = {
 	  even match {
-	    case true => Set((-1, 0), (0, -1), (1, 0), (1, 1), (0, 1), (-1, 1))
-	    case false => Set((-1, -1), (0, -1), (1, -1), (1, 0), (0, 1), (-1, 0))
+	    case true => List((-1, 0), (0, -1), (1, 0), (1, 1), (0, 1), (-1, 1))
+	    case false => List((-1, -1), (0, -1), (1, -1), (1, 0), (0, 1), (-1, 0))
 	  }
 	}
 	
+	private val directionsList = List(Directions.NW, Directions.N, Directions.NE, Directions.SE, Directions.S, Directions.SW)
+		
 	def distance(from:T, to:T):Int = {
 	  val fromCube = from.toCubeHex
 	  val toCube = to.toCubeHex
