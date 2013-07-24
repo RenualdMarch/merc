@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<elements>
+	<element type="Grass" from="N" to="N"/>
+	<element type="Grass" from="NE" to="NE"/>
+	<element type="Grass" from="NW" to="NW"/>
+	<element type="Grass" from="S" to="S"/>
+	<element type="Grass" from="SE" to="SE"/>
+	<element type="Grass" from="SW" to="SW"/>
+	
+	<element type="Grass" from="S" to="SW"/>
+	
+	<element type="Grass" from="N" to="SE"/>
+</elements>

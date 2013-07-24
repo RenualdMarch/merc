@@ -8,8 +8,8 @@ import mr.merc.map.terrain.Sand
 
 class TerrainHexAdditiveTest extends FunSuite {
   
-  def exist(tr:Traversable[TerrainHexViewAdditive], from:Directions.Direction, to:Directions.Direction, tp:TerrainType) {
-    assert(tr.exists(ad => ad.from == from && ad.to == to && ad.terrainType == tp))
+  def exist(tr:Traversable[TerrainHexViewAdditive], from:Directions.Direction, to:Directions.Direction, hexType:TerrainType, tp:TerrainType) {
+    assert(tr.exists(ad => ad.from == from && ad.to == to && ad.neighbourTerrainType == tp && hexType == ad.hexTerrainType))
   }
   
   test("case with different single terrains") {
@@ -18,9 +18,9 @@ class TerrainHexAdditiveTest extends FunSuite {
 	  val view = new TerrainHexFieldView(field)
 	  val additives = TerrainHexViewAdditive.extractAdditives(view.hex(1, 1))
 	  assert(additives.size === 3)
-	  exist(additives, Directions.NW, Directions.NW, Hill)
-	  exist(additives, Directions.NE, Directions.NE, Sand)
-	  exist(additives, Directions.S, Directions.S, Hill)
+	  exist(additives, Directions.NW, Directions.NW, Grass, Hill)
+	  exist(additives, Directions.NE, Directions.NE, Grass, Sand)
+	  exist(additives, Directions.S, Directions.S, Grass, Hill)
   }
   
   test("case with single and multiple terrains") {
@@ -29,8 +29,8 @@ class TerrainHexAdditiveTest extends FunSuite {
 	  val view = new TerrainHexFieldView(field)
 	  val additives = TerrainHexViewAdditive.extractAdditives(view.hex(1, 1))
 	  assert(additives.size === 2)
-	  exist(additives, Directions.NE, Directions.NW, Hill)
-	  exist(additives, Directions.SE, Directions.SE, Sand)
+	  exist(additives, Directions.NE, Directions.NW, Grass, Hill)
+	  exist(additives, Directions.SE, Directions.SE, Grass, Sand)
   }
   
   test("case on the edge") {
@@ -39,7 +39,7 @@ class TerrainHexAdditiveTest extends FunSuite {
 	  val view = new TerrainHexFieldView(field)
       val additives = TerrainHexViewAdditive.extractAdditives(view.hex(2, 0))
 	  assert(additives.size === 1)
-	  exist(additives, Directions.S, Directions.SW, Hill)
+	  exist(additives, Directions.S, Directions.SW, Grass, Hill)
   }
 }
 

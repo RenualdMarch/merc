@@ -7,16 +7,16 @@ object TerrainHexViewAdditive {
     val neig = view.neighbours
     val different = neig.filter(n => n._2.terrain != view.hex.terrain)
     
-    val additives = different.map(n => new TerrainHexViewAdditive(n._1, n._1, n._2.terrain))
-    uniteAdditives(additives)
+    val additives = different.map(n => new TerrainHexViewAdditive(n._1, n._1, view.hex.terrain, n._2.terrain))
+    uniteAdditives(additives, view.hex.terrain)
    }
   
-  private def uniteAdditives(tr:Traversable[TerrainHexViewAdditive]):List[TerrainHexViewAdditive] = {
+  private def uniteAdditives(tr:Traversable[TerrainHexViewAdditive], terrainType:TerrainType):List[TerrainHexViewAdditive] = {
     var retList = tr.toList
     while (whichCanBeUnited(retList).isDefined) {
       val toUnite = whichCanBeUnited(retList).get
       retList = retList.filterNot(p => p == toUnite._1 || p == toUnite._2)
-      val united = unite(toUnite._1, toUnite._2)
+      val united = unite(toUnite._1, toUnite._2, terrainType)
       retList ::= united      
     }
     
@@ -36,17 +36,17 @@ object TerrainHexViewAdditive {
   }
   
   private def canBeUnited(first:TerrainHexViewAdditive, second:TerrainHexViewAdditive):Boolean = {
-    first.terrainType == second.terrainType && (isNeighbour(first.from, second.to) || isNeighbour(first.to, second.from))
+    first.neighbourTerrainType == second.neighbourTerrainType && (isNeighbour(first.from, second.to) || isNeighbour(first.to, second.from))
   }
   
   private def isNeighbour(first:Directions.Direction, second:Directions.Direction) = Directions.neighbours(first).contains(second)
   
-  private def unite(first:TerrainHexViewAdditive, second:TerrainHexViewAdditive):TerrainHexViewAdditive = {
-    require(first.terrainType == second.terrainType)
+  private def unite(first:TerrainHexViewAdditive, second:TerrainHexViewAdditive, terrain:TerrainType):TerrainHexViewAdditive = {
+    require(first.neighbourTerrainType == second.neighbourTerrainType)
     if (isNeighbour(first.from, second.to)) {
-      new TerrainHexViewAdditive(second.from, first.to, first.terrainType)
+      new TerrainHexViewAdditive(second.from, first.to, terrain, first.neighbourTerrainType)
     } else if (isNeighbour(second.from, first.to)) {
-      new TerrainHexViewAdditive(first.from, second.to, first.terrainType)
+      new TerrainHexViewAdditive(first.from, second.to, terrain, first.neighbourTerrainType)
     } else {
       throw new IllegalAccessException("Additives are not neighbours")
     }
@@ -54,7 +54,7 @@ object TerrainHexViewAdditive {
 }
 
 class TerrainHexViewAdditive(originalFrom:Directions.Direction, 
-    originalTo:Directions.Direction, val terrainType:TerrainType) {
+    originalTo:Directions.Direction, val hexTerrainType:TerrainType, val neighbourTerrainType:TerrainType) {
 
   private val normalized = Directions.normalizeClockwise(originalFrom, originalTo)
   val from = normalized._1
