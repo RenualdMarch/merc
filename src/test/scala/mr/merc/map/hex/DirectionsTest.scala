@@ -25,4 +25,18 @@ class DirectionsTest extends FunSuite {
 	  val result2 = Directions.normalizeClockwise(Directions.NW, Directions.SE)
 	  assert(result2 === (Directions.SE, Directions.NW))
 	}
+	
+	test("comparing slices") {
+	  assert(Directions.leftSliceContainsRightSlice((Directions.NE, Directions.SW), (Directions.NE, Directions.S)))
+	  assert(!Directions.leftSliceContainsRightSlice((Directions.NE, Directions.S), (Directions.NE, Directions.SW)))
+	  assert(!Directions.leftSliceContainsRightSlice((Directions.NE, Directions.SW), (Directions.S, Directions.NW)))
+	  assert(Directions.leftSliceContainsRightSlice((Directions.NE, Directions.SW), (Directions.NE, Directions.SW)))
+	}
+	
+	test("overlapping slices") {
+	  assert(Directions.overlapping((Directions.NE, Directions.SW), (Directions.NE, Directions.S)))
+	  assert(!Directions.overlapping((Directions.NW, Directions.SW), (Directions.NE, Directions.SE)))
+	  assert(Directions.overlapping((Directions.NE, Directions.SW), (Directions.NE, Directions.SW)))
+  
+	}
 }

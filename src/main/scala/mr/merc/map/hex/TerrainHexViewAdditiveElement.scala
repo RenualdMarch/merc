@@ -7,7 +7,7 @@ import scala.xml.XML
 import java.io.File
 
 object TerrainHexViewAdditiveElement {
-  private [hex] val elements = new ArrayBuffer[TerrainHexViewAdditiveElement]
+  private [hex] var elements = List[TerrainHexViewAdditiveElement]()
   
   parseXml("terrainAdditivesElements.xml")
   
@@ -21,12 +21,12 @@ object TerrainHexViewAdditiveElement {
       new TerrainHexViewAdditiveElement(terrain, from, to)
     })
     
-    elements ++= parsed
+    elements = parsed.toList
   }
   
-  private [hex] def clean() {
-    elements.clear()
-  }
+  def elementsByType(terrain:TerrainType) = elements.filter(_.terrainType == terrain).sortBy(e => -Directions.length(e.from, e.to))
+  
+
 }
 
 case class TerrainHexViewAdditiveElement(val terrainType:TerrainType, val from:Directions.Direction, val to:Directions.Direction) {

@@ -10,4 +10,11 @@
 	<element type="Grass" from="S" to="SW"/>
 	
 	<element type="Grass" from="N" to="SE"/>
+	
+	<element type="Sand" from="N" to="N"/>
+	<element type="Sand" from="NE" to="NE"/>
+	<element type="Sand" from="NW" to="NW"/>
+	<element type="Sand" from="S" to="S"/>
+	<element type="Sand" from="SE" to="SE"/>
+	<element type="Sand" from="SW" to="SW"/>
 </elements>

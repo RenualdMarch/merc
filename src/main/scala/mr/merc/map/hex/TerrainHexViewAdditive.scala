@@ -10,7 +10,7 @@ object TerrainHexViewAdditive {
     val additives = different.map(n => new TerrainHexViewAdditive(n._1, n._1, view.hex.terrain, n._2.terrain))
     uniteAdditives(additives, view.hex.terrain)
    }
-  
+   
   private def uniteAdditives(tr:Traversable[TerrainHexViewAdditive], terrainType:TerrainType):List[TerrainHexViewAdditive] = {
     var retList = tr.toList
     while (whichCanBeUnited(retList).isDefined) {
@@ -36,20 +36,13 @@ object TerrainHexViewAdditive {
   }
   
   private def canBeUnited(first:TerrainHexViewAdditive, second:TerrainHexViewAdditive):Boolean = {
-    first.neighbourTerrainType == second.neighbourTerrainType && (isNeighbour(first.from, second.to) || isNeighbour(first.to, second.from))
+    first.neighbourTerrainType == second.neighbourTerrainType && (Directions.isNeighbour(first.from, second.to) || Directions.isNeighbour(first.to, second.from))
   }
-  
-  private def isNeighbour(first:Directions.Direction, second:Directions.Direction) = Directions.neighbours(first).contains(second)
   
   private def unite(first:TerrainHexViewAdditive, second:TerrainHexViewAdditive, terrain:TerrainType):TerrainHexViewAdditive = {
     require(first.neighbourTerrainType == second.neighbourTerrainType)
-    if (isNeighbour(first.from, second.to)) {
-      new TerrainHexViewAdditive(second.from, first.to, terrain, first.neighbourTerrainType)
-    } else if (isNeighbour(second.from, first.to)) {
-      new TerrainHexViewAdditive(first.from, second.to, terrain, first.neighbourTerrainType)
-    } else {
-      throw new IllegalAccessException("Additives are not neighbours")
-    }
+    val pair = Directions.unite((first.from, first.to), (second.from, second.to))
+    new TerrainHexViewAdditive(pair._1, pair._2, terrain, first.neighbourTerrainType)
   }
 }
 
