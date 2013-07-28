@@ -5,6 +5,8 @@ import scala.collection.mutable.ArrayBuffer
 import mr.merc.map.terrain.Grass
 import scala.xml.XML
 import java.io.File
+import mr.merc.image.MImage
+import scalafx.scene.canvas.GraphicsContext
 
 object TerrainHexViewAdditiveElement {
   private [hex] var elements = List[TerrainHexViewAdditiveElement]()
@@ -37,6 +39,11 @@ case class TerrainHexViewAdditiveElement(val terrainType:TerrainType, val from:D
 	} 
   
   
-    def path = "/images/" + terrainType.name + "/" + namePart + ".png"
+    def path = "/images/terrain/" + terrainType.name + "/" + namePart + ".png"
 
+    private lazy val image = MImage(path)
+    
+    def drawItself(gc:GraphicsContext, x:Int, y:Int) {
+      gc.drawImage(image.image, x, y)
+    }
 }

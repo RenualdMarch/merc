@@ -22,9 +22,16 @@ class TerrainHexView(val hex:TerrainHex, val neighbours:Map[Directions.Value, Te
 	  side * hex.y + side / 2
 	}
 	
+	private lazy val elements:List[TerrainHexViewAdditiveElement] = {
+	  val additives = TerrainHexViewAdditive.extractAdditives(this)
+	  val rule = new TerrainHexViewAdditiveRule
+	  rule.transform(additives)
+	}
+	
 	def image = MImage(hex.terrain.imagePath)
 	
 	def drawItself(gc:GraphicsContext) {
 	  gc.drawImage(image.image, x, y)
+	  elements foreach (_.drawItself(gc, x, y))
 	}
 }
