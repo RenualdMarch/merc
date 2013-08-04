@@ -8,6 +8,7 @@ import mr.merc.map.terrain.Sand
 import mr.merc.map.terrain.Water
 import mr.merc.map.terrain.BankOutside
 import mr.merc.map.terrain.BankInside
+import mr.merc.map.terrain.Mountain
 
 class TerrainHexAdditiveTest extends FunSuite {
   
@@ -16,7 +17,7 @@ class TerrainHexAdditiveTest extends FunSuite {
   }
   
   test("case with different single terrains") {
-	  val deter = new TypeDeterminator(Map(((0, 1) -> Sand), ((2, 1) -> Hill), ((1, 2) -> Sand)))
+	  val deter = new TypeDeterminator(Map(((0, 1) -> Sand), ((2, 1) -> Hill), ((0, 2) -> Mountain), ((1, 2) -> Sand)))
 	  val field = new TerrainHexField(5, 5, deter)
 	  val view = new TerrainHexFieldView(field)
 	  val additives = TerrainHexViewAdditive.extractAdditives(view.hex(1, 1))

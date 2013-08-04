@@ -5,10 +5,14 @@ import mr.merc.map.terrain.Sand
 import mr.merc.map.terrain.Hill
 import scala.collection.generic.CanBuildFrom
 import mr.merc.map.terrain.TerrainType
+import mr.merc.map.terrain.Swamp
+import mr.merc.map.terrain.Water
+import mr.merc.map.terrain.Mountain
+import mr.merc.map.terrain.Road
 
 object TerrainHexViewAdditiveRule {
   // first is drawn first
-  private val orderOfTypes = List(Sand, Grass, Hill)
+  private val orderOfTypes = List(Water, Swamp, Grass, Sand, Road, Hill, Mountain)
 }
 
 /**
@@ -34,7 +38,7 @@ class TerrainHexViewAdditiveRule {
 	
 	private [hex] def additivesToElements(add:TerrainHexViewAdditive):List[TerrainHexViewAdditiveElement] = {
 	  val allElements = TerrainHexViewAdditiveElement.elementsByType(add.neighbourTerrainType).toList
-      val possibleElements = allElements.filter(e => additiveContainsElement(add, e))
+	  val possibleElements = allElements.filter(e => additiveContainsElement(add, e))
       additivesToElementsRec(add, Set(), possibleElements).toList	   
 	}
 	
@@ -45,9 +49,6 @@ class TerrainHexViewAdditiveRule {
 	    Set()
 	  } else {
 		val possibleElements = possible.filter(p => !areElementsOverlapping(acc + p))
-		if (possibleElements.size == 0) {
-		  println("empty")
-		}
 	    val currentResult = additivesToElementsRec(add, acc + possibleElements.head, possibleElements.tail)
 		if (!currentResult.isEmpty) {
 		  currentResult

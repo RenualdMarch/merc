@@ -38,7 +38,7 @@ object Directions extends Enumeration {
       }
     }          
     
-    //FIXME to something with hacks
+    //FIXME do something with hacks
     def leftSliceContainsRightSlice(left:DirPair, right:DirPair):Boolean = {
       var pair = (toDegrees(left), toDegrees(right))
       var normLeft = pair._1
@@ -57,7 +57,7 @@ object Directions extends Enumeration {
       secondResult
     }
     
-    //FIXME to something with hacks
+    //FIXME do something with hacks
     def overlapping(left:DirPair, right:DirPair):Boolean = {
       var pair = (toDegrees(left), toDegrees(right))
       var normLeft = pair._1

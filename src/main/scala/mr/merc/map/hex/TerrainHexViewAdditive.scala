@@ -5,6 +5,7 @@ import mr.merc.map.terrain.Hill
 import mr.merc.map.terrain.Water
 import mr.merc.map.terrain.BankOutside
 import mr.merc.map.terrain.BankInside
+import mr.merc.map.terrain.Mountain
 
 object TerrainHexViewAdditive {
   def extractAdditives(view:TerrainHexView):List[TerrainHexViewAdditive] = {
@@ -35,6 +36,8 @@ object TerrainHexViewAdditive {
       case (Water, _) => List(new TerrainHexViewAdditive(add.from, add.to, Water, BankInside))
       case (Hill, _) => Nil
       case (_, Hill) => Nil
+      case (_, Mountain) => Nil
+      case (Mountain, _) => Nil
       case (_, _) => List(add)
     }
   }
