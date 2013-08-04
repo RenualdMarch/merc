@@ -1,6 +1,10 @@
 package mr.merc.map.hex
 
 import mr.merc.map.terrain.TerrainType
+import mr.merc.map.terrain.Hill
+import mr.merc.map.terrain.Water
+import mr.merc.map.terrain.BankOutside
+import mr.merc.map.terrain.BankInside
 
 object TerrainHexViewAdditive {
   def extractAdditives(view:TerrainHexView):List[TerrainHexViewAdditive] = {
@@ -8,7 +12,8 @@ object TerrainHexViewAdditive {
     val different = neig.filter(n => n._2.terrain != view.hex.terrain)
     
     val additives = different.map(n => new TerrainHexViewAdditive(n._1, n._1, view.hex.terrain, n._2.terrain))
-    uniteAdditives(additives, view.hex.terrain)
+    val transformed = additives.flatMap(applyTerrainTypeCustomRules)
+    uniteAdditives(transformed, view.hex.terrain)
    }
    
   private def uniteAdditives(tr:Traversable[TerrainHexViewAdditive], terrainType:TerrainType):List[TerrainHexViewAdditive] = {
@@ -21,6 +26,17 @@ object TerrainHexViewAdditive {
     }
     
     retList
+  }
+  
+  private def applyTerrainTypeCustomRules(add:TerrainHexViewAdditive):List[TerrainHexViewAdditive] = {
+    (add.hexTerrainType, add.neighbourTerrainType) match {
+      case (Water, Water) => List(add)
+      case (_, Water) => List(new TerrainHexViewAdditive(add.from, add.to, add.hexTerrainType, BankOutside))
+      case (Water, _) => List(new TerrainHexViewAdditive(add.from, add.to, Water, BankInside))
+      case (Hill, _) => Nil
+      case (_, Hill) => Nil
+      case (_, _) => List(add)
+    }
   }
   
   private def whichCanBeUnited(tr:Traversable[TerrainHexViewAdditive]):Option[(TerrainHexViewAdditive, TerrainHexViewAdditive)] = {
@@ -46,10 +62,19 @@ object TerrainHexViewAdditive {
   }
 }
 
-class TerrainHexViewAdditive(originalFrom:Directions.Direction, 
-    originalTo:Directions.Direction, val hexTerrainType:TerrainType, val neighbourTerrainType:TerrainType) {
-
-  private val normalized = Directions.normalizeClockwise(originalFrom, originalTo)
-  val from = normalized._1
-  val to = normalized._2
+class TerrainHexViewAdditive(_from:Directions.Direction, 
+    _to:Directions.Direction, val hexTerrainType:TerrainType, val neighbourTerrainType:TerrainType) {
+  
+  private val neighbours = Directions.neighbours(_from).contains(_to)
+  private val pair:Directions.DirPair = {
+    if (neighbours && Directions.next(_to) == _from) {
+      (Directions.N, Directions.NW)
+    } else {
+      (_from, _to)
+    }
+    
+  }
+  
+  val from = pair._1
+  val to = pair._2
 }

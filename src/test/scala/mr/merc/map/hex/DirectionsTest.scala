@@ -17,26 +17,29 @@ class DirectionsTest extends FunSuite {
 	  val set = Directions.neighbours(Directions.NW)
 	  assert(set === Set(Directions.SW, Directions.N))
 	}
-	
-	test("clockwise sort") {
-	  val result1 = Directions.normalizeClockwise(Directions.N, Directions.S)
-	  assert(result1 === (Directions.N, Directions.S))
-	  
-	  val result2 = Directions.normalizeClockwise(Directions.NW, Directions.SE)
-	  assert(result2 === (Directions.SE, Directions.NW))
-	}
-	
+		
 	test("comparing slices") {
 	  assert(Directions.leftSliceContainsRightSlice((Directions.NE, Directions.SW), (Directions.NE, Directions.S)))
 	  assert(!Directions.leftSliceContainsRightSlice((Directions.NE, Directions.S), (Directions.NE, Directions.SW)))
 	  assert(!Directions.leftSliceContainsRightSlice((Directions.NE, Directions.SW), (Directions.S, Directions.NW)))
 	  assert(Directions.leftSliceContainsRightSlice((Directions.NE, Directions.SW), (Directions.NE, Directions.SW)))
+	  assert(Directions.leftSliceContainsRightSlice((Directions.S, Directions.N), (Directions.SW, Directions.N)))
+	  assert(Directions.leftSliceContainsRightSlice((Directions.S, Directions.NE), (Directions.SW, Directions.N)))
+	  
+	  assert(Directions.leftSliceContainsRightSlice((Directions.NW, Directions.N), (Directions.NW, Directions.NW)))
+	  assert(Directions.leftSliceContainsRightSlice((Directions.NW, Directions.N), (Directions.N, Directions.N)))
+	  
 	}
 	
 	test("overlapping slices") {
 	  assert(Directions.overlapping((Directions.NE, Directions.SW), (Directions.NE, Directions.S)))
-	  assert(!Directions.overlapping((Directions.NW, Directions.SW), (Directions.NE, Directions.SE)))
+	  assert(!Directions.overlapping((Directions.SW, Directions.NW), (Directions.NE, Directions.SE)))
+	  assert(Directions.overlapping((Directions.NW, Directions.SW), (Directions.NE, Directions.SE)))
 	  assert(Directions.overlapping((Directions.NE, Directions.SW), (Directions.NE, Directions.SW)))
-  
+  	  assert(Directions.overlapping((Directions.S, Directions.NE), (Directions.NW, Directions.S)))
+  	  assert(Directions.overlapping((Directions.NW, Directions.N), (Directions.NW, Directions.NW)))
+	  assert(Directions.overlapping((Directions.NW, Directions.N), (Directions.N, Directions.N)))
+
+	  
 	}
 }

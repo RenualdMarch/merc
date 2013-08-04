@@ -4,6 +4,7 @@ import mr.merc.map.terrain.Grass
 import mr.merc.map.terrain.Sand
 import mr.merc.map.terrain.Hill
 import scala.collection.generic.CanBuildFrom
+import mr.merc.map.terrain.TerrainType
 
 object TerrainHexViewAdditiveRule {
   // first is drawn first
@@ -21,10 +22,13 @@ class TerrainHexViewAdditiveRule {
   
 	private [hex] def filterNotNeededAdditives(add:Traversable[TerrainHexViewAdditive]):List[TerrainHexViewAdditive] = {
 	  add.filter(viewAdd => {
-	    val strengthOfCurrent = TerrainHexViewAdditiveRule.orderOfTypes.indexOf(viewAdd.hexTerrainType)
-	    val strengthOfNeighbour = TerrainHexViewAdditiveRule.orderOfTypes.indexOf(viewAdd.neighbourTerrainType)
-	    
-	    strengthOfCurrent < strengthOfNeighbour
+	    if (TerrainType.helperTypesList.contains(viewAdd.hexTerrainType) || TerrainType.helperTypesList.contains(viewAdd.neighbourTerrainType)) {
+	      true
+	    } else {
+	        val strengthOfCurrent = TerrainHexViewAdditiveRule.orderOfTypes.indexOf(viewAdd.hexTerrainType)
+	        val strengthOfNeighbour = TerrainHexViewAdditiveRule.orderOfTypes.indexOf(viewAdd.neighbourTerrainType)
+	        strengthOfCurrent < strengthOfNeighbour
+	    }
 	  }).toList
 	}
 	
@@ -40,7 +44,10 @@ class TerrainHexViewAdditiveRule {
 	  } else if (!acc.isEmpty && sumOfElementsSlices(acc) != Set((add.from, add.to)) && possible.isEmpty) {
 	    Set()
 	  } else {
-		val possibleElements = possible.filter(p => !areElementsOverlapping(acc + p))  
+		val possibleElements = possible.filter(p => !areElementsOverlapping(acc + p))
+		if (possibleElements.size == 0) {
+		  println("empty")
+		}
 	    val currentResult = additivesToElementsRec(add, acc + possibleElements.head, possibleElements.tail)
 		if (!currentResult.isEmpty) {
 		  currentResult

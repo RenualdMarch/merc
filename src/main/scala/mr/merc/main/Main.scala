@@ -24,6 +24,7 @@ import mr.merc.map.hex.TerrainHexField
 import mr.merc.map.hex.TerrainHexFieldView
 import scalafx.scene.image.Image
 import mr.merc.map.terrain.Sand
+import mr.merc.map.terrain.Water
 
 
 object Main extends JFXApp {
@@ -82,10 +83,12 @@ object Main extends JFXApp {
   }
 
   private def mapInit(x:Int, y:Int) = 
-    if (x != 1 && y != 1) {
-      new TerrainHex(x, y, Grass)
-    } else {
+    if (x == 1) {
+      new TerrainHex(x, y, Water)
+    } else if (y == 2){
       new TerrainHex(x, y, Sand)
+    } else {
+      new TerrainHex(x, y, Grass)
     }
 
 }
