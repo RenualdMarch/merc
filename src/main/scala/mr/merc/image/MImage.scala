@@ -1,6 +1,7 @@
 package mr.merc.image
 
 import scalafx.scene.image.Image
+import scalafx.scene.canvas.GraphicsContext
 
 object MImage {
   def apply(path:String, xOffset:Int, yOffset:Int, alpha:Float):MImage =
@@ -22,7 +23,17 @@ abstract class MImage private[image] (val xOffset:Int, val yOffset:Int, val alph
   val defaultAlpha = 1f
   def imagePath:Option[String]
 
-  def image:Image
+  protected def image:Image
+  
+  def drawImage(gc:GraphicsContext, x:Int, y:Int) {
+    gc.drawImage(image, x, y)
+  }
+  
+  def drawCenteredImage(gc:GraphicsContext, x:Int, y:Int, width:Int, height:Int) {
+    val actualX = x + (width - this.width) / 2
+    val actualY = y + (height - this.height) / 2
+    gc.drawImage(image, actualX, actualY)
+  }
 
   def width = image.width.value
 

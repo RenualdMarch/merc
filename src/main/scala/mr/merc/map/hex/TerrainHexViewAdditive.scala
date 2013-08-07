@@ -6,6 +6,8 @@ import mr.merc.map.terrain.Water
 import mr.merc.map.terrain.BankOutside
 import mr.merc.map.terrain.BankInside
 import mr.merc.map.terrain.Mountain
+import mr.merc.map.terrain.Forest
+import mr.merc.map.terrain.Grass
 
 object TerrainHexViewAdditive {
   def extractAdditives(view:TerrainHexView):List[TerrainHexViewAdditive] = {
@@ -29,16 +31,18 @@ object TerrainHexViewAdditive {
     retList
   }
   
-  private def applyTerrainTypeCustomRules(add:TerrainHexViewAdditive):List[TerrainHexViewAdditive] = {
+  private def applyTerrainTypeCustomRules(add:TerrainHexViewAdditive):Option[TerrainHexViewAdditive] = {
     (add.hexTerrainType, add.neighbourTerrainType) match {
-      case (Water, Water) => List(add)
-      case (_, Water) => List(new TerrainHexViewAdditive(add.from, add.to, add.hexTerrainType, BankOutside))
-      case (Water, _) => List(new TerrainHexViewAdditive(add.from, add.to, Water, BankInside))
-      case (Hill, _) => Nil
-      case (_, Hill) => Nil
-      case (_, Mountain) => Nil
-      case (Mountain, _) => Nil
-      case (_, _) => List(add)
+      case (Water, Water) => Some(add)
+      case (Forest, _) => None
+      case (_, Water) => Some(new TerrainHexViewAdditive(add.from, add.to, add.hexTerrainType, BankOutside))
+      case (Water, _) => Some(new TerrainHexViewAdditive(add.from, add.to, Water, BankInside))
+      case (Hill, _) => None
+      case (_, Hill) => None
+      case (_, Mountain) => None
+      case (Mountain, _) => None      
+      case (_, Forest) => Some(new TerrainHexViewAdditive(add.from, add.to, add.hexTerrainType, Grass))
+      case (_, _) => Some(add)
     }
   }
   

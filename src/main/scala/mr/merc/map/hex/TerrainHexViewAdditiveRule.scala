@@ -9,10 +9,11 @@ import mr.merc.map.terrain.Swamp
 import mr.merc.map.terrain.Water
 import mr.merc.map.terrain.Mountain
 import mr.merc.map.terrain.Road
+import mr.merc.map.terrain.Forest
 
 object TerrainHexViewAdditiveRule {
   // first is drawn first
-  private val orderOfTypes = List(Water, Swamp, Grass, Sand, Road, Hill, Mountain)
+  private val orderOfTypes = List(Water, Forest, Swamp, Grass, Sand, Road, Hill, Mountain)
 }
 
 /**

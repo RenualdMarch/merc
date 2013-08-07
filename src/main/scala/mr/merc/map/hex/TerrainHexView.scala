@@ -4,6 +4,8 @@ import scalafx.scene.canvas.GraphicsContext
 import javafx.embed.swing.SwingFXUtils
 import scalafx.scene.image.WritableImage
 import mr.merc.image.MImage
+import mr.merc.map.terrain.Grass
+import mr.merc.map.terrain.Forest
 
 class TerrainHexView(val hex:TerrainHex, val neighbours:Map[Directions.Value, TerrainHex]) {
 	val side = 72
@@ -28,10 +30,25 @@ class TerrainHexView(val hex:TerrainHex, val neighbours:Map[Directions.Value, Te
 	  rule.transform(additives)
 	}
 	
-	def image = MImage(hex.terrain.imagePath)
+	def image:MImage = {
+	  if (hex.terrain == Forest) {
+	    MImage(Grass.imagePath)
+	  } else {
+	    MImage(hex.terrain.imagePath)
+	  }	  
+	}
+	  
+	def secondaryImage:Option[MImage] = {
+	  if (hex.terrain == Forest) {
+	    Some(MImage(Forest.imagePath))
+	  } else {
+	    None
+	  }
+	}
 	
 	def drawItself(gc:GraphicsContext) {
-	  gc.drawImage(image.image, x, y)
+	  image.drawCenteredImage(gc, x, y, side, side)
+	  secondaryImage.map(_.drawCenteredImage(gc, x, y, side, side))
 	  elements foreach (_.drawItself(gc, x, y))
 	}
 }

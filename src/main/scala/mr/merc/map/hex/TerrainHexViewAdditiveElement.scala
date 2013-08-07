@@ -47,6 +47,6 @@ case class TerrainHexViewAdditiveElement(val terrainType:TerrainType, val from:D
     private lazy val image = MImage(path)
     
     def drawItself(gc:GraphicsContext, x:Int, y:Int) {
-      gc.drawImage(image.image, x, y)
+      image.drawImage(gc, x, y)
     }
 }

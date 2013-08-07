@@ -27,13 +27,12 @@ import mr.merc.map.terrain.Sand
 import mr.merc.map.terrain.Water
 import mr.merc.map.terrain.Swamp
 import mr.merc.map.terrain.Road
+import mr.merc.map.terrain.Forest
 
 
 object Main extends JFXApp {
   val map = new TerrainHexFieldView(new TerrainHexField(5, 5, mapInit))
-  
-  
-  
+    
   val screenRect = Screen.primary.visualBounds
   val canvas = new Canvas(screenRect.width, screenRect.height)
 
@@ -86,9 +85,9 @@ object Main extends JFXApp {
 
   private def mapInit(x:Int, y:Int) = 
     if (x == 1 || x == 2) {
-      new TerrainHex(x, y, Road)
+      new TerrainHex(x, y, Water)
     } else if (y == 2){
-      new TerrainHex(x, y, Swamp)
+      new TerrainHex(x, y, Forest)
     } else {
       new TerrainHex(x, y, Grass)
     }

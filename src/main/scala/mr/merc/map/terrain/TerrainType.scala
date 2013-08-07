@@ -1,7 +1,7 @@
 package mr.merc.map.terrain
 
 object TerrainType {
-  val list = List(Water, Grass, Sand, Swamp, Hill, Mountain, Road)
+  val list = List(Water, Forest, Grass, Sand, Swamp, Hill, Mountain, Road)
   def byName(name:String) = (list ::: helperTypesList).find(_.name.equalsIgnoreCase(name)).get
   val helperTypesList = List(BankInside, BankOutside)
 }
@@ -20,3 +20,5 @@ case object BankOutside extends TerrainType("bankOutside")
 case object Swamp extends TerrainType("swamp")
 case object Mountain extends TerrainType("mountain")
 case object Road extends TerrainType("road")
+case object Forest extends TerrainType("forest")
+
