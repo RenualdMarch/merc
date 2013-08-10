@@ -6,7 +6,6 @@ import org.scalatest.BeforeAndAfter
 import mr.merc.map.terrain.Sand
 
 class TerrainHexViewAdditiveTest extends FunSuite with BeforeAndAfter {
-
   
   test("Elements loaded correctly") {
     val elements = TerrainHexViewAdditiveElement.elements

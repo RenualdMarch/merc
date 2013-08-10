@@ -26,7 +26,7 @@ class TerrainHexViewAdditiveRule {
     }
   
 	private [hex] def filterNotNeededAdditives(add:Traversable[TerrainHexViewAdditive]):List[TerrainHexViewAdditive] = {
-	  val filtered = add.filter(viewAdd => {
+	  add.filter(viewAdd => {
 	    if (TerrainType.helperTypesList.contains(viewAdd.hexTerrainType) || TerrainType.helperTypesList.contains(viewAdd.neighbourTerrainType)) {
 	      true
 	    } else {
@@ -35,7 +35,6 @@ class TerrainHexViewAdditiveRule {
 	        strengthOfCurrent > strengthOfNeighbour
 	    }
 	  }).toList
-	  filtered
 	}
 	
 	private [hex] def additivesToElements(add:TerrainHexViewAdditive):List[TerrainHexViewAdditiveElement] = {

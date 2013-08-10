@@ -47,25 +47,22 @@ class TerrainHexView(val hex:TerrainHex, field:TerrainHexField) {
 	  }
 	}
 	
-	val mapObjects:List[MImage] = {
-	  // map object of this field must be drawn last to be higher
-	  var objects = List[MImage]()
-	  hex.mapObj match {
-	    case Some(mapObj) => objects :::= mapObj.images(hex, field)
-	    case None =>
-	  }
-	  
-	  // then go map objects for neighbors
+	val mapObject = hex.mapObj match {
+	    case Some(mapObj) => mapObj.images(hex, field)
+	    case None => Nil
+	  }	  
+	
+	
+	val neighbourMapObjects:List[MImage] = {
 	  val neigMapObj = field.neighbours(hex).filter(p => p.mapObj != None && p.mapObj != hex.mapObj)
-	  val neigImages = neigMapObj.flatMap(p => p.mapObj.get.images(hex, field)).toList
-	  objects :::= neigImages
-	  objects
+	  neigMapObj.flatMap(p => p.mapObj.get.images(hex, field)).toList
 	}
 	
 	def drawItself(gc:GraphicsContext) {
 	  image.drawCenteredImage(gc, x, y, side, side)
 	  elements foreach (_.drawItself(gc, x, y))
-	  mapObjects foreach (_.drawCenteredImage(gc, x, y, side, side))
+	  neighbourMapObjects foreach (_.drawCenteredImage(gc, x, y, side, side))
 	  secondaryImage.map(_.drawCenteredImage(gc, x, y, side, side))
+	  mapObject foreach (_.drawCenteredImage(gc, x, y, side, side))	 
 	}
 }
