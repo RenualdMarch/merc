@@ -30,6 +30,7 @@ import mr.merc.map.terrain.Road
 import mr.merc.map.terrain.Forest
 import mr.merc.map.objects.WoodenBridge
 import mr.merc.map.objects.House
+import mr.merc.map.terrain.Mountain
 
 object Main extends JFXApp {
   val map = new TerrainHexFieldView(new TerrainHexField(5, 5, mapInit))
@@ -92,7 +93,7 @@ object Main extends JFXApp {
     } else if (x == 4 && y == 3){
       new TerrainHex(x, y, Grass, Some(House))
     } else {
-      new TerrainHex(x, y, Grass)
+      new TerrainHex(x, y, Sand)
     }
 
 }
