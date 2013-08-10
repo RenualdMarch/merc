@@ -9,6 +9,8 @@ object Directions extends Enumeration {
     
     val list = List(N, NE, SE, S, SW, NW)
     
+    def opposite(dir:Direction) = next(next(next(dir)))
+    
     def next(dir:Direction):Direction = {
       if (dir != NW) {
          val index = list.indexOf(dir)

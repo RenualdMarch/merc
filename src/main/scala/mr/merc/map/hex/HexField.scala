@@ -12,7 +12,7 @@ class HexField[T <: Hex : ClassManifest](val width:Int, val height:Int, init:(In
 	}
 	
 	def hexes:Seq[T] = {
-	  val indices = for (x <- 0 until width; y <- 0 until height) yield {
+	  val indices = for (y <- 0 until height; x <- 0 until width) yield {
 		  (x, y)
 	  }
 	  

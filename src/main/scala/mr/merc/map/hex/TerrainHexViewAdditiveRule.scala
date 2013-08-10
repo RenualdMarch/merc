@@ -13,7 +13,7 @@ import mr.merc.map.terrain.Forest
 
 object TerrainHexViewAdditiveRule {
   // first is drawn first
-  private val orderOfTypes = List(Water, Forest, Swamp, Grass, Sand, Road, Hill, Mountain)
+  private val orderOfTypes = List(Hill, Mountain, Water, Forest, Swamp, Grass, Sand, Road)
 }
 
 /**
@@ -26,15 +26,16 @@ class TerrainHexViewAdditiveRule {
     }
   
 	private [hex] def filterNotNeededAdditives(add:Traversable[TerrainHexViewAdditive]):List[TerrainHexViewAdditive] = {
-	  add.filter(viewAdd => {
+	  val filtered = add.filter(viewAdd => {
 	    if (TerrainType.helperTypesList.contains(viewAdd.hexTerrainType) || TerrainType.helperTypesList.contains(viewAdd.neighbourTerrainType)) {
 	      true
 	    } else {
 	        val strengthOfCurrent = TerrainHexViewAdditiveRule.orderOfTypes.indexOf(viewAdd.hexTerrainType)
 	        val strengthOfNeighbour = TerrainHexViewAdditiveRule.orderOfTypes.indexOf(viewAdd.neighbourTerrainType)
-	        strengthOfCurrent < strengthOfNeighbour
+	        strengthOfCurrent > strengthOfNeighbour
 	    }
 	  }).toList
+	  filtered
 	}
 	
 	private [hex] def additivesToElements(add:TerrainHexViewAdditive):List[TerrainHexViewAdditiveElement] = {

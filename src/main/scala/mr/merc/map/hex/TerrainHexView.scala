@@ -7,7 +7,8 @@ import mr.merc.image.MImage
 import mr.merc.map.terrain.Grass
 import mr.merc.map.terrain.Forest
 
-class TerrainHexView(val hex:TerrainHex, val neighbours:Map[Directions.Value, TerrainHex]) {
+class TerrainHexView(val hex:TerrainHex, field:TerrainHexField) {
+    val neighbours = field.neighboursWithDirections(hex.x, hex.y)
 	val side = 72
 	val x = findX
 	val y = findY
@@ -30,7 +31,7 @@ class TerrainHexView(val hex:TerrainHex, val neighbours:Map[Directions.Value, Te
 	  rule.transform(additives)
 	}
 	
-	def image:MImage = {
+	val image:MImage = {
 	  if (hex.terrain == Forest) {
 	    MImage(Grass.imagePath)
 	  } else {
@@ -38,7 +39,7 @@ class TerrainHexView(val hex:TerrainHex, val neighbours:Map[Directions.Value, Te
 	  }	  
 	}
 	  
-	def secondaryImage:Option[MImage] = {
+	val secondaryImage:Option[MImage] = {
 	  if (hex.terrain == Forest) {
 	    Some(MImage(Forest.imagePath))
 	  } else {
@@ -46,9 +47,25 @@ class TerrainHexView(val hex:TerrainHex, val neighbours:Map[Directions.Value, Te
 	  }
 	}
 	
+	val mapObjects:List[MImage] = {
+	  // map object of this field must be drawn last to be higher
+	  var objects = List[MImage]()
+	  hex.mapObj match {
+	    case Some(mapObj) => objects :::= mapObj.images(hex, field)
+	    case None =>
+	  }
+	  
+	  // then go map objects for neighbors
+	  val neigMapObj = field.neighbours(hex).filter(p => p.mapObj != None && p.mapObj != hex.mapObj)
+	  val neigImages = neigMapObj.flatMap(p => p.mapObj.get.images(hex, field)).toList
+	  objects :::= neigImages
+	  objects
+	}
+	
 	def drawItself(gc:GraphicsContext) {
 	  image.drawCenteredImage(gc, x, y, side, side)
-	  secondaryImage.map(_.drawCenteredImage(gc, x, y, side, side))
 	  elements foreach (_.drawItself(gc, x, y))
+	  mapObjects foreach (_.drawCenteredImage(gc, x, y, side, side))
+	  secondaryImage.map(_.drawCenteredImage(gc, x, y, side, side))
 	}
 }

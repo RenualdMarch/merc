@@ -28,6 +28,7 @@ import mr.merc.map.terrain.Water
 import mr.merc.map.terrain.Swamp
 import mr.merc.map.terrain.Road
 import mr.merc.map.terrain.Forest
+import mr.merc.map.objects.WoodenBridge
 
 
 object Main extends JFXApp {
@@ -85,7 +86,7 @@ object Main extends JFXApp {
 
   private def mapInit(x:Int, y:Int) = 
     if (x == 1 || x == 2) {
-      new TerrainHex(x, y, Water)
+      new TerrainHex(x, y, Water, if (y == 2) Some(WoodenBridge) else None)
     } else if (y == 2){
       new TerrainHex(x, y, Forest)
     } else {
