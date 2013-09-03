@@ -1,9 +1,11 @@
 package mr.merc.map.terrain
 
 object TerrainType {
-  val list = List(Water, Forest, Grass, Sand, Swamp, Hill, Mountain, Road)
-  def byName(name:String) = (list ::: helperTypesList).find(_.name.equalsIgnoreCase(name)).get
-  val helperTypesList = List(BankInside, BankOutside)
+  val list = List[TerrainType](Water, Forest, Grass, Sand, Swamp, Hill, Mountain, Road)
+  val helperTypesList = List[TerrainType](BankInside, BankOutside)
+  private val namesMap = (list ::: helperTypesList).map(t => (t.name.toLowerCase(), t)).toMap
+
+  def apply(name:String) = namesMap(name.toLowerCase())
 }
 
 abstract sealed class TerrainType(val name:String) {

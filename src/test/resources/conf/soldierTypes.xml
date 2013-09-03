@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soldierTypes>
+	<soldierType name="testSoldier" cost="2" hp="3" movement="10" exp="45" level="3">
+		<attacks>
+			<attack imageName="attack1" damage="3" count="4" attackType="Impact" ranged="false"/>
+			<attack imageName="attack2" damage="2" count="3" attackType="Fire" ranged="true"/>
+		</attacks>
+		<moveCosts>
+			<moveCost type="Sand" cost="1"/>
+			<moveCost type="Grass" cost="2"/>
+		</moveCosts>
+		<defences>
+			<defence type="Sand" defence="50"/>
+			<defence type="Grass" defence="30"/>
+		</defences>
+		<resistances>
+			<resistance type="Impact" resistance="0"/>
+			<resistance type="Pierce" resistance="20"/>
+			<resistance type="Arcane" resistance="-30"/>
+		</resistances>
+	</soldierType>
+</soldierTypes>

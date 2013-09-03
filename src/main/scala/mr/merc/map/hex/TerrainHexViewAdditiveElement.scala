@@ -17,7 +17,7 @@ object TerrainHexViewAdditiveElement {
     val path = getClass.getResource("/conf/" + name).toURI
     val xml = XML.loadFile(new File(path))
     val parsed = (xml \ "element").map(node => {
-      val terrain = TerrainType.byName((node \ "@type").toString())
+      val terrain = TerrainType((node \ "@type").toString())
       val from = Directions.withName((node \ "@from").toString())
       val to = Directions.withName((node \ "@to").toString())
       new TerrainHexViewAdditiveElement(terrain, from, to)
