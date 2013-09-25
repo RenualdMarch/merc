@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soldierTypes>
+	<soldierType name="Human-Horseman" cost="23" hp="48" movement="8" exp="44" level="1">
+		<attacks>
+			<attack imageName="spear" damage="9" count="2" attackType="Pierce" ranged="false"/>
+		</attacks>
+		<moveCosts>
+			<moveCost type="Water" cost="3"/>
+			<moveCost type="Forest" cost="3"/>
+			<moveCost type="Swamp" cost="4"/>
+			<moveCost type="Hill" cost="2"/>
+			<moveCost type="Mountain" cost="1000"/>
+			<moveCost type="Road" cost="1"/>
+			<moveCost type="Sand" cost="2"/>
+			<moveCost type="Grass" cost="1"/>
+		</moveCosts>
+		<defences>
+			<defence type="Water" defence="30"/>
+			<defence type="Forest" defence="30"/>
+			<defence type="Swamp" defence="20"/>
+			<defence type="Hill" defence="40"/>
+			<defence type="Mountain" defence="0"/>
+			<defence type="Road" defence="40"/>
+			<defence type="Sand" defence="30"/>
+			<defence type="Grass" defence="40"/>
+		</defences>
+		<resistances>
+			<resistance type="Blade" resistance="20"/>
+			<resistance type="Impact" resistance="30"/>
+			<resistance type="Cold" resistance="0"/>
+			<resistance type="Pierce" resistance="-20"/>
+			<resistance type="Fire" resistance="0"/>
+			<resistance type="Arcane" resistance="20"/>			
+		</resistances>
+	</soldierType>
+</soldierTypes>

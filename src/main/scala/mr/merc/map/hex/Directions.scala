@@ -2,6 +2,7 @@ package mr.merc.map.hex
 
 import scala.math.Ordering
 
+// TODO refactor this 
 object Directions extends Enumeration {
     type Direction = Value
     type DirPair = (Direction, Direction)

@@ -2,6 +2,7 @@ package mr.merc.image
 
 import scalafx.scene.image.Image
 import scalafx.scene.canvas.GraphicsContext
+import scalafx.scene.image.ImageView
 
 object MImage {
   def apply(path:String, xOffset:Int, yOffset:Int, alpha:Float):MImage =
@@ -23,7 +24,7 @@ abstract class MImage private[image] (val xOffset:Int, val yOffset:Int, val alph
   val defaultAlpha = 1f
   def imagePath:Option[String]
 
-  protected def image:Image
+  private [image] def image:Image
   
   def drawImage(gc:GraphicsContext, x:Int, y:Int) {
     gc.drawImage(image, x, y)
@@ -35,7 +36,11 @@ abstract class MImage private[image] (val xOffset:Int, val yOffset:Int, val alph
     gc.drawImage(image, actualX, actualY)
   }
 
-  def width = image.width.value
+  def width = image.width.value.toInt
 
-  def height = image.height.value
+  def height = image.height.value.toInt
+  
+  def changeAlpha(newAlpha:Float):MImage
+  
+  lazy val mirror = new LazyMirroredImage(this, -xOffset, yOffset, alpha)
 }
