@@ -18,11 +18,11 @@ import mr.merc.unit.view.FirstAttackSSuccState
 import mr.merc.unit.view.FirstAttackSFailState
 import mr.merc.image.LazyMirroredImage
 import mr.merc.unit.view.SoldierViewAttackState
-import mr.merc.map.hex.Directions
 import mr.merc.unit.view.FirstAttackNWSuccState
 import mr.merc.unit.view.FirstAttackNWFailState
 import mr.merc.unit.view.FirstAttackSWSuccState
 import mr.merc.unit.view.FirstAttackSWFailState
+import mr.merc.map.hex._
 
 
 class SoldierTypeViewInfoTest extends FunSuite with ShouldMatchers {
@@ -94,8 +94,7 @@ class SoldierTypeViewInfoTest extends FunSuite with ShouldMatchers {
 	  
 	  for (s <- SoldierViewAttackState.all if s.number == 1) {
 	    val attack2 = vt.images(s)
-	    val configurable = Set(Directions.N, Directions.NE, Directions.SE, Directions.S)
-	    val nonConfigurable = Set(Directions.NW, Directions.SW)
+	    val configurable = Set(N, NE, SE, S)
 	    
 	    if (s.success) {
 	      assert(attack2.size === 2)
@@ -146,8 +145,7 @@ class SoldierTypeViewInfoTest extends FunSuite with ShouldMatchers {
 	  val vt = SoldierTypeViewInfo("testType2")
 	  for (s <- SoldierViewAttackState.all) {
 	    val attack = vt.images(s)
-	    val configurable = Set(Directions.N, Directions.NE, Directions.SE, Directions.S)
-	    val nonConfigurable = Set(Directions.NW, Directions.SW)
+	    val configurable = Set(N, NE, SE, S)
 	    
 	    assert(attack.size === 1)
 	    if (configurable.contains(s.direction)) {

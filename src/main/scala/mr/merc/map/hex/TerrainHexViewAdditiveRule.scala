@@ -62,17 +62,17 @@ class TerrainHexViewAdditiveRule {
 	private def additiveContainsElement(add:TerrainHexViewAdditive, elem:TerrainHexViewAdditiveElement):Boolean = {
 	  val addDirections = (add.from, add.to)
 	  val elemDirection = (elem.from, elem.to)
-	  Directions.leftSliceContainsRightSlice(addDirections, elemDirection)
+	  Direction.leftSliceContainsRightSlice(addDirections, elemDirection)
 	}
 	
 	private [hex] def areElementsOverlapping(elements:Traversable[TerrainHexViewAdditiveElement]):Boolean = {
 	  elements.exists(el1 => {
-	    elements.exists(el2 => el1 != el2 && Directions.overlapping((el1.from, el1.to), (el2.from, el2.to)))
+	    elements.exists(el2 => el1 != el2 && Direction.overlapping((el1.from, el1.to), (el2.from, el2.to)))
 	  })	  
 	}
 	
-	private [hex] def sumOfElementsSlices(elements:Traversable[TerrainHexViewAdditiveElement]):Set[(Directions.Direction, Directions.Direction)] = {
+	private [hex] def sumOfElementsSlices(elements:Traversable[TerrainHexViewAdditiveElement]):Set[(Direction, Direction)] = {
 	  val set = elements.map(el => (el.from, el.to)).toSet
-	  Directions.unite(set)
+	  Direction.unite(set)
 	}
 }

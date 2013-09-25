@@ -18,8 +18,8 @@ object TerrainHexViewAdditiveElement {
     val xml = XML.loadFile(new File(path))
     val parsed = (xml \ "element").map(node => {
       val terrain = TerrainType((node \ "@type").toString())
-      val from = Directions.withName((node \ "@from").toString())
-      val to = Directions.withName((node \ "@to").toString())
+      val from = Direction.name((node \ "@from").toString())
+      val to = Direction.name((node \ "@to").toString())
       new TerrainHexViewAdditiveElement(terrain, from, to)
     })
     
@@ -27,14 +27,14 @@ object TerrainHexViewAdditiveElement {
   }
   
   def elementsByType(terrain:TerrainType):List[TerrainHexViewAdditiveElement] = {
-    val ret = elements.filter(_.terrainType == terrain).sortBy(e => -Directions.length(e.from, e.to))
+    val ret = elements.filter(_.terrainType == terrain).sortBy(e => -Direction.length(e.from, e.to))
     require(!ret.isEmpty, s"elements list for terrain type $terrain")
     ret
   }
 
 }
 
-case class TerrainHexViewAdditiveElement(val terrainType:TerrainType, val from:Directions.Direction, val to:Directions.Direction) {
+case class TerrainHexViewAdditiveElement(val terrainType:TerrainType, val from:Direction, val to:Direction) {
 	private def namePart = if (from == to) {
 	  from.toString().toLowerCase()
 	} else {

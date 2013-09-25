@@ -5,7 +5,7 @@ import scala.xml.XML
 import java.io.File
 import scala.xml.Node
 import scala.xml.NodeSeq
-import mr.merc.map.hex.Directions
+import mr.merc.map.hex._
 
 object SoldierTypeViewInfo {
   val rootPath = "/images/units/"
@@ -81,7 +81,7 @@ object SoldierTypeViewInfo {
       case _ => throw new IllegalArgumentException(s"Illegal attack name $attackName")
     }
     
-    val directions = List(Directions.N, Directions.NE, Directions.SE, Directions.S)
+    val directions = List(N, NE, SE, S)
     val success = directions map (d => (d, parseAttackDirection(typeNode, typeName, attackName, "succ", d))) toMap
     val fail = directions map (d => (d, parseAttackDirection(typeNode, typeName, attackName, "fail", d))) toMap
     
@@ -93,12 +93,12 @@ object SoldierTypeViewInfo {
   
   private def addSWandNW(map:Map[SoldierViewAttackState, List[MImage]]):Map[SoldierViewAttackState, List[MImage]] = {
     val added = map flatMap(p => {
-      if (p._1.direction == Directions.SE) {
-        val st = SoldierViewAttackState(p._1.success, Directions.SW, p._1.number)
+      if (p._1.direction == SE) {
+        val st = SoldierViewAttackState(p._1.success, SW, p._1.number)
         val images = p._2.map(_.mirror)
         Some((st, images))
-      } else if (p._1.direction == Directions.NE) {
-        val st = SoldierViewAttackState(p._1.success, Directions.NW, p._1.number)
+      } else if (p._1.direction == NE) {
+        val st = SoldierViewAttackState(p._1.success, NW, p._1.number)
         val images = p._2.map(_.mirror)
         Some((st, images))
       } else {
@@ -110,7 +110,7 @@ object SoldierTypeViewInfo {
   }
   
   
-  private def parseAttackDirection(typeNode:Node, typeName:String, attackName:String, success:String, direction:Directions.Direction):List[MImage] = {
+  private def parseAttackDirection(typeNode:Node, typeName:String, attackName:String, success:String, direction:Direction):List[MImage] = {
     val images = parseImagesList(typeName, typeNode \ attackName \ direction.toString().toLowerCase() \ success, Nil)
     val allImages = parseImagesList(typeName, typeNode \ attackName \ "all" \ success, Nil)
     

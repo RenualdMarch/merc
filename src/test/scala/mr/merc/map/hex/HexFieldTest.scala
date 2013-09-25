@@ -108,33 +108,33 @@ class HexFieldTest extends FunSuite {
 	test("even directions") {
 	  val even = bigField.hex(1, 1)
 	  val map = bigField.neighboursWithDirections(even)
-	  assert(map(Directions.N) === Hex(1, 0))
-	  assert(map(Directions.S) === Hex(1, 2))
-	  assert(map(Directions.NE) === Hex(2, 1))
-	  assert(map(Directions.NW) === Hex(0, 1))
-	  assert(map(Directions.SE) === Hex(2, 2))
-	  assert(map(Directions.SW) === Hex(0, 2))
+	  assert(map(N) === Hex(1, 0))
+	  assert(map(S) === Hex(1, 2))
+	  assert(map(NE) === Hex(2, 1))
+	  assert(map(NW) === Hex(0, 1))
+	  assert(map(SE) === Hex(2, 2))
+	  assert(map(SW) === Hex(0, 2))
 	}
 	
 	test("odd directions") {
 	  val odd = bigField.hex(2, 2)
 	  val map = bigField.neighboursWithDirections(odd)
-	  assert(map(Directions.N) === Hex(2, 1))
-	  assert(map(Directions.S) === Hex(2, 3))
-	  assert(map(Directions.NE) === Hex(3, 1))
-	  assert(map(Directions.NW) === Hex(1, 1))
-	  assert(map(Directions.SE) === Hex(3, 2))
-	  assert(map(Directions.SW) === Hex(1, 2))
+	  assert(map(N) === Hex(2, 1))
+	  assert(map(S) === Hex(2, 3))
+	  assert(map(NE) === Hex(3, 1))
+	  assert(map(NW) === Hex(1, 1))
+	  assert(map(SE) === Hex(3, 2))
+	  assert(map(SW) === Hex(1, 2))
 	}
 	
 	test("directions on the border") {
 	  val hex = bigField.hex(2, 0)
 	  val map = bigField.neighboursWithDirections(hex)
-	  assert(map.get(Directions.N) === None)
-	  assert(map(Directions.S) === Hex(2, 1))
-	  assert(map.get(Directions.NE) === None)
-	  assert(map.get(Directions.NW) === None)
-	  assert(map(Directions.SE) === Hex(3, 0))
-	  assert(map(Directions.SW) === Hex(1, 0))
+	  assert(map.get(N) === None)
+	  assert(map(S) === Hex(2, 1))
+	  assert(map.get(NE) === None)
+	  assert(map.get(NW) === None)
+	  assert(map(SE) === Hex(3, 0))
+	  assert(map(SW) === Hex(1, 0))
 	}
 }

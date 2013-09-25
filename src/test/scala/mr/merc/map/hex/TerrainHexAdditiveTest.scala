@@ -12,7 +12,7 @@ import mr.merc.map.terrain.Mountain
 
 class TerrainHexAdditiveTest extends FunSuite {
   
-  def exist(tr:Traversable[TerrainHexViewAdditive], from:Directions.Direction, to:Directions.Direction, hexType:TerrainType, tp:TerrainType) {
+  def exist(tr:Traversable[TerrainHexViewAdditive], from:Direction, to:Direction, hexType:TerrainType, tp:TerrainType) {
     assert(tr.exists(ad => ad.from == from && ad.to == to && ad.neighbourTerrainType == tp && hexType == ad.hexTerrainType))
   }
   
@@ -22,8 +22,8 @@ class TerrainHexAdditiveTest extends FunSuite {
 	  val view = new TerrainHexFieldView(field)
 	  val additives = TerrainHexViewAdditive.extractAdditives(view.hex(1, 1))
 	  assert(additives.size === 2)
-	  exist(additives, Directions.NW, Directions.NW, Grass, Sand)
-	  exist(additives, Directions.S, Directions.S, Grass, Sand)
+	  exist(additives, NW, NW, Grass, Sand)
+	  exist(additives, S, S, Grass, Sand)
   }
   
   test("case with single and multiple terrains") {
@@ -33,8 +33,8 @@ class TerrainHexAdditiveTest extends FunSuite {
 	  val additives = TerrainHexViewAdditive.extractAdditives(view.hex(1, 1))
 	  assert(additives.size === 2)
 	  
-	  exist(additives, Directions.NW, Directions.NE, Grass, Sand)
-	  exist(additives, Directions.S, Directions.S, Grass, Sand)
+	  exist(additives, NW, NE, Grass, Sand)
+	  exist(additives, S, S, Grass, Sand)
   }
   
   test("case on the edge") {
@@ -43,26 +43,26 @@ class TerrainHexAdditiveTest extends FunSuite {
 	  val view = new TerrainHexFieldView(field)
       val additives = TerrainHexViewAdditive.extractAdditives(view.hex(2, 0))
 	  assert(additives.size === 1)
-	  exist(additives, Directions.S, Directions.SW, Grass, Sand)
+	  exist(additives, S, SW, Grass, Sand)
   }
   
   test("normalizing when covering full circle") {
-    val add1 = new TerrainHexViewAdditive(Directions.N, Directions.NE, Grass, Sand)
-    val add2 = new TerrainHexViewAdditive(Directions.NW, Directions.N, Grass, Sand)
-    val add3 = new TerrainHexViewAdditive(Directions.SE, Directions.N, Grass, Sand)
-    val add4 = new TerrainHexViewAdditive(Directions.S, Directions.SE, Grass, Sand)
+    val add1 = new TerrainHexViewAdditive(N, NE, Grass, Sand)
+    val add2 = new TerrainHexViewAdditive(NW, N, Grass, Sand)
+    val add3 = new TerrainHexViewAdditive(SE, N, Grass, Sand)
+    val add4 = new TerrainHexViewAdditive(S, SE, Grass, Sand)
     
-    assert(add1.from === Directions.N)
-    assert(add1.to === Directions.NE)
+    assert(add1.from === N)
+    assert(add1.to === NE)
     
-    assert(add2.from === Directions.NW)
-    assert(add2.to === Directions.N)
+    assert(add2.from === NW)
+    assert(add2.to === N)
     
-    assert(add3.from === Directions.SE)
-    assert(add3.to === Directions.N)
+    assert(add3.from === SE)
+    assert(add3.to === N)
         
-    assert(add4.from === Directions.N)
-    assert(add4.to === Directions.NW)    
+    assert(add4.from === N)
+    assert(add4.to === NW)    
   }
   
   test("case with water") {
@@ -72,12 +72,12 @@ class TerrainHexAdditiveTest extends FunSuite {
 	
     val additives = TerrainHexViewAdditive.extractAdditives(view.hex(1, 1))
 	assert(additives.size === 2)
-	exist(additives, Directions.N, Directions.N, Grass, Sand)
-	exist(additives, Directions.NE, Directions.SE, Grass, BankOutside)
+	exist(additives, N, N, Grass, Sand)
+	exist(additives, NE, SE, Grass, BankOutside)
     
 	val additivesOnWater = TerrainHexViewAdditive.extractAdditives(view.hex(2, 1))
     assert(additivesOnWater.size === 1)
-	exist(additivesOnWater, Directions.SW, Directions.N, Water, BankInside)	
+	exist(additivesOnWater, SW, N, Water, BankInside)	
   }
 }
 

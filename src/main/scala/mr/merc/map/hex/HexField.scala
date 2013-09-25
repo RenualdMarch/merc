@@ -52,9 +52,9 @@ class HexField[T <: Hex : ClassManifest](val width:Int, val height:Int, init:(In
 		corrections.map(h => (h._1 + x, h._2 + y))
 	}
 		
-	def neighboursWithDirections(hex:T):Map[Directions.Direction, T] = neighboursWithDirections(hex.x, hex.y)
+	def neighboursWithDirections(hex:T):Map[Direction, T] = neighboursWithDirections(hex.x, hex.y)
 	
-	def neighboursWithDirections(x:Int, y:Int):Map[Directions.Direction, T] = {
+	def neighboursWithDirections(x:Int, y:Int):Map[Direction, T] = {
 	  val resultList = (directionsList zip neighboursListWithInvalid(x, y)).filter(dh => isLegalCoords(dh._2._1, dh._2._2))
 	  resultList.map(df => (df._1, hex(df._2._1, df._2._2))).toMap
 	}
@@ -66,7 +66,7 @@ class HexField[T <: Hex : ClassManifest](val width:Int, val height:Int, init:(In
 	  }
 	}
 	
-	private val directionsList = List(Directions.NW, Directions.N, Directions.NE, Directions.SE, Directions.S, Directions.SW)
+	private val directionsList = List(NW, N, NE, SE, S, SW)
 		
 	def distance(from:T, to:T):Int = {
 	  val fromCube = from.toCubeHex

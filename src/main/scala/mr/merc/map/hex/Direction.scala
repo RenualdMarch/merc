@@ -2,47 +2,13 @@ package mr.merc.map.hex
 
 import scala.math.Ordering
 
-// TODO refactor this 
-object Directions extends Enumeration {
-    type Direction = Value
-    type DirPair = (Direction, Direction)
-    val N, NE, SE, S, SW, NW = Value
-    
-    val list = List(N, NE, SE, S, SW, NW)
-    
-    def opposite(dir:Direction) = next(next(next(dir)))
-    
-    def next(dir:Direction):Direction = {
-      if (dir != NW) {
-         val index = list.indexOf(dir)
-         list(index + 1)
-      } else {
-        N
-      }
-    }
-    
-    def prev(dir:Direction):Direction = {
-      if (dir != N) {
-         val index = list.indexOf(dir)
-         list(index - 1)
-      } else {
-        NW
-      }
-    }
-    
-    def neighbours(dir:Direction):Set[Direction] = {
-      val index = list.indexOf(dir)
-      if (index == 0) {
-        Set(list(1), list.last)
-      } else if (index == list.size - 1) {
-        Set(list(0), list(list.size - 2))
-      } else {
-        Set(list(index - 1), list(index + 1))
-      }
-    }          
-    
-    //FIXME do something with hacks
-    def leftSliceContainsRightSlice(left:DirPair, right:DirPair):Boolean = {
+object Direction {
+  val list = List(N, NE, SE, S, SW, NW)
+  type DirPair = (Direction, Direction)
+  
+  def name(n:String) = list.find(_.name.equalsIgnoreCase(n)).get
+  
+  def leftSliceContainsRightSlice(left:DirPair, right:DirPair):Boolean = {
       var pair = (toDegrees(left), toDegrees(right))
       var normLeft = pair._1
       var normRight = pair._2
@@ -114,16 +80,13 @@ object Directions extends Enumeration {
     } 
     
 	def canBeUnited(first:DirPair, second:DirPair):Boolean = {
-	   isNeighbour(first._1, second._2) || isNeighbour(first._2, second._1)
+	   first._1.isNeighbour(second._2) || first._2.isNeighbour(second._1)
 	}
-  
-    def isNeighbour(first:Direction, second:Direction) = {
-      neighbours(first).contains(second)
-    }
-  
+	
+	
     def unite(first:DirPair, second:DirPair):DirPair = {
 	    require(!overlapping(first, second), s"overlapping pair: $first, $second")
-        require(isNeighbour(first._1, second._2) || isNeighbour(second._1, first._2))
+        require(first._1.isNeighbour(second._2) || second._1.isNeighbour(first._2))
 	    
         val pair = normalizeForNieghboring(first, second)
         val firstDeg = pair._1
@@ -182,3 +145,50 @@ object Directions extends Enumeration {
       list(number)
     }
 }
+
+sealed abstract class Direction(val name:String) {
+    
+    override def toString = name
+  
+    def opposite = next.next.next
+    
+    def next:Direction = {
+      if (this != NW) {
+         val index = Direction.list.indexOf(this)
+         Direction.list(index + 1)
+      } else {
+        N
+      }
+    }
+    
+    def prev:Direction = {
+      if (this != N) {
+         val index = Direction.list.indexOf(this)
+         Direction.list(index - 1)
+      } else {
+        NW
+      }
+    }
+    
+    def neighbours:Set[Direction] = {
+      val index = Direction.list.indexOf(this)
+      if (index == 0) {
+        Set(Direction.list(1), Direction.list.last)
+      } else if (index == Direction.list.size - 1) {
+        Set(Direction.list(0), Direction.list(Direction.list.size - 2))
+      } else {
+        Set(Direction.list(index - 1), Direction.list(index + 1))
+      }
+    }
+    
+    def isNeighbour(dir:Direction) = {
+      neighbours.contains(dir)
+    }
+}
+
+object N extends Direction("N")
+object NE extends Direction("NE")
+object SE extends Direction("SE")
+object S extends Direction("S")
+object SW extends Direction("SW")
+object NW extends Direction("NW")
