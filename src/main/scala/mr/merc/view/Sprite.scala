@@ -13,8 +13,8 @@ object Sprite {
   def apply(image:MImage):Sprite[SpriteState] = apply(List(image))
 }
 
-// TODO add mirroring for images
-class Sprite[T <: SpriteState](images:Map[T, List[MImage]], private var _state:T, var mirroringEnabled:Boolean = true) {
+class Sprite[T <: SpriteState](val images:Map[T, List[MImage]], private var _state:T, 
+			var mirroringEnabled:Boolean = true, var animationEnabled:Boolean = true) {
 	require(images.keys.exists(_ == _state), "Initial state isn't present in map!")
 	require(!images.values.exists(_.size == 0), "There are states with zero images")
 	
@@ -23,21 +23,21 @@ class Sprite[T <: SpriteState](images:Map[T, List[MImage]], private var _state:T
 	var duration = 100
 	private var _x = 0
 	var y = 0
-	private var rightDirection = true
+	var rightDirection = true
 	
 	def x = _x
 	
 	def x_=(i:Int) {
 	  if (mirroringEnabled) {
 		  val oldX = _x
-		  x = i
+		  _x = i
 		  if (oldX > x) {
 		    rightDirection = false
 		  } else {
 		    rightDirection = true	    
 		  }
 	  } else {
-	    x = i
+	    _x = i
 	  }
 	}
 	
@@ -73,7 +73,11 @@ class Sprite[T <: SpriteState](images:Map[T, List[MImage]], private var _state:T
     def updateTime(delta:Int):Int = {
       _time += delta
       val increase = _time / duration
-      increaseIndex(increase)
+      
+      if (animationEnabled) {
+    	  increaseIndex(increase)
+      }
+      
       _time -= increase * duration
       increase
     }

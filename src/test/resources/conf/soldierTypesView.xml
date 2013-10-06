@@ -89,4 +89,31 @@
 			<image name="im15"/>
 		</stand>
 	</view>
+	<view name="testSoldier">
+		<attack1>
+			<all>
+				<succ>
+					<image name="im14"/>
+				</succ>
+			</all>
+		</attack1>
+		<stand>
+			<image name="im15"/>
+		</stand>
+	</view>
+	<view name="testSoldier2">
+		<attack1>
+			<all>
+				<succ>
+					<image name="im14"/>
+					<image name="im15"/>
+					<image name="im16"/>
+					<image name="im17"/>
+				</succ>
+			</all>
+		</attack1>
+		<stand>
+			<image name="im15"/>
+		</stand>
+	</view>
 </views>

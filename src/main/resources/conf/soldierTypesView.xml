@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<views>
+	<view name="Human-Horseman">
+		<attack1>
+			<n>
+				<succ>
+					<image name="horseman-n-attack1"/>
+					<image name="horseman-n-attack2"/>
+					<image name="horseman-n-attack3"/>
+					<image name="horseman-n-attack4"/>
+					<image name="horseman-n-attack5"/>
+					<image name="horseman-n-attack6"/>
+					<image name="horseman-n-attack7"/>
+					<image name="horseman-n-attack8"/>
+					<image name="horseman-n-attack9"/>
+					<image name="horseman-n-attack10"/>
+					<image name="horseman-n-attack11"/>
+					<image name="horseman-n-attack12"/>					
+				</succ>
+			</n>
+			<ne>
+				<succ>
+					<image name="horseman-ne-attack1"/>
+					<image name="horseman-ne-attack2"/>
+					<image name="horseman-ne-attack3"/>
+					<image name="horseman-ne-attack4"/>
+					<image name="horseman-ne-attack5"/>
+					<image name="horseman-ne-attack6"/>
+					<image name="horseman-ne-attack7"/>
+					<image name="horseman-ne-attack8"/>
+					<image name="horseman-ne-attack9"/>
+					<image name="horseman-ne-attack10"/>
+					<image name="horseman-ne-attack11"/>
+					<image name="horseman-ne-attack12"/>	
+				</succ>
+			</ne>
+			<se>
+				<succ>
+					<image name="horseman-se-attack1"/>
+					<image name="horseman-se-attack2"/>
+					<image name="horseman-se-attack3"/>
+					<image name="horseman-se-attack4"/>
+					<image name="horseman-se-attack5"/>
+					<image name="horseman-se-attack6"/>
+					<image name="horseman-se-attack7"/>
+					<image name="horseman-se-attack8"/>
+					<image name="horseman-se-attack9"/>
+					<image name="horseman-se-attack10"/>
+					<image name="horseman-se-attack11"/>
+					<image name="horseman-se-attack12"/>	
+				</succ>
+			</se>
+			<s>
+				<succ>
+					<image name="horseman-s-attack1"/>
+					<image name="horseman-s-attack2"/>
+					<image name="horseman-s-attack3"/>
+					<image name="horseman-s-attack4"/>
+					<image name="horseman-s-attack5"/>
+					<image name="horseman-s-attack6"/>
+					<image name="horseman-s-attack7"/>
+					<image name="horseman-s-attack8"/>
+					<image name="horseman-s-attack9"/>
+					<image name="horseman-s-attack10"/>
+					<image name="horseman-s-attack11"/>
+					<image name="horseman-s-attack12"/>	
+				</succ>				
+			</s>
+		</attack1>
+		<stand>
+			<image name="horseman"/>
+		</stand>
+		<death>
+			<image name="horseman-se-die1"/>
+			<image name="horseman-se-die2"/>
+			<image name="horseman-se-die3"/>
+			<image name="horseman-se-die4"/>
+			<image name="horseman-se-die5"/>
+		</death>
+		<move>
+			<image name="horseman-se-run1"/>
+		</move>
+	</view>
+</views>

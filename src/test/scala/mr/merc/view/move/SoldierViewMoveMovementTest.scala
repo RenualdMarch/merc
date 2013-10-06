@@ -1,0 +1,32 @@
+package mr.merc.view.move
+
+import mr.merc.map.hex._
+import mr.merc.map.terrain.Grass
+import org.scalatest.FunSuite
+import mr.merc.unit.Soldier
+import mr.merc.unit.SoldierType
+import mr.merc.unit.view.SoldierView
+
+class SoldierViewMoveMovementTest extends FunSuite {
+	val map = new TerrainHexField(5, 5, (x, y) => new TerrainHex(x, y, Grass))
+	val mapView = new TerrainHexFieldView(map)
+	val soldier = new Soldier("1", SoldierType("testSoldier"))
+	map.hex(0, 1).soldier = Some(soldier)
+	val soldierView = new SoldierView(soldier)
+	
+	test("simple movement") {
+	  // moving from (0, 1) to (1, 0)
+	  val from = mapView.hex(0, 1)
+	  val to = mapView.hex(1, 0)
+	  val movement = new SoldierViewMoveMovement(from, to, soldierView)
+	  movement.start()
+	  assert(soldierView.x === 36)
+	  assert(soldierView.y === 72 + 36)
+	  while (!movement.isOver) {
+	    movement.update(1000)
+	  }
+	  
+	  assert(soldierView.x === 72 * 3 / 4 + 36)
+	  assert(soldierView.y === 72)
+	}
+}
