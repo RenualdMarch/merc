@@ -6,6 +6,7 @@ import org.scalatest.FunSuite
 import mr.merc.unit.Soldier
 import mr.merc.unit.SoldierType
 import mr.merc.unit.view.SoldierView
+import mr.merc.map.hex.view.TerrainHexFieldView
 
 class SoldierViewMoveMovementTest extends FunSuite {
 	val map = new TerrainHexField(5, 5, (x, y) => new TerrainHex(x, y, Grass))

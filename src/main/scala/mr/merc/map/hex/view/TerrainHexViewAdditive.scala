@@ -1,4 +1,4 @@
-package mr.merc.map.hex
+package mr.merc.map.hex.view
 
 import mr.merc.map.terrain.TerrainType
 import mr.merc.map.terrain.Hill
@@ -7,7 +7,11 @@ import mr.merc.map.terrain.BankOutside
 import mr.merc.map.terrain.BankInside
 import mr.merc.map.terrain.Mountain
 import mr.merc.map.terrain.Forest
-import mr.merc.map.terrain.Grass
+import mr.merc.map.terrain.Grass 
+import mr.merc.map.hex.Direction
+import mr.merc.map.hex.N
+import mr.merc.map.hex.NW
+import scala.Option.option2Iterable
 
 object TerrainHexViewAdditive {
   def extractAdditives(view:TerrainHexView):List[TerrainHexViewAdditive] = {

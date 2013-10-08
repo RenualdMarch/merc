@@ -17,14 +17,16 @@ class SoldierAttackMovementTest extends FunSuite {
 	
 	test("animation") {
 	  val soldier = new Soldier("1", SoldierType("testSoldier2"))
+	  val enemy = new Soldier("2", SoldierType("testSoldier2"))
 	  val soldierView = new SoldierView(soldier)
+	  val enemyView = new SoldierView(enemy)
 	  val direction = NE
 	  val from = (0, 10)
 	  val to = (300, 410) 
 	  // distance is 500, speed is 100, time is 5 sec
 	  
 	  val movement = new SoldierAttackMovement(from, to, direction,
-	      true, soldierView, 0)
+	      true, soldierView, enemyView, 0)
 	  movement.start()
 	  assert(soldierView.x === 0)
 	  assert(soldierView.y === 10)

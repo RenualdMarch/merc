@@ -1,12 +1,11 @@
-package mr.merc.map.hex
+package mr.merc.map.hex.view
 
 import mr.merc.map.terrain.TerrainType
-import scala.collection.mutable.ArrayBuffer
-import mr.merc.map.terrain.Grass
 import scala.xml.XML
 import java.io.File
 import mr.merc.image.MImage
 import scalafx.scene.canvas.GraphicsContext
+import mr.merc.map.hex.Direction
 
 object TerrainHexViewAdditiveElement {
   private [hex] var elements = List[TerrainHexViewAdditiveElement]()

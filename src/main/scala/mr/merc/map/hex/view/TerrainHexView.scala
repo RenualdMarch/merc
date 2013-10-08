@@ -1,14 +1,15 @@
-package mr.merc.map.hex
+package mr.merc.map.hex.view
 
 import scalafx.scene.canvas.GraphicsContext
-import javafx.embed.swing.SwingFXUtils
-import scalafx.scene.image.WritableImage
 import mr.merc.image.MImage
 import mr.merc.map.terrain.Grass
 import mr.merc.map.terrain.Forest
+import mr.merc.map.hex.TerrainHex
+import mr.merc.map.hex.TerrainHexField
 
 class TerrainHexView(val hex:TerrainHex, field:TerrainHexField) {
     val neighbours = field.neighboursWithDirections(hex.x, hex.y)
+    val directions = neighbours map (p => (p._2, p._1)) toMap
 	val side = 72
 	val x = findX
 	val y = findY

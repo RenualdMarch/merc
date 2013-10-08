@@ -1,6 +1,8 @@
-package mr.merc.map.hex
+package mr.merc.map.hex.view
 
 import org.scalatest.FunSuite
+import mr.merc.map.hex.TerrainHex
+import mr.merc.map.hex.TerrainHexField
 
 class TerrainHexViewTest extends FunSuite {
 	val field = new TerrainHexField(5, 5, TerrainHex.grassInit)

@@ -17,11 +17,11 @@ import scalafx.scene.Scene
 import scalafx.stage.Stage
 import scalafx.application.JFXApp.PrimaryStage
 import scalafx.stage.Screen
-import mr.merc.map.hex.TerrainHexView
+import mr.merc.map.hex.view.TerrainHexView
 import mr.merc.map.hex.TerrainHex
 import mr.merc.map.terrain.Grass
 import mr.merc.map.hex.TerrainHexField
-import mr.merc.map.hex.TerrainHexFieldView
+import mr.merc.map.hex.view.TerrainHexFieldView
 import scalafx.scene.image.Image
 import mr.merc.map.terrain.Sand
 import mr.merc.map.terrain.Water
@@ -31,10 +31,17 @@ import mr.merc.map.terrain.Forest
 import mr.merc.map.objects.WoodenBridge
 import mr.merc.map.objects.House
 import mr.merc.map.terrain.Mountain
+import mr.merc.map.view.MapView
+import mr.merc.unit.Soldier
+import mr.merc.unit.SoldierType
 
 object Main extends JFXApp {
-  val map = new TerrainHexFieldView(new TerrainHexField(5, 5, mapInit))
-    
+  val field = new TerrainHexField(5, 5, mapInit)
+  val soldier = new Soldier("1", SoldierType("Human-Horseman"))
+  field.hex(4, 1).soldier = Some(soldier)
+  val mapView = new MapView(field)
+  
+  
   val screenRect = Screen.primary.visualBounds
   val canvas = new Canvas(screenRect.width, screenRect.height)
 
@@ -80,9 +87,7 @@ object Main extends JFXApp {
   private def reset(color: Color) {
     gc.fill = color
     gc.fillRect(0, 0, canvas.width.get, canvas.height.get);
-    map.hexes.foreach(h => {
-      h.drawItself(gc)
-    })
+    mapView.drawItself(gc)
   }
 
   private def mapInit(x:Int, y:Int) = 

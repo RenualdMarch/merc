@@ -1,6 +1,6 @@
 package mr.merc.view.move
 
-import mr.merc.map.hex.TerrainHexView
+import mr.merc.map.hex.view.TerrainHexView
 import mr.merc.unit.view.SoldierView
 
 class SoldierViewMoveMovement(from:TerrainHexView, to:TerrainHexView, soldier:SoldierView) extends Movement {

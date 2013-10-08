@@ -1,9 +1,10 @@
-package mr.merc.map.hex
+package mr.merc.map.hex.view
 
 import org.scalatest.FunSuite
 import mr.merc.map.terrain.Grass
 import org.scalatest.BeforeAndAfter
 import mr.merc.map.terrain.Sand
+import mr.merc.map.hex._
 
 class TerrainHexViewAdditiveTest extends FunSuite with BeforeAndAfter {
   

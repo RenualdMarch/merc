@@ -1,6 +1,6 @@
 package mr.merc.view.move
 
-import mr.merc.map.hex.TerrainHexView
+import mr.merc.map.hex.view.TerrainHexView
 import mr.merc.unit.view.SoldierView
 import mr.merc.map.hex.Direction
 import mr.merc.map.hex._
@@ -21,9 +21,9 @@ object SoldierAttackMovement {
 }
 
 class SoldierAttackMovement(from:(Int, Int), to:(Int, Int), dir:Direction,
-    success:Boolean, soldier:SoldierView, attackNumber:Int) extends Movement {  
+    success:Boolean, attacker:SoldierView, defender:SoldierView, attackNumber:Int) extends Movement {  
     private val state = SoldierViewAttackState(success, dir, attackNumber)
-    private val attackImagesSize = soldier.images(state).size
+    private val attackImagesSize = attacker.images(state).size
     val frames = SoldierAttackMovement.imagesList(attackImagesSize)
     
     // attack sequence is played
@@ -33,20 +33,20 @@ class SoldierAttackMovement(from:(Int, Int), to:(Int, Int), dir:Direction,
     private val linearMovementFromEnemy = new LinearMovement(to._1, to._2, from._1, from._2, SoldierAttackMovement.attackSpeed)
     
     def start() {
-      soldier.animationEnabled = false
-      soldier.mirroringEnabled = false
+      attacker.animationEnabled = false
+      attacker.mirroringEnabled = false
       
       if (dir == SE || dir == NE) {
-        soldier.rightDirection = true
+        attacker.rightDirection = true
       } else if (dir == SW || dir == NW) {
-        soldier.rightDirection = false
+        attacker.rightDirection = false
       }
       
-      soldier.x = from._1
-      soldier.y = from._2
+      attacker.x = from._1
+      attacker.y = from._2
       
-      soldier.state = state
-      soldier.index = 0
+      attacker.state = state
+      attacker.index = 0
     }
     
     private def frameListIndex:Int = {
@@ -72,23 +72,26 @@ class SoldierAttackMovement(from:(Int, Int), to:(Int, Int), dir:Direction,
     }
     
     private def changeSoldierConfigurationBack() {
-      soldier.animationEnabled = true
-      soldier.mirroringEnabled = true
+      attacker.animationEnabled = true
+      attacker.mirroringEnabled = true
     }
     
     private def handleMoveToEnemy(time:Int) {
       linearMovementToEnemy.update(time)
-      soldier.x = linearMovementToEnemy.x
-      soldier.y = linearMovementToEnemy.y
-      soldier.index = frames(frameListIndex)
+      attacker.x = linearMovementToEnemy.x
+      attacker.y = linearMovementToEnemy.y
+      attacker.index = frames(frameListIndex)
     }
     
     private def handleMoveFromEnemy(time:Int) {
       linearMovementFromEnemy.update(time)
-      soldier.x = linearMovementFromEnemy.x
-      soldier.y = linearMovementFromEnemy.y
-      soldier.index = attackImagesSize - 1
+      attacker.x = linearMovementFromEnemy.x
+      attacker.y = linearMovementFromEnemy.y
+      attacker.index = attackImagesSize - 1
     }
+    
+  
+    override def soldiers = List(defender, attacker)
     
 	def isOver = linearMovementToEnemy.isOver && linearMovementFromEnemy.isOver
 }

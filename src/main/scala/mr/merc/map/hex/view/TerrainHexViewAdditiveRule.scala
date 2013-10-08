@@ -1,15 +1,15 @@
-package mr.merc.map.hex
+package mr.merc.map.hex.view
 
 import mr.merc.map.terrain.Grass
 import mr.merc.map.terrain.Sand
 import mr.merc.map.terrain.Hill
-import scala.collection.generic.CanBuildFrom
 import mr.merc.map.terrain.TerrainType
 import mr.merc.map.terrain.Swamp
 import mr.merc.map.terrain.Water
 import mr.merc.map.terrain.Mountain
 import mr.merc.map.terrain.Road
 import mr.merc.map.terrain.Forest
+import mr.merc.map.hex.Direction
 
 object TerrainHexViewAdditiveRule {
   // first is drawn first
