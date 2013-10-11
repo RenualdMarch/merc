@@ -34,6 +34,10 @@ import mr.merc.map.terrain.Mountain
 import mr.merc.map.view.MapView
 import mr.merc.unit.Soldier
 import mr.merc.unit.SoldierType
+import scalafx.animation.Timeline
+import scalafx.animation.KeyFrame
+import scalafx.util.Duration
+import scalafx.animation.Animation
 
 object Main extends JFXApp {
   val field = new TerrainHexField(5, 5, mapInit)
@@ -63,9 +67,11 @@ object Main extends JFXApp {
   }
   
   val gc = canvas.graphicsContext2D
-
+  val timeline = Timeline(KeyFrame(Duration.apply(50), "baseLoop", gameLoop()))
+  timeline.cycleCount = Animation.INDEFINITE
+  
   reset(Color.BLUE)
-
+  timeline.play()
   // Clear away portions as the user drags the mouse
   canvas.onMouseDragged = (e: MouseEvent) => {
     gc.clearRect(e.x - 2, e.y - 2, 5, 5)
@@ -86,10 +92,18 @@ object Main extends JFXApp {
    */
   private def reset(color: Color) {
     gc.fill = color
-    gc.fillRect(0, 0, canvas.width.get, canvas.height.get);
+    gc.fillRect(0, 0, canvas.width.get, canvas.height.get);    
+  }  
+  
+  var lastUpdateTime = System.currentTimeMillis()
+  def gameLoop() {
+    val currentTime = System.currentTimeMillis
+    val timePassed = currentTime - lastUpdateTime
+    lastUpdateTime = currentTime
+    mapView.update(timePassed.toInt)
     mapView.drawItself(gc)
   }
-
+  
   private def mapInit(x:Int, y:Int) = 
     if (x == 1 || x == 2) {
       new TerrainHex(x, y, Water, if (y == 2) Some(WoodenBridge) else None)

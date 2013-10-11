@@ -66,4 +66,6 @@ class TerrainHexView(val hex:TerrainHex, field:TerrainHexField) {
 	  secondaryImage.map(_.drawCenteredImage(gc, x, y, side, side))
 	  mapObject foreach (_.drawCenteredImage(gc, x, y, side, side))	 
 	}
+	
+	def center = (x + side / 2, y + side / 2)
 }

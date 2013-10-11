@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectiles>
+	<projectile name="testProjectile">
+		<start>
+			<!-- just n and ne are enough, all other images are mirrored -->
+			<!-- but there can be also "all" images -->
+			<all>
+				<image name="im1"/>
+				<image name="im2"/>
+			</all>
+		</start>
+		<move>
+			<n>
+				<image name="im3"/>
+				<image name="im4"/>
+			</n>
+			<ne>
+				<image name="im5"/>
+				<image name="im6"/>
+			</ne>
+		</move>
+		<end>
+			<all>
+				<image name="im7"/>
+				<image name="im8"/>
+				<image name="im9"/>
+			</all>
+		</end>
+	</projectile>
+	<projectile name="testProjectile2">
+		<move>
+			<all>
+				<image name="im10"/>
+				<image name="im11"/>
+			</all>
+		</move>
+	</projectile>
+</projectiles>

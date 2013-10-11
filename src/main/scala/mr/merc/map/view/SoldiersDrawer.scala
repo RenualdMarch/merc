@@ -23,7 +23,11 @@ class SoldiersDrawer {
 	def soldiers = _soldiers
 	def movements = _movements
 	
-	private def soldierInMovements = movements flatMap (_.soldiers)
+	private def drawablesInMovements = movements flatMap (_.drawables)
+	private def soldierInMovements = drawablesInMovements flatMap(d => d match {
+	  case soldier:SoldierView => Some(soldier)
+	  case _ => None
+ 	})
 	
 	def update(time:Int) {
 	  _soldiers foreach (_.updateTime(time))
@@ -33,6 +37,6 @@ class SoldiersDrawer {
 	
 	def drawSoldiers(gc:GraphicsContext) {
 	  _soldiers -- soldierInMovements foreach (_.drawItself(gc))
-	  soldierInMovements foreach (_.drawItself(gc))
+	  drawablesInMovements foreach (_.drawItself(gc))
 	}
 }

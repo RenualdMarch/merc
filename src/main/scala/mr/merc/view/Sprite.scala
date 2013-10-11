@@ -14,7 +14,7 @@ object Sprite {
 }
 
 class Sprite[T <: SpriteState](val images:Map[T, List[MImage]], private var _state:T, 
-			var mirroringEnabled:Boolean = true, var animationEnabled:Boolean = true) {
+			var mirroringEnabled:Boolean = true, var animationEnabled:Boolean = true) extends Drawable {
 	require(images.keys.exists(_ == _state), "Initial state isn't present in map!")
 	require(!images.values.exists(_.size == 0), "There are states with zero images")
 	
@@ -66,7 +66,7 @@ class Sprite[T <: SpriteState](val images:Map[T, List[MImage]], private var _sta
       if (rightDirection) {
     	currentImage.drawImage(gc, x, y)
       } else {
-        currentImage.mirror.drawImage(gc, x, y)
+        currentImage.mirrorVertically.drawImage(gc, x, y)
       }
     }
 	

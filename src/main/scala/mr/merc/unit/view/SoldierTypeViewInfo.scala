@@ -95,11 +95,11 @@ object SoldierTypeViewInfo {
     val added = map flatMap(p => {
       if (p._1.direction == SE) {
         val st = SoldierViewAttackState(p._1.success, SW, p._1.number)
-        val images = p._2.map(_.mirror)
+        val images = p._2.map(_.mirrorVertically)
         Some((st, images))
       } else if (p._1.direction == NE) {
         val st = SoldierViewAttackState(p._1.success, NW, p._1.number)
-        val images = p._2.map(_.mirror)
+        val images = p._2.map(_.mirrorVertically)
         Some((st, images))
       } else {
         None
@@ -161,6 +161,6 @@ object SoldierTypeViewInfo {
   }
 }
 
-case class SoldierTypeViewInfo(name:String, images:Map[SoldierViewState, List[MImage]], effects:Map[SoldierViewState, EffectInfo] = Map()) {
+case class SoldierTypeViewInfo(name:String, images:Map[SoldierViewState, List[MImage]]) {
 
 }

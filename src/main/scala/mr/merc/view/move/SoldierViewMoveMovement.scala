@@ -24,4 +24,5 @@ class SoldierViewMoveMovement(from:TerrainHexView, to:TerrainHexView, soldier:So
   
   def isOver = linearMovement.isOver
   
+  override def drawables = List(soldier)
 }

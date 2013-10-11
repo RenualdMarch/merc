@@ -93,7 +93,7 @@ class SoldierDrawerTest extends FunSuite with MockitoSugar with BeforeAndAfter {
  }
 }
 
-class ExampleMovement(override val soldiers:List[SoldierView]) extends Movement {
+class ExampleMovement(override val drawables:List[SoldierView]) extends Movement {
     private var updatedCount = 0
   
     def start() {}

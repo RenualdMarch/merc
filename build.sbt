@@ -16,8 +16,6 @@ libraryDependencies += "org.scalamock" %% "scalamock-scalatest-support" % "3.0.1
 
 libraryDependencies += "org.mockito" % "mockito-core" % "1.9.5"
 
-//libraryDependencies += "org.scalaz" %% "scalaz-core" % "6.0.4"
-
 //libraryDependencies += "joda-time" % "joda-time" % "2.1"
 
 //libraryDependencies += "org.joda" % "joda-convert" % "1.1"

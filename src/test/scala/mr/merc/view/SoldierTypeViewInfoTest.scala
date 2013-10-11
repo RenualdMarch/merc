@@ -16,7 +16,7 @@ import mr.merc.unit.view.FirstAttackSESuccState
 import mr.merc.unit.view.FirstAttackSEFailState
 import mr.merc.unit.view.FirstAttackSSuccState
 import mr.merc.unit.view.FirstAttackSFailState
-import mr.merc.image.LazyMirroredImage
+import mr.merc.image.LazyMirroredVerticallyImage
 import mr.merc.unit.view.SoldierViewAttackState
 import mr.merc.unit.view.FirstAttackNWSuccState
 import mr.merc.unit.view.FirstAttackNWFailState
@@ -75,21 +75,21 @@ class SoldierTypeViewInfoTest extends FunSuite with ShouldMatchers {
 	  
 	  val attack1sws = vt.images(FirstAttackSWSuccState)
 	  assert(attack1sws.size === 2)
-	  assert(attack1sws(0).isInstanceOf[LazyMirroredImage])
-	  assert(attack1sws(1).isInstanceOf[LazyMirroredImage])
+	  assert(attack1sws(0).isInstanceOf[LazyMirroredVerticallyImage])
+	  assert(attack1sws(1).isInstanceOf[LazyMirroredVerticallyImage])
 
 	  val attack1swf= vt.images(FirstAttackSWFailState)
 	  assert(attack1swf.size === 1)
-	  assert(attack1swf(0).isInstanceOf[LazyMirroredImage])
+	  assert(attack1swf(0).isInstanceOf[LazyMirroredVerticallyImage])
 
 	  val attack1nws = vt.images(FirstAttackNWSuccState)
 	  assert(attack1nws.size === 2)
-	  assert(attack1nws(0).isInstanceOf[LazyMirroredImage])
-	  assert(attack1nws(1).isInstanceOf[LazyMirroredImage])
+	  assert(attack1nws(0).isInstanceOf[LazyMirroredVerticallyImage])
+	  assert(attack1nws(1).isInstanceOf[LazyMirroredVerticallyImage])
 
 	  val attack1nwf= vt.images(FirstAttackNWFailState)
 	  assert(attack1nwf.size === 1)
-	  assert(attack1nwf(0).isInstanceOf[LazyMirroredImage])
+	  assert(attack1nwf(0).isInstanceOf[LazyMirroredVerticallyImage])
 	  
 	  
 	  for (s <- SoldierViewAttackState.all if s.number == 1) {
@@ -102,14 +102,14 @@ class SoldierTypeViewInfoTest extends FunSuite with ShouldMatchers {
 	        assert(attack2(0).imagePath.get === "/images/units/testType1/im4a.png")
 	        assert(attack2(1).imagePath.get === "/images/units/testType1/im5a.png")
 	      } else {
-	        attack2.foreach(p => assert(p.isInstanceOf[LazyMirroredImage]))
+	        attack2.foreach(p => assert(p.isInstanceOf[LazyMirroredVerticallyImage]))
 	      }
 	    } else {
 	      assert(attack2.size === 1)
 	      if (configurable.contains(s.direction)) {
 	        assert(attack2(0).imagePath.get === "/images/units/testType1/im6a.png")
 	      } else {
-	        attack2.foreach(p => assert(p.isInstanceOf[LazyMirroredImage]))
+	        attack2.foreach(p => assert(p.isInstanceOf[LazyMirroredVerticallyImage]))
 	      }
 	    }
 	  }
@@ -154,7 +154,7 @@ class SoldierTypeViewInfoTest extends FunSuite with ShouldMatchers {
 	      assert(attack(0).xOffset === 0)
 	      assert(attack(0).yOffset === 0)
 	    } else {
-	      attack.foreach(p => assert(p.isInstanceOf[LazyMirroredImage]))
+	      attack.foreach(p => assert(p.isInstanceOf[LazyMirroredVerticallyImage]))
 	    }	   
 	  }
 	  

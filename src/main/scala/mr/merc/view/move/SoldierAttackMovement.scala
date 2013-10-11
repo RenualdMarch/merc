@@ -90,8 +90,7 @@ class SoldierAttackMovement(from:(Int, Int), to:(Int, Int), dir:Direction,
       attacker.index = attackImagesSize - 1
     }
     
-  
-    override def soldiers = List(defender, attacker)
+    override def drawables = List(defender, attacker)
     
 	def isOver = linearMovementToEnemy.isOver && linearMovementFromEnemy.isOver
 }

@@ -17,6 +17,8 @@ object MImage {
   def apply(image:Image, xOffset:Int, yOffset:Int):MImage = apply(image, xOffset, yOffset, 1f)
 
   def apply(image:Image):MImage = apply(image, 0, 0)
+  
+  val emptyImage = apply(ImageUtil.emptyImage)
 }
 
 abstract class MImage private[image] (val xOffset:Int, val yOffset:Int, val alpha:Float) {
@@ -42,5 +44,7 @@ abstract class MImage private[image] (val xOffset:Int, val yOffset:Int, val alph
   
   def changeAlpha(newAlpha:Float):MImage
   
-  lazy val mirror = new LazyMirroredImage(this, -xOffset, yOffset, alpha)
+  lazy val mirrorVertically = new LazyMirroredVerticallyImage(this, -xOffset, yOffset, alpha)
+  
+  lazy val mirrorHorizontally = new LazyMirroredHorizontallyImage(this, xOffset, -yOffset, alpha)
 }
