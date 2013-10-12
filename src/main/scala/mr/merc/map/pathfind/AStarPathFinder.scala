@@ -5,6 +5,10 @@ import scala.collection.mutable.ArrayBuffer
 
 class AStarPathFinder {
 	def findPath[T](grid:Grid[T], from:T, to:T):Option[List[T]] = {
+	  if (grid.cellWhereItIsForbiddenToStop(to)) {
+	    return None
+	  }
+	  
 	  val openList = collection.mutable.Set[Node[T]]()
 	  val closedList = collection.mutable.Set[Node[T]]()
 	  
@@ -19,13 +23,20 @@ class AStarPathFinder {
 	    
 	    val neighbours = grid.neighbours(smallestF.t).map(new Node(_))
 	    neighbours.foreach(n => {
-	      if (!grid.isBlocked(n.t) && !closedList.contains(n)) {
+	      
+	      // it is blocked if it is blocked or if 
+	      // it is cell cell where movement must be stopped and
+	      // this cell is not path destination
+	      val blocked = grid.isBlocked(n.t) || 
+	    		  (grid.cellWhereMovementMustBeStopped(n.t) && n.t != to)
+	      
+	      if (!blocked && !closedList.contains(n)) {
 	        
 	        if (!openList.contains(n)) {
 	          openList += n	          
 	          n.parent = smallestF
 	          n.h = grid.distance(n.t, to)
-              n.g = grid.price(n.t);
+              n.g = grid.price(n.t)
 	        } else {	          
 	          if (n.g < smallestF.g + grid.price(smallestF.t)) {
 	        	  n.parent = smallestF.parent

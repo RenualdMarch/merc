@@ -5,9 +5,11 @@ import mr.merc.map.terrain.TerrainType
 import mr.merc.map.terrain.Sand
 import org.scalatest.BeforeAndAfter
 import mr.merc.map.hex.TerrainHex
+import mr.merc.players.Player
 
 class AttackTest extends FunSuite with BeforeAndAfter {
-	
+	val player1 = Player("1")
+	val player2 = Player("2")
     val firstType = new SoldierType("type1", 1, 10, 1, 10, 1, 
 			List(new Attack("name", 3, 2, Impact, false), new Attack("name", 1, 2, Pierce, true)), 
 			Map(), Map(Sand -> 50), Map(Impact -> 0, Pierce -> 0))
@@ -26,8 +28,8 @@ class AttackTest extends FunSuite with BeforeAndAfter {
     	else if (x == 50) false else fail
     
 	before {
-      firstSoldier = new Soldier("first", firstType)
-      secondSoldier = new Soldier("second", secondType)
+      firstSoldier = new Soldier("first", firstType, player1)
+      secondSoldier = new Soldier("second", secondType, player2)
       attackerHex.soldier = Some(firstSoldier)
       defenderHex.soldier = Some(secondSoldier)
     }

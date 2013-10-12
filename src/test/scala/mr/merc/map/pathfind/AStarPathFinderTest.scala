@@ -41,4 +41,32 @@ class AStarPathFinderTest extends FunSuite{
 	  val result = finder.findPath(grid, from, to)
 	  assert(result.isEmpty)
 	}
+	
+	test("pathfinding with cells where you can only to stop") {
+	  val grid = new HexField[Hex](5, 5, Hex.hexInit) {
+	    override def cellWhereMovementMustBeStopped(h:Hex) = {
+	      h.x == 1 && h.y == 0 || h.x == 2 && h.y == 1
+	    }
+	  }
+	  
+	  val from = grid.hex(0, 0)
+	  val dest = grid.hex(2, 1)
+	  val result = finder.findPath(grid, from, dest)
+	  val connector1 = grid.hex(0, 1)
+	  val connector2 = grid.hex(1, 1)
+	  assert(result.get === List(from, connector1, connector2, dest))
+	}
+	
+	test("pathfinding with cells that are forbidden to stop") {
+	  val grid = new HexField[Hex](5, 5, Hex.hexInit) {
+	    override def cellWhereItIsForbiddenToStop(h:Hex) = {
+	      h.x == 1 && h.y == 0
+	    }
+	  }
+	  
+	  val from = grid.hex(0, 0)
+	  val dest = grid.hex(1, 0)
+	  val result = finder.findPath(grid, from, dest)
+	  assert(result === None)
+	}
 }

@@ -38,10 +38,11 @@ import scalafx.animation.Timeline
 import scalafx.animation.KeyFrame
 import scalafx.util.Duration
 import scalafx.animation.Animation
+import mr.merc.players.Player
 
 object Main extends JFXApp {
   val field = new TerrainHexField(5, 5, mapInit)
-  val soldier = new Soldier("1", SoldierType("Human-Horseman"))
+  val soldier = new Soldier("1", SoldierType("Human-Horseman"), Player(""))
   field.hex(4, 1).soldier = Some(soldier)
   val mapView = new MapView(field)
   

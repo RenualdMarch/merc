@@ -6,6 +6,7 @@ import mr.merc.unit.SoldierType
 import mr.merc.unit.view.SoldierView
 import mr.merc.map.hex.NE
 import mr.merc.unit.view.FirstAttackNESuccState
+import mr.merc.players.Player
 
 class SoldierAttackMovementTest extends FunSuite {
 	test("imagesList") {
@@ -16,8 +17,8 @@ class SoldierAttackMovementTest extends FunSuite {
 	}
 	
 	test("animation") {
-	  val soldier = new Soldier("1", SoldierType("testSoldier2"))
-	  val enemy = new Soldier("2", SoldierType("testSoldier2"))
+	  val soldier = new Soldier("1", SoldierType("testSoldier2"), Player("1"))
+	  val enemy = new Soldier("2", SoldierType("testSoldier2"), Player("2"))
 	  val soldierView = new SoldierView(soldier)
 	  val enemyView = new SoldierView(enemy)
 	  val direction = NE

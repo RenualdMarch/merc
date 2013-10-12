@@ -5,4 +5,6 @@ trait Grid[T] {
 	def distance(from:T, to:T):Int
 	def neighbours(t:T):Set[T]
 	def price(t:T) = 1
+	def cellWhereMovementMustBeStopped(t:T) = false
+	def cellWhereItIsForbiddenToStop(t:T) = false
 }
