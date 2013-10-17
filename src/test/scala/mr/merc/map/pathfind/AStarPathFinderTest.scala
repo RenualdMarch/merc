@@ -3,9 +3,12 @@ package mr.merc.map.pathfind
 import org.scalatest.FunSuite
 import mr.merc.map.hex.Hex
 import mr.merc.map.hex.HexField
+import mr.merc.map.hex.TerrainHexField
+import mr.merc.map.hex.TerrainHex
+import mr.merc.map.terrain.Grass
 
 class AStarPathFinderTest extends FunSuite{
-	val finder = new AStarPathFinder()
+	val finder = AStarPathFinder
   
 	test("pathfinding sanity check") {
 		val grid = new HexField[Hex](5, 5, Hex.hexInit)
@@ -68,5 +71,14 @@ class AStarPathFinderTest extends FunSuite{
 	  val dest = grid.hex(1, 0)
 	  val result = finder.findPath(grid, from, dest)
 	  assert(result === None)
+	}
+	
+	test("simple pathfinding") {
+	  val grid = new TerrainHexField(10, 10, (x, y) => new TerrainHex(x, y, Grass))
+	  val from = grid.hex(0, 0)
+	  val dest = grid.hex(5, 2)
+	  val result = finder.findPath(grid, from, dest)
+	  import grid.hex
+	  assert(result.get === List(hex(0, 0), hex(1, 0), hex(2, 1), hex(3, 1), hex(4, 2), hex(5, 2)))
 	}
 }

@@ -3,7 +3,7 @@ package mr.merc.map.pathfind
 import mr.merc.map.Grid
 import scala.collection.mutable.ArrayBuffer
 
-class AStarPathFinder {
+object AStarPathFinder {
 	def findPath[T](grid:Grid[T], from:T, to:T):Option[List[T]] = {
 	  if (grid.cellWhereItIsForbiddenToStop(to)) {
 	    return None
@@ -17,7 +17,7 @@ class AStarPathFinder {
 	  
 	  openList += (new Node(from))
 	  while (!found && !noRoute) {
-	    val smallestF = openList.reduce((x1, x2) => if (x1.f < x2.f) x1 else x2)
+	    val smallestF = openList.minBy(_.f)
 	    closedList += smallestF
 	    openList-=(smallestF)
 	    

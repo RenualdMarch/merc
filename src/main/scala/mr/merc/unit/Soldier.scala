@@ -7,6 +7,8 @@ class Soldier(val name:String, var soldierType:SoldierType, val player:Player) {
 	var currentExp = 0
 	var movePointsRemain = soldierType.movement
 	def hp = currentHp
+	var attackedThisTurn = false
+	def movedThisTurn = movePointsRemain != soldierType.movement
 	
 	def damage(attack:Attack) {
 	  currentHp -= soldierType.damageWithResistance(attack)

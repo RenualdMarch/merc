@@ -23,3 +23,5 @@ libraryDependencies += "org.mockito" % "mockito-core" % "1.9.5"
 unmanagedJars in Compile += Attributed.blank(file(System.getenv("JAVA_HOME") + "/jre/lib/jfxrt.jar"))
 
 mainClass := Some("mr.merc.main.Main")
+
+scalacOptions ++= Seq("-feature", "-deprecation", "-language:postfixOps")

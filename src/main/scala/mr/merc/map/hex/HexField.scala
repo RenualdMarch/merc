@@ -2,8 +2,9 @@ package mr.merc.map.hex
 
 import scala.math._
 import mr.merc.map.Grid
+import scala.reflect.ClassTag
 
-class HexField[T <: Hex : ClassManifest](val width:Int, val height:Int, init:(Int, Int) => T) extends Grid[T] {
+class HexField[T <: Hex : ClassTag](val width:Int, val height:Int, init:(Int, Int) => T) extends Grid[T] {
 	private val arr = Array.ofDim[T](width, height)
 	for (x <- 0 until width; y <- 0 until height) {
 	  if (isLegalCoords(x, y)) { 

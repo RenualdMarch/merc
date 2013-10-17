@@ -30,6 +30,11 @@ class GameField(val hexField:TerrainHexField, val players:List[Player]) {
 	  hexField.hexes filter (h => hasPlayerOnHex(h, player) || hasPlayerOnNeighborHex(h, player)) toSet
 	}
 	
+	// TODO add allies
+	def zoneOfControlForEnemys(player:Player):Set[TerrainHex] = {
+	  players filterNot(_ == player) map (zoneOfControlFor) reduce (_ ++ _)
+	}
+	
 	private def hasPlayerOnHex(hex:TerrainHex, player:Player):Boolean = {
 	  hex.soldier.map(_.player == player).getOrElse(false)
 	}

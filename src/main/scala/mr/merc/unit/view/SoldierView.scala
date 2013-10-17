@@ -32,7 +32,7 @@ object SoldierView {
   
 }
 
-class SoldierView (soldier:Soldier) extends Sprite[SoldierViewState](SoldierTypeViewInfo(soldier.soldierType.name).images, StandState) {
+class SoldierView (val soldier:Soldier) extends Sprite[SoldierViewState](SoldierTypeViewInfo(soldier.soldierType.name).images, StandState) {
   
   def moveMovement(path:List[TerrainHexView]):Movement = {
     val list = path zip path.tail map (p => new SoldierViewMoveMovement(p._1, p._2, this))
