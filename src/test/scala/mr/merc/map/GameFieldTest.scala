@@ -73,6 +73,5 @@ class GameFieldTest extends FunSuite {
       assert(grid2.cellWhereMovementMustBeStopped(hex(0, 0)) === true)
       assert(grid2.cellWhereMovementMustBeStopped(hex(3, 1)) === false)
       assert(grid2.cellWhereMovementMustBeStopped(hex(1, 2)) === false)
-      
     }
 }

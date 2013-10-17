@@ -56,6 +56,18 @@ class BattleModelTest extends FunSuite with BeforeAndAfter {
 	  field.hex(1, 0).soldier = Some(oneMoreEnemy)
 	  assert(model.validateMovementEvent(soldier, field.hex(0, 0), field.hex(0, 1)) === false)
 	  
+	  // can move when is in enemy's zone of control and havn't moved
+	  val mover = new Soldier("6", simpleSoldierType, Player("1"))
+	  val enemy1 = new Soldier("6", simpleSoldierType, Player("2"))
+	  val enemy2 = new Soldier("7", simpleSoldierType, Player("2"))
+	  field.hex(6, 4).soldier = Some(mover)
+	  field.hex(5, 3).soldier = Some(enemy1)
+	  field.hex(7, 4).soldier = Some(enemy2)
+	  assert(model.validateMovementEvent(mover, field.hex(6, 4), field.hex(6, 3)) === true)
+	  assert(model.validateMovementEvent(mover, field.hex(6, 4), field.hex(7, 3)) === true)
+	  assert(model.validateMovementEvent(mover, field.hex(6, 4), field.hex(6, 5)) === true)
+	  assert(model.validateMovementEvent(mover, field.hex(6, 4), field.hex(5, 4)) === true)
+	  assert(model.validateMovementEvent(mover, field.hex(6, 4), field.hex(7, 2)) === false)
 	}
 	
 	test("attack validation") {
@@ -159,4 +171,6 @@ class BattleModelTest extends FunSuite with BeforeAndAfter {
 	    case _ => fail
 	  }
 	}
+	
+	
 }
