@@ -20,8 +20,8 @@ object SoldierAttackMovement {
   }
 }
 
-class SoldierAttackMovement(from:(Int, Int), to:(Int, Int), dir:Direction,
-    success:Boolean, attacker:SoldierView, defender:SoldierView, attackNumber:Int) extends Movement {  
+class SoldierAttackMovement(val from:(Int, Int), val to:(Int, Int), val dir:Direction,
+    val success:Boolean, val attacker:SoldierView, val defender:SoldierView, val attackNumber:Int) extends Movement {  
     private val state = SoldierViewAttackState(success, dir, attackNumber)
     private val attackImagesSize = attacker.images(state).size
     val frames = SoldierAttackMovement.imagesList(attackImagesSize)

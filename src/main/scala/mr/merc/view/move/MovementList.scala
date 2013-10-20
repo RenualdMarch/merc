@@ -1,6 +1,6 @@
 package mr.merc.view.move
 
-class MovementList(list:List[Movement]) extends Movement {
+class MovementList(val list:List[Movement]) extends Movement {
 	private val moves = list.toVector
 	private var current = 0
 	

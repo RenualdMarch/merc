@@ -6,13 +6,20 @@ import mr.merc.map.terrain.Grass
 import mr.merc.map.terrain.Forest
 import mr.merc.map.hex.TerrainHex
 import mr.merc.map.hex.TerrainHexField
+import mr.merc.map.hex.CubeHex
+
+object TerrainHexView {
+  val Side = 72
+}
 
 class TerrainHexView(val hex:TerrainHex, field:TerrainHexField) {
     val neighbours = field.neighboursWithDirections(hex.x, hex.y)
     val directions = neighbours map (p => (p._2, p._1)) toMap
-	val side = 72
-	val x = findX
+	val side = TerrainHexView.Side
+    val x = findX
 	val y = findY
+	
+	override def toString = s"TerrainHexView[coords=($hex.x, $hex.y), pixels=($x,$y)]" 
 	
 	private def findX = if (hex.x % 2 == 0) {
 	  hex.x * 6 * side / 8
@@ -68,4 +75,5 @@ class TerrainHexView(val hex:TerrainHex, field:TerrainHexField) {
 	}
 	
 	def center = (x + side / 2, y + side / 2)
+	def coords = (x, y)
 }

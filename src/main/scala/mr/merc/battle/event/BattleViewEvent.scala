@@ -5,7 +5,7 @@ import mr.merc.map.hex.TerrainHex
 import mr.merc.unit.AttackResult
 import mr.merc.players.Player
 
-trait BattleViewEvent {
+sealed trait BattleViewEvent {
 
 }
 
@@ -13,6 +13,7 @@ trait BattleViewEventHandler {
   def handleEvent(event:BattleViewEvent)
 }
 
-case class AttackBattleViewEvent(attackerTerrainHex:TerrainHex, defenterTerrainHex:TerrainHex, result:List[AttackResult])
-case class MoveBattleViewEvent(soldier:Soldier, path:List[TerrainHex])
-case class EndMoveViewEvent(nextPlayer:Player)
+case class AttackBattleViewEvent(attackerTerrainHex:TerrainHex, 
+    defenterTerrainHex:TerrainHex, result:List[AttackResult]) extends BattleViewEvent
+case class MoveBattleViewEvent(soldier:Soldier, path:List[TerrainHex]) extends BattleViewEvent
+case class EndMoveViewEvent(nextPlayer:Player) extends BattleViewEvent

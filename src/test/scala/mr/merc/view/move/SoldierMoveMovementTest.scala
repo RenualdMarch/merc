@@ -9,7 +9,7 @@ import mr.merc.unit.view.SoldierView
 import mr.merc.map.hex.view.TerrainHexFieldView
 import mr.merc.players.Player
 
-class SoldierViewMoveMovementTest extends FunSuite {
+class SoldierMoveMovementTest extends FunSuite {
 	val map = new TerrainHexField(5, 5, (x, y) => new TerrainHex(x, y, Grass))
 	val mapView = new TerrainHexFieldView(map)
 	val soldier = new Soldier("1", SoldierType("testSoldier"), Player("0"))
@@ -20,7 +20,7 @@ class SoldierViewMoveMovementTest extends FunSuite {
 	  // moving from (0, 1) to (1, 0)
 	  val from = mapView.hex(0, 1)
 	  val to = mapView.hex(1, 0)
-	  val movement = new SoldierViewMoveMovement(from, to, soldierView)
+	  val movement = new SoldierMoveMovement(from, to, soldierView)
 	  movement.start()
 	  assert(soldierView.x === 36)
 	  assert(soldierView.y === 72 + 36)

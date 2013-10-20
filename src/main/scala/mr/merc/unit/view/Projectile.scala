@@ -78,7 +78,7 @@ class Projectile(val name:String, val start:Map[Direction, List[MImage]],
 	require(move.size == 6)
 	require(end.size == 6)
 	
-	def buildView(dir:Direction, from:TerrainHexView, to:TerrainHexView) = 
+	def buildView(dir:Direction, from:(Int, Int), to:(Int, Int)) = 
 	  new ProjectileView(start(dir), move(dir), end(dir),
-	    from.center, to.center, speed)
+	    from, to, speed)
 }

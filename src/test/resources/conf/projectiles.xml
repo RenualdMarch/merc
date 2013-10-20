@@ -35,4 +35,20 @@
 			</all>
 		</move>
 	</projectile>
+	<projectile name="testProjectile3-succ">
+		<move>
+			<all>
+				<image name="im0"/>
+				<image name="im1"/>
+			</all>
+		</move>
+	</projectile>
+	<projectile name="testProjectile3-fail">
+		<move>
+			<all>
+				<image name="im0"/>
+				<image name="im1"/>
+			</all>
+		</move>
+	</projectile>
 </projectiles>

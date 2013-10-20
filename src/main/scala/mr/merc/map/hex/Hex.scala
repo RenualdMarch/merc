@@ -17,6 +17,8 @@ class Hex(val x:Int, val y:Int) {
     new CubeHex(cubeX, cubeY, cubeZ)
   }
   
+  private [hex] def toAxialHex = toCubeHex.toAxialHex
+  
   override def equals(any:Any) = any match {
     case hex:Hex => hex.x == x && hex.y == y
     case _ => false

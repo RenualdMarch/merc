@@ -68,10 +68,18 @@ object Attack {
     })
   }
   
+  def apply(imageName:String, damage:Int, count:Int, attackType:AttackType, 
+    ranged:Boolean) = new Attack(imageName, damage, count, attackType, ranged)
   
-  
+  def apply(imageName:String, damage:Int, count:Int, attackType:AttackType, 
+    ranged:Boolean, projectile:String) = new Attack(imageName, damage, count, attackType, ranged, Some(projectile))
 }
 
-case class Attack(imageName:String, damage:Int, count:Int, attackType:AttackType, ranged:Boolean) {
-	
+// TODO move image name and projectile name to view configuration
+class Attack(val imageName:String, val damage:Int, val count:Int, val attackType:AttackType, 
+    val ranged:Boolean, private val _projectile:Option[String] = None) {
+	def projectileName(success:Boolean) = success match {
+	  case true => _projectile map (_ + "-succ")
+	  case false => _projectile map (_ + "-fail")
+	}
 }

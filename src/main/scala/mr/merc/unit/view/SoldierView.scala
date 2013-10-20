@@ -12,7 +12,7 @@ import mr.merc.map.hex.TerrainHex
 import mr.merc.map.terrain._
 import mr.merc.view.move.Movement
 import mr.merc.unit.Soldier
-import mr.merc.view.move.SoldierViewMoveMovement
+import mr.merc.view.move.SoldierMoveMovement
 import mr.merc.view.move.MovementList
 import mr.merc.view.move.SoldierAttackMovement
 import mr.merc.unit.AttackResult
@@ -35,7 +35,7 @@ object SoldierView {
 class SoldierView (val soldier:Soldier) extends Sprite[SoldierViewState](SoldierTypeViewInfo(soldier.soldierType.name).images, StandState) {
   
   def moveMovement(path:List[TerrainHexView]):Movement = {
-    val list = path zip path.tail map (p => new SoldierViewMoveMovement(p._1, p._2, this))
+    val list = path zip path.tail map (p => new SoldierMoveMovement(p._1, p._2, this))
     new MovementList(list)
   }
   

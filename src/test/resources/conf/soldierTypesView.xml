@@ -45,7 +45,6 @@
 		<attack2>
 			<all>
 				<!-- effects have ther's own configuration in special file -->
-				<!-- <succ effect="">  -->
 				<succ>
 					<image name="im4a"/>
 					<image name="im5a"/>
@@ -114,6 +113,8 @@
 		</attack1>
 		<stand>
 			<image name="im15"/>
+			<image name="im16"/>
+			<image name="im17"/>
 		</stand>
 	</view>
 </views>
