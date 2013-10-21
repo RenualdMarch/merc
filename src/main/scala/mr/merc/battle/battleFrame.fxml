@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.GridPane?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+           fx:controller="mr.merc.battle.BattleController" fx:id="parentPaneDelegate">
+	<center>
+		<Canvas fx:id="battleCanvasDelegate" />
+	</center>
+	<right>
+		<GridPane fx:id="rightPanelDelegate" prefWidth="400" style="-fx-background-color: black"/>
+	</right>
+</BorderPane>

@@ -39,81 +39,19 @@ import scalafx.animation.KeyFrame
 import scalafx.util.Duration
 import scalafx.animation.Animation
 import mr.merc.players.Player
+import javafx.{fxml => jfxf}
+import javafx.{scene => jfxs}
 
-object Main extends JFXApp {
-  val field = new TerrainHexField(5, 5, mapInit)
-  val soldier = new Soldier("1", SoldierType("Human-Horseman"), Player(""))
-  field.hex(4, 1).soldier = Some(soldier)
-  val mapView = new MapView(field)
-  
+object Main extends JFXApp {  
+  val rootPane: jfxs.Parent = jfxf.FXMLLoader.load(getClass.getResource("/mr/merc/battle/battleFrame.fxml"))
   
   val screenRect = Screen.primary.visualBounds
-  val canvas = new Canvas(screenRect.width, screenRect.height)
-
-  // Draw background with gradient
-  val rect = new Rectangle {
-    height = screenRect.height
-    width = screenRect.width
-    fill = new LinearGradient(0, 0, 1, 1, true, CycleMethod.REFLECT, List(Stop(0, Color.RED), Stop(1, Color.YELLOW)))
-  }
-
-  val rootPane = new Group
-  rootPane.children = List(rect, canvas)
 
   stage = new PrimaryStage {
-    title = "Canvas Doodle Test"
+    title = "Mercenary"
     scene = new Scene(screenRect.width, screenRect.height) {
       root = rootPane
     }
   }
   
-  val gc = canvas.graphicsContext2D
-  val timeline = Timeline(KeyFrame(Duration.apply(50), "baseLoop", gameLoop()))
-  timeline.cycleCount = Animation.INDEFINITE
-  
-  reset(Color.BLUE)
-  timeline.play()
-  // Clear away portions as the user drags the mouse
-  canvas.onMouseDragged = (e: MouseEvent) => {
-    gc.clearRect(e.x - 2, e.y - 2, 5, 5)
-  }
-
-  // Fill the Canvas with a Blue rectnagle when the user double-clicks
-  canvas.onMouseClicked = (e: MouseEvent) => {
-    if (e.clickCount > 1) {
-      reset(Color.BLUE);
-    }
-  }
-
-  /**
-   * Resets the canvas to its original look by filling in a rectangle covering
-   * its entire width and height. Color.BLUE is used in this demo.
-   *
-   * @param color The color to fill
-   */
-  private def reset(color: Color) {
-    gc.fill = color
-    gc.fillRect(0, 0, canvas.width.get, canvas.height.get);    
-  }  
-  
-  var lastUpdateTime = System.currentTimeMillis()
-  def gameLoop() {
-    val currentTime = System.currentTimeMillis
-    val timePassed = currentTime - lastUpdateTime
-    lastUpdateTime = currentTime
-    mapView.update(timePassed.toInt)
-    mapView.drawItself(gc)
-  }
-  
-  private def mapInit(x:Int, y:Int) = 
-    if (x == 1 || x == 2) {
-      new TerrainHex(x, y, Water, if (y == 2) Some(WoodenBridge) else None)
-    } else if (y == 2){
-      new TerrainHex(x, y, Forest)
-    } else if (x == 4 && y == 3){
-      new TerrainHex(x, y, Grass, Some(House))
-    } else {
-      new TerrainHex(x, y, Sand)
-    }
-
 }
