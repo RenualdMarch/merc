@@ -1,12 +1,13 @@
-package mr.merc.battle
+package mr.merc.ui.battle
 
 import scalafx.Includes._
 import javafx.scene.{layout => jfxsl}
+import javafx.scene.{text => jfxt}
 import javafx.{fxml => jfxf}
 import java.net.URL
 import java.util.ResourceBundle
-import scalafx.scene.layout.GridPane
 import javafx.scene.{canvas => jfxc}
+import javafx.scene.{image => jfxi}
 import scalafx.scene.canvas.Canvas
 import mr.merc.map.hex.TerrainHexField
 import mr.merc.unit.Soldier
@@ -21,14 +22,26 @@ import mr.merc.map.terrain._
 import mr.merc.map.objects._
 import scalafx.util.Duration
 import scalafx.animation.Animation
-import scalafx.stage.Screen
 import scalafx.scene.layout.BorderPane
+import scalafx.scene.layout.VBox
+import scalafx.scene.image.ImageView
+import scalafx.scene.text.Text
+import javafx.{fxml => jfxf}
+import javafx.scene.{canvas => jfxc}
+import javafx.scene.{image => jfxi}
+import javafx.scene.{layout => jfxsl}
+import javafx.scene.{text => jfxt}
+import scalafx.beans.binding.NumberBinding.sfxNumberBinding2jfx
+import scalafx.beans.property.DoubleProperty.sfxDoubleProperty2jfx
+import scalafx.beans.property.ReadOnlyDoubleProperty.sfxReadOnlyDoubleProperty2jfx
+import mr.merc.ui.common.SoldierWrapper
+import mr.merc.ui.common.SoldierWrapper
 
 class BattleController extends jfxf.Initializable {
 
   @jfxf.FXML
-  private var rightPanelDelegate: jfxsl.GridPane = _
-  private var rightPanel: GridPane = _
+  private var rightPanelDelegate: jfxsl.VBox = _
+  private var rightPanel: VBox = _
   
   @jfxf.FXML
   private var battleCanvasDelegate: jfxc.Canvas = _
@@ -38,26 +51,56 @@ class BattleController extends jfxf.Initializable {
   private var parentPaneDelegate: jfxsl.BorderPane = _
   private var parentPane:BorderPane = _
   
-  private def gc = battleCanvas.graphicsContext2D
+  @jfxf.FXML
+  private var miniMapCanvasDelegate: jfxc.Canvas = _
+  private var miniMapCanvas: Canvas = _
   
-  def initialize(url: URL, rb: ResourceBundle) {
-    rightPanel = new GridPane(rightPanelDelegate)
-    battleCanvas = new Canvas(battleCanvasDelegate)
-    parentPane = new BorderPane(parentPaneDelegate)
-    
-    battleCanvas.width <== parentPane.width - rightPanel.width
-    battleCanvas.height <== parentPane.height
-    
-        
-    val timeline = Timeline(KeyFrame(Duration(50), "baseLoop", gameLoop()))
-    timeline.cycleCount = Animation.INDEFINITE
-    timeline.play()
-  }
+  @jfxf.FXML
+  private var soldierImageViewDelegate: jfxi.ImageView = _
+  private var soldierImageView : ImageView = _
+  
+  @jfxf.FXML
+  private var soldierNameDelegate: jfxt.Text = _
+  private var soldierName : Text = _
+  
+  @jfxf.FXML
+  private var soldierLevelDelegate: jfxt.Text = _
+  private var soldierLevel : Text = _
+  
+  @jfxf.FXML
+  private var soldierHPDelegate: jfxt.Text = _
+  private var soldierHP : Text = _
+  
+  private var soldierWrapper: SoldierWrapper = _
   
   val field = new TerrainHexField(5, 5, mapInit)
   val soldier = new Soldier("1", SoldierType("Human-Horseman"), Player(""))
   field.hex(4, 1).soldier = Some(soldier)
   val mapView = new MapView(field)
+  
+  private def gc = battleCanvas.graphicsContext2D
+  
+  def initialize(url: URL, rb: ResourceBundle) {
+    rightPanel = new VBox(rightPanelDelegate)
+    battleCanvas = new Canvas(battleCanvasDelegate)
+    parentPane = new BorderPane(parentPaneDelegate)
+    miniMapCanvas = new Canvas(miniMapCanvasDelegate)
+    soldierName = new Text(soldierNameDelegate)
+    soldierLevel = new Text(soldierLevelDelegate)
+    soldierHP = new Text(soldierHPDelegate)
+    
+    soldierWrapper = new SoldierWrapper(soldier)
+    
+    battleCanvas.width <== parentPane.width - rightPanel.width
+    battleCanvas.height <== parentPane.height
+    soldierName.text <== soldierWrapper.name
+    soldierLevel.text <== soldierWrapper.level
+    soldierHP.text <== soldierWrapper.hp
+    
+    val timeline = Timeline(KeyFrame(Duration(50), "baseLoop", gameLoop()))
+    timeline.cycleCount = Animation.INDEFINITE
+    timeline.play()
+  }
   
   private def reset(color: Color) {
     gc.fill = color

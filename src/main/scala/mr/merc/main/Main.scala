@@ -43,7 +43,7 @@ import javafx.{fxml => jfxf}
 import javafx.{scene => jfxs}
 
 object Main extends JFXApp {  
-  val rootPane: jfxs.Parent = jfxf.FXMLLoader.load(getClass.getResource("/mr/merc/battle/battleFrame.fxml"))
+  val rootPane: jfxs.Parent = jfxf.FXMLLoader.load(getClass.getResource("/mr/merc/ui/battle/battleFrame.fxml"))
   
   val screenRect = Screen.primary.visualBounds
 
