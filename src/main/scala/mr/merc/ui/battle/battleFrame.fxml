@@ -23,7 +23,7 @@
 						<Text fx:id="soldierNameDelegate" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
 						<Text text="Level" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
 						<Text fx:id="soldierLevelDelegate" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-						<Text text="HP" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+						<Text text="%soldier.hp" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
 						<Text fx:id="soldierHPDelegate" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
 					</children>
 				</GridPane>
