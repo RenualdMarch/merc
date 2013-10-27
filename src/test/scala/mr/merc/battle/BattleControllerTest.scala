@@ -1,0 +1,111 @@
+package mr.merc.battle
+
+import org.scalatest.FunSuite
+import org.scalatest.BeforeAndAfter
+import mr.merc.map.GameField
+import mr.merc.map.hex.TerrainHexField
+import mr.merc.map.hex.TerrainHex
+import mr.merc.map.terrain.Grass
+import mr.merc.players.Player
+import mr.merc.unit.SoldierType
+import mr.merc.unit.Attack
+import mr.merc.unit.Impact
+import mr.merc.unit.Soldier
+import mr.merc.map.hex.view.TerrainHexFieldView
+
+class BattleControllerTest extends FunSuite with BeforeAndAfter {
+    var controller:BattleController = _
+    val fieldView = new TerrainHexFieldView(new TerrainHexField(10, 10, (x, y) => new TerrainHex(x, y, Grass)))
+    
+    before {
+      val hexField = new TerrainHexField(10, 10, (x, y) => new TerrainHex(x, y, Grass))
+      val simpleSoldierType = new SoldierType("testType1", 1, 20, 6, 5, 1, 
+			List(Attack("", 10, 1, Impact, false)), Map(Grass -> 2), 
+			Map(Grass -> 60), Map(Impact -> 0))
+      val soldier1 = new Soldier("1", simpleSoldierType, Player("1"))
+      val soldier2 = new Soldier("2", simpleSoldierType, Player("1"))
+      val soldier3 = new Soldier("3", simpleSoldierType, Player("2"))
+      val soldier4 = new Soldier("4", simpleSoldierType, Player("2"))
+      hexField.hex(0, 0).soldier = Some(soldier1)
+      hexField.hex(3, 0).soldier = Some(soldier2)
+      hexField.hex(0, 4).soldier = Some(soldier3)
+      hexField.hex(7, 4).soldier = Some(soldier4)
+      
+      val gameField = new GameField(hexField, List(Player("1"), Player("2")))
+      
+      controller = new BattleController(gameField, new BattleControllerParent(){})
+    }
+    
+    def moveMouse(hexX:Int, hexY:Int) = controller.moveMouse _ tupled fieldView.hex(hexX, hexY).center
+    def rightClick(hexX:Int, hexY:Int) = {
+      moveMouse(hexX, hexY)
+      controller.rightClickMouse()
+    }
+    
+    def leftClick(hexX:Int, hexY:Int) = {
+      moveMouse(hexX, hexY)
+      controller.leftClickMouse()
+    }
+    
+	test("on mouse move soldier on hex is shown") {
+	  moveMouse(3, 0)
+	  assert(controller.soldierToShow.soldier.get.name === "2")
+	}
+	
+	test("on mouse move if there is no soldier on hex - nothing is shown") {
+	  moveMouse(4, 0)
+	  assert(controller.soldierToShow.soldier === None)
+	}
+	
+	test("select soldier then move mouse to see shown soldiers") {
+	  leftClick(3, 0)
+	  assert(controller.soldierToShow.soldier.get.name === "2")
+	  moveMouse(0, 0)
+	  assert(controller.soldierToShow.soldier.get.name === "1")
+	  moveMouse(1, 1)
+	  assert(controller.soldierToShow.soldier.get.name === "2")
+	}
+	
+	test("select soldier then select nothing then select another soldier") {
+	  leftClick(3, 0)
+	  assert(controller.selectedSoldier.get.name === "2")
+	  leftClick(1, 1)
+	  assert(controller.selectedSoldier === None)
+	  leftClick(7, 4)
+	  assert(controller.selectedSoldier.get.name === "4")
+	}
+	
+	test("select soldier then order him to move") {
+	  leftClick(0, 0)
+	  rightClick(1, 0)
+	  assert(controller.battleView.mapView.terrainView.hex(1, 0).hex.soldier.get.name === "1")
+	}
+	
+	ignore("select soldier then move to enemy and see if arrow appears") {
+	  fail
+	}
+	
+	ignore("select soldier and see if possible moves are shown") {
+	  fail
+	}
+	
+	ignore("select enemy soldier and see that possible moves are not shown") {
+	  fail
+	}
+	
+	ignore("select soldier and attack enemy") {
+	  fail
+	}
+	
+	ignore("select soldier and attack unreachable enemy") {
+	  fail
+	}
+
+	ignore("select soldier and try to attack another your soldier") {
+	  fail
+	}
+	
+	ignore("select soldier and try to move to unreachable hex") {
+	  fail
+	}
+}

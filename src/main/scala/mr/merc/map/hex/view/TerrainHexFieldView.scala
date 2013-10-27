@@ -28,7 +28,7 @@ class TerrainHexFieldView(field:TerrainHexField) {
 	  // odd rows are +36 on y
 	  // side is 3/4 * hex side
 	  
-	  val column = pixelX / side
+	  val column = pixelX / (side * 3 / 4)
 	  val row = if (column % 2 == 0) {
 	    pixelY / side
 	  } else {

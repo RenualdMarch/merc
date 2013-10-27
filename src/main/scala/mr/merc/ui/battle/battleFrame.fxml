@@ -8,7 +8,7 @@
 <?import javafx.scene.text.Text?>
 
 <BorderPane xmlns:fx="http://javafx.com/fxml"
-           fx:controller="mr.merc.ui.battle.BattleController" fx:id="parentPaneDelegate">
+           fx:controller="mr.merc.ui.battle.BattleFrame" fx:id="parentPaneDelegate">
 	<center>
 		<Canvas fx:id="battleCanvasDelegate" />
 	</center>
@@ -19,9 +19,9 @@
 				<ImageView fx:id="soldierImageViewDelegate" fitHeight="72" fitWidth="72" />
 				<GridPane vgap="20" hgap="10" alignment="center">
 					<children>
-						<Text text="Name" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+						<Text text="%soldier.name" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
 						<Text fx:id="soldierNameDelegate" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-						<Text text="Level" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+						<Text text="%soldier.level" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
 						<Text fx:id="soldierLevelDelegate" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
 						<Text text="%soldier.hp" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
 						<Text fx:id="soldierHPDelegate" GridPane.columnIndex="1" GridPane.rowIndex="2"/>

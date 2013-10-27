@@ -5,8 +5,7 @@ import org.scalatest.FunSuite
 
 class LocalizationTest extends FunSuite {
 
-  test("message without parameters") {    
-    Localization.currentLanguage = "en"
+  test("message without parameters") {
     val actualMessage: String = Localization("default.message")
 
     assert(actualMessage === "Default Message")
@@ -29,17 +28,4 @@ class LocalizationTest extends FunSuite {
 
     assert(actualMessage === "not.existing.message")
   }
-
-  test("message for different language") {
-    val actualMessage: String = Localization("default.message")("ua")
-
-    assert(actualMessage === "Повідомлення")
-  }
-
-  test("not existing message with explicit language") {
-    val actualMessage: String = Localization("not.existing.message")("ru")
-
-    assert(actualMessage === "not.existing.message")
-  }
-
 }

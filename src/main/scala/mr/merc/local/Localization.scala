@@ -10,13 +10,12 @@ object Localization {
   private val MessageSeparator = "="
   private val ParamHolder = "%s"
 
-  //TODO move to Configuration
-  private val defaultLanguage = "ru"
-  private [local] var currentLanguage = "ru"
+  //TODO take from configuration
+  private val currentLanguage = "en"
   private val filenamePattern = "/local/messages"
   private val languages = List("en", "ua", "ru")
 
-  def apply(key: String, params: Any*)(implicit language:String = currentLanguage) = getMessage(language, key, params:_*)
+  def apply(key: String, params: Any*) = getMessage(currentLanguage, key, params:_*)
 
   private def getMessage(language:String, key: String, params: Any*) = {
     messages(language).get(key) match {
@@ -30,7 +29,7 @@ object Localization {
       msg.replaceFirst(ParamHolder, p.toString))
   }
 
-  private def initMessages() = languages.map(l => (l -> parseMessages(l))) toMap
+  private def initMessages() = languages.view.map(l => (l -> parseMessages(l))) toMap
 
   private def parseMessages(language: String): Map[String, String] = {
     val fileName = filenamePattern + "." + language

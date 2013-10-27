@@ -38,6 +38,8 @@ class BattleView(model:BattleModel, private val soldierDrawer:SoldiersDrawer = n
 	  soldierDrawer.drawSoldiers(gc)
 	}
 	
+	def hexByPixel(x:Int, y:Int) = mapView.hexByPixel(x, y)
+	
 	// TODO this operation can be speed up from n to c
 	def wrap(s:Soldier):SoldierView = {
 	  soldierDrawer.soldiers.find(_.soldier == s).get
@@ -54,6 +56,11 @@ class BattleView(model:BattleModel, private val soldierDrawer:SoldiersDrawer = n
 	      		handleAttackEvent(wrap(attackerTerrainHex), wrap(defenderTerrainHex), result)
 	    case MoveBattleViewEvent(soldier, path) => handleMovementEvent(wrap(soldier), path map wrap)
 	    case EndMoveViewEvent(nextPlayer) => handleEndMoveEvent(nextPlayer)
+	    // TODO implement this
+	    case ShowMovementOptions(hexes) => 
+	    case HideMovementOptions => 
+	    case ShowArrow(src, dest) => 
+	    case HideArrow => 
 	  }
 	}
 	

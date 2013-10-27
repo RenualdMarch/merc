@@ -23,6 +23,9 @@ class TerrainHexFieldViewTest extends FunSuite {
 	  val fourthHex = field.hexByPixelCoords(100, 0)
 	  assert(fourthHex === None)
 	  
-	  
+	  val expectedHex = field.hex(7, 4)
+	  val fifthHex = field.hexByPixelCoords(expectedHex.center._1, expectedHex.center._2)
+	  assert(fifthHex.get.hex.x === 7)
+	  assert(fifthHex.get.hex.y === 4)
 	}
 }

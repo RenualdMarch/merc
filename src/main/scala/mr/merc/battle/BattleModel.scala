@@ -7,6 +7,7 @@ import mr.merc.map.hex.TerrainHex
 import mr.merc.map.pathfind.AStarPathFinder
 import mr.merc.map.terrain.TerrainType
 import mr.merc.unit.Attack
+import mr.merc.map.pathfind.MercPossibleMovesFinder
 
 class BattleModel(val map:GameField) extends BattleModelEventHandler {
 	
@@ -38,7 +39,7 @@ class BattleModel(val map:GameField) extends BattleModelEventHandler {
       val defenderAttack = selectBestAttackForDefender(soldier, defender, attackerAttack)
       soldier.attackedThisTurn = true
       val result = Attack.battle(from, target, attackerAttack, defenderAttack)
-      new AttackModelEventResult(from, target, soldier, defender, result)
+      new AttackModelEventResult(from, target, result)
     }
     
     private [battle] def selectBestAttackForDefender(attacker:Soldier, defender:Soldier, attackersAttack:Attack):Option[Attack] = {
@@ -54,8 +55,11 @@ class BattleModel(val map:GameField) extends BattleModelEventHandler {
       }
      }
     
+     def hexBySoldier(soldierOpt:Option[Soldier]):Option[TerrainHex] = soldierOpt map hexBySoldier
+     
+     def hexBySoldier(soldier:Soldier) = map.hexField.hexes.find(h => h.soldier == Some(soldier)).get
     
-    def validateMovementEvent(soldier:Soldier, from:TerrainHex, to:TerrainHex):Boolean = {
+     def validateMovementEvent(soldier:Soldier, from:TerrainHex, to:TerrainHex, validatePath:Boolean = true):Boolean = {
       if (soldier.attackedThisTurn) {
         return false
       }
@@ -64,14 +68,33 @@ class BattleModel(val map:GameField) extends BattleModelEventHandler {
         return false
       }
       
-      val pathOpt = AStarPathFinder.findPath(map.gridForSoldier(soldier), from, to)
-      pathOpt match {
-        case Some(path) => {
-          val price = pathPrice(soldier.soldierType.moveCost, path)
-          price <= soldier.movePointsRemain
+      if (validatePath) {
+        val pathOpt = AStarPathFinder.findPath(map.gridForSoldier(soldier), from, to)
+        pathOpt match {
+          case Some(path) => {
+            val price = pathPrice(soldier.soldierType.moveCost, path)
+            price <= soldier.movePointsRemain
+          }
+          case None => false
         }
-        case None => false
-      }      
+      } else {
+        true
+      }
+    }
+     
+    def possibleMoves(soldier:Soldier, currentHex:TerrainHex):Set[TerrainHex] = {
+      val possible = MercPossibleMovesFinder.findPossibleMoves(map.gridForSoldier(soldier), currentHex, soldier.movePointsRemain)
+      possible filter (validateMovementEvent(soldier, currentHex, _, false))
+    }
+    
+    
+    // TODO add test
+    def validateMovementAndAttack(soldier:Soldier, start:TerrainHex, destination:TerrainHex, underAttack:TerrainHex):Boolean = {
+      if (start != destination) {
+        validateMovementEvent(soldier, start, destination) && validateAttackEvent(soldier, destination, underAttack, 0)
+      } else {
+        validateAttackEvent(soldier, destination, underAttack, 0)
+      }
     }
     
     // TODO allies

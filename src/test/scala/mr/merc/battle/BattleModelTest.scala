@@ -130,11 +130,9 @@ class BattleModelTest extends FunSuite with BeforeAndAfter {
 	  val result = model.handleEvent(event)
 	  result match {
 	    case AttackModelEventResult(attackerTerrainHex, defenterTerrainHex, 
-	        attackerFromEvent, defenderFromEvent, result) => {
+	        result) => {
 	      assert(attackerTerrainHex === field.hex(0, 0))
 	      assert(defenterTerrainHex === field.hex(1, 0))
-	      assert(attacker === attackerFromEvent)
-	      assert(defender === defenderFromEvent)
 	      assert(result.size === 3)
 	      assert(result(0).attacker === attacker)
 	      assert(result(0).defender === defender)
@@ -172,5 +170,16 @@ class BattleModelTest extends FunSuite with BeforeAndAfter {
 	  }
 	}
 	
+	test("possible moves") {
+	  val simpleSoldierType = new SoldierType("1", 1, 20, 4, 5, 1, 
+			List(), Map(Grass -> 2), 
+			Map(), Map())
+	  val soldier = new Soldier("1", simpleSoldierType, Player("1"))
+	  field.hex(0, 0).soldier = Some(soldier)
+	  val moves = model.possibleMoves(soldier, field.hex(0, 0))
+	  val currentField = field
+	  import currentField.hex
+	  assert(moves === Set(hex(0, 0), hex(0, 1), hex(1, 0), hex(2, 0), hex(2, 1), hex(1, 1), hex(0, 2)))
+	}
 	
 }

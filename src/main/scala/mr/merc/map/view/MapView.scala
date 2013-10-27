@@ -6,11 +6,14 @@ import scalafx.scene.canvas.GraphicsContext
 import mr.merc.unit.view.SoldierView
 
 // TODO replace all arguments with one object which represents model
+// TODO add update method which handles case when soldiers changed
 class MapView(field:TerrainHexField) {
 	val terrainView = new TerrainHexFieldView(field)
 	val soldiersDrawer = new SoldiersDrawer()
 	
 	createSoldiers foreach (soldiersDrawer.addSoldier)
+	
+	def hexByPixel(x:Int, y:Int) = terrainView.hexByPixelCoords(x, y)
 	
 	private def createSoldiers:List[SoldierView] = {
 	  val soldiers = terrainView.hexes.flatMap(h => {

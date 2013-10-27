@@ -8,37 +8,48 @@ import java.net.URL
 import java.util.ResourceBundle
 import javafx.scene.{canvas => jfxc}
 import javafx.scene.{image => jfxi}
-import scalafx.scene.canvas.Canvas
-import mr.merc.map.hex.TerrainHexField
-import mr.merc.unit.Soldier
-import mr.merc.map.view.MapView
-import mr.merc.players.Player
-import mr.merc.unit.SoldierType
-import scalafx.animation.Timeline
-import scalafx.animation.KeyFrame
-import scalafx.scene.paint.Color
-import mr.merc.map.hex.TerrainHex
-import mr.merc.map.terrain._
-import mr.merc.map.objects._
-import scalafx.util.Duration
-import scalafx.animation.Animation
-import scalafx.scene.layout.BorderPane
 import scalafx.scene.layout.VBox
+import scalafx.scene.canvas.Canvas
+import scalafx.scene.layout.BorderPane
 import scalafx.scene.image.ImageView
 import scalafx.scene.text.Text
-import javafx.{fxml => jfxf}
-import javafx.scene.{canvas => jfxc}
-import javafx.scene.{image => jfxi}
-import javafx.scene.{layout => jfxsl}
-import javafx.scene.{text => jfxt}
-import scalafx.beans.binding.NumberBinding.sfxNumberBinding2jfx
-import scalafx.beans.property.DoubleProperty.sfxDoubleProperty2jfx
-import scalafx.beans.property.ReadOnlyDoubleProperty.sfxReadOnlyDoubleProperty2jfx
 import mr.merc.ui.common.SoldierWrapper
-import mr.merc.ui.common.SoldierWrapper
+import scalafx.animation.Timeline
+import scalafx.animation.KeyFrame
+import mr.merc.battle.BattleController
+import scalafx.scene.paint.Color
+import scalafx.util.Duration
+import scalafx.animation.Animation
+import mr.merc.battle.BattleControllerParent
+import mr.merc.map.hex.TerrainHexField
+import mr.merc.unit.Soldier
+import mr.merc.map.GameField
+import mr.merc.players.Player
+import mr.merc.unit.SoldierType
+import mr.merc.map.hex.TerrainHex
+import mr.merc.map.objects._
+import mr.merc.map.terrain._
 
-class BattleController extends jfxf.Initializable {
-
+class BattleFrame extends jfxf.Initializable with BattleControllerParent {
+  val field = new TerrainHexField(5, 5, mapInit)
+  val soldier = new Soldier("1", SoldierType("Human-Horseman"), Player("1"))
+  field.hex(4, 1).soldier = Some(soldier)  
+  val gameField = new GameField(field, List(Player("1"), Player("2")))
+  private def mapInit(x:Int, y:Int) = 
+    if (x == 1 || x == 2) {
+      new TerrainHex(x, y, Water, if (y == 2) Some(WoodenBridge) else None)
+    } else if (y == 2){
+      new TerrainHex(x, y, Forest)
+    } else if (x == 4 && y == 3){
+      new TerrainHex(x, y, Grass, Some(House))
+    } else {
+      new TerrainHex(x, y, Sand)
+    }
+  
+  
+  
+  val controller = new BattleController(gameField, this)
+  
   @jfxf.FXML
   private var rightPanelDelegate: jfxsl.VBox = _
   private var rightPanel: VBox = _
@@ -71,12 +82,7 @@ class BattleController extends jfxf.Initializable {
   private var soldierHPDelegate: jfxt.Text = _
   private var soldierHP : Text = _
   
-  private var soldierWrapper: SoldierWrapper = _
-  
-  val field = new TerrainHexField(5, 5, mapInit)
-  val soldier = new Soldier("1", SoldierType("Human-Horseman"), Player(""))
-  field.hex(4, 1).soldier = Some(soldier)
-  val mapView = new MapView(field)
+  private var soldierWrapper = controller.soldierToShow
   
   private def gc = battleCanvas.graphicsContext2D
   
@@ -89,18 +95,17 @@ class BattleController extends jfxf.Initializable {
     soldierLevel = new Text(soldierLevelDelegate)
     soldierHP = new Text(soldierHPDelegate)
     
-    soldierWrapper = new SoldierWrapper(soldier)
-    
     battleCanvas.width <== parentPane.width - rightPanel.width
     battleCanvas.height <== parentPane.height
     soldierName.text <== soldierWrapper.name
     soldierLevel.text <== soldierWrapper.level
     soldierHP.text <== soldierWrapper.hp
     
-    val timeline = Timeline(KeyFrame(Duration(50), "baseLoop", gameLoop()))
+    val timeline = Timeline(KeyFrame(50 ms, onFinished = gameLoop))
     timeline.cycleCount = Animation.INDEFINITE
     timeline.play()
   }
+  
   
   private def reset(color: Color) {
     gc.fill = color
@@ -112,20 +117,8 @@ class BattleController extends jfxf.Initializable {
     val currentTime = System.currentTimeMillis
     val timePassed = currentTime - lastUpdateTime
     lastUpdateTime = currentTime
-    mapView.update(timePassed.toInt)
+    controller.update(timePassed.toInt)
     reset(Color.BLUE)
-    mapView.drawItself(gc)
+    controller.drawBattleCanvas(gc)
   }
-  
-  private def mapInit(x:Int, y:Int) = 
-    if (x == 1 || x == 2) {
-      new TerrainHex(x, y, Water, if (y == 2) Some(WoodenBridge) else None)
-    } else if (y == 2){
-      new TerrainHex(x, y, Forest)
-    } else if (x == 4 && y == 3){
-      new TerrainHex(x, y, Grass, Some(House))
-    } else {
-      new TerrainHex(x, y, Sand)
-    }
-
 }

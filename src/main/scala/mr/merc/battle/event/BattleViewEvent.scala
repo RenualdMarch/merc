@@ -17,3 +17,8 @@ case class AttackBattleViewEvent(attackerTerrainHex:TerrainHex,
     defenterTerrainHex:TerrainHex, result:List[AttackResult]) extends BattleViewEvent
 case class MoveBattleViewEvent(soldier:Soldier, path:List[TerrainHex]) extends BattleViewEvent
 case class EndMoveViewEvent(nextPlayer:Player) extends BattleViewEvent
+
+case class ShowMovementOptions(hexes:Set[TerrainHex]) extends BattleViewEvent
+case object HideMovementOptions extends BattleViewEvent
+case class ShowArrow(src:TerrainHex, dest:TerrainHex) extends BattleViewEvent
+case object HideArrow extends BattleViewEvent
