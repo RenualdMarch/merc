@@ -89,11 +89,11 @@ class BattleModel(val map:GameField) extends BattleModelEventHandler {
     
     
     // TODO add test
-    def validateMovementAndAttack(soldier:Soldier, start:TerrainHex, destination:TerrainHex, underAttack:TerrainHex):Boolean = {
+    def validateMovementAndAttack(soldier:Soldier, start:TerrainHex, destination:TerrainHex, underAttack:TerrainHex, attackNumber:Int):Boolean = {
       if (start != destination) {
-        validateMovementEvent(soldier, start, destination) && validateAttackEvent(soldier, destination, underAttack, 0)
+        validateMovementEvent(soldier, start, destination) && validateAttackEvent(soldier, destination, underAttack, attackNumber)
       } else {
-        validateAttackEvent(soldier, destination, underAttack, 0)
+        validateAttackEvent(soldier, destination, underAttack, attackNumber)
       }
     }
     

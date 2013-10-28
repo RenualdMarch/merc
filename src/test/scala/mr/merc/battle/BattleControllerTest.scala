@@ -81,31 +81,68 @@ class BattleControllerTest extends FunSuite with BeforeAndAfter {
 	  assert(controller.battleView.mapView.terrainView.hex(1, 0).hex.soldier.get.name === "1")
 	}
 	
-	ignore("select soldier then move to enemy and see if arrow appears") {
-	  fail
+	test("select soldier then move to enemy and see if arrow appears") {
+	  leftClick(0, 0)
+	  moveMouse(0, 3)
+	  moveMouse(0, 4)
+	  assert(controller.selectedSoldier.get.name === "1")
+	  assert(controller.soldierToShow.soldier.get.name === "3")
+	  assert(controller.arrowIsShown === true)
 	}
 	
-	ignore("select soldier and see if possible moves are shown") {
-	  fail
+	test("select soldier and see if possible moves are shown") {
+	  leftClick(0, 0)
+	  assert(controller.selectedSoldier.get.name === "1")
+	  assert(controller.movementOptionsAreShown === true)
 	}
 	
-	ignore("select enemy soldier and see that possible moves are not shown") {
-	  fail
+	test("select soldier and attack enemy") {
+	  leftClick(0, 0)
+	  moveMouse(0, 3)
+	  moveMouse(0, 4)
+	  assert(controller.selectedSoldier.get.name === "1")
+	  val attacker = controller.selectedSoldier.get
+	  assert(controller.soldierToShow.soldier.get.name === "3")
+	  assert(controller.arrowIsShown === true)
+	  rightClick(0, 4)
+	  assert(attacker.attackedThisTurn === true)
+	  leftClick(0, 3)
+	  assert(controller.selectedSoldier.get.name === "1")
 	}
 	
-	ignore("select soldier and attack enemy") {
-	  fail
-	}
-	
-	ignore("select soldier and attack unreachable enemy") {
-	  fail
+	test("select soldier and attack unreachable enemy") {
+	  leftClick(0, 0)
+	  assert(controller.selectedSoldier.get.name === "1")
+	  val attacker = controller.selectedSoldier.get
+	  moveMouse(7, 3)
+	  rightClick(7, 4)
+	  assert(attacker.attackedThisTurn === false)
+	  leftClick(0, 0)
+	  assert(controller.selectedSoldier.get.name === "1")
 	}
 
-	ignore("select soldier and try to attack another your soldier") {
-	  fail
+	test("select soldier and try to attack another your soldier") {
+	  leftClick(0, 0)
+	  assert(controller.selectedSoldier.get.name === "1")
+	  val attacker = controller.selectedSoldier.get
+	  moveMouse(2, 0)
+	  rightClick(3, 0)
+	  assert(attacker.attackedThisTurn === false)
+	  leftClick(0, 0)
+	  assert(controller.selectedSoldier.get.name === "1")
 	}
 	
-	ignore("select soldier and try to move to unreachable hex") {
+	test("select soldier and try to move to unreachable hex") {
+	  leftClick(0, 0)
+	  assert(controller.selectedSoldier.get.name === "1")
+	  rightClick(7, 7)
+	  assert(controller.selectedSoldier === None)
+	  leftClick(0, 0)
+	  assert(controller.selectedSoldier.get.name === "1")
+	}
+	
+	// TODO write this test
+	ignore("select enemy soldier and see that possible moves are not shown") {
 	  fail
 	}
 }
