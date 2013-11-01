@@ -1,6 +1,6 @@
 package mr.merc.ui.battle
 
-import scalafx.Includes._
+
 import javafx.scene.{layout => jfxsl}
 import javafx.scene.{text => jfxt}
 import javafx.{fxml => jfxf}
@@ -8,6 +8,8 @@ import java.net.URL
 import java.util.ResourceBundle
 import javafx.scene.{canvas => jfxc}
 import javafx.scene.{image => jfxi}
+import javafx.{event => jfxe}
+import javafx.scene.{input => jfxin}
 import scalafx.scene.layout.VBox
 import scalafx.scene.canvas.Canvas
 import scalafx.scene.layout.BorderPane
@@ -33,6 +35,7 @@ import mr.merc.map.terrain._
 class BattleFrame extends jfxf.Initializable with BattleControllerParent {
   val field = new TerrainHexField(5, 5, mapInit)
   val soldier = new Soldier("1", SoldierType("Human-Horseman"), Player("1"))
+  soldier.exp = 10
   field.hex(4, 1).soldier = Some(soldier)  
   val gameField = new GameField(field, List(Player("1"), Player("2")))
   private def mapInit(x:Int, y:Int) = 
@@ -101,6 +104,29 @@ class BattleFrame extends jfxf.Initializable with BattleControllerParent {
     soldierLevel.text <== soldierWrapper.level
     soldierHP.text <== soldierWrapper.hp
     
+    // Yeah, java style
+    battleCanvasDelegate.addEventHandler(jfxin.MouseEvent.MOUSE_CLICKED, new jfxe.EventHandler[jfxin.MouseEvent] {
+      def handle(event:jfxin.MouseEvent) {
+        val x = event.getX().toInt
+        val y = event.getY().toInt
+        controller.moveMouse(x, y)
+        if (event.getButton() == jfxin.MouseButton.PRIMARY) {
+          controller.leftClickMouse()
+        } else if (event.getButton() == jfxin.MouseButton.SECONDARY) {
+          controller.rightClickMouse()
+        }
+      }            
+    })
+    
+    battleCanvasDelegate.addEventHandler(jfxin.MouseEvent.MOUSE_MOVED, new jfxe.EventHandler[jfxin.MouseEvent] {
+      def handle(event:jfxin.MouseEvent) {
+        val x = event.getX().toInt
+        val y = event.getY().toInt
+        controller.moveMouse(x, y)
+      }            
+    })
+    
+    import scalafx.Includes._
     val timeline = Timeline(KeyFrame(50 ms, onFinished = gameLoop))
     timeline.cycleCount = Animation.INDEFINITE
     timeline.play()

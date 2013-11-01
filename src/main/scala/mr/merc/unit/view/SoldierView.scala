@@ -16,6 +16,9 @@ import mr.merc.view.move.SoldierMoveMovement
 import mr.merc.view.move.MovementList
 import mr.merc.view.move.SoldierAttackMovement
 import mr.merc.unit.AttackResult
+import scalafx.scene.paint.Color
+import mr.merc.unit.SoldierType
+import scalafx.scene.canvas.GraphicsContext
 
 object SoldierView {  
   private [view] val attackDistancePercentage = 0.6
@@ -33,6 +36,25 @@ object SoldierView {
 }
 
 class SoldierView (val soldier:Soldier) extends Sprite[SoldierViewState](SoldierTypeViewInfo(soldier.soldierType.name).images, StandState) {
+  private val maxHp = 100
+  private val healthBarHeight = Math.min(soldier.soldierType.hp, maxHp) * TerrainHexView.Side / maxHp
+  private val healthBarWidth = 4
+  
+  private val maxXp = 200
+  private val xpBarHeight = Math.min(soldier.soldierType.exp, maxXp) * TerrainHexView.Side / maxXp
+  private val xpBarWidth = 4
+  
+  val healthBar = new VerticalBarView(healthBarWidth, healthBarHeight, Color.WHITE, Color.RED, hpPercent)
+  val xpBar = new VerticalBarView(xpBarWidth, xpBarHeight, Color.WHITE, Color.WHITE, xpPercent)
+  
+  def hpPercent = soldier.hp.toDouble / soldier.soldierType.hp
+  def xpPercent = soldier.exp.toDouble / soldier.soldierType.exp
+  
+  override def drawItself(gc:GraphicsContext) {
+    super.drawItself(gc)
+    healthBar.draw(x, y + TerrainHexView.Side - healthBarHeight, gc)
+    xpBar.draw(x + 6, y + TerrainHexView.Side - xpBarHeight, gc)
+  }
   
   def moveMovement(path:List[TerrainHexView]):Movement = {
     val list = path zip path.tail map (p => new SoldierMoveMovement(p._1, p._2, this))
@@ -49,6 +71,11 @@ class SoldierView (val soldier:Soldier) extends Sprite[SoldierViewState](Soldier
     						correction._2 * SoldierView.attackDistancePercentage toInt)
     val to = (from._1 + actualCorrection._1, from._2 + actualCorrection._2)
     new SoldierAttackMovement(from, to, direction, result.success, this, enemy, attackNumber)
+  }
+  
+  def refreshBars() {
+    healthBar.fillPercentage = hpPercent
+    xpBar.fillPercentage = xpPercent
   }
 }
 

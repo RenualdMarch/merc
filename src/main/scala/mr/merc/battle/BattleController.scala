@@ -23,8 +23,6 @@ import mr.merc.ui.battle.BattleFrame
 
 
 class BattleController(gameField:GameField, parent:BattleControllerParent)  {
-  // TODO move GameField creation somewhere else
-
   val battleModel = new BattleModel(gameField)
   val battleView = new BattleView(battleModel)
   

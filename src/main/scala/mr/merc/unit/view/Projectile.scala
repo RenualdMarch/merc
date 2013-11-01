@@ -47,8 +47,10 @@ object Projectile {
   }
   
   private def parseImage(projectileName:String, node:Node):MImage = {
-    val name = (node \ "@name").toString()    
-    MImage(rootPath + projectileName + "/" + name + ".png")
+    val name = (node \ "@name").toString()
+    val x = if((node \ "@x").isEmpty) 0 else (node \ "@x").toString.toInt
+    val y = if((node \ "@y").isEmpty) 0 else (node \ "@y").toString.toInt
+    MImage(rootPath + projectileName + "/" + name + ".png", x, y)
   }
   
   private def parseState(name:String, node:NodeSeq):Map[Direction, List[MImage]] = {

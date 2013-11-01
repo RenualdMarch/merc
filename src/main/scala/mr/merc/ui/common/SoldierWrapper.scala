@@ -34,7 +34,7 @@ class SoldierWrapper(private var _soldier:Option[Soldier]) {
 	    case Some(soldier) => {
 	      hp.value = soldier.hp.toString
 	      name.value = soldier.name
-	      exp.value = soldier.currentExp.toString
+	      exp.value = soldier.exp.toString
 	      expToNextLevel.value = soldier.soldierType.exp.toString
 	      movePoints.value = soldier.movePointsRemain.toString
 	      movePointsTotal.value = soldier.soldierType.movement.toString

@@ -4,7 +4,7 @@ import mr.merc.players.Player
 
 class Soldier(val name:String, var soldierType:SoldierType, val player:Player) {
 	private var currentHp = soldierType.hp
-	var currentExp = 0
+	var exp = 0
 	var movePointsRemain = soldierType.movement
 	def hp = currentHp
 	var attackedThisTurn = false
