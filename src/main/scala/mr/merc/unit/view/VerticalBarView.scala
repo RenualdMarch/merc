@@ -13,12 +13,12 @@ class VerticalBarView(width:Int, height:Int, borderColor:Color, fillColor:Color,
 	
 	def draw(x:Int, y:Int, gc:GraphicsContext) {
 	  gc.save()
-	  gc.setFill(fillColor)
+	  gc.fill = fillColor
 	  val filledHeight = (height-2) * fillPercentage
 	  val filledWidth = width
 	  gc.fillRect(x, y - filledHeight + height - 1, width, filledHeight)
-	  gc.setStroke(borderColor)
-	  gc.setLineWidth(1)
+	  gc.stroke = borderColor
+	  gc.lineWidth = 1
 	  gc.beginPath()
 	  gc.rect(x, y, width, height)
 	  gc.closePath()

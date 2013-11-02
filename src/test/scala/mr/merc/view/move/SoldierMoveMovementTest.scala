@@ -22,13 +22,13 @@ class SoldierMoveMovementTest extends FunSuite {
 	  val to = mapView.hex(1, 0)
 	  val movement = new SoldierMoveMovement(from, to, soldierView)
 	  movement.start()
-	  assert(soldierView.x === 36)
-	  assert(soldierView.y === 72 + 36)
+	  assert(soldierView.x === 0)
+	  assert(soldierView.y === 72)
 	  while (!movement.isOver) {
 	    movement.update(1000)
 	  }
 	  
-	  assert(soldierView.x === 72 * 3 / 4 + 36)
-	  assert(soldierView.y === 72)
+	  assert(soldierView.x === 72 * 3 / 4)
+	  assert(soldierView.y === 36)
 	}
 }

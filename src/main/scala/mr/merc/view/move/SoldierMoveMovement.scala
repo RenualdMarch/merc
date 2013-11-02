@@ -13,8 +13,8 @@ class SoldierMoveMovement(val from:TerrainHexView, val to:TerrainHexView, val so
   }
   
   private def updateSoldierCoords() {
-    soldier.x = linearMovement.x + 36
-    soldier.y = linearMovement.y + 36
+    soldier.x = linearMovement.x
+    soldier.y = linearMovement.y
   }
   
   def update(time:Int) {

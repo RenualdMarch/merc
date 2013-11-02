@@ -18,37 +18,26 @@ import mr.merc.unit.AttackResult
 import mr.merc.view.move.SoldierAttackMovement
 import mr.merc.view.move.SoldierRangedAttackMovement
 
-class BattleView(model:BattleModel, private val soldierDrawer:SoldiersDrawer = new SoldiersDrawer) {
-	val mapView = new MapView(model.map.hexField)
-		
-	model.map.hexField.hexes foreach(h => h.soldier foreach(s => {
-	  val view = new SoldierView(s)
-	  view.x = wrap(h).x
-	  view.y = wrap(h).y
-	  soldierDrawer.addSoldier(view)
-    }))
+// injecting soldier drawer for test purposes only
+class BattleView(model:BattleModel, _soldierDrawer:SoldiersDrawer = new SoldiersDrawer) {
+	val mapView = new MapView(model.map.hexField, _soldierDrawer)
 	
+	private val hexesViewMap = mapView.terrainView.hexes.map(v => (v.hex -> v)) toMap
+	private val soldiersMap = mapView.soldiers.map(s => (s.soldier -> s)) toMap
+
 	def update(time:Int) {
 	  mapView.update(time)
-	  soldierDrawer.update(time)
 	}
 	
 	def drawItself(gc:GraphicsContext) {
 	  mapView.drawItself(gc)
-	  soldierDrawer.drawSoldiers(gc)
 	}
 	
 	def hexByPixel(x:Int, y:Int) = mapView.hexByPixel(x, y)
 	
-	// TODO this operation can be speed up from n to c
-	def wrap(s:Soldier):SoldierView = {
-	  soldierDrawer.soldiers.find(_.soldier == s).get
-	}
+	def wrap(s:Soldier) = soldiersMap(s)
 	
-	// TODO this operation can be speed up from n to c
-	def wrap(t:TerrainHex):TerrainHexView = {
-	  mapView.terrainView.hexes.find(_.hex == t).get
-	}
+	def wrap(t:TerrainHex) = hexesViewMap(t)
 	
 	def handleEvent(event:BattleViewEvent) {
 	  event match {
@@ -56,11 +45,19 @@ class BattleView(model:BattleModel, private val soldierDrawer:SoldiersDrawer = n
 	      		handleAttackEvent(wrap(attackerTerrainHex), wrap(defenderTerrainHex), result)
 	    case MoveBattleViewEvent(soldier, path) => handleMovementEvent(wrap(soldier), path map wrap)
 	    case EndMoveViewEvent(nextPlayer) => handleEndMoveEvent(nextPlayer)
-	    // TODO implement this
-	    case ShowMovementOptions(hexes) => 
-	    case HideMovementOptions => 
-	    case ShowArrow(src, dest) => 
-	    case HideArrow => 
+	    case ShowMovementOptions(hexes) => {
+	      val options = hexes map wrap
+	      mapView.terrainView.movementOptions = Some(options)
+	    }
+	    case HideMovementOptions => {
+	      mapView.terrainView.movementOptions = None
+	    }
+	    case ShowArrow(src, dest) => {
+	      mapView.terrainView.arrow = Some(wrap(src), wrap(dest))
+	    }
+	    case HideArrow => {
+	      mapView.terrainView.arrow = None
+	    }
 	  }
 	}
 	
@@ -84,7 +81,7 @@ class BattleView(model:BattleModel, private val soldierDrawer:SoldiersDrawer = n
 	  }
 	  
 	  val move = new MovementList(result map factory)
-	  soldierDrawer.addMovement(move)
+	  mapView.addMovement(move)
 	}
 	
 	private def handleMovementEvent(soldier:SoldierView, path:List[TerrainHexView]) {
@@ -92,7 +89,7 @@ class BattleView(model:BattleModel, private val soldierDrawer:SoldiersDrawer = n
 	  val departure = path.init
 	  val allMovements = for ((a, b) <- departure zip destination) yield     
 	    new SoldierMoveMovement(a, b, soldier)
-	  soldierDrawer.addMovement(new MovementList(allMovements))
+	  mapView.addMovement(new MovementList(allMovements))
 	}
 	
 	private def handleEndMoveEvent(player:Player) {

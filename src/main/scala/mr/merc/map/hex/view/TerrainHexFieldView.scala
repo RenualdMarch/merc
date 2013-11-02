@@ -10,6 +10,9 @@ import mr.merc.map.terrain._
 
 class TerrainHexFieldView(field:TerrainHexField) {
 	val hexes = field.hexes.map(th => new TerrainHexView(th, field))
+	private val hexSet = hexes toSet
+	var movementOptions:Option[Set[TerrainHexView]] = None
+	var arrow:Option[(TerrainHexView, TerrainHexView)] = None
 	
 	private val map = hexes map (h => ((h.hex.x, h.hex.y), h)) toMap
 	
@@ -19,6 +22,26 @@ class TerrainHexFieldView(field:TerrainHexField) {
 	  hexes.foreach(_.drawItself(gc))
 	}
 	
+	def drawMovementImpossible(gc:GraphicsContext) {
+	  movementOptions match {
+	    case Some(actualMovementOptions) => {
+	      val arrowHexes = arrow.map(p => Set(p._1, p._2)).getOrElse(Set())
+	      val darkHexes = hexSet -- actualMovementOptions -- arrowHexes
+	      darkHexes.foreach(_.drawMovementImpossible(gc))
+	    }
+	    case None =>
+	  }
+	}
+	
+	def drawArrow(gc:GraphicsContext) {
+	  if (arrow.isDefined) {
+	    val start = arrow.get._1
+	    val finish = arrow.get._2
+	    val direction = field.direction(start.hex, finish.hex)
+	    start.drawArrowStart(gc, direction)
+	    finish.drawArrowEnd(gc, direction)
+	  }
+	}
 	
 	private val infiniteField = new InfiniteHexField((x, y) => new TerrainHex(x, y, Grass))
 	def hexByPixelCoords(pixelX:Int, pixelY:Int):Option[TerrainHexView] = {
