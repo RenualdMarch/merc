@@ -130,7 +130,7 @@ class BattleModelTest extends FunSuite with BeforeAndAfter {
 	  val result = model.handleEvent(event)
 	  result match {
 	    case AttackModelEventResult(attackerTerrainHex, defenterTerrainHex, 
-	        result) => {
+	        attacker, defender, result) => {
 	      assert(attackerTerrainHex === field.hex(0, 0))
 	      assert(defenterTerrainHex === field.hex(1, 0))
 	      assert(result.size === 3)
@@ -182,4 +182,61 @@ class BattleModelTest extends FunSuite with BeforeAndAfter {
 	  assert(moves === Set(hex(0, 0), hex(0, 1), hex(1, 0), hex(2, 0), hex(2, 1), hex(1, 1), hex(0, 2)))
 	}
 	
+	test("possible attacks when there are no moves should return empty set when there are moves") {
+	  val soldier = new Soldier("1", simpleSoldierType, Player("1"))
+	  field.hex(0, 0).soldier = Some(soldier)
+	  val enemy = new Soldier("2", simpleSoldierType, Player("2"))
+	  field.hex(0, 1).soldier = Some(enemy)
+	  val moves = model.possibleAttacksWhenThereAreNoMoves(soldier, field.hex(0, 0))
+	  assert(moves.size === 0)
+	}
+	
+	test("possible attacks when there are no moves should return empty set when there are no moves and no enemies near") {
+	  val soldier = new Soldier("1", simpleSoldierType, Player("1"))
+	  soldier.movePointsRemain = 0
+	  field.hex(0, 0).soldier = Some(soldier)
+	  val enemy = new Soldier("2", simpleSoldierType, Player("2"))
+	  field.hex(0, 2).soldier = Some(enemy)
+	  val moves = model.possibleAttacksWhenThereAreNoMoves(soldier, field.hex(0, 0))
+	  assert(moves.size === 0)	
+	}
+	
+    test("possible attacks when there are no moves should return enemies that are near when there are moves") {
+	  val soldier = new Soldier("1", simpleSoldierType, Player("1"))
+	  soldier.movePointsRemain = 0
+	  field.hex(0, 0).soldier = Some(soldier)
+	  val enemy = new Soldier("2", simpleSoldierType, Player("2"))
+	  field.hex(0, 1).soldier = Some(enemy)
+	  val moves = model.possibleAttacksWhenThereAreNoMoves(soldier, field.hex(0, 0))
+	  assert(moves === Set(field.hex(0, 1)))	
+	}
+	
+	test("possible attacks when there are no moves should return enemies that are near when there are moves but soldier alread moved") {
+	  val soldier = new Soldier("1", simpleSoldierType, Player("1"))
+	  soldier.movePointsRemain = 5
+	  field.hex(0, 0).soldier = Some(soldier)
+	  val enemy = new Soldier("2", simpleSoldierType, Player("2"))
+	  field.hex(0, 1).soldier = Some(enemy)
+	  val moves = model.possibleAttacksWhenThereAreNoMoves(soldier, field.hex(0, 0))
+	  assert(moves === Set(field.hex(0, 1)))	
+	}
+	
+	test("possible attacks when there are no moves should return empty set  when soldier haven't already moved even is there are enemies near") {
+	  val soldier = new Soldier("1", simpleSoldierType, Player("1"))
+	  field.hex(0, 0).soldier = Some(soldier)
+	  val enemy = new Soldier("2", simpleSoldierType, Player("2"))
+	  field.hex(0, 1).soldier = Some(enemy)
+	  val moves = model.possibleAttacksWhenThereAreNoMoves(soldier, field.hex(0, 0))
+	  assert(moves === Set())	
+	}
+	
+	test("possible moves when enemy soldier is near") {
+	  val soldier = new Soldier("1", simpleSoldierType, Player("1"))
+	  field.hex(0, 0).soldier = Some(soldier)
+	  val enemy = new Soldier("1", simpleSoldierType, Player("2"))
+	  field.hex(0, 1).soldier = Some(enemy)
+	  
+	  val possible = model.possibleMoves(soldier, field.hex(0, 0))
+	  assert(possible === Set(field.hex(1, 0), field.hex(0, 0)))
+	}
 }

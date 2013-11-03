@@ -3,7 +3,7 @@ package mr.merc.map.pathfind
 import mr.merc.map.Grid
 
 object MercPossibleMovesFinder {
-	def findPossibleMoves[T](grid:Grid[T], from:T, maxPrice:Int):Set[T] = {
+	def findPossibleMoves[T](grid:Grid[T], from:T, maxPrice:Int, alreadyMoved:Boolean):Set[T] = {
 		val queue = collection.mutable.Queue[Node[T]]()
 		val startingNode = new Node(from, 0)
 		queue enqueue startingNode
@@ -24,7 +24,14 @@ object MercPossibleMovesFinder {
 		        addNeigboursToQueue = true
 		      }
 		  }
-		  addNeigboursToQueue &&= !grid.cellWhereMovementMustBeStopped(current.t)
+		  
+		  val stopHere = if (from == current.t) {
+		    alreadyMoved && grid.cellWhereMovementMustBeStopped(current.t)
+		  } else {
+		    grid.cellWhereMovementMustBeStopped(current.t)
+		  }
+		  
+		  addNeigboursToQueue &&= !stopHere
 		  
 		  if (addNeigboursToQueue) {
 		    queue ++= getNeighbours(current, grid)

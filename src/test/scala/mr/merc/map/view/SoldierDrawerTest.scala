@@ -74,18 +74,19 @@ class SoldierDrawerTest extends FunSuite with MockitoSugar with BeforeAndAfter {
    val soldiersDrawer = new SoldiersDrawer
    addSoldiers(soldiersDrawer)
    
-   val move1 = new ExampleMovement(List(soldier1))
-   soldiersDrawer.addMovement(move1)
+   val move1 = new ExampleMovement(List(soldier1, soldier2))   
    val move2 = new ExampleMovement(List(soldier3))
+   soldiersDrawer.addMovement(move1)
    soldiersDrawer.addMovement(move2)
    
-   assert(soldiersDrawer.movements === List(move2, move1))
+   assert(soldiersDrawer.movements.toList === List(move1, move2))
    
    soldiersDrawer.drawSoldiers(gc)
-   val inOrder = org.mockito.Mockito.inOrder(soldier1, soldier3, soldier2);
-   inOrder.verify(soldier2).drawItself(gc)
+   val inOrder = org.mockito.Mockito.inOrder(soldier1, soldier2, soldier3);
    inOrder.verify(soldier3).drawItself(gc)
    inOrder.verify(soldier1).drawItself(gc)
+   inOrder.verify(soldier2).drawItself(gc)
+   
  }
  
  after {

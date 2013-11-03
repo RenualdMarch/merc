@@ -5,7 +5,8 @@ import mr.merc.map.hex.Hex
 import mr.merc.map.hex.HexField
 import mr.merc.map.hex.TerrainHexField
 import mr.merc.map.hex.TerrainHex
-import mr.merc.map.terrain.Grass
+import mr.merc.map.terrain._
+import mr.merc.map.objects._
 
 class AStarPathFinderTest extends FunSuite{
 	val finder = AStarPathFinder
@@ -80,5 +81,33 @@ class AStarPathFinderTest extends FunSuite{
 	  val result = finder.findPath(grid, from, dest)
 	  import grid.hex
 	  assert(result.get === List(hex(0, 0), hex(1, 0), hex(2, 1), hex(3, 1), hex(4, 2), hex(5, 2)))
+	}
+	
+	test("complex pathfinding") {
+	   def mapInit(x:Int, y:Int) = if (x == 1 || x == 2) {
+         new TerrainHex(x, y, Water, if (y == 2) Some(WoodenBridge) else None)
+       } else if (y == 2){
+         new TerrainHex(x, y, Forest)
+       } else if (x == 4 && y == 3){
+         new TerrainHex(x, y, Grass, Some(House))
+       } else {
+         new TerrainHex(x, y, Sand)
+       }
+	   
+	   val costMap:Map[TerrainType, Int] = Map(Water -> 3, Forest -> 3, Swamp -> 4, 
+	       Hill -> 2,  Mountain -> 1000, Road -> 1, Sand -> 2, Grass -> 1)			
+
+	   val field = new TerrainHexField(5, 5, mapInit)
+	   val start = field.hex(4, 3)
+	   val finish = field.hex(1, 2)
+	   
+	   val optimalPath = List(field.hex(4, 3), field.hex(3, 3), field.hex(2, 3), field.hex(1, 2))
+	   val optimalSum = optimalPath.tail.map(h => costMap(h.terrain)).sum
+	       
+	   val path = AStarPathFinder.findPath(field, start, finish)
+	   val pathSum = path.get.tail.map(h => costMap(h.terrain)).sum
+	   println(optimalSum)
+	   println(pathSum)
+	   assert(path.get === List(field.hex(4, 3), field.hex(3, 3), field.hex(2, 3), field.hex(1, 2)))
 	}
 }

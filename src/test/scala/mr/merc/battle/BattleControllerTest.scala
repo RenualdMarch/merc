@@ -141,6 +141,14 @@ class BattleControllerTest extends FunSuite with BeforeAndAfter {
 	  assert(controller.selectedSoldier.get.name === "1")
 	}
 	
+	test("select soldier and move and see that possible moves are no longer shown and soldier is not selected") {
+	  leftClick(0, 0)
+	  assert(controller.selectedSoldier.get.name === "1")
+	  rightClick(1, 1)
+	  assert(controller.movementOptionsAreShown === false)
+	  assert(controller.selectedSoldier === None)
+	}
+	
 	// TODO write this test
 	ignore("select enemy soldier and see that possible moves are not shown") {
 	  fail

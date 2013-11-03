@@ -47,7 +47,7 @@ class Sprite[T <: SpriteState](val images:Map[T, List[MImage]], private var _sta
 	
 	def index_=(i:Int) {
 	  require(i >= 0, "Index cann't be less then 0")
-	  require(i < images(state).size, "Index bigger than size")
+	  require(i < images(state).size, s"Index $i is bigger than size ${images(state).size} for state $state")
 	  _index = i
 	  _time = 0
 	}
@@ -58,6 +58,7 @@ class Sprite[T <: SpriteState](val images:Map[T, List[MImage]], private var _sta
 	  require(images.keys.exists(_ == st), "State isn't present in map!")
 	  _state = st
 	  _time = 0
+	  _index = 0
 	}
   
     private def currentImage = images(state)(index)

@@ -78,8 +78,9 @@ class BattleController(gameField:GameField, parent:BattleControllerParent)  {
     hexOpt match {
       case Some(hex) => {
         movementOptionsAreShown = true
-        val possible = battleModel.possibleMoves(selectedSoldier.get, hex)
-        battleView.handleEvent(ShowMovementOptions(possible))
+        val possible = battleModel.possibleMoves(selectedSoldier.get, hex) ++ Set(hex) ++
+          battleModel.possibleAttacksWhenThereAreNoMoves(selectedSoldier.get, hex)
+          battleView.handleEvent(ShowMovementOptions(possible))
       }
       case None => // do nothing
     }
@@ -100,13 +101,13 @@ class BattleController(gameField:GameField, parent:BattleControllerParent)  {
             
              if (visitedHexesList.isDefined && battleModel.validateMovementAndAttack(attacker, attackerHex, 
         		visitedHexesList.prev.get, visitedHexesList.current.get, 0)) {
-             
-               // TODO IMPORTANT!!! Here add attack selection via dialog!
+               
                if (attackerHex != visitedHexesList.prev.get) {
                  val moveResult = battleModel.handleMovementEvent(attacker, attackerHex, visitedHexesList.prev.get)
                  battleView.handleEvent(moveResult.buildBattleViewEvent)
                }
-          
+               
+               // TODO IMPORTANT!!! Here add attack selection via dialog!
                val attackResult = battleModel.handleEvent(AttackModelEvent(attacker, visitedHexesList.prev.get, hex, 0))
                battleView.handleEvent(attackResult.buildBattleViewEvent)
             }        
@@ -122,10 +123,11 @@ class BattleController(gameField:GameField, parent:BattleControllerParent)  {
             if (battleModel.validateMovementEvent(soldier, from, hex)) {
               val result = battleModel.handleEvent(MovementModelEvent(soldier, from, hex))
               battleView.handleEvent(result.buildBattleViewEvent)
-            } else {
-              selectedSoldier = None
-              soldierToShow.soldier = None
             }
+            
+            selectedSoldier = None
+            soldierToShow.soldier = None
+            removeMovementOptions()
           }
           case None => // do nothing
         }
@@ -162,11 +164,16 @@ class BattleController(gameField:GameField, parent:BattleControllerParent)  {
   }
   
   private [battle] def canBeCurrentHexAttackedFromPrevious:Boolean = {
-    val hexOpt = battleModel.hexBySoldier(selectedSoldier)
-    if (visitedHexesList.isDefined && hexOpt.isDefined) {
-      battleModel.validateMovementAndAttack(selectedSoldier.get, hexOpt.get, visitedHexesList.prev.get, visitedHexesList.current.get, 0)
-    } else {
+    val canSoldierAttack = selectedSoldier.map(!_.attackedThisTurn).getOrElse(false)
+    if (!canSoldierAttack) {
       false
+    } else {
+      val hexOpt = battleModel.hexBySoldier(selectedSoldier)
+      if (visitedHexesList.isDefined && hexOpt.isDefined) {
+        battleModel.validateMovementAndAttack(selectedSoldier.get, hexOpt.get, visitedHexesList.prev.get, visitedHexesList.current.get, 0)
+      } else {
+        false
+      }
     }
   }
   
@@ -185,9 +192,6 @@ class BattleController(gameField:GameField, parent:BattleControllerParent)  {
   def drawBattleCanvas(gc:GraphicsContext) {
     battleView.drawItself(gc)
   }
-  
-
-
 }
 
 private [battle] class VisitedHexesList {

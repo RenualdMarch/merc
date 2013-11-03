@@ -5,6 +5,7 @@ import mr.merc.unit.view.SoldierView
 import mr.merc.map.hex.Direction
 import mr.merc.map.hex._
 import mr.merc.unit.view.SoldierViewAttackState
+import mr.merc.unit.view.StandState
 
 object SoldierAttackMovement {
   private val frameCount = 20
@@ -74,6 +75,7 @@ class SoldierAttackMovement(val from:(Int, Int), val to:(Int, Int), val dir:Dire
     private def changeSoldierConfigurationBack() {
       attacker.animationEnabled = true
       attacker.mirroringEnabled = true
+      attacker.state = StandState
     }
     
     private def handleMoveToEnemy(time:Int) {

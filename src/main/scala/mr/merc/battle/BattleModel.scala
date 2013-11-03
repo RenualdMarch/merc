@@ -39,7 +39,7 @@ class BattleModel(val map:GameField) extends BattleModelEventHandler {
       val defenderAttack = selectBestAttackForDefender(soldier, defender, attackerAttack)
       soldier.attackedThisTurn = true
       val result = Attack.battle(from, target, attackerAttack, defenderAttack)
-      new AttackModelEventResult(from, target, result)
+      new AttackModelEventResult(from, target, soldier, defender, result)
     }
     
     private [battle] def selectBestAttackForDefender(attacker:Soldier, defender:Soldier, attackersAttack:Attack):Option[Attack] = {
@@ -83,10 +83,23 @@ class BattleModel(val map:GameField) extends BattleModelEventHandler {
     }
      
     def possibleMoves(soldier:Soldier, currentHex:TerrainHex):Set[TerrainHex] = {
-      val possible = MercPossibleMovesFinder.findPossibleMoves(map.gridForSoldier(soldier), currentHex, soldier.movePointsRemain)
+      val possible = MercPossibleMovesFinder.findPossibleMoves(map.gridForSoldier(soldier), currentHex, soldier.movePointsRemain, soldier.movedThisTurn)
       possible filter (validateMovementEvent(soldier, currentHex, _, false))
     }
     
+    def possibleAttacksWhenThereAreNoMoves(soldier:Soldier, currentHex:TerrainHex):Set[TerrainHex] = {
+      val neigbours = map.hexField.neighbours(currentHex)
+      val enemiesNear = neigbours.filter(_.soldier.map(_.player != soldier.player).getOrElse(false))
+      if (enemiesNear.isEmpty) {
+        return Set()
+      }
+      
+      if (soldier.movedThisTurn) {
+        enemiesNear
+      } else {
+        Set()
+      }
+     }
     
     // TODO add test
     def validateMovementAndAttack(soldier:Soldier, start:TerrainHex, destination:TerrainHex, underAttack:TerrainHex, attackNumber:Int):Boolean = {

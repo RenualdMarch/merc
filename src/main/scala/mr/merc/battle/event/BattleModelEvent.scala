@@ -21,8 +21,8 @@ case class MovementModelEvent(soldier:Soldier, from:TerrainHex, to:TerrainHex) e
 case class AttackModelEvent(soldier:Soldier, from:TerrainHex, target:TerrainHex, attackNumber:Int) extends BattleModelEvent
 case class EndMoveModelEvent() extends BattleModelEvent
 
-case class AttackModelEventResult(attackerTerrainHex:TerrainHex, defenterTerrainHex:TerrainHex, result:List[AttackResult]) extends BattleModelEventResult {
-  def buildBattleViewEvent = AttackBattleViewEvent(attackerTerrainHex, defenterTerrainHex, result)
+case class AttackModelEventResult(attackerTerrainHex:TerrainHex, defenterTerrainHex:TerrainHex, attacker:Soldier, defender:Soldier, result:List[AttackResult]) extends BattleModelEventResult {
+  def buildBattleViewEvent = AttackBattleViewEvent(attackerTerrainHex, defenterTerrainHex, attacker, defender, result)
 }
 case class MovementModelEventResult(soldier:Soldier, path:List[TerrainHex]) extends BattleModelEventResult {
   def buildBattleViewEvent = MoveBattleViewEvent(soldier, path)

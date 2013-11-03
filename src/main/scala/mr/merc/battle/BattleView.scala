@@ -41,8 +41,8 @@ class BattleView(model:BattleModel, _soldierDrawer:SoldiersDrawer = new Soldiers
 	
 	def handleEvent(event:BattleViewEvent) {
 	  event match {
-	    case AttackBattleViewEvent(attackerTerrainHex, defenderTerrainHex, result) => 
-	      		handleAttackEvent(wrap(attackerTerrainHex), wrap(defenderTerrainHex), result)
+	    case AttackBattleViewEvent(attackerTerrainHex, defenderTerrainHex, attacker, defender, result) => 
+	      		handleAttackEvent(wrap(attackerTerrainHex), wrap(defenderTerrainHex), attacker, defender, result)
 	    case MoveBattleViewEvent(soldier, path) => handleMovementEvent(wrap(soldier), path map wrap)
 	    case EndMoveViewEvent(nextPlayer) => handleEndMoveEvent(nextPlayer)
 	    case ShowMovementOptions(hexes) => {
@@ -62,21 +62,26 @@ class BattleView(model:BattleModel, _soldierDrawer:SoldiersDrawer = new Soldiers
 	}
 	
 	private def handleAttackEvent(attackerTerrainHex:TerrainHexView, 
-				defenterTerrainHex:TerrainHexView, result:List[AttackResult]) {	  
-	  val dir = model.map.hexField.direction(attackerTerrainHex.hex, defenterTerrainHex.hex)
+				defenderTerrainHex:TerrainHexView, attacker:Soldier, defender:Soldier, result:List[AttackResult]) {	  
+	  val dir = model.map.hexField.direction(attackerTerrainHex.hex, defenderTerrainHex.hex)
 	  	  
 	  def factory(res:AttackResult) = {
-	    val attacker = res.attacker
-	    val defender = res.defender
+	    val currentAttacker = res.attacker
+	    val currendDefender = res.defender
 	    val attack = res.attack
 	    val ranged = attack.ranged
 	    val attackNumber = res.attacker.soldierType.attacks.indexOf(attack)
+	    
+	    val attackPos = if (attacker == currentAttacker) attackerTerrainHex.coords else defenderTerrainHex.coords
+	    val defenderPos = if (defender == currendDefender) defenderTerrainHex.coords else attackerTerrainHex.coords 
+	    val currentDirection = if (attacker == currentAttacker) dir else dir.opposite
+	    
 	    if(ranged) {
-	      new SoldierRangedAttackMovement(attackerTerrainHex.coords, defenterTerrainHex.coords, dir,
-	    			res.success, wrap(attacker), wrap(defender), attackNumber)
+	      new SoldierRangedAttackMovement(attackPos, defenderPos, currentDirection,
+	    			res.success, wrap(currentAttacker), wrap(currendDefender), attackNumber)
 	    } else {
-	      new SoldierAttackMovement(attackerTerrainHex.coords, defenterTerrainHex.coords, dir,
-	    			res.success, wrap(attacker), wrap(defender), attackNumber)
+	      new SoldierAttackMovement(attackPos, defenderPos, currentDirection,
+	    			res.success, wrap(currentAttacker), wrap(currendDefender), attackNumber)
 	    }
 	  }
 	  

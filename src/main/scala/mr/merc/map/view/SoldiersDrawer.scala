@@ -3,10 +3,11 @@ package mr.merc.map.view
 import mr.merc.unit.view.SoldierView
 import mr.merc.view.move.Movement
 import scalafx.scene.canvas.GraphicsContext
+import scala.collection.mutable.Queue
 
 class SoldiersDrawer {
 	private var _soldiers = Set[SoldierView]()
-	private var _movements = List[Movement]()
+	private val _movements = Queue[Movement]()
 	
 	def addSoldier(s:SoldierView) {
 	  _soldiers += s
@@ -17,13 +18,14 @@ class SoldiersDrawer {
 	}
 	
 	def addMovement(movement:Movement) {
-	  _movements ::= movement
+	  movement.start()
+	  _movements enqueue movement
 	}
 	
 	def soldiers = _soldiers
 	def movements = _movements
 	
-	private def drawablesInMovements = movements flatMap (_.drawables)
+	private def drawablesInMovements = movements.headOption.map(_.drawables).getOrElse(Nil)
 	private def soldierInMovements = drawablesInMovements flatMap(d => d match {
 	  case soldier:SoldierView => Some(soldier)
 	  case _ => None
@@ -31,8 +33,12 @@ class SoldiersDrawer {
 	
 	def update(time:Int) {
 	  _soldiers foreach (_.updateTime(time))
-	  _movements foreach (_.update(time))
-	  _movements = _movements filterNot(_.isOver)
+	  if (!_movements.isEmpty) {
+	  _movements.front.update(time)
+	    if (movements.front.isOver) {
+	      _movements.dequeue()
+	    }
+	  }
 	}
 	
 	def drawSoldiers(gc:GraphicsContext) {

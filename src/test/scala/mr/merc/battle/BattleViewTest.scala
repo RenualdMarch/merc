@@ -26,6 +26,7 @@ import mr.merc.battle.event.AttackBattleViewEvent
 import mr.merc.view.move.SoldierRangedAttackMovement
 import mr.merc.map.hex.SE
 import mr.merc.view.move.SoldierAttackMovement
+import mr.merc.map.hex.NW
 
 
 class BattleViewTest extends FunSuite with BeforeAndAfter with MockitoSugar {
@@ -101,7 +102,7 @@ class BattleViewTest extends FunSuite with BeforeAndAfter with MockitoSugar {
       to.soldier = Some(defender)
       val soldierDrawer = new SoldiersDrawer
       view = new BattleView(model, soldierDrawer)
-      val event = new AttackBattleViewEvent(from, to, result)
+      val event = new AttackBattleViewEvent(from, to, attacker, defender, result)
       view.handleEvent(event)
       assert(soldierDrawer.movements.size === 1)
       assert(soldierDrawer.movements(0).isInstanceOf[MovementList])
@@ -140,7 +141,7 @@ class BattleViewTest extends FunSuite with BeforeAndAfter with MockitoSugar {
       val soldierDrawer = new SoldiersDrawer
       view = new BattleView(model, soldierDrawer)
       
-      val event = new AttackBattleViewEvent(from, to, result)
+      val event = new AttackBattleViewEvent(from, to, attacker, defender, result)
       view.handleEvent(event)
       
       assert(soldierDrawer.movements.size === 1)
@@ -158,11 +159,11 @@ class BattleViewTest extends FunSuite with BeforeAndAfter with MockitoSugar {
       assert(first.attackNumber === 0)
       
       val second = move.list(1).asInstanceOf[SoldierAttackMovement]
-      assert(second.from === (0, 0))
-      assert(second.to === (72 * 3 / 4, 72 / 2))
+      assert(second.from === (72 * 3 / 4, 72 / 2))
+      assert(second.to === (0, 0))
       assert(second.attacker.soldier === defender)
       assert(second.defender.soldier === attacker)
-      assert(second.dir === SE)
+      assert(second.dir === NW)
       assert(second.success === true)
       assert(second.attackNumber === 0)
       

@@ -7,6 +7,7 @@ import mr.merc.unit.view.SoldierView
 import mr.merc.map.hex.NE
 import mr.merc.unit.view.FirstAttackNESuccState
 import mr.merc.players.Player
+import mr.merc.unit.view.StandState
 
 class SoldierAttackMovementTest extends FunSuite {
 	test("imagesList") {
@@ -79,8 +80,8 @@ class SoldierAttackMovementTest extends FunSuite {
 	  movement.update(5000 / 4)
 	  assert(soldierView.x === 0 / 2)
 	  assert(soldierView.y === 10)
-	  assert(soldierView.state === FirstAttackNESuccState)
-	  assert(soldierView.index === 3)
+	  assert(soldierView.state === StandState)
+	  assert(soldierView.index === 0)
 	  
 	  assert(movement.isOver)
 	  
