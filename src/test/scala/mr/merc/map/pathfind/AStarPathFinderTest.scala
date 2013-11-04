@@ -16,7 +16,7 @@ class AStarPathFinderTest extends FunSuite{
 		val from = grid.hex(0, 1)
 		val to = grid.hex(0, 3)
 		val connector = grid.hex(0, 2)
-		val result = finder.findPath(grid, from, to)
+		val result = finder.findPath(grid, from, to, 10)
 		assert(result.get === List(from, connector, to))
 	}
 	
@@ -30,7 +30,7 @@ class AStarPathFinderTest extends FunSuite{
 	  val connector1 = grid.hex(1, 1)
 	  val connector2 = grid.hex(1, 2)
 	  
-	  val result = finder.findPath(grid, from, to)
+	  val result = finder.findPath(grid, from, to, 10)
 	  assert(result.get === List(from, connector1, connector2, to))
 	}
 	
@@ -42,7 +42,7 @@ class AStarPathFinderTest extends FunSuite{
 	  val from = grid.hex(0, 1)
 	  val to = grid.hex(4, 3)
 	   
-	  val result = finder.findPath(grid, from, to)
+	  val result = finder.findPath(grid, from, to, 10)
 	  assert(result.isEmpty)
 	}
 	
@@ -55,7 +55,7 @@ class AStarPathFinderTest extends FunSuite{
 	  
 	  val from = grid.hex(0, 0)
 	  val dest = grid.hex(2, 1)
-	  val result = finder.findPath(grid, from, dest)
+	  val result = finder.findPath(grid, from, dest, 10)
 	  val connector1 = grid.hex(0, 1)
 	  val connector2 = grid.hex(1, 1)
 	  assert(result.get === List(from, connector1, connector2, dest))
@@ -70,7 +70,7 @@ class AStarPathFinderTest extends FunSuite{
 	  
 	  val from = grid.hex(0, 0)
 	  val dest = grid.hex(1, 0)
-	  val result = finder.findPath(grid, from, dest)
+	  val result = finder.findPath(grid, from, dest, 10)
 	  assert(result === None)
 	}
 	
@@ -78,7 +78,7 @@ class AStarPathFinderTest extends FunSuite{
 	  val grid = new TerrainHexField(10, 10, (x, y) => new TerrainHex(x, y, Grass))
 	  val from = grid.hex(0, 0)
 	  val dest = grid.hex(5, 2)
-	  val result = finder.findPath(grid, from, dest)
+	  val result = finder.findPath(grid, from, dest, 10)
 	  import grid.hex
 	  assert(result.get === List(hex(0, 0), hex(1, 0), hex(2, 1), hex(3, 1), hex(4, 2), hex(5, 2)))
 	}
@@ -97,14 +97,16 @@ class AStarPathFinderTest extends FunSuite{
 	   val costMap:Map[TerrainType, Int] = Map(Water -> 3, Forest -> 3, Swamp -> 4, 
 	       Hill -> 2,  Mountain -> 1000, Road -> 1, Sand -> 2, Grass -> 1)			
 
-	   val field = new TerrainHexField(5, 5, mapInit)
+	   val field = new TerrainHexField(5, 5, mapInit) {
+	     override def price(hex:TerrainHex) = costMap(hex.terrain)
+	   }
 	   val start = field.hex(4, 3)
 	   val finish = field.hex(1, 2)
 	   
 	   val optimalPath = List(field.hex(4, 3), field.hex(3, 3), field.hex(2, 3), field.hex(1, 2))
 	   val optimalSum = optimalPath.tail.map(h => costMap(h.terrain)).sum
 	       
-	   val path = AStarPathFinder.findPath(field, start, finish)
+	   val path = AStarPathFinder.findPath(field, start, finish, 10)
 	   val pathSum = path.get.tail.map(h => costMap(h.terrain)).sum
 	   println(optimalSum)
 	   println(pathSum)

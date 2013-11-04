@@ -7,20 +7,20 @@ object MercPossibleMovesFinder {
 		val queue = collection.mutable.Queue[Node[T]]()
 		val startingNode = new Node(from, 0)
 		queue enqueue startingNode
-		val calculated = collection.mutable.Map[Node[T], Node[T]]()
+		val calculated = collection.mutable.Map[T, Node[T]]()
 		while (!queue.isEmpty) {
 		  val current = queue.dequeue()
 		  var addNeigboursToQueue = false
 		  if (current.pathPrice <= maxPrice) {
-		    if (calculated.contains(current)) {
-		        val earlierValue = calculated(current)
+		    if (calculated.contains(current.t)) {
+		        val earlierValue = calculated(current.t)
 		        if (earlierValue.pathPrice > current.pathPrice) {
-		          calculated.remove(earlierValue)
-		          calculated += (current -> current)
+		          calculated.remove(earlierValue.t)
+		          calculated += (current.t -> current)
 		          addNeigboursToQueue = true
 		        }
 		      } else {
-		        calculated += (current -> current)
+		        calculated += (current.t -> current)
 		        addNeigboursToQueue = true
 		      }
 		  }
@@ -39,7 +39,7 @@ object MercPossibleMovesFinder {
 		
 		}
 		
-		calculated.keySet.map(_.t).toSet
+		calculated.keySet.toSet
 	}
 	
 	private def getNeighbours[T](parent:Node[T], grid:Grid[T]):Set[Node[T]] = {

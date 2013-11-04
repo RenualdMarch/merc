@@ -179,7 +179,7 @@ class BattleModelTest extends FunSuite with BeforeAndAfter {
 	  val moves = model.possibleMoves(soldier, field.hex(0, 0))
 	  val currentField = field
 	  import currentField.hex
-	  assert(moves === Set(hex(0, 0), hex(0, 1), hex(1, 0), hex(2, 0), hex(2, 1), hex(1, 1), hex(0, 2)))
+	  assert(moves === Set(hex(0, 1), hex(1, 0), hex(2, 0), hex(2, 1), hex(1, 1), hex(0, 2)))
 	}
 	
 	test("possible attacks when there are no moves should return empty set when there are moves") {
@@ -237,6 +237,6 @@ class BattleModelTest extends FunSuite with BeforeAndAfter {
 	  field.hex(0, 1).soldier = Some(enemy)
 	  
 	  val possible = model.possibleMoves(soldier, field.hex(0, 0))
-	  assert(possible === Set(field.hex(1, 0), field.hex(0, 0)))
+	  assert(possible === Set(field.hex(1, 0)))
 	}
 }

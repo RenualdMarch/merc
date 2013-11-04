@@ -22,7 +22,7 @@ class BattleModel(val map:GameField) extends BattleModelEventHandler {
     private [battle] def handleMovementEvent(soldier:Soldier, from:TerrainHex, to:TerrainHex):MovementModelEventResult = {
       require(validateMovementEvent(soldier, from, to))
       require(to.soldier == None)
-      val path = AStarPathFinder.findPath(map.gridForSoldier(soldier), from, to)
+      val path = AStarPathFinder.findPath(map.gridForSoldier(soldier), from, to, soldier.movePointsRemain, soldier.movedThisTurn)
       val movePrice = pathPrice(soldier.soldierType.moveCost, path.get)
       soldier.movePointsRemain -= movePrice
       from.soldier = None
@@ -60,6 +60,10 @@ class BattleModel(val map:GameField) extends BattleModelEventHandler {
      def hexBySoldier(soldier:Soldier) = map.hexField.hexes.find(h => h.soldier == Some(soldier)).get
     
      def validateMovementEvent(soldier:Soldier, from:TerrainHex, to:TerrainHex, validatePath:Boolean = true):Boolean = {
+      if (from == to) {
+        return false
+      }
+       
       if (soldier.attackedThisTurn) {
         return false
       }
@@ -69,7 +73,7 @@ class BattleModel(val map:GameField) extends BattleModelEventHandler {
       }
       
       if (validatePath) {
-        val pathOpt = AStarPathFinder.findPath(map.gridForSoldier(soldier), from, to)
+        val pathOpt = AStarPathFinder.findPath(map.gridForSoldier(soldier), from, to, soldier.movePointsRemain, soldier.movedThisTurn)
         pathOpt match {
           case Some(path) => {
             val price = pathPrice(soldier.soldierType.moveCost, path)
