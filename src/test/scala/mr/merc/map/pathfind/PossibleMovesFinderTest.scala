@@ -5,7 +5,7 @@ import mr.merc.map.hex.HexField
 import mr.merc.map.hex.Hex
 
 class MercPossibleMovesFinderTest extends FunSuite {
-	val finder = MercPossibleMovesFinder
+	val finder = PossibleMovesFinder
   
     test("sanity check") {
 	  val grid = new HexField[Hex](5, 5, Hex.hexInit)

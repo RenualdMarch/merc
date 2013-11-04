@@ -4,10 +4,10 @@ import mr.merc.map.GameField
 import mr.merc.battle.event._
 import mr.merc.unit.Soldier
 import mr.merc.map.hex.TerrainHex
-import mr.merc.map.pathfind.AStarPathFinder
+import mr.merc.map.pathfind.PathFinder
 import mr.merc.map.terrain.TerrainType
 import mr.merc.unit.Attack
-import mr.merc.map.pathfind.MercPossibleMovesFinder
+import mr.merc.map.pathfind.PossibleMovesFinder
 
 class BattleModel(val map:GameField) extends BattleModelEventHandler {
 	
@@ -22,7 +22,7 @@ class BattleModel(val map:GameField) extends BattleModelEventHandler {
     private [battle] def handleMovementEvent(soldier:Soldier, from:TerrainHex, to:TerrainHex):MovementModelEventResult = {
       require(validateMovementEvent(soldier, from, to))
       require(to.soldier == None)
-      val path = AStarPathFinder.findPath(map.gridForSoldier(soldier), from, to, soldier.movePointsRemain, soldier.movedThisTurn)
+      val path = PathFinder.findPath(map.gridForSoldier(soldier), from, to, soldier.movePointsRemain, soldier.movedThisTurn)
       val movePrice = pathPrice(soldier.soldierType.moveCost, path.get)
       soldier.movePointsRemain -= movePrice
       from.soldier = None
@@ -73,7 +73,7 @@ class BattleModel(val map:GameField) extends BattleModelEventHandler {
       }
       
       if (validatePath) {
-        val pathOpt = AStarPathFinder.findPath(map.gridForSoldier(soldier), from, to, soldier.movePointsRemain, soldier.movedThisTurn)
+        val pathOpt = PathFinder.findPath(map.gridForSoldier(soldier), from, to, soldier.movePointsRemain, soldier.movedThisTurn)
         pathOpt match {
           case Some(path) => {
             val price = pathPrice(soldier.soldierType.moveCost, path)
@@ -87,7 +87,7 @@ class BattleModel(val map:GameField) extends BattleModelEventHandler {
     }
      
     def possibleMoves(soldier:Soldier, currentHex:TerrainHex):Set[TerrainHex] = {
-      val possible = MercPossibleMovesFinder.findPossibleMoves(map.gridForSoldier(soldier), currentHex, soldier.movePointsRemain, soldier.movedThisTurn)
+      val possible = PossibleMovesFinder.findPossibleMoves(map.gridForSoldier(soldier), currentHex, soldier.movePointsRemain, soldier.movedThisTurn)
       possible filter (validateMovementEvent(soldier, currentHex, _, false))
     }
     

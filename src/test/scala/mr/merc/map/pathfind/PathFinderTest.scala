@@ -8,8 +8,8 @@ import mr.merc.map.hex.TerrainHex
 import mr.merc.map.terrain._
 import mr.merc.map.objects._
 
-class AStarPathFinderTest extends FunSuite{
-	val finder = AStarPathFinder
+class PathFinderTest extends FunSuite{
+	val finder = PathFinder
   
 	test("pathfinding sanity check") {
 		val grid = new HexField[Hex](5, 5, Hex.hexInit)
@@ -106,7 +106,7 @@ class AStarPathFinderTest extends FunSuite{
 	   val optimalPath = List(field.hex(4, 3), field.hex(3, 3), field.hex(2, 3), field.hex(1, 2))
 	   val optimalSum = optimalPath.tail.map(h => costMap(h.terrain)).sum
 	       
-	   val path = AStarPathFinder.findPath(field, start, finish, 10)
+	   val path = finder.findPath(field, start, finish, 10)
 	   val pathSum = path.get.tail.map(h => costMap(h.terrain)).sum
 	   println(optimalSum)
 	   println(pathSum)
