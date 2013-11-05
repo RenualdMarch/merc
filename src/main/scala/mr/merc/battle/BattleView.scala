@@ -17,6 +17,8 @@ import mr.merc.players.Player
 import mr.merc.unit.AttackResult
 import mr.merc.view.move.SoldierAttackMovement
 import mr.merc.view.move.SoldierRangedAttackMovement
+import mr.merc.view.move.MomentaryMovement
+import mr.merc.view.move.MomentaryMovement
 
 // injecting soldier drawer for test purposes only
 class BattleView(model:BattleModel, _soldierDrawer:SoldiersDrawer = new SoldiersDrawer) {
@@ -85,7 +87,11 @@ class BattleView(model:BattleModel, _soldierDrawer:SoldiersDrawer = new Soldiers
 	    }
 	  }
 	  
-	  val move = new MovementList(result map factory)
+	  val attacksList = result map factory
+	  def refreshAttacker = wrap(attacker).refreshBars()
+	  def refreshDefender = wrap(defender).refreshBars()
+	  val refreshList = List(new MomentaryMovement(refreshAttacker), new MomentaryMovement(refreshDefender))
+	  val move = new MovementList(attacksList ++ refreshList)
 	  mapView.addMovement(move)
 	}
 	

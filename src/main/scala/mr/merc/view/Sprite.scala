@@ -33,7 +33,7 @@ class Sprite[T <: SpriteState](val images:Map[T, List[MImage]], private var _sta
 		  _x = i
 		  if (oldX > x) {
 		    rightDirection = false
-		  } else {
+		  } else if (oldX < x){
 		    rightDirection = true	    
 		  }
 	  } else {
