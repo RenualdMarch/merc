@@ -5,9 +5,9 @@ import mr.merc.unit.Soldier
 import mr.merc.unit.SoldierType
 import mr.merc.unit.view.SoldierView
 import mr.merc.map.hex.NE
-import mr.merc.unit.view.FirstAttackNESuccState
 import mr.merc.players.Player
 import mr.merc.unit.view.StandState
+import mr.merc.unit.view.SoldierViewAttackState
 
 class SoldierAttackMovementTest extends FunSuite {
 	test("imagesList") {
@@ -32,49 +32,49 @@ class SoldierAttackMovementTest extends FunSuite {
 	  movement.start()
 	  assert(soldierView.x === 0)
 	  assert(soldierView.y === 10)
-	  assert(soldierView.state === FirstAttackNESuccState)
+	  assert(soldierView.state === SoldierViewAttackState(true, NE, 0))
 	  assert(soldierView.index === 0)
 	  
 	  movement.update(5000 / 4)
 	  assert(soldierView.x === 300 / 4)
 	  assert(soldierView.y === 110)
-	  assert(soldierView.state === FirstAttackNESuccState)
+	  assert(soldierView.state === SoldierViewAttackState(true, NE, 0))
 	  assert(soldierView.index === 1)
 	  
 	  movement.update(5000 / 4)
 	  assert(soldierView.x === 300 / 2)
 	  assert(soldierView.y === 210)
-	  assert(soldierView.state === FirstAttackNESuccState)
+	  assert(soldierView.state === SoldierViewAttackState(true, NE, 0))
 	  assert(soldierView.index === 2)
 	  
 	  movement.update(5000 / 4)
 	  assert(soldierView.x === 300 * 3 / 4)
 	  assert(soldierView.y === 310)
-	  assert(soldierView.state === FirstAttackNESuccState)
+	  assert(soldierView.state === SoldierViewAttackState(true, NE, 0))
 	  assert(soldierView.index === 3)
 	  
 	  movement.update(5000 / 4)
 	  assert(soldierView.x === 300)
 	  assert(soldierView.y === 410)
-	  assert(soldierView.state === FirstAttackNESuccState)
+	  assert(soldierView.state === SoldierViewAttackState(true, NE, 0))
 	  assert(soldierView.index === 3)
 	  
 	  movement.update(5000 / 4)
 	  assert(soldierView.x === 300 * 3 / 4)
 	  assert(soldierView.y === 310)
-	  assert(soldierView.state === FirstAttackNESuccState)
+	  assert(soldierView.state === SoldierViewAttackState(true, NE, 0))
 	  assert(soldierView.index === 3)
 	  
 	  movement.update(5000 / 4)
 	  assert(soldierView.x === 300 / 2)
 	  assert(soldierView.y === 210)
-	  assert(soldierView.state === FirstAttackNESuccState)
+	  assert(soldierView.state === SoldierViewAttackState(true, NE, 0))
 	  assert(soldierView.index === 3)
 	  
 	  movement.update(5000 / 4)
 	  assert(soldierView.x === 300 / 4)
 	  assert(soldierView.y === 110)
-	  assert(soldierView.state === FirstAttackNESuccState)
+	  assert(soldierView.state === SoldierViewAttackState(true, NE, 0))
 	  assert(soldierView.index === 3)
 	  
 	  movement.update(5000 / 4)
