@@ -20,4 +20,4 @@ unmanagedJars in Compile += Attributed.blank(file(System.getenv("JAVA_HOME") + "
 
 mainClass := Some("mr.merc.main.Main")
 
-scalacOptions ++= Seq("-feature", "-deprecation", "-language:postfixOps")
+scalacOptions ++= Seq("-feature", "-deprecation", "-language:postfixOps", "-language:implicitConversions")

@@ -5,7 +5,7 @@ import scalafx.scene.paint.Color
 import scalafx.scene.image.WritableImage
 import java.nio.ByteBuffer
 
-class SoldierColorTransformer {
+object SoldierColorTransformer {
     private case class RGB(red:Int, green:Int, blue:Int) {
       
       def this(color:Color) {

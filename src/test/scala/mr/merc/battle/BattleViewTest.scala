@@ -107,7 +107,7 @@ class BattleViewTest extends FunSuite with BeforeAndAfter with MockitoSugar {
       assert(soldierDrawer.movements.size === 1)
       assert(soldierDrawer.movements(0).isInstanceOf[MovementList])
       val move = soldierDrawer.movements(0).asInstanceOf[MovementList]
-      assert(move.list.size === 2)
+      assert(move.list.size === 4)
       
       val first = move.list(0).asInstanceOf[SoldierRangedAttackMovement]
       assert(first.from === (0, 0))
@@ -147,7 +147,7 @@ class BattleViewTest extends FunSuite with BeforeAndAfter with MockitoSugar {
       assert(soldierDrawer.movements.size === 1)
       assert(soldierDrawer.movements(0).isInstanceOf[MovementList])
       val move = soldierDrawer.movements(0).asInstanceOf[MovementList]
-      assert(move.list.size === 2)
+      assert(move.list.size === 4)
       
       val first = move.list(0).asInstanceOf[SoldierAttackMovement]
       assert(first.from === (0, 0))

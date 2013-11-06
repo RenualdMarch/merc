@@ -103,13 +103,8 @@ class PathFinderTest extends FunSuite{
 	   val start = field.hex(4, 3)
 	   val finish = field.hex(1, 2)
 	   
-	   val optimalPath = List(field.hex(4, 3), field.hex(3, 3), field.hex(2, 3), field.hex(1, 2))
-	   val optimalSum = optimalPath.tail.map(h => costMap(h.terrain)).sum
-	       
 	   val path = finder.findPath(field, start, finish, 10)
 	   val pathSum = path.get.tail.map(h => costMap(h.terrain)).sum
-	   println(optimalSum)
-	   println(pathSum)
 	   assert(path.get === List(field.hex(4, 3), field.hex(3, 3), field.hex(2, 3), field.hex(1, 2)))
 	}
 }

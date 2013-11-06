@@ -39,12 +39,7 @@ abstract class MImage private[image] (val xOffset:Int, val yOffset:Int, val alph
     gc.drawImage(image, actualX, actualY)
   }
 
-  private val transformer = new SoldierColorTransformer
-  def changeSoldierColor(color:Color):MImage = {
-    val newImage = transformer.transformImage(image, color)
-    new EagerMImage(newImage, xOffset, yOffset, alpha)
-  }
-  
+  def changeSoldierColor(color:Color) = new LazyChangedColorMImage(color, this, xOffset, yOffset, alpha)
   def width = image.width.value.toInt
 
   def height = image.height.value.toInt
