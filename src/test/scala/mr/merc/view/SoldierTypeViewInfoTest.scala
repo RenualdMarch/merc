@@ -1,32 +1,32 @@
 package mr.merc.view
 
 import org.scalatest.FunSuite
-import mr.merc.unit.view.SoldierTypeViewInfo
-import mr.merc.unit.view.IdleState
-import mr.merc.unit.view.StandState
-import mr.merc.unit.view.DeathState
-import mr.merc.unit.view.MoveState
-import mr.merc.unit.view.DefenceState
 import org.scalatest.matchers.ShouldMatchers
-import mr.merc.unit.view.FirstAttackNSuccState
-import mr.merc.unit.view.FirstAttackNFailState
+import mr.merc.unit.view.SoldierViewAttackState
+import mr.merc.map.hex._
+import mr.merc.unit.view.DeathState
+import mr.merc.unit.view.DefenceState
 import mr.merc.unit.view.FirstAttackNEFailState
 import mr.merc.unit.view.FirstAttackNESuccState
-import mr.merc.unit.view.FirstAttackSESuccState
-import mr.merc.unit.view.FirstAttackSEFailState
-import mr.merc.unit.view.FirstAttackSSuccState
-import mr.merc.unit.view.FirstAttackSFailState
-import mr.merc.image.LazyMirroredVerticallyImage
-import mr.merc.unit.view.SoldierViewAttackState
-import mr.merc.unit.view.FirstAttackNWSuccState
+import mr.merc.unit.view.FirstAttackNFailState
+import mr.merc.unit.view.FirstAttackNSuccState
 import mr.merc.unit.view.FirstAttackNWFailState
-import mr.merc.unit.view.FirstAttackSWSuccState
+import mr.merc.unit.view.FirstAttackNWSuccState
+import mr.merc.unit.view.FirstAttackSEFailState
+import mr.merc.unit.view.FirstAttackSESuccState
+import mr.merc.unit.view.FirstAttackSFailState
+import mr.merc.unit.view.FirstAttackSSuccState
 import mr.merc.unit.view.FirstAttackSWFailState
-import mr.merc.map.hex._
+import mr.merc.unit.view.FirstAttackSWSuccState
+import mr.merc.unit.view.IdleState
+import mr.merc.unit.view.MoveState
+import mr.merc.unit.view.StandState
+import mr.merc.image.LazyMirroredVerticallyImage
+import mr.merc.unit.view.SoldierTypeViewInfo
 
 
 class SoldierTypeViewInfoTest extends FunSuite with ShouldMatchers {
-  
+ 
     test("loading without optional parameters") {
 	  val vt = SoldierTypeViewInfo("testType1")
 	  val attack1ns = vt.images(FirstAttackNSuccState)

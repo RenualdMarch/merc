@@ -6,13 +6,26 @@ import java.io.File
 import scala.xml.Node
 import scala.xml.NodeSeq
 import mr.merc.map.hex._
+import scalafx.scene.paint.Color
 
 object SoldierTypeViewInfo {
   val rootPath = "/images/units/"
+  private val colorsCache = collection.mutable.Map[(String, Color), SoldierTypeViewInfo]()  
     
-  private val types = parse.map(p => (p.name, p)).toMap
+  private val rawTypes = parse.map(p => (p.name, p)).toMap
   
-  def apply(name:String) = types(name)
+  def apply(name:String) = rawTypes(name)
+  
+  def apply(name:String, color:Color):SoldierTypeViewInfo = {
+    if (colorsCache.contains(name, color)) {
+      colorsCache(name, color)
+    } else {
+      val result = apply(name).toColor(color)
+      colorsCache += ((name, color) -> result)
+      result
+    }
+    
+  }
   
   private def parse:List[SoldierTypeViewInfo] = {
     val path = getClass.getResource("/conf/soldierTypesView.xml").toURI
@@ -162,5 +175,8 @@ object SoldierTypeViewInfo {
 }
 
 case class SoldierTypeViewInfo(name:String, images:Map[SoldierViewState, List[MImage]]) {
-
+	def toColor(color:Color):SoldierTypeViewInfo = {
+	  val newImages = images.mapValues(_.map(_.changeSoldierColor(color))).toSeq.toMap
+	  SoldierTypeViewInfo(name, newImages)
+	}
 }

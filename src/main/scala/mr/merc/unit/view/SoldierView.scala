@@ -35,7 +35,7 @@ object SoldierView {
   
 }
 
-class SoldierView (val soldier:Soldier) extends Sprite[SoldierViewState](SoldierTypeViewInfo(soldier.soldierType.name).images, StandState) {
+class SoldierView (val soldier:Soldier, color:Color = Color.RED) extends Sprite[SoldierViewState](SoldierTypeViewInfo(soldier.soldierType.name, color).images, StandState) {
   private val maxHp = 100
   private val healthBarHeight = Math.min(soldier.soldierType.hp, maxHp) * TerrainHexView.Side / maxHp
   private val healthBarWidth = 4
