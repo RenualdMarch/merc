@@ -19,6 +19,7 @@ import mr.merc.unit.AttackResult
 import scalafx.scene.paint.Color
 import mr.merc.unit.SoldierType
 import scalafx.scene.canvas.GraphicsContext
+import scalafx.scene.shape.Ellipse
 
 object SoldierView {  
   private [view] val attackDistancePercentage = 0.6
@@ -35,7 +36,7 @@ object SoldierView {
   
 }
 
-class SoldierView (val soldier:Soldier, color:Color = Color.RED) extends Sprite[SoldierViewState](SoldierTypeViewInfo(soldier.soldierType.name, color).images, StandState) {
+class SoldierView (val soldier:Soldier) extends Sprite[SoldierViewState](SoldierTypeViewInfo(soldier.soldierType.name, soldier.player.color).images, StandState) {
   private val maxHp = 100
   private val healthBarHeight = Math.min(soldier.soldierType.hp, maxHp) * TerrainHexView.Side / maxHp
   private val healthBarWidth = 4
@@ -46,11 +47,21 @@ class SoldierView (val soldier:Soldier, color:Color = Color.RED) extends Sprite[
   
   val healthBar = new VerticalBarView(healthBarWidth, healthBarHeight, Color.WHITE, Color.RED, hpPercent)
   val xpBar = new VerticalBarView(xpBarWidth, xpBarHeight, Color.WHITE, Color.WHITE, xpPercent)
+  val ellipse = new Ellipse
   
   def hpPercent = soldier.hp.toDouble / soldier.soldierType.hp
   def xpPercent = soldier.exp.toDouble / soldier.soldierType.exp
   
   override def drawItself(gc:GraphicsContext) {
+    
+    gc.save()
+    gc.fill = soldier.player.color
+    gc.globalAlpha = 0.2
+    gc.fillOval(x + 9, y + 48, 48, 24)
+    gc.globalAlpha = 1
+    gc.stroke = soldier.player.color
+    gc.strokeOval(x + 9, y + 48, 48, 24)
+    gc.restore()
     super.drawItself(gc)
     healthBar.draw(x, y + TerrainHexView.Side - healthBarHeight, gc)
     xpBar.draw(x + 6, y + TerrainHexView.Side - xpBarHeight, gc)
