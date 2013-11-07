@@ -22,6 +22,8 @@ class MovementList(val list:List[Movement]) extends Movement {
 	
 	override def isOver = current == list.size
 	
+	override def drawables = currentMovement.drawables
+	
 	override def update(time:Int) {
 	  require(!isOver, "Action already over")
 	  

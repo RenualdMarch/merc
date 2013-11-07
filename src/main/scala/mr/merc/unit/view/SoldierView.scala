@@ -53,7 +53,13 @@ class SoldierView (val soldier:Soldier) extends Sprite[SoldierViewState](Soldier
   def xpPercent = soldier.exp.toDouble / soldier.soldierType.exp
   
   override def drawItself(gc:GraphicsContext) {
-    
+    drawOvalUnderSoldier(gc)    
+    super.drawItself(gc)
+    healthBar.draw(x, y + TerrainHexView.Side - healthBarHeight, gc)
+    xpBar.draw(x + 6, y + TerrainHexView.Side - xpBarHeight, gc)
+  }
+  
+  private def drawOvalUnderSoldier(gc:GraphicsContext) {
     gc.save()
     gc.fill = soldier.player.color
     gc.globalAlpha = 0.2
@@ -62,9 +68,6 @@ class SoldierView (val soldier:Soldier) extends Sprite[SoldierViewState](Soldier
     gc.stroke = soldier.player.color
     gc.strokeOval(x + 9, y + 48, 48, 24)
     gc.restore()
-    super.drawItself(gc)
-    healthBar.draw(x, y + TerrainHexView.Side - healthBarHeight, gc)
-    xpBar.draw(x + 6, y + TerrainHexView.Side - xpBarHeight, gc)
   }
   
   def moveMovement(path:List[TerrainHexView]):Movement = {
