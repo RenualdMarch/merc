@@ -6,6 +6,7 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.text.Text?>
+<?import javafx.scene.control.Button?>
 
 <BorderPane xmlns:fx="http://javafx.com/fxml"
            fx:controller="mr.merc.ui.battle.BattleFrame" fx:id="parentPaneDelegate">
@@ -13,11 +14,11 @@
 		<Canvas fx:id="battleCanvasDelegate" />
 	</center>
 	<right>
-		<VBox fx:id="rightPanelDelegate" prefWidth="400" style="-fx-background-color: cyan" spacing="20">
+		<VBox fx:id="rightPanelDelegate" prefWidth="400" style="-fx-background-color: cyan" spacing="20" alignment="TOP_CENTER">
 			<children>
 				<Canvas fx:id="miniMapCanvasDelegate" width="300" height="300" />
 				<ImageView fx:id="soldierImageViewDelegate" fitHeight="72" fitWidth="72" />
-				<GridPane vgap="20" hgap="10" alignment="center">
+				<GridPane vgap="20" hgap="10" alignment="TOP_LEFT" style="-fx-padding: 0 0 0 100;">
 					<children>
 						<Text text="%soldier.name" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
 						<Text fx:id="soldierNameDelegate" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
@@ -28,6 +29,7 @@
 					</children>
 				</GridPane>
 			</children>
+			<Button fx:id="endTurnButtonDelegate" text="%turn.end" />
 		</VBox>
 	</right>
 </BorderPane>

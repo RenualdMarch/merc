@@ -1,3 +1,4 @@
 soldier.hp=Hit Points
 soldier.name=Name
 soldier.level=Level
+turn.end=Turn end

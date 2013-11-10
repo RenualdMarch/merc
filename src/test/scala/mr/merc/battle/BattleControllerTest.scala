@@ -149,8 +149,62 @@ class BattleControllerTest extends FunSuite with BeforeAndAfter {
 	  assert(controller.selectedSoldier === None)
 	}
 	
-	// TODO write this test
-	ignore("select enemy soldier and see that possible moves are not shown") {
-	  fail
+	test("end turn button") {
+	  assert(controller.battleModel.currentPlayer === Player("1"))
+	  controller.endTurnButton()
+	  assert(controller.battleModel.currentPlayer === Player("2"))
+	  controller.endTurnButton()
+	  assert(controller.battleModel.currentPlayer === Player("1"))
 	}
+	
+	test("when click on enemy soldier, moving options are shown") {
+	  leftClick(7, 4)
+	  assert(controller.movementOptionsAreShown === true)
+	}
+	
+	test("when click on enemy soldier and order him to move, you lose selection") {
+	  leftClick(7, 4)
+	  rightClick(7, 5)
+	  assert(controller.selectedSoldier === None)
+	  assert(controller.movementOptionsAreShown === false)
+	  leftClick(7, 4)
+	  assert(controller.selectedSoldier.get.movedThisTurn === false)	  
+	  assert(controller.selectedSoldier.get.name === "4")
+	}
+	
+	test("when click on enemy soldier and order him to move and attack, you lose selection") {
+	  leftClick(0, 4)
+	  moveMouse(0, 1)
+	  rightClick(0, 0)
+	  assert(controller.selectedSoldier === None)
+	  leftClick(0, 4)
+	  assert(controller.selectedSoldier.get.name === "3")
+	  assert(controller.selectedSoldier.get.movedThisTurn === false)
+	  assert(controller.selectedSoldier.get.attackedThisTurn === false)
+	}
+	
+	test("when click on enemy soldier and order hit to attack, you lose selection") {
+	  val field = controller.battleModel.map.hexField
+	  val soldier = field.hex(0, 4).soldier.get
+	  field.hex(0, 4).soldier = None
+	  field.hex(0, 1).soldier = Some(soldier)
+	  leftClick(0, 1)
+	  assert(controller.selectedSoldier.get.name === "3")
+	  rightClick(0, 0)
+	  assert(controller.selectedSoldier === None)
+	  leftClick(0, 1)
+	  assert(controller.selectedSoldier.get.name === "3")
+	  assert(controller.selectedSoldier.get.movedThisTurn === false)
+	  assert(controller.selectedSoldier.get.attackedThisTurn === false)
+	}
+	
+	test("move points are regenerated after turn end") {
+	  leftClick(0, 0)
+	  val soldier = controller.selectedSoldier.get
+	  soldier.movePointsRemain = 0
+	  assert(soldier.movedThisTurn === true)
+	  controller.endTurnButton()
+	  assert(soldier.movedThisTurn === false)
+	}
+	
 }

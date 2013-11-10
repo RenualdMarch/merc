@@ -104,6 +104,6 @@ class BattleView(model:BattleModel, _soldierDrawer:SoldiersDrawer = new Soldiers
 	}
 	
 	private def handleEndMoveEvent(player:Player) {
-	  ???
+	  // do nothing by now
 	}
 }

@@ -20,6 +20,7 @@ import mr.merc.battle.event.ShowMovementOptions
 import mr.merc.battle.event.MovementModelEvent
 import mr.merc.battle.event.AttackModelEvent
 import mr.merc.ui.battle.BattleFrame
+import mr.merc.battle.event.EndMoveModelEvent
 
 
 class BattleController(gameField:GameField, parent:BattleControllerParent)  {
@@ -134,6 +135,17 @@ class BattleController(gameField:GameField, parent:BattleControllerParent)  {
       }
     }
   })
+  
+  def endTurnButton() {
+    if (battleModel.validateEndTurn) {
+      val result = battleModel.handleEvent(EndMoveModelEvent())
+      battleView.handleEvent(result.buildBattleViewEvent)
+      removeArrow()
+      removeMovementOptions()
+      selectedSoldier = None
+      soldierToShow.soldier = None
+    }
+  }
   
   def leftClickMouse() = withCurrent(hex => {
     hex.soldier match {

@@ -16,4 +16,8 @@ class Soldier(val name:String, var soldierType:SoldierType, val player:Player) {
 	    currentHp = 0
 	  }
 	}
+	
+	def resetMovePoints() {
+	  movePointsRemain = soldierType.movement
+	}
 }

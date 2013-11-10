@@ -7,6 +7,7 @@ import javafx.{fxml => jfxf}
 import java.net.URL
 import java.util.ResourceBundle
 import javafx.scene.{canvas => jfxc}
+import javafx.scene.{control => jfxctr}
 import javafx.scene.{image => jfxi}
 import javafx.{event => jfxe}
 import javafx.scene.{input => jfxin}
@@ -31,6 +32,8 @@ import mr.merc.unit.SoldierType
 import mr.merc.map.hex.TerrainHex
 import mr.merc.map.objects._
 import mr.merc.map.terrain._
+import scalafx.scene.control.Button
+import javafx.event.ActionEvent
 
 class BattleFrame extends jfxf.Initializable with BattleControllerParent {
   val field = new TerrainHexField(5, 5, mapInit)
@@ -89,7 +92,11 @@ class BattleFrame extends jfxf.Initializable with BattleControllerParent {
   private var soldierHPDelegate: jfxt.Text = _
   private var soldierHP : Text = _
   
-  private var soldierWrapper = controller.soldierToShow
+  @jfxf.FXML
+  private var endTurnButtonDelegate : jfxctr.Button = _
+  private var endTurnButton: Button = _
+  
+  private val soldierWrapper = controller.soldierToShow
   
   private def gc = battleCanvas.graphicsContext2D
   
@@ -101,6 +108,7 @@ class BattleFrame extends jfxf.Initializable with BattleControllerParent {
     soldierName = new Text(soldierNameDelegate)
     soldierLevel = new Text(soldierLevelDelegate)
     soldierHP = new Text(soldierHPDelegate)
+    endTurnButton = new Button(endTurnButtonDelegate)
     
     battleCanvas.width <== parentPane.width - rightPanel.width
     battleCanvas.height <== parentPane.height
@@ -122,13 +130,19 @@ class BattleFrame extends jfxf.Initializable with BattleControllerParent {
       }            
     })
     
-    battleCanvasDelegate.addEventHandler(jfxin.MouseEvent.MOUSE_MOVED, new jfxe.EventHandler[jfxin.MouseEvent] {
+    battleCanvas.onMouseMoved = new jfxe.EventHandler[jfxin.MouseEvent] {
       def handle(event:jfxin.MouseEvent) {
         val x = event.getX().toInt
         val y = event.getY().toInt
         controller.moveMouse(x, y)
       }            
-    })
+    }
+    
+    endTurnButton.onAction = new jfxe.EventHandler[ActionEvent] {
+      def handle(event:ActionEvent) {
+        controller.endTurnButton()
+      }
+    }
     
     import scalafx.Includes._
     val timeline = Timeline(KeyFrame(50 ms, onFinished = gameLoop))
@@ -138,8 +152,10 @@ class BattleFrame extends jfxf.Initializable with BattleControllerParent {
   
   
   private def reset(color: Color) {
+    gc.save()
     gc.fill = color
     gc.fillRect(0, 0, battleCanvas.width.get, battleCanvas.height.get);    
+    gc.restore()
   }  
   
   var lastUpdateTime = System.currentTimeMillis()

@@ -10,12 +10,15 @@ import mr.merc.unit.Attack
 import mr.merc.map.pathfind.PossibleMovesFinder
 
 class BattleModel(val map:GameField) extends BattleModelEventHandler {
-	
+	private var currentPlayerIndex = 0
+    def currentPlayer = map.players(currentPlayerIndex)
+	private val soldiers = map.hexField.hexes.flatMap(_.soldier)
+    
     def handleEvent(event:BattleModelEvent):BattleModelEventResult = {
 	  event match {
 	    case MovementModelEvent(soldier, from, to) => handleMovementEvent(soldier, from, to)
 	    case AttackModelEvent(soldier, from, target, attackNumber) => handleAttackEvent(soldier, from, target, attackNumber)
-	    case EndMoveModelEvent() => ???
+	    case EndMoveModelEvent() => handleEndTurnEvent()
 	  }	  
 	}
     
@@ -29,6 +32,13 @@ class BattleModel(val map:GameField) extends BattleModelEventHandler {
       to.soldier = Some(soldier)
       
       new MovementModelEventResult(soldier, path.get)
+    }
+    
+    private [battle] def handleEndTurnEvent():EndMoveModelEventResult = {
+      require(validateEndTurn)
+      soldiers.filter(_.player == currentPlayer).foreach(_.resetMovePoints())
+      nextPlayer()
+      EndMoveModelEventResult(currentPlayer)
     }
     
     private [battle] def handleAttackEvent(soldier:Soldier, from:TerrainHex, target:TerrainHex, attackNumber:Int):AttackModelEventResult = {
@@ -59,7 +69,11 @@ class BattleModel(val map:GameField) extends BattleModelEventHandler {
      
      def hexBySoldier(soldier:Soldier) = map.hexField.hexes.find(h => h.soldier == Some(soldier)).get
     
-     def validateMovementEvent(soldier:Soldier, from:TerrainHex, to:TerrainHex, validatePath:Boolean = true):Boolean = {
+     def validateMovementEvent(soldier:Soldier, from:TerrainHex, to:TerrainHex, validatePath:Boolean = true, checkPlayer:Boolean = true):Boolean = {
+      if (checkPlayer && soldier.player != currentPlayer) {
+        return false
+      }
+       
       if (from == to) {
         return false
       }
@@ -88,7 +102,7 @@ class BattleModel(val map:GameField) extends BattleModelEventHandler {
      
     def possibleMoves(soldier:Soldier, currentHex:TerrainHex):Set[TerrainHex] = {
       val possible = PossibleMovesFinder.findPossibleMoves(map.gridForSoldier(soldier), currentHex, soldier.movePointsRemain, soldier.movedThisTurn)
-      possible filter (validateMovementEvent(soldier, currentHex, _, false))
+      possible filter (validateMovementEvent(soldier, currentHex, _, false, false))
     }
     
     def possibleAttacksWhenThereAreNoMoves(soldier:Soldier, currentHex:TerrainHex):Set[TerrainHex] = {
@@ -116,6 +130,10 @@ class BattleModel(val map:GameField) extends BattleModelEventHandler {
     
     // TODO allies
     def validateAttackEvent(soldier:Soldier, from:TerrainHex, target:TerrainHex, attackNumber:Int):Boolean = {
+      if (soldier.player != currentPlayer) {
+        return false
+      }
+      
       if (soldier.soldierType.attacks.size <= attackNumber) {
         return false
       }
@@ -129,6 +147,16 @@ class BattleModel(val map:GameField) extends BattleModelEventHandler {
         case None => false
       }
     }
+    
+    // TODO no reason to end turn when game is over
+    def validateEndTurn = true
+    
+    private def nextPlayer() {
+      currentPlayerIndex += 1
+      if (currentPlayerIndex == map.players.size) {
+        currentPlayerIndex = 0
+      }
+    }    
     
     private def pathPrice(cost:Map[TerrainType, Int], path:List[TerrainHex]):Int = {
       path.tail.map(t => cost(t.terrain)).sum
