@@ -53,7 +53,7 @@ class SoldierView (val soldier:Soldier) extends Sprite[SoldierViewState](Soldier
   def xpPercent = soldier.exp.toDouble / soldier.soldierType.exp
   
   override def drawItself(gc:GraphicsContext) {
-    if (state != DeathState && state != NoState && state.isInstanceOf[SoldierViewAttackState]) {
+    if (state != DeathState && state != NoState && !state.isInstanceOf[SoldierViewAttackState]) {
       drawOvalUnderSoldier(gc)
     }
     
@@ -91,18 +91,6 @@ class SoldierView (val soldier:Soldier) extends Sprite[SoldierViewState](Soldier
   def moveMovement(path:List[TerrainHexView]):Movement = {
     val list = path zip path.tail map (p => new SoldierMoveMovement(p._1, p._2, this))
     new MovementList(list)
-  }
-  
-  def attackMovement(current:TerrainHexView, underAttack:TerrainHexView, enemy:SoldierView, result:AttackResult):Movement = {
-    val attackNumber = soldier.soldierType.attacks.indexOf(result.attack)
-    val direction = current.directions(underAttack.hex)
-    require(attackNumber == 0 || attackNumber == 1, s"attack number is illegal: $attackNumber")
-    val from = (current.x, current.y)
-    val correction = SoldierView.coordsCorrection(direction)
-    val actualCorrection = (correction._1 * SoldierView.attackDistancePercentage toInt,
-    						correction._2 * SoldierView.attackDistancePercentage toInt)
-    val to = (from._1 + actualCorrection._1, from._2 + actualCorrection._2)
-    new SoldierAttackMovement(from, to, direction, result.success, this, enemy, attackNumber)
   }
   
   def refreshBars() {

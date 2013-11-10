@@ -89,9 +89,8 @@ class BattleView(model:BattleModel, _soldierDrawer:SoldiersDrawer = new Soldiers
 	  }
 	  
 	  val attacksList = result map factory
-	  def refreshAttacker = wrap(attacker).refreshBars()
-	  def refreshDefender = wrap(defender).refreshBars()
-	  val refreshList = List(new MomentaryMovement(refreshAttacker), new MomentaryMovement(refreshDefender))
+	  val refreshList = List(new MomentaryMovement(battleOverActions(attacker)), 
+	      new MomentaryMovement(battleOverActions(defender)))
 	  val move = new MovementList(attacksList ++ refreshList)
 	  mapView.addMovement(move)
 	}
