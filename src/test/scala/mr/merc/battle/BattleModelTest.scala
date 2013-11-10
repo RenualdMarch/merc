@@ -239,4 +239,24 @@ class BattleModelTest extends FunSuite with BeforeAndAfter {
 	  val possible = model.possibleMoves(soldier, field.hex(0, 0))
 	  assert(possible === Set(field.hex(1, 0)))
 	}
+	
+	test("after battle soldier with 0 hp dissapear from field") {
+	  val soldier = new Soldier("1", simpleSoldierType, Player("1"))
+	  field.hex(0, 0).soldier = Some(soldier)
+	  val enemy = new Soldier("1", simpleSoldierType, Player("2"))
+	  field.hex(0, 1).soldier = Some(enemy)
+	  
+	  while (enemy.hp != 0 && soldier.hp != 0) {
+	    soldier.attackedThisTurn = false
+	    model.handleAttackEvent(soldier, field.hex(0, 0), field.hex(0, 1), 0)
+	  }
+	  
+	  if (soldier.hp == 0) {
+	    assert(field.hex(0, 0).soldier === None)
+	  } else {
+	    assert(field.hex(0, 1).soldier === None)
+	  }
+	  
+	  
+	}
 }

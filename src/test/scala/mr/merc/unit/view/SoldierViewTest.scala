@@ -2,6 +2,8 @@ package mr.merc.unit.view
 
 import org.scalatest.FunSuite
 import mr.merc.map.hex._
+import mr.merc.unit._
+import mr.merc.players._
 
 class SoldierViewTest extends FunSuite {
 	
@@ -23,5 +25,29 @@ class SoldierViewTest extends FunSuite {
 	  
 	  val swCorr = SoldierView.coordsCorrection(SW)
 	  assert(swCorr === (-54, 36))
+	}
+	
+	test("after setting state to death after animation is finished, noState is used") {
+	  val soldierType = SoldierType("testSoldier")
+	  val soldier = new Soldier("1", soldierType, Player("1"))
+	  val view = new SoldierView(soldier)
+	  
+	  view.state = StandState
+	  view.updateTime(10000)
+	  view.state = DeathState
+	  view.updateTime(10000)
+	  assert(view.state === NoState)
+	}
+	
+	test("after setting idle state after animation is over, standing state is used") {
+	  val soldierType = SoldierType("testSoldier")
+	  val soldier = new Soldier("1", soldierType, Player("1"))
+	  val view = new SoldierView(soldier)
+	  
+	  view.state = StandState
+	  view.updateTime(10000)
+	  view.state = IdleState
+	  view.updateTime(10000)
+	  assert(view.state === StandState)
 	}
 }

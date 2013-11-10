@@ -30,7 +30,10 @@ abstract class MImage private[image] (val xOffset:Int, val yOffset:Int, val alph
   private [image] def image:Image
   
   def drawImage(gc:GraphicsContext, x:Int, y:Int) {
+    gc.save()
+    gc.globalAlpha = alpha
     gc.drawImage(image, x, y)
+    gc.restore()
   }
   
   def drawCenteredImage(gc:GraphicsContext, x:Int, y:Int, width:Int, height:Int) {

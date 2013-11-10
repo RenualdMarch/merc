@@ -202,9 +202,11 @@ class BattleControllerTest extends FunSuite with BeforeAndAfter {
 	  leftClick(0, 0)
 	  val soldier = controller.selectedSoldier.get
 	  soldier.movePointsRemain = 0
+	  soldier.attackedThisTurn = true
 	  assert(soldier.movedThisTurn === true)
 	  controller.endTurnButton()
 	  assert(soldier.movedThisTurn === false)
+	  assert(soldier.attackedThisTurn === false)
 	}
 	
 }

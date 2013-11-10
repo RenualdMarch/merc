@@ -19,6 +19,7 @@ import mr.merc.view.move.SoldierAttackMovement
 import mr.merc.view.move.SoldierRangedAttackMovement
 import mr.merc.view.move.MomentaryMovement
 import mr.merc.view.move.MomentaryMovement
+import mr.merc.unit.view._
 
 // injecting soldier drawer for test purposes only
 class BattleView(model:BattleModel, _soldierDrawer:SoldiersDrawer = new SoldiersDrawer) {
@@ -93,6 +94,14 @@ class BattleView(model:BattleModel, _soldierDrawer:SoldiersDrawer = new Soldiers
 	  val refreshList = List(new MomentaryMovement(refreshAttacker), new MomentaryMovement(refreshDefender))
 	  val move = new MovementList(attacksList ++ refreshList)
 	  mapView.addMovement(move)
+	}
+	
+	private def battleOverActions(soldier:Soldier) {
+	  val view = wrap(soldier)
+	  view.refreshBars()
+	  if (soldier.hp == 0) {
+	    view.state = DeathState
+	  }
 	}
 	
 	private def handleMovementEvent(soldier:SoldierView, path:List[TerrainHexView]) {

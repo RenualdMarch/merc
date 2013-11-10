@@ -55,6 +55,11 @@ class MovementListTest extends FunSuite{
 	  assert(list(5).isOver)
 	  assert(move.isOver)
 	}
+	
+	test("empty list") {
+	  val list = new MovementList(Nil)
+	  assert(list.isOver)
+	}
 }
 
 class MomentaryTestMovement extends Movement {

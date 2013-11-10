@@ -36,7 +36,10 @@ class BattleModel(val map:GameField) extends BattleModelEventHandler {
     
     private [battle] def handleEndTurnEvent():EndMoveModelEventResult = {
       require(validateEndTurn)
-      soldiers.filter(_.player == currentPlayer).foreach(_.resetMovePoints())
+      soldiers.filter(_.player == currentPlayer).foreach{s => 
+          s.resetMovePoints()
+          s.attackedThisTurn = false
+       }
       nextPlayer()
       EndMoveModelEventResult(currentPlayer)
     }
@@ -49,6 +52,12 @@ class BattleModel(val map:GameField) extends BattleModelEventHandler {
       val defenderAttack = selectBestAttackForDefender(soldier, defender, attackerAttack)
       soldier.attackedThisTurn = true
       val result = Attack.battle(from, target, attackerAttack, defenderAttack)
+      if (soldier.hp == 0) {
+        from.soldier = None
+      } else if (defender.hp == 0) {
+        target.soldier = None
+      }
+      
       new AttackModelEventResult(from, target, soldier, defender, result)
     }
     

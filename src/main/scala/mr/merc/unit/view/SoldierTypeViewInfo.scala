@@ -39,8 +39,8 @@ object SoldierTypeViewInfo {
       val defence = parseImagesList(typeName, node \ "defence", stand)
       val death = parseImagesList(typeName, node \ "death", createDeathAnimation(stand(0)))
     
-      val images = Map((DefenceState -> defence), (IdleState -> idle), (MoveState -> move),
-          (StandState -> stand), (DeathState -> death))
+      val images:Map[SoldierViewState ,List[mr.merc.image.MImage]] = Map(DefenceState -> defence, IdleState -> idle, MoveState -> move,
+          StandState -> stand, DeathState -> death, NoState -> List(MImage.emptyImage))
       val attacks = attacksMap(node, typeName)
           
     SoldierTypeViewInfo(typeName, images ++ attacks)    

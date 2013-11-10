@@ -53,10 +53,28 @@ class SoldierView (val soldier:Soldier) extends Sprite[SoldierViewState](Soldier
   def xpPercent = soldier.exp.toDouble / soldier.soldierType.exp
   
   override def drawItself(gc:GraphicsContext) {
-    drawOvalUnderSoldier(gc)    
+    if (state != DeathState && state != NoState && state.isInstanceOf[SoldierViewAttackState]) {
+      drawOvalUnderSoldier(gc)
+    }
+    
     super.drawItself(gc)
-    healthBar.draw(x, y + TerrainHexView.Side - healthBarHeight, gc)
-    xpBar.draw(x + 6, y + TerrainHexView.Side - xpBarHeight, gc)
+    
+    if (state != DeathState && state != NoState) {
+      healthBar.draw(x, y + TerrainHexView.Side - healthBarHeight, gc)
+      xpBar.draw(x + 6, y + TerrainHexView.Side - xpBarHeight, gc)
+    }
+  }
+  
+  override def updateTime(delta:Int):Int = {
+    val result = super.updateTime(delta)
+    if (result > 0 && index == 0) {
+      if (state == DeathState) {
+        state = NoState
+      } else if (state == IdleState) {
+        state = StandState
+      }
+    }
+    result
   }
   
   private def drawOvalUnderSoldier(gc:GraphicsContext) {

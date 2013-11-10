@@ -55,7 +55,7 @@ class Sprite[T <: SpriteState](val images:Map[T, List[MImage]], private var _sta
 	def state = _state
 	
 	def state_=(st:T) {
-	  require(images.keys.exists(_ == st), "State isn't present in map!")
+	  require(images.keys.exists(_ == st), s"State $st isn't present in map!")
 	  _state = st
 	  _time = 0
 	  _index = 0
