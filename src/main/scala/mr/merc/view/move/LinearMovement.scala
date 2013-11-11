@@ -1,7 +1,7 @@
 package mr.merc.view.move
 
 // speed means pixels per second
-class LinearMovement(x1:Int, y1:Int, x2:Int, y2:Int, speed:Int) extends Movement{
+class LinearMovement(x1:Int, y1:Int, x2:Int, y2:Int, speed:Int, percentage:Double = 1.0) extends Movement{
     private var timePassed = 0 // in ms
 	
     def start() = {}
@@ -19,8 +19,10 @@ class LinearMovement(x1:Int, y1:Int, x2:Int, y2:Int, speed:Int) extends Movement
       if (covered > 1) 1 else covered
     }
     
+    def destination = (x1 + percentage * (x2 - x1) toInt, y1 + percentage * (y2 - y1) toInt)
+    
 	def isOver:Boolean = timePassed >= timeToCover
     
-    def x:Int = x1 + coveredPart * (x2 - x1) toInt
-	def y:Int = y1 + coveredPart * (y2 - y1) toInt
+    def x:Int = x1 + coveredPart * percentage * (x2 - x1) toInt
+	def y:Int = y1 + coveredPart * percentage * (y2 - y1) toInt
  }

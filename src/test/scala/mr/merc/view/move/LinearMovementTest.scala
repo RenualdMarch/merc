@@ -36,4 +36,14 @@ class LinearMovementTest extends FunSuite {
 	  assert(movement.y === 60)
 	  assert(movement.isOver)
 	}
+	
+	test("percentage") {	  
+	  val movement = new LinearMovement(10, 20, 40, 60, 10, 0.8)
+	  assert(movement.destination === (34, 52))
+	  movement.start()
+	  movement.update(6000)
+	  assert(movement.x === 34)
+	  assert(movement.y === 52)
+	  
+	}
 }
