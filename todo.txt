@@ -1,3 +1,13 @@
+For M3, these things should be completed:
+
 Attack attributes
 Soldier type attributes
-
+Minimap
+Soldier status ball - can move, can only attack, can do nothing
+Sounds
+Music
+Configuration
+Attack selection dialog
+Add mage to units and test his attack
+Add damage numbers during attack
+UI - improve soldier panel

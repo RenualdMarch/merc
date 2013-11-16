@@ -28,7 +28,7 @@ class SoldierAttackMovementTest extends FunSuite {
 	  // distance is 500, speed is 100, time is 5 sec
 	  
 	  val movement = new SoldierAttackMovement(from, to, direction,
-	      true, soldierView, enemyView, 0)
+	      true, soldierView, enemyView, 0, 70)
 	  movement.start()
 	  assert(soldierView.x === 0)
 	  assert(soldierView.y === 10)
@@ -36,49 +36,49 @@ class SoldierAttackMovementTest extends FunSuite {
 	  assert(soldierView.index === 0)
 	  
 	  movement.update(5000 / 4)
-	  assert(soldierView.x === 300 / 4)
-	  assert(soldierView.y === 110)
+	  assert(soldierView.x === 300 / 4 * 7 / 10)
+	  assert(soldierView.y === 10 + 100 * 7 / 10)
 	  assert(soldierView.state === SoldierViewAttackState(true, NE, 0))
 	  assert(soldierView.index === 1)
 	  
 	  movement.update(5000 / 4)
-	  assert(soldierView.x === 300 / 2)
-	  assert(soldierView.y === 210)
+	  assert(soldierView.x === 300 / 2 * 7 / 10)
+	  assert(soldierView.y === 10 + 200 * 7 / 10)
 	  assert(soldierView.state === SoldierViewAttackState(true, NE, 0))
 	  assert(soldierView.index === 2)
 	  
 	  movement.update(5000 / 4)
-	  assert(soldierView.x === 300 * 3 / 4)
-	  assert(soldierView.y === 310)
+	  assert(soldierView.x === 300 * 3 / 4 * 7 / 10)
+	  assert(soldierView.y === 10 + 300 * 7 / 10 - 1) // -1 is correction
 	  assert(soldierView.state === SoldierViewAttackState(true, NE, 0))
 	  assert(soldierView.index === 3)
 	  
 	  movement.update(5000 / 4)
-	  assert(soldierView.x === 300)
-	  assert(soldierView.y === 410)
+	  assert(soldierView.x === 300 * 7 / 10)
+	  assert(soldierView.y === 10 + 400 * 7 / 10)
 	  assert(soldierView.state === SoldierViewAttackState(true, NE, 0))
 	  assert(soldierView.index === 3)
 	  
 	  movement.update(5000 / 4)
-	  assert(soldierView.x === 300 * 3 / 4)
-	  assert(soldierView.y === 310)
+	  assert(soldierView.x === 300 * 3 / 4 * 7 / 10)
+	  assert(soldierView.y === 10 + 300 * 7 / 10)
 	  assert(soldierView.state === SoldierViewAttackState(true, NE, 0))
 	  assert(soldierView.index === 3)
 	  
 	  movement.update(5000 / 4)
-	  assert(soldierView.x === 300 / 2)
-	  assert(soldierView.y === 210)
+	  assert(soldierView.x === 300 / 2 * 7 / 10)
+	  assert(soldierView.y === 10 + 200 * 7 / 10)
 	  assert(soldierView.state === SoldierViewAttackState(true, NE, 0))
 	  assert(soldierView.index === 3)
 	  
 	  movement.update(5000 / 4)
-	  assert(soldierView.x === 300 / 4)
-	  assert(soldierView.y === 110)
+	  assert(soldierView.x === 300 / 4 * 7 / 10)
+	  assert(soldierView.y === 10 + 100 * 7 / 10)
 	  assert(soldierView.state === SoldierViewAttackState(true, NE, 0))
 	  assert(soldierView.index === 3)
 	  
 	  movement.update(5000 / 4)
-	  assert(soldierView.x === 0 / 2)
+	  assert(soldierView.x === 0)
 	  assert(soldierView.y === 10)
 	  assert(soldierView.state === StandState)
 	  assert(soldierView.index === 0)

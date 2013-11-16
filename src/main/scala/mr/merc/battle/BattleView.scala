@@ -71,7 +71,7 @@ class BattleView(model:BattleModel, _soldierDrawer:SoldiersDrawer = new Soldiers
 	  def factory(res:AttackResult) = {
 	    val currentAttacker = res.attacker
 	    val currendDefender = res.defender
-	    val attack = res.attack
+	    val attack = res.attackersAttack
 	    val ranged = attack.ranged
 	    val attackNumber = res.attacker.soldierType.attacks.indexOf(attack)
 	    

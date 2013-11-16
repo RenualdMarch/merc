@@ -69,7 +69,7 @@ class BattleModel(val map:GameField) extends BattleModelEventHandler {
       } else if (rangedAttacks.size == 1) {
         Some(rangedAttacks(0))
       } else {
-        val sorted = rangedAttacks.sortBy(ra => attacker.soldierType.damageWithResistance(ra) * ra.count)
+        val sorted = rangedAttacks.sortBy(ra => Attack.possibleAttackersDamage(false, defender, attacker, ra, Some(attackersAttack)) * ra.count)
         Some(sorted.last)
       }
      }

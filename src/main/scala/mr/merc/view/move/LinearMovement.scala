@@ -11,7 +11,7 @@ class LinearMovement(x1:Int, y1:Int, x2:Int, y2:Int, speed:Int, percentage:Doubl
       timePassed += time
     }
     
-    private val distance = scala.math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1))
+    private val distance = percentage * scala.math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1))
     private val timeToCover = distance * 1000 / speed toInt
     
     def coveredPart:Double = {

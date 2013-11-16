@@ -9,7 +9,6 @@ import mr.merc.unit.view.StandState
 
 object SoldierAttackMovement {
   private val frameCount = 20
-  val attackSpeed = 100
   
   private [view] def imagesList(imagesCount:Int):List[Int] = {
     val incr = imagesCount * 1000 / frameCount
@@ -22,17 +21,19 @@ object SoldierAttackMovement {
 }
 
 class SoldierAttackMovement(val from:(Int, Int), val to:(Int, Int), val dir:Direction,
-    val success:Boolean, val attacker:SoldierView, val defender:SoldierView, val attackNumber:Int) extends Movement {  
+    val success:Boolean, val attacker:SoldierView, val defender:SoldierView, 
+    val attackNumber:Int, val attackSpeed:Int = 100) extends Movement {  
+    
     private val attackMovementPercentage = 0.7
     private val state = SoldierViewAttackState(success, dir, attackNumber)
     private val attackImagesSize = attacker.images(state).size
     val frames = SoldierAttackMovement.imagesList(attackImagesSize)
     
     // attack sequence is played
-    private val linearMovementToEnemy = new LinearMovement(from._1, from._2, to._1, to._2, SoldierAttackMovement.attackSpeed, attackMovementPercentage)
+    private val linearMovementToEnemy = new LinearMovement(from._1, from._2, to._1, to._2, attackSpeed, attackMovementPercentage)
     private val dest = linearMovementToEnemy.destination
     // last frame of attack animation is here
-    private val linearMovementFromEnemy = new LinearMovement(dest._1, dest._2, from._1, from._2, SoldierAttackMovement.attackSpeed)
+    private val linearMovementFromEnemy = new LinearMovement(dest._1, dest._2, from._1, from._2, attackSpeed)
     
     def start() {
       attacker.animationEnabled = false

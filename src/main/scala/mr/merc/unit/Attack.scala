@@ -15,14 +15,14 @@ object Attack {
     val attacker = attackerHex.soldier.get
     val defender = defenderHex.soldier.get
     
-    val attackerStrikes = generateAttacks(attacker, defender, defender.soldierType.defence(defenderHex.terrain), attackerSelection, f)
+    val attackerStrikes = generateAttacks(true, attacker, defender, defender.soldierType.defence(defenderHex.terrain), attackerSelection, defenderSelection, f)
     val defenderStrikes = defenderSelection match {
-      case Some(attack) => generateAttacks(defender, attacker, attacker.soldierType.defence(attackerHex.terrain), attack, f)
+      case Some(attack) => generateAttacks(false, defender, attacker, attacker.soldierType.defence(attackerHex.terrain), attack, Some(attackerSelection), f)
       case None => Nil
     }
     
     val mergedAttacks = mergeAttacks(attackerStrikes, defenderStrikes)
-    val filteredAttacks = filterNotNeededAttacks(attacker, defender, mergedAttacks)
+    val filteredAttacks = filterNotNeededAttacks(attacker, defender, mergedAttacks, attackerSelection, defenderSelection)
     
     // and here we are changing state
     filteredAttacks foreach (_.applyDamage())
@@ -30,9 +30,9 @@ object Attack {
     filteredAttacks
   }
   
-  private def generateAttacks(attacker:Soldier, defender:Soldier, defence:Int, attack:Attack, f:Int => Boolean):List[AttackResult] = {
-    val retVal = for (i <- 0 until attack.count) yield {
-      AttackResult(attacker, defender, attack, f(defence))
+  private def generateAttacks(attackerIsAttacking:Boolean, attacker:Soldier, defender:Soldier, defence:Int, attackersAttack:Attack, defendersAttack:Option[Attack], f:Int => Boolean):List[AttackResult] = {
+    val retVal = for (i <- 0 until attackersAttack.count) yield {
+      AttackResult(attackerIsAttacking, attacker, defender, attackersAttack, defendersAttack, f(defence))
     }
     
     retVal.toList
@@ -48,7 +48,7 @@ object Attack {
     }
   }
   
-  private def filterNotNeededAttacks(attacker:Soldier, defender:Soldier, attacks:List[AttackResult]):List[AttackResult] = {
+  private def filterNotNeededAttacks(attacker:Soldier, defender:Soldier, attacks:List[AttackResult], attackerAttack:Attack, defenderAttack:Option[Attack]):List[AttackResult] = {
     var attackerState = attacker.hp
     var defenderState = defender.hp
     
@@ -57,29 +57,35 @@ object Attack {
         false
       } else if (res.success) {
         if (res.attacker == attacker) {
-          defenderState -= defender.soldierType.damageWithResistance(res.attack)
+          defenderState -= possibleAttackersDamage(true, attacker, defender, attackerAttack, defenderAttack)
         } else {
-          attackerState -= attacker.soldierType.damageWithResistance(res.attack)
+          attackerState -= possibleAttackersDamage(false, defender, attacker, defenderAttack.get, Some(attackerAttack))
         }
         true
       } else {
         true
       }
-    })
+    })    
+
+  }
+  
+      // when defender deals damage, first parameter is false, otherwise true
+  def possibleAttackersDamage(actualAttackerAttacks:Boolean, attacker:Soldier, defender:Soldier, attackersAttack:Attack, defendersAttack:Option[Attack]):Int = {
+	attackersAttack.damage * (100 + defender.soldierType.resistance(attackersAttack.attackType)) / 100
   }
   
   def apply(imageName:String, damage:Int, count:Int, attackType:AttackType, 
     ranged:Boolean) = new Attack(imageName, damage, count, attackType, ranged)
   
   def apply(imageName:String, damage:Int, count:Int, attackType:AttackType, 
-    ranged:Boolean, projectile:String) = new Attack(imageName, damage, count, attackType, ranged, Some(projectile))
+    ranged:Boolean, projectile:String) = new Attack(imageName, damage, count, attackType, ranged, projectile = Some(projectile))
 }
 
 // TODO move image name and projectile name to view configuration
 class Attack(val imageName:String, val damage:Int, val count:Int, val attackType:AttackType, 
-    val ranged:Boolean, private val _projectile:Option[String] = None) {
+    val ranged:Boolean, val attributes:Set[AttackAttribute] = Set(), private val projectile:Option[String] = None) {
 	def projectileName(success:Boolean) = success match {
-	  case true => _projectile map (_ + "-succ")
-	  case false => _projectile map (_ + "-fail")
+	  case true => projectile map (_ + "-succ")
+	  case false => projectile map (_ + "-fail")
 	}
 }
