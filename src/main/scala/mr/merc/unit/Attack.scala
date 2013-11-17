@@ -15,14 +15,24 @@ object Attack {
     val attacker = attackerHex.soldier.get
     val defender = defenderHex.soldier.get
     
-    val attackerStrikes = generateAttacks(true, attacker, defender, defender.soldierType.defence(defenderHex.terrain), attackerSelection, defenderSelection, f)
-    val defenderStrikes = defenderSelection match {
-      case Some(attack) => generateAttacks(false, defender, attacker, attacker.soldierType.defence(attackerHex.terrain), attack, Some(attackerSelection), f)
-      case None => Nil
+    val rounds = if (attackerSelection.attributes.contains(Berserk) || 
+        defenderSelection.map(_.attributes.contains(Berserk)).getOrElse(false)) {
+      30
+    } else {
+      1
     }
     
-    val mergedAttacks = mergeAttacks(attackerStrikes, defenderStrikes)
-    val filteredAttacks = filterNotNeededAttacks(attacker, defender, mergedAttacks, attackerSelection, defenderSelection)
+    val resultAttacks = for (i <- 0 until rounds) yield {
+      val attackerStrikes = generateAttacks(true, attacker, defender, defender.soldierType.defence(defenderHex.terrain), attackerSelection, defenderSelection, f)
+      val defenderStrikes = defenderSelection match {
+        case Some(attack) => generateAttacks(false, defender, attacker, attacker.soldierType.defence(attackerHex.terrain), attack, Some(attackerSelection), f)
+        case None => Nil
+      }
+      
+      mergeAttacks(attackerStrikes, defenderStrikes)
+    }
+    
+    val filteredAttacks = filterNotNeededAttacks(attacker, defender, resultAttacks.toList.flatten, attackerSelection, defenderSelection)
     
     // and here we are changing state
     filteredAttacks foreach (_.applyDamage())
@@ -31,8 +41,15 @@ object Attack {
   }
   
   private def generateAttacks(attackerIsAttacking:Boolean, attacker:Soldier, defender:Soldier, defence:Int, attackersAttack:Attack, defendersAttack:Option[Attack], f:Int => Boolean):List[AttackResult] = {
+  
     val retVal = for (i <- 0 until attackersAttack.count) yield {
-      AttackResult(attackerIsAttacking, attacker, defender, attackersAttack, defendersAttack, f(defence))
+      val damage = Attack.possibleAttackersDamage(attackerIsAttacking, attacker, defender, attackersAttack, defendersAttack)
+      val drained = if (attackersAttack.attributes.contains(Drain)) {
+        damage / 2
+      } else {
+        0
+      }
+      AttackResult(attackerIsAttacking, attacker, defender, attackersAttack, defendersAttack, f(defence), damage, drained)
     }
     
     retVal.toList
@@ -52,18 +69,41 @@ object Attack {
     var attackerState = attacker.hp
     var defenderState = defender.hp
     
-    attacks.takeWhile(res => {
+    attacks.flatMap(res => {
       if (attackerState <= 0 || defenderState <= 0) {
-        false
+        None
       } else if (res.success) {
         if (res.attacker == attacker) {
-          defenderState -= possibleAttackersDamage(true, attacker, defender, attackerAttack, defenderAttack)
+          val damage = possibleAttackersDamage(true, attacker, defender, attackerAttack, defenderAttack)
+          defenderState -= damage
+          if (defenderState < 0) {
+            val actualDamage = damage + defenderState
+            val drain = if (res.attackersAttack.attributes.contains(Drain)) {
+              actualDamage / 2
+            } else {
+              0
+            }
+            Some(AttackResult(res.isAttackerAttackingThisRound, res.attacker, res.defender, res.attackersAttack, res.defendersAttack, res.success, actualDamage, drain))
+          } else {
+            Some(res)
+          }          
         } else {
-          attackerState -= possibleAttackersDamage(false, defender, attacker, defenderAttack.get, Some(attackerAttack))
+          val damage = possibleAttackersDamage(false, defender, attacker, defenderAttack.get, Some(attackerAttack))
+          attackerState -= damage
+          if (attackerState < 0) {
+            val actualDamage = damage + attackerState
+            val drain = if (res.attackersAttack.attributes.contains(Drain)) {
+              actualDamage / 2
+            } else {
+              0
+            }
+            Some(AttackResult(res.isAttackerAttackingThisRound, res.attacker, res.defender, res.attackersAttack, res.defendersAttack, res.success, actualDamage, drain))
+          } else {
+            Some(res)
+          }          
         }
-        true
       } else {
-        true
+        Some(res)
       }
     })    
 
@@ -71,7 +111,13 @@ object Attack {
   
       // when defender deals damage, first parameter is false, otherwise true
   def possibleAttackersDamage(actualAttackerAttacks:Boolean, attacker:Soldier, defender:Soldier, attackersAttack:Attack, defendersAttack:Option[Attack]):Int = {
-	attackersAttack.damage * (100 + defender.soldierType.resistance(attackersAttack.attackType)) / 100
+	val damageWithResistances = attackersAttack.damage * (100 + defender.soldierType.resistance(attackersAttack.attackType)) / 100
+	if (actualAttackerAttacks && attackersAttack.attributes.contains(Charge) || 
+	    !actualAttackerAttacks && defendersAttack.map(_.attributes.contains(Charge)).getOrElse(false)) {
+	  damageWithResistances * 2
+	} else {
+	  damageWithResistances
+	}
   }
   
   def apply(imageName:String, damage:Int, count:Int, attackType:AttackType, 

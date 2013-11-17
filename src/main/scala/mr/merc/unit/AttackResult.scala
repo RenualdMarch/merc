@@ -1,9 +1,10 @@
 package mr.merc.unit
 
-case class AttackResult(isAttackerAttackingThisRound:Boolean, attacker:Soldier, defender:Soldier, attackersAttack:Attack, defendersAttack:Option[Attack], success:Boolean) {
+case class AttackResult(isAttackerAttackingThisRound:Boolean, attacker:Soldier, defender:Soldier, attackersAttack:Attack, defendersAttack:Option[Attack], success:Boolean, damage:Int, drained:Int) {
 	def applyDamage() = if (success) {
-	  val damage = Attack.possibleAttackersDamage(isAttackerAttackingThisRound, attacker, defender, attackersAttack, defendersAttack)
 	  defender.hp -= damage
-	  if (defender.hp < 0) defender.hp = 0
+	  if (attackersAttack.attributes.contains(Drain)) {
+		  attacker.hp += drained
+	  }
 	}
 }

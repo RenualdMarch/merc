@@ -31,13 +31,13 @@ case object Slow extends AttackAttribute
 	// Slow halves the damage caused by attacks and the movement 
 	// cost for a slowed unit is doubled. A unit that is slowed 
 	// will feature a snail icon in its sidebar information when it is selected. 
-case object Petrify extends AttackAttribute
-    // This attack petrifies the target, turning it to stone. Units that 
-	// have been petrified may not move or attack. 
-
 
 // NOT NEEDED NOW
 //case object Plague extends AttackAttribute
     // When a unit is killed by a Plague attack, that unit is replaced 
 	// with a Walking Corpse on the same side as the unit with the 
-	// Plague attack. This doesn�t work on Undead or units in villages. 
+	// Plague attack. This doesnt work on Undead or units in villages. 
+//case object Petrify extends AttackAttribute
+    // This attack petrifies the target, turning it to stone. Units that 
+	// have been petrified may not move or attack. 
+

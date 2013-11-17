@@ -93,8 +93,8 @@ class BattleViewTest extends FunSuite with BeforeAndAfter with MockitoSugar {
     test("attack ranged") {
       val attacker = new Soldier("1", rangedSoldierType, Player("1"))
       val defender = new Soldier("2", closedSoldierType, Player("2"))
-      val result = List(AttackResult(true, attacker, defender, rangedSoldierType.attacks(0), None, true), 
-      		AttackResult(true, attacker, defender, rangedSoldierType.attacks(0), None, false))
+      val result = List(AttackResult(true, attacker, defender, rangedSoldierType.attacks(0), None, true, 10, 0), 
+      		AttackResult(true, attacker, defender, rangedSoldierType.attacks(0), None, false, 10, 0))
       val field = model.map.hexField
 	  val from = field.hex(0, 0)
 	  from.soldier = Some(attacker)
@@ -131,8 +131,8 @@ class BattleViewTest extends FunSuite with BeforeAndAfter with MockitoSugar {
     test("attack not ranged") {
       val attacker = new Soldier("1", closedSoldierType, Player("1"))
       val defender = new Soldier("2", closedSoldierType, Player("2"))
-      val result = List(AttackResult(true, attacker, defender, closedSoldierType.attacks(0), Some(closedSoldierType.attacks(0)), false), 
-      		AttackResult(false, defender, attacker, closedSoldierType.attacks(0), Some(closedSoldierType.attacks(0)), true))
+      val result = List(AttackResult(true, attacker, defender, closedSoldierType.attacks(0), Some(closedSoldierType.attacks(0)), false, 20, 0), 
+      		AttackResult(false, defender, attacker, closedSoldierType.attacks(0), Some(closedSoldierType.attacks(0)), true, 5, 0))
       val field = model.map.hexField
 	  val from = field.hex(0, 0)
 	  from.soldier = Some(attacker)
