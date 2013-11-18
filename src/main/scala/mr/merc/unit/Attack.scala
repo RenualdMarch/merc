@@ -65,6 +65,14 @@ object Attack {
     }
   }
   
+  private def fixDrain(maxHp:Int, currentHp:Int, drain:Int):Int = {
+    if (currentHp + drain > maxHp) {
+      maxHp - currentHp
+    } else {
+      drain
+    }
+  }
+  
   private def filterNotNeededAttacks(attacker:Soldier, defender:Soldier, attacks:List[AttackResult], attackerAttack:Attack, defenderAttack:Option[Attack]):List[AttackResult] = {
     var attackerState = attacker.hp
     var defenderState = defender.hp
@@ -83,17 +91,14 @@ object Attack {
             } else {
               0
             }
-            val finalDrain = if (attackerState + drain > attacker.hp) {
-              val result = attacker.hp - attackerState
-              attackerState += result
-              result
-            } else {
-              attackerState += drain
-              drain
-            }
+            val finalDrain = fixDrain(attacker.hp, attackerState, drain)
+            attackerState += finalDrain
+
             Some(AttackResult(res.isAttackerAttackingThisRound, res.attacker, res.defender, res.attackersAttack, res.defendersAttack, res.success, actualDamage, finalDrain))
           } else {
-            Some(res)
+            val finalDrain = fixDrain(attacker.hp, attackerState, res.drained)
+            attackerState += finalDrain
+            Some(AttackResult(res.isAttackerAttackingThisRound, res.attacker, res.defender, res.attackersAttack, res.defendersAttack, res.success, res.damage, finalDrain))
           }          
         } else {
           val damage = possibleAttackersDamage(false, defender, attacker, defenderAttack.get, Some(attackerAttack))
@@ -105,17 +110,14 @@ object Attack {
             } else {
               0
             }
-            val finalDrain = if (defenderState + drain > defender.hp) {
-              val result = defender.hp - defenderState
-              defenderState += result
-              result
-            } else {
-              defenderState += drain
-              drain
-            }
+            
+            val finalDrain = fixDrain(defender.hp, defenderState, drain)
+            defenderState += finalDrain
             Some(AttackResult(res.isAttackerAttackingThisRound, res.attacker, res.defender, res.attackersAttack, res.defendersAttack, res.success, actualDamage, finalDrain))
           } else {
-            Some(res)
+            val finalDrain = fixDrain(defender.hp, defenderState, res.drained)
+            defenderState += finalDrain
+            Some(AttackResult(res.isAttackerAttackingThisRound, res.attacker, res.defender, res.attackersAttack, res.defendersAttack, res.success, res.damage, finalDrain))
           }          
         }
       } else {

@@ -176,7 +176,9 @@ class DrainAttributeTest extends FunSuite {
 	  defenderHex.soldier = Some(defender)
 	  val result = Attack.battle(attackerHex, defenderHex,attackerType.attacks(0), Some(defenderType.attacks(0)), f(60))
 	  assert(result.size === 3)
-	  result foreach (r => assert(r.drained === 5))
+	  assert(result(0).drained === 0)
+	  assert(result(1).drained === 5)
+	  assert(result(2).drained === 5)
   }
   
   test("drained health is added during apply damage state") {
