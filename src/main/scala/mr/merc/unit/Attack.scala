@@ -83,7 +83,15 @@ object Attack {
             } else {
               0
             }
-            Some(AttackResult(res.isAttackerAttackingThisRound, res.attacker, res.defender, res.attackersAttack, res.defendersAttack, res.success, actualDamage, drain))
+            val finalDrain = if (attackerState + drain > attacker.hp) {
+              val result = attacker.hp - attackerState
+              attackerState += result
+              result
+            } else {
+              attackerState += drain
+              drain
+            }
+            Some(AttackResult(res.isAttackerAttackingThisRound, res.attacker, res.defender, res.attackersAttack, res.defendersAttack, res.success, actualDamage, finalDrain))
           } else {
             Some(res)
           }          
@@ -97,7 +105,15 @@ object Attack {
             } else {
               0
             }
-            Some(AttackResult(res.isAttackerAttackingThisRound, res.attacker, res.defender, res.attackersAttack, res.defendersAttack, res.success, actualDamage, drain))
+            val finalDrain = if (defenderState + drain > defender.hp) {
+              val result = defender.hp - defenderState
+              defenderState += result
+              result
+            } else {
+              defenderState += drain
+              drain
+            }
+            Some(AttackResult(res.isAttackerAttackingThisRound, res.attacker, res.defender, res.attackersAttack, res.defendersAttack, res.success, actualDamage, finalDrain))
           } else {
             Some(res)
           }          

@@ -193,7 +193,14 @@ class DrainAttributeTest extends FunSuite {
   }
   
   test("drained life is added immidiately after successful attack") {
-    fail
+    val attackerType = soldierType(15, 50, 20, 4, Set(Drain))
+	val defenderType = soldierType(100, 50, 10, 4, Set.empty)
+	val attacker = new Soldier("1", attackerType, Player("1"))
+	val defender = new Soldier("2", defenderType, Player("2"))
+	attackerHex.soldier = Some(attacker)
+	defenderHex.soldier = Some(defender)
+    val results = Attack.battle(attackerHex, defenderHex, attackerType.attacks(0), Some(defenderType.attacks(0)), f(60))
+    assert(results.size === 8)
   }
   
   test("drained life is not added after failed attack") {
