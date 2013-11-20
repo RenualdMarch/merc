@@ -29,7 +29,11 @@ object Attack {
         case None => Nil
       }
       
-      mergeAttacks(attackerStrikes, defenderStrikes)
+      if (defenderSelection.map(_.attributes.contains(Firststrike)).getOrElse(false) && !attackerSelection.attributes.contains(Firststrike)) {
+        mergeAttacks(defenderStrikes, attackerStrikes)
+      } else {
+        mergeAttacks(attackerStrikes, defenderStrikes)
+      }
     }
     
     val filteredAttacks = filterNotNeededAttacks(attacker, defender, resultAttacks.toList.flatten, attackerSelection, defenderSelection)
