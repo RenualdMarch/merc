@@ -6,7 +6,7 @@ import scala.util.Random
 object Attack {
   private val maxDefence = 100
   private def resolveAttack(defence:Int) = Random.nextInt(maxDefence) >= defence
-
+  
   def battle(attackerHex:TerrainHex, defenderHex:TerrainHex, attackerSelection:Attack, defenderSelection:Option[Attack], 
       f:Int => Boolean = resolveAttack):List[AttackResult] = {
     require(attackerHex.soldier.isDefined)
@@ -45,7 +45,6 @@ object Attack {
   }
   
   private def generateAttacks(attackerIsAttacking:Boolean, attacker:Soldier, defender:Soldier, defence:Int, attackersAttack:Attack, defendersAttack:Option[Attack], f:Int => Boolean):List[AttackResult] = {
-  
     val retVal = for (i <- 0 until attackersAttack.count) yield {
       val damage = Attack.possibleAttackersDamage(attackerIsAttacking, attacker, defender, attackersAttack, defendersAttack)
       val drained = if (attackersAttack.attributes.contains(Drain)) {
@@ -53,7 +52,9 @@ object Attack {
       } else {
         0
       }
-      AttackResult(attackerIsAttacking, attacker, defender, attackersAttack, defendersAttack, f(defence), damage, drained)
+      val success = f(attackersAttack.chanceOfSuccess(defence))
+      
+      AttackResult(attackerIsAttacking, attacker, defender, attackersAttack, defendersAttack, success, damage, drained)
     }
     
     retVal.toList
@@ -127,11 +128,10 @@ object Attack {
       } else {
         Some(res)
       }
-    })    
-
+    })
   }
   
-      // when defender deals damage, first parameter is false, otherwise true
+  // when defender deals damage, first parameter is false, otherwise true
   def possibleAttackersDamage(actualAttackerAttacks:Boolean, attacker:Soldier, defender:Soldier, attackersAttack:Attack, defendersAttack:Option[Attack]):Int = {
 	val damageWithResistances = attackersAttack.damage * (100 + defender.soldierType.resistance(attackersAttack.attackType)) / 100
 	if (actualAttackerAttacks && attackersAttack.attributes.contains(Charge) || 
@@ -156,4 +156,12 @@ class Attack(val imageName:String, val damage:Int, val count:Int, val attackType
 	  case true => projectile map (_ + "-succ")
 	  case false => projectile map (_ + "-fail")
 	}
+	
+    def chanceOfSuccess(enemysDefence:Int) = if (attributes.contains(Magical)) {
+      30 
+    } else if (attributes.contains(Marksman) && enemysDefence > 40) {
+      40
+    } else {
+      enemysDefence
+    }
 }

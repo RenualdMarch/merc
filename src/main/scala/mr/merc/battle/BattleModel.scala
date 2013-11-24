@@ -36,10 +36,7 @@ class BattleModel(val map:GameField) extends BattleModelEventHandler {
     
     private [battle] def handleEndTurnEvent():EndMoveModelEventResult = {
       require(validateEndTurn)
-      soldiers.filter(_.player == currentPlayer).foreach{s => 
-          s.resetMovePoints()
-          s.attackedThisTurn = false
-       }
+      soldiers.filter(_.player == currentPlayer).foreach(_.endMove())
       nextPlayer()
       EndMoveModelEventResult(currentPlayer)
     }

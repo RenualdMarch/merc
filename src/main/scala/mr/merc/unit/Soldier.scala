@@ -4,6 +4,7 @@ import mr.merc.players.Player
 
 class Soldier(val name:String, var soldierType:SoldierType, val player:Player) {
 	private var _hp = soldierType.hp
+	private var _state = Set[SoldierState]()
 	
 	def hp = _hp
 	def hp_=(newHp:Int) {
@@ -20,7 +21,18 @@ class Soldier(val name:String, var soldierType:SoldierType, val player:Player) {
 	var attackedThisTurn = false
 	def movedThisTurn = movePointsRemain != soldierType.movement
 	
-	def resetMovePoints() {
+	def endMove() {
 	  movePointsRemain = soldierType.movement
+	  attackedThisTurn = false
 	}
+	
+	def addState(state:SoldierState) {
+	  _state += state
+	}
+	
+	def removeState(state:SoldierState) {
+	  _state -= state
+	}
+	
+	def state = _state
 }

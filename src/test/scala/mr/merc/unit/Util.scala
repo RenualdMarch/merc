@@ -1,0 +1,45 @@
+package mr.merc.unit
+
+import org.scalatest.FunSuite
+import mr.merc.map.terrain.Sand
+import mr.merc.map.hex.TerrainHex
+import mr.merc.players.Player
+import org.scalatest.BeforeAndAfter
+import org.scalatest.FunSuite
+import org.scalatest.FunSuite
+
+object Util extends FunSuite {
+  
+  	val attackerHex = new TerrainHex(0, 0, Sand)
+	val defenderHex = new TerrainHex(1, 0, Sand)
+	
+  	def soldierType(hp:Int, defence:Int, attackDamage:Int, attackCount:Int, attributes:Set[AttackAttribute], resistance:Int = 0) = 
+	  new SoldierType("type0", 1, hp, 1, 10, 1, 
+		List(new Attack("name", attackDamage, attackCount, Impact, false, attributes)), 
+		Map(), Map(Sand -> defence), Map(Impact -> resistance))
+  	def f(t:Int)(d:Int):Boolean = t >= d
+  	
+  	def attackByAttackerGeneric(results:List[AttackResult], attacker:Soldier, defender:Soldier, 
+  	      attackerType:SoldierType, defenderType:SoldierType,
+  	      isAttackerAttackingThisRound:Boolean, success:Boolean)(i:Int) = {
+	  val result = results(i)
+	  assert(result.attacker === attacker)
+	  assert(result.defender === defender)
+	  assert(result.attackersAttack === attackerType.attacks(0))
+	  assert(result.defendersAttack.get === defenderType.attacks(0))
+	  assert(result.isAttackerAttackingThisRound === isAttackerAttackingThisRound)
+	  assert(result.success === success)
+	}
+	  
+	def attackByDefenderGeneric(results:List[AttackResult], attacker:Soldier, defender:Soldier, 
+  	      attackerType:SoldierType, defenderType:SoldierType,
+  	      isAttackerAttackingThisRound:Boolean, success:Boolean)(i:Int) = {
+	  val result = results(i)
+	  assert(result.attacker === defender)
+	  assert(result.defender === attacker)
+	  assert(result.attackersAttack === defenderType.attacks(0))
+	  assert(result.defendersAttack.get === attackerType.attacks(0))
+	  assert(result.isAttackerAttackingThisRound === isAttackerAttackingThisRound)
+	  assert(result.success === success)
+	}
+}

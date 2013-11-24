@@ -6,5 +6,13 @@ case class AttackResult(isAttackerAttackingThisRound:Boolean, attacker:Soldier, 
 	  if (attackersAttack.attributes.contains(Drain)) {
 		  attacker.hp += drained
 	  }
+	  
+	  if (attackersAttack.attributes.contains(Slow)) {
+	    defender.addState(Slowed)
+	  }
+	  
+	  if (attackersAttack.attributes.contains(Poison)) {
+	    defender.addState(Poisoned)
+	  }
 	}
 }
