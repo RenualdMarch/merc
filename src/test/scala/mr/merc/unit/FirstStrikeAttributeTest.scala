@@ -2,12 +2,14 @@ package mr.merc.unit
 
 import org.scalatest.FunSuite
 import mr.merc.players.Player
-
+import mr.merc.map.terrain.Sand
+import mr.merc.map.hex.TerrainHex
 class FirststrikeAttributeTest extends FunSuite {
   import Util._
   val firstStrikeType = soldierType(100, 50, 10, 2, Set(Firststrike))
   val otherType = soldierType(100, 50, 10, 2, Set.empty)
-  
+  val attackerHex = new TerrainHex(0, 0, Sand)
+  val defenderHex = new TerrainHex(1, 0, Sand)    
   test("soldier with first strike attacks first when he is attacker") {
 
 	val attacker = new Soldier("1", firstStrikeType, Player("1"))

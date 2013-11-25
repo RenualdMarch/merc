@@ -24,6 +24,10 @@ class Soldier(val name:String, var soldierType:SoldierType, val player:Player) {
 	def endMove() {
 	  movePointsRemain = soldierType.movement
 	  attackedThisTurn = false
+	  if (state.contains(Poisoned)) {
+	    hp -= 8
+	    if (hp <= 0) hp = 1
+	  }
 	}
 	
 	def addState(state:SoldierState) {

@@ -1,9 +1,13 @@
 package mr.merc.unit
 import org.scalatest.FunSuite
 import mr.merc.players.Player
-
+import mr.merc.map.terrain.Sand
+import mr.merc.map.hex.TerrainHex
 class ChargeAttributeTest extends FunSuite {
   import Util._
+  val attackerHex = new TerrainHex(0, 0, Sand)
+  val defenderHex = new TerrainHex(1, 0, Sand)  
+  
   test("charge works when offensive") {
       val attackerType = soldierType(100, 50, 5, 2, Set(Charge))
 	  val defenderType = soldierType(100, 50, 7, 1, Set.empty)

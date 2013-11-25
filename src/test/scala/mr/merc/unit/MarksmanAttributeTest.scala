@@ -2,13 +2,15 @@ package mr.merc.unit
 
 import org.scalatest.FunSuite
 import mr.merc.players.Player
-
+import mr.merc.map.terrain.Sand
+import mr.merc.map.hex.TerrainHex
 class MarksmanAttributeTest extends FunSuite {
   import Util._
   val attackerType = soldierType(100, 50, 10, 1, Set(Marksman))
   val strongDefenderType = soldierType(100, 90, 10, 1, Set())
   val weakDefenderType = soldierType(100, 30, 10, 1, Set())
-  
+  val attackerHex = new TerrainHex(0, 0, Sand)
+  val defenderHex = new TerrainHex(1, 0, Sand)    
   test("marksman makes attack chance be equal to defence if defence is smaller") {
     val attacker = new Soldier("1", attackerType, Player("1"))
 	val defender = new Soldier("2", weakDefenderType, Player("2"))

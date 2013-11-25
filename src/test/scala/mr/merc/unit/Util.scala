@@ -8,11 +8,7 @@ import org.scalatest.BeforeAndAfter
 import org.scalatest.FunSuite
 import org.scalatest.FunSuite
 
-object Util extends FunSuite {
-  
-  	val attackerHex = new TerrainHex(0, 0, Sand)
-	val defenderHex = new TerrainHex(1, 0, Sand)
-	
+object Util extends FunSuite {	
   	def soldierType(hp:Int, defence:Int, attackDamage:Int, attackCount:Int, attributes:Set[AttackAttribute], resistance:Int = 0) = 
 	  new SoldierType("type0", 1, hp, 1, 10, 1, 
 		List(new Attack("name", attackDamage, attackCount, Impact, false, attributes)), 

@@ -2,12 +2,14 @@ package mr.merc.unit
 
 import org.scalatest.FunSuite
 import mr.merc.players.Player
-
+import mr.merc.map.terrain.Sand
+import mr.merc.map.hex.TerrainHex
 class PoisonAttributeTest extends FunSuite {
   import Util._
   val attackerType = soldierType(100, 50, 10, 1, Set(Poison))
   val defenderType = soldierType(100, 90, 10, 1, Set())
-  
+  val attackerHex = new TerrainHex(0, 0, Sand)
+  val defenderHex = new TerrainHex(1, 0, Sand)    
   test("defender is poisoned when attack is successfull") {
     val attacker = new Soldier("1", attackerType, Player("1"))
 	val defender = new Soldier("2", defenderType, Player("2"))

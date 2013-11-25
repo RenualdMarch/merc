@@ -2,11 +2,15 @@ package mr.merc.unit
 import org.scalatest.FunSuite
 import mr.merc.players.Player
 import org.scalatest.BeforeAndAfter
+import mr.merc.map.terrain.Sand
+import mr.merc.map.hex.TerrainHex
 
 
 class BerserkAttributeTest extends FunSuite with BeforeAndAfter {
 	import Util._
   
+  	val attackerHex = new TerrainHex(0, 0, Sand)
+	val defenderHex = new TerrainHex(1, 0, Sand)
     test("berserk attribute in attack") {
 	  val attackerType = soldierType(10, 70, 5, 2, Set(Berserk))
 	  val defenderType = soldierType(30, 50, 5, 2, Set.empty)
