@@ -1,6 +1,6 @@
 For M3, these things should be completed:
 
-Attack attributes
++Attack attributes(done)
 Soldier type attributes
 Minimap
 Soldier status ball - can move, can only attack, can do nothing

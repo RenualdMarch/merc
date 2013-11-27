@@ -28,6 +28,10 @@ class Soldier(val name:String, var soldierType:SoldierType, val player:Player) {
 	    hp -= 8
 	    if (hp <= 0) hp = 1
 	  }
+	  
+	  if (state.contains(Slowed)) {
+	    removeState(Slowed)
+	  }
 	}
 	
 	def addState(state:SoldierState) {

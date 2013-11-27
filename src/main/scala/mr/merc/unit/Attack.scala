@@ -81,14 +81,21 @@ object Attack {
   private def filterNotNeededAttacks(attacker:Soldier, defender:Soldier, attacks:List[AttackResult], attackerAttack:Attack, defenderAttack:Option[Attack]):List[AttackResult] = {
     var attackerState = attacker.hp
     var defenderState = defender.hp
+    var attackerSlowed = attacker.state.contains(Slowed)
+    var defenderSlowed = defender.state.contains(Slowed)
     
     attacks.flatMap(res => {
       if (attackerState <= 0 || defenderState <= 0) {
         None
       } else if (res.success) {
         if (res.attacker == attacker) {
-          val damage = possibleAttackersDamage(true, attacker, defender, attackerAttack, defenderAttack)
+          val possibleDamage = possibleAttackersDamage(true, attacker, defender, attackerAttack, defenderAttack)
+          val damage = if (attackerSlowed) possibleDamage / 2 else possibleDamage
           defenderState -= damage
+          if (attackerAttack.attributes.contains(Slow)) {
+            defenderSlowed = true
+          }
+          
           if (defenderState < 0) {
             val actualDamage = damage + defenderState
             val drain = if (res.attackersAttack.attributes.contains(Drain)) {
@@ -98,7 +105,7 @@ object Attack {
             }
             val finalDrain = fixDrain(attacker.hp, attackerState, drain)
             attackerState += finalDrain
-
+            
             Some(AttackResult(res.isAttackerAttackingThisRound, res.attacker, res.defender, res.attackersAttack, res.defendersAttack, res.success, actualDamage, finalDrain))
           } else {
             val finalDrain = fixDrain(attacker.hp, attackerState, res.drained)
@@ -106,8 +113,13 @@ object Attack {
             Some(AttackResult(res.isAttackerAttackingThisRound, res.attacker, res.defender, res.attackersAttack, res.defendersAttack, res.success, res.damage, finalDrain))
           }          
         } else {
-          val damage = possibleAttackersDamage(false, defender, attacker, defenderAttack.get, Some(attackerAttack))
+          val possibleDamage = possibleAttackersDamage(false, defender, attacker, defenderAttack.get, Some(attackerAttack))
+          val damage = if (defenderSlowed) possibleDamage / 2 else possibleDamage
           attackerState -= damage
+          if (defenderAttack.get.attributes.contains(Slow)) {
+            attackerSlowed = true
+          }
+          
           if (attackerState < 0) {
             val actualDamage = damage + attackerState
             val drain = if (res.attackersAttack.attributes.contains(Drain)) {
@@ -115,6 +127,7 @@ object Attack {
             } else {
               0
             }
+
             
             val finalDrain = fixDrain(defender.hp, defenderState, drain)
             defenderState += finalDrain
@@ -134,12 +147,14 @@ object Attack {
   // when defender deals damage, first parameter is false, otherwise true
   def possibleAttackersDamage(actualAttackerAttacks:Boolean, attacker:Soldier, defender:Soldier, attackersAttack:Attack, defendersAttack:Option[Attack]):Int = {
 	val damageWithResistances = attackersAttack.damage * (100 + defender.soldierType.resistance(attackersAttack.attackType)) / 100
-	if (actualAttackerAttacks && attackersAttack.attributes.contains(Charge) || 
+	val damage = if (actualAttackerAttacks && attackersAttack.attributes.contains(Charge) || 
 	    !actualAttackerAttacks && defendersAttack.map(_.attributes.contains(Charge)).getOrElse(false)) {
 	  damageWithResistances * 2
 	} else {
 	  damageWithResistances
 	}
+	
+	if (attacker.state.contains(Slowed)) damage / 2 else damage
   }
   
   def apply(imageName:String, damage:Int, count:Int, attackType:AttackType, 
