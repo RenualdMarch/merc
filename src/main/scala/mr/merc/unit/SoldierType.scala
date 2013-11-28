@@ -58,7 +58,7 @@ object SoldierType {
 
 case class SoldierType(name:String, cost:Int, hp:Int, movement:Int, exp:Int, level:Int, 
     attacks:List[Attack], moveCost:Map[TerrainType, Int], defence:Map[TerrainType, Int], 
-    resistance:Map[AttackType, Int], soldierTypeAttributes:Set[SoldierAttribute] = Set()) {
+    resistance:Map[AttackType, Int], soldierTypeAttributes:Set[SoldierTypeAttribute] = Set()) {
   
   
 }

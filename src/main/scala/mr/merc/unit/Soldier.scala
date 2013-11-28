@@ -1,6 +1,7 @@
 package mr.merc.unit
 
 import mr.merc.players.Player
+import mr.merc.map.hex.TerrainHexField
 
 class Soldier(val name:String, var soldierType:SoldierType, val player:Player) {
 	private var _hp = soldierType.hp
@@ -43,4 +44,13 @@ class Soldier(val name:String, var soldierType:SoldierType, val player:Player) {
 	}
 	
 	def state = _state
+	
+	def beforeTurnActions(field:TerrainHexField, x:Int, y:Int):List[BeforeTurnAction] = {
+	  if (soldierType.soldierTypeAttributes.contains(Cures)) {
+	    val allies = field.neighbours(x, y).flatMap(_.soldier).filter(_.player == this.player)
+	    allies.map(CureSoldier).toList
+	  } else {	  
+	    Nil
+	  }
+	}
 }
