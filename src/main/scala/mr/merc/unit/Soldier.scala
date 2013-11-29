@@ -21,7 +21,7 @@ class Soldier(val name:String, var soldierType:SoldierType, val player:Player) {
 	var movePointsRemain = soldierType.movement
 	var attackedThisTurn = false
 	def movedThisTurn = movePointsRemain != soldierType.movement
-	
+	def needsHealing = hp != soldierType.hp
 	def endMove() {
 	  movePointsRemain = soldierType.movement
 	  attackedThisTurn = false
@@ -46,11 +46,31 @@ class Soldier(val name:String, var soldierType:SoldierType, val player:Player) {
 	def state = _state
 	
 	def beforeTurnActions(field:TerrainHexField, x:Int, y:Int):List[BeforeTurnAction] = {
-	  if (soldierType.soldierTypeAttributes.contains(Cures)) {
-	    val allies = field.neighbours(x, y).flatMap(_.soldier).filter(_.player == this.player)
-	    allies.map(CureSoldier).toList
-	  } else {	  
-	    Nil
+	  val attributes = soldierType.soldierTypeAttributes
+	  val result = collection.mutable.ArrayBuffer[BeforeTurnAction]()
+	  
+	  val neighbours = field.neighbours(x, y).flatMap(_.soldier).filter(_.player == this.player)
+	  if (attributes.contains(Cures)) {
+	    val allies = neighbours.filter(_.state.contains(Poisoned))
+	    result ++= allies.map(t => CureSoldier(this, t))
 	  }
+	  
+	  val heal = if (attributes.contains(Heals4)) Some(Heals4) 
+			  else if (attributes.contains(Heals8)) Some(Heals8)
+			  else None
+	  
+      heal match {
+		case Some(healing) => {
+		  val needsHealing = neighbours.filter(_.needsHealing)
+		  val actions = healing match {
+		    case Heals4 => needsHealing.map(Heal4Soldier(this, _))
+		    case Heals8 => needsHealing.map(Heal8Soldier(this, _))
+		  }
+		  result ++= actions
+		}
+		case None => // do nothing
+	  }
+	  
+	  result toList
 	}
 }
