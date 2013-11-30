@@ -3,7 +3,7 @@ For M3, these things should be completed:
 +Attack attributes(done)
 +Soldier type attributes(done)
 +Add attributes to configuration
-Configuration
++Configuration
 Sounds
 Music
 Minimap
