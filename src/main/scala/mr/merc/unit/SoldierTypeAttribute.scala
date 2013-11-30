@@ -1,8 +1,15 @@
 package mr.merc.unit
 
+object SoldierTypeAttribute {
+  private val list = List[SoldierTypeAttribute](Cures, Heals4, Heals8, Regenerates, Skirmisher, Steadfast)
+  private val map = list map (a => a.toString() -> a) toMap
+  def apply(name:String) = map(name)
+}
+
 sealed trait SoldierTypeAttribute {
 
 }
+
 case object Cures extends SoldierTypeAttribute
     // A unit which can cure an ally of poison, although the ally 
 	// will receive no additional healing on the turn it is cured of the poison. 

@@ -146,7 +146,7 @@ object Attack {
   
   // when defender deals damage, first parameter is false, otherwise true
   def possibleAttackersDamage(actualAttackerAttacks:Boolean, attacker:Soldier, defender:Soldier, attackersAttack:Attack, defendersAttack:Option[Attack]):Int = {
-	val resistance = if (actualAttackerAttacks && defender.soldierType.soldierTypeAttributes.contains(Steadfast)) {
+	val resistance = if (actualAttackerAttacks && defender.soldierType.attributes.contains(Steadfast)) {
 	  val res = defender.soldierType.resistance(attackersAttack.attackType)
 	  if (res <= 0) {
 	    res

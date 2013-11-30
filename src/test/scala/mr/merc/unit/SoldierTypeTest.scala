@@ -13,6 +13,8 @@ class SoldierTypeTest extends FunSuite {
 	  assert(sType.name === "testSoldier")
 	  assert(sType.exp === 45)
 	  assert(sType.level === 3)
+	  assert(sType.attacks(1).attributes === Set(Drain, Firststrike))
+	  assert(sType.attributes === Set.empty)
 	  
 	  val attacks = sType.attacks
 	  assert(attacks.size === 2)
@@ -36,5 +38,9 @@ class SoldierTypeTest extends FunSuite {
 	  assert(sType.resistance(Impact) === 0)
 	  assert(sType.resistance(Pierce) === 20)
 	  assert(sType.resistance(Arcane) === -30)
+	  
+	  val sType2 = SoldierType("testSoldier2")
+	  assert(sType2.attributes === Set(Cures, Heals4))
+	  assert(sType2.attacks(0).attributes === Set(Poison))
 	}
 }

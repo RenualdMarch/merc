@@ -1,5 +1,12 @@
 package mr.merc.unit
 
+object AttackAttribute {
+  private val list = List[AttackAttribute](Berserk, Charge, Drain, 
+      Firststrike, Magical, Marksman, Poison, Slow)
+  private val map = list map (a => a.toString() -> a) toMap
+  def apply(name:String) = map(name)
+}
+
 sealed trait AttackAttribute {
 }
 

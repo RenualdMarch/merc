@@ -43,7 +43,7 @@ class Soldier(val name:String, var soldierType:SoldierType, val player:Player) {
 	
 	// TODO split into methods
 	def beforeTurnActions(field:TerrainHexField, x:Int, y:Int):List[BeforeTurnAction] = {
-	  val attributes = soldierType.soldierTypeAttributes
+	  val attributes = soldierType.attributes
 	  val result = collection.mutable.ArrayBuffer[BeforeTurnAction]()
 	  
 	  val neighbours = field.neighbours(x, y).flatMap(_.soldier).filter(_.player == this.player)

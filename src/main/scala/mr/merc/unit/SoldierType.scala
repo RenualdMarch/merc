@@ -20,6 +20,7 @@ object SoldierType {
       val movement = (node \ "@movement").toString().toInt
       val exp = (node \ "@exp").toString().toInt
       val level = (node \ "@level").toString().toInt
+      val attributes = split((node \ "@attributes").toString()).map(SoldierTypeAttribute.apply)
 
       val attacks = (node \ "attacks" \ "attack").map(attackNode => {
         val imageName = (attackNode \ "@imageName").toString()
@@ -28,7 +29,9 @@ object SoldierType {
         val ranged = (attackNode \ "@ranged").toString().toBoolean
         val attackTypeName = (attackNode \ "@attackType").toString()
         val attackType = AttackType(attackTypeName)
-        new Attack(imageName, damage, count, attackType, ranged)
+        val attributes = split((attackNode \ "@attributes").toString()).map(AttackAttribute.apply)
+
+        new Attack(imageName, damage, count, attackType, ranged, attributes)
       }).toList
       
       val moveCostsMap = (node \ "moveCosts" \ "moveCost").map(costNode => {
@@ -49,16 +52,22 @@ object SoldierType {
         (attackType, resistance)
       }).toMap
       
-      new SoldierType(name, cost, hp, movement, exp, level, attacks, moveCostsMap, defencesMap, resistancesMap)
+      new SoldierType(name, cost, hp, movement, exp, level, attacks, moveCostsMap, defencesMap, resistancesMap, attributes)
     })
     
     parsed.toList
 	}
+  
+  private def split(line:String) = if (line.isEmpty()) {
+    Set() 
+  } else {
+    line.split(",").map(_.trim()) toSet
+  }
 }
 
 case class SoldierType(name:String, cost:Int, hp:Int, movement:Int, exp:Int, level:Int, 
     attacks:List[Attack], moveCost:Map[TerrainType, Int], defence:Map[TerrainType, Int], 
-    resistance:Map[AttackType, Int], soldierTypeAttributes:Set[SoldierTypeAttribute] = Set()) {
+    resistance:Map[AttackType, Int], attributes:Set[SoldierTypeAttribute] = Set()) {
   
   
 }

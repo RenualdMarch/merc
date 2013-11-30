@@ -10,7 +10,7 @@ import mr.merc.unit.Skirmisher
 class GameField(val hexField:TerrainHexField, val players:List[Player]) {
 	def gridForSoldier(soldier:Soldier):Grid[TerrainHex] = {
 	  new Grid[TerrainHex] {
-		  	private val mustStopHere = if (soldier.soldierType.soldierTypeAttributes.contains(Skirmisher)) {
+		  	private val mustStopHere = if (soldier.soldierType.attributes.contains(Skirmisher)) {
 		  	  Set.empty[TerrainHex]
 		  	} else {
 		  	  players.filterNot(_ == soldier.player).map(zoneOfControlFor).reduce(_ ++ _)
