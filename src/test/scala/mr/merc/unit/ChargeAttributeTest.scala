@@ -35,8 +35,8 @@ class ChargeAttributeTest extends FunSuite {
   }
   
   test("charge works with resistances") {
-      val attackerType = soldierType(100, 50, 10, 2, Set(Charge), 20)
-	  val defenderType = soldierType(100, 50, 10, 1, Set.empty, -20)
+      val attackerType = soldierType(100, 50, 10, 2, Set(Charge), -20)
+	  val defenderType = soldierType(100, 50, 10, 1, Set.empty, 20)
 	  val attacker = new Soldier("1", attackerType, Player("1"))
 	  val defender = new Soldier("2", defenderType, Player("2"))
 	  attackerHex.soldier = Some(attacker)

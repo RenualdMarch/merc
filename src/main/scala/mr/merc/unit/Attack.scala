@@ -146,7 +146,20 @@ object Attack {
   
   // when defender deals damage, first parameter is false, otherwise true
   def possibleAttackersDamage(actualAttackerAttacks:Boolean, attacker:Soldier, defender:Soldier, attackersAttack:Attack, defendersAttack:Option[Attack]):Int = {
-	val damageWithResistances = attackersAttack.damage * (100 + defender.soldierType.resistance(attackersAttack.attackType)) / 100
+	val resistance = if (actualAttackerAttacks && defender.soldierType.soldierTypeAttributes.contains(Steadfast)) {
+	  val res = defender.soldierType.resistance(attackersAttack.attackType)
+	  if (res <= 0) {
+	    res
+	  } else if (res * 2 > 50) {
+	    50
+	  } else {
+	    res * 2
+	  }
+	} else {
+	  defender.soldierType.resistance(attackersAttack.attackType)
+	}
+    
+    val damageWithResistances = attackersAttack.damage * (100 - resistance) / 100
 	val damage = if (actualAttackerAttacks && attackersAttack.attributes.contains(Charge) || 
 	    !actualAttackerAttacks && defendersAttack.map(_.attributes.contains(Charge)).getOrElse(false)) {
 	  damageWithResistances * 2
