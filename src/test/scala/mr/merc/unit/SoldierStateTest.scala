@@ -12,19 +12,18 @@ class SoldierStateTest extends FunSuite{
 	test("poisoned state results in 8 hp drop") {
 	  val soldier = new Soldier("1", soldierType, Player("1"))
 	  soldier.addState(Poisoned)
-	  soldier.hp = 10
-	  soldier.endMove()
-	  assert(soldier.hp === 2)
+	  PoisoningDamage(soldier).action()
+	  assert(soldier.hp === 12)
 	}
 	
 	test("poisonined doesn't go below 1 hp") {
 	  val soldier = new Soldier("1", soldierType, Player("1"))
 	  soldier.addState(Poisoned)
 	  soldier.hp = 8
-	  soldier.endMove()
+	  PoisoningDamage(soldier).action()
 	  assert(soldier.hp === 1)
 	  soldier.hp = 5
-	  soldier.endMove()
+	  PoisoningDamage(soldier).action()
 	  assert(soldier.hp === 1)
 	}
 	
