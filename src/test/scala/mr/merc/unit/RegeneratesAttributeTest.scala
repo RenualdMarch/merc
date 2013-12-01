@@ -31,10 +31,19 @@ class RegeneratesAttributeTest extends FunSuite with BeforeAndAfter {
 	
 	test("regenerates improves health when soldier is not poisoned") {
 	  soldier.hp = 10
+	  soldier.movePointsRemain -= 1
 	  Regeneration(soldier).action()
 	  assert(soldier.state === Set())
 	  assert(soldier.hp === 18)
 	}
+	
+	test("regenerates improves more health when soldier didn't move") {
+	  soldier.hp = 10
+	  Regeneration(soldier).action()
+	  assert(soldier.state === Set())
+	  assert(soldier.hp === 20)
+	}
+	
 	
 	test("regenerates is not created when unit is ok") {
 	  val actions = soldier.beforeTurnActions(field, 1, 1)

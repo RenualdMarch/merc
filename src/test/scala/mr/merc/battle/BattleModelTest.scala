@@ -15,6 +15,9 @@ import mr.merc.battle.event.AttackModelEvent
 import mr.merc.battle.event.AttackModelEventResult
 import mr.merc.battle.event.MovementModelEvent
 import mr.merc.battle.event.MovementModelEventResult
+import mr.merc.unit.Cures
+import mr.merc.unit.Heals4
+import mr.merc.unit.Poisoned
 
 class BattleModelTest extends FunSuite with BeforeAndAfter {
 	var field:TerrainHexField = _
@@ -259,8 +262,29 @@ class BattleModelTest extends FunSuite with BeforeAndAfter {
 	    assert(field.hex(0, 0).soldier === None)
 	  } else {
 	    assert(field.hex(0, 1).soldier === None)
-	  }
+	  }	  
+	}
+	
+	test("end turn and before turn events") {
+	  val curer = new SoldierType("1", 1, 20, 10, 5, 1, 
+			List(Attack("", 10, 1, Impact, false), Attack("", 6, 2, Impact, false)), Map(Grass -> 2), 
+			Map(Grass -> 60), Map(Impact -> 0), Set(Cures, Heals4))
+	  val poisonedSoldier = new Soldier("1", curer, Player("1"))
+	  val enemy = new Soldier("1", simpleSoldierType, Player("2"))
+	  val damagedSoldier = new Soldier("2", curer, Player("1"))
+	  field.hex(0, 0).soldier = Some(damagedSoldier)
+	  field.hex(0, 1).soldier = Some(poisonedSoldier)
+	  field.hex(4, 4).soldier = Some(enemy)
+	  assert(model.currentPlayer === Player("1"))
+	  damagedSoldier.movePointsRemain -= 1
+	  poisonedSoldier.movePointsRemain -= 1
+	  model.handleEndTurnEvent()
+	  // during enemy's turn one of players is poisoned, another is damaged
+	  poisonedSoldier.addState(Poisoned)
+	  damagedSoldier.hp = 10
 	  
-	  
+	  model.handleEndTurnEvent()
+	  assert(poisonedSoldier.state === Set())
+	  assert(damagedSoldier.hp === 14)
 	}
 }

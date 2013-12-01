@@ -38,7 +38,7 @@ class PoisonAttributeTest extends FunSuite {
   test("poisoned doesn't change health during end turn") {
     val soldier = new Soldier("1", attackerType, Player("1"))
     soldier.addState(Poisoned)
-    soldier.endMove()
+    soldier.beforeTurnRenowation()
     assert(soldier.hp === 100)
   }
   

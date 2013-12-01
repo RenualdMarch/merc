@@ -4,11 +4,13 @@ For M3, these things should be completed:
 +Soldier type attributes(done)
 +Add attributes to configuration
 +Configuration
++add healing 2 points for not moving
+Add mage to units and test his attack
+Soldier status ball - can move, can only attack, can do nothing
 Sounds
 Music
 Minimap
-Add mage to units and test his attack
-Soldier status ball - can move, can only attack, can do nothing
 Attack selection dialog
 Add damage numbers during attack
 UI - improve soldier panel
+Add showing before turn actions???(really low priority now)

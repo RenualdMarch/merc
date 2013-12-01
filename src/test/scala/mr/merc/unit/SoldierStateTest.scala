@@ -43,12 +43,12 @@ class SoldierStateTest extends FunSuite{
 	  assert(attackerAsDefenderDamage === 5)
 	}
 	
-	test("slowing dissapears after end turn") {
+	test("slowing dissapears after new turn begins") {
 	  val someType = Util.soldierType(100, 50, 10, 3, Set())
 	  val soldier = new Soldier("1", someType, Player("1")) 
 	  soldier.addState(Slowed)
 	  assert(soldier.state === Set(Slowed))
-	  soldier.endMove()
+	  soldier.beforeTurnRenowation()
 	  assert(soldier.state === Set())
 	}
 	

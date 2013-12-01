@@ -136,14 +136,30 @@ class HealingAttributeTest extends FunSuite with BeforeAndAfter {
 	test("healing4") {
 	  val weakendSoldier = new Soldier("1", simpleSoldierType(), Player("1"))
 	  weakendSoldier.hp = 10
+	  weakendSoldier.movePointsRemain -= 1
 	  Heal4Soldier(null, weakendSoldier).action()
 	  assert(weakendSoldier.hp === 14)
+	}
+	
+	test("healing4 when soldier didn't move") {
+	  val weakendSoldier = new Soldier("1", simpleSoldierType(), Player("1"))
+	  weakendSoldier.hp = 10
+	  Heal4Soldier(null, weakendSoldier).action()
+	  assert(weakendSoldier.hp === 16)
 	}
 	
 	test("healing8") {
 	  val weakendSoldier = new Soldier("1", simpleSoldierType(), Player("1"))
 	  weakendSoldier.hp = 10
+	  weakendSoldier.movePointsRemain -= 1
 	  Heal8Soldier(null, weakendSoldier).action()
 	  assert(weakendSoldier.hp === 18)	  
+	}
+	
+	test("healing8 when soldier didn't move") {
+	  val weakendSoldier = new Soldier("1", simpleSoldierType(), Player("1"))
+	  weakendSoldier.hp = 10
+	  Heal8Soldier(null, weakendSoldier).action()
+	  assert(weakendSoldier.hp === 20)	  
 	}
 }

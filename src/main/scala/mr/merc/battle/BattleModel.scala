@@ -8,11 +8,12 @@ import mr.merc.map.pathfind.PathFinder
 import mr.merc.map.terrain.TerrainType
 import mr.merc.unit.Attack
 import mr.merc.map.pathfind.PossibleMovesFinder
+import mr.merc.unit.BeforeTurnAction
 
 class BattleModel(val map:GameField) extends BattleModelEventHandler {
 	private var currentPlayerIndex = 0
     def currentPlayer = map.players(currentPlayerIndex)
-	private val soldiers = map.hexField.hexes.flatMap(_.soldier)
+	private def soldiers = map.hexField.hexes.flatMap(_.soldier)
     
     def handleEvent(event:BattleModelEvent):BattleModelEventResult = {
 	  event match {
@@ -36,8 +37,13 @@ class BattleModel(val map:GameField) extends BattleModelEventHandler {
     
     private [battle] def handleEndTurnEvent():EndMoveModelEventResult = {
       require(validateEndTurn)
-      soldiers.filter(_.player == currentPlayer).foreach(_.endMove())
       nextPlayer()
+      val beforeTurnActions = map.hexField.hexes.filter(_.soldier.isDefined).map(h => (h.x, h.y, h.soldier.get)).
+      		filter(_._3.player == currentPlayer).flatMap{case (x,y,s) => s.beforeTurnActions(map.hexField, x, y)}
+      val filteredActions = BeforeTurnAction.filterActions(beforeTurnActions.toSet)
+      filteredActions foreach (_.action())
+      soldiers.filter(_.player == currentPlayer).foreach(_.beforeTurnRenowation())
+      
       EndMoveModelEventResult(currentPlayer)
     }
     
@@ -107,8 +113,14 @@ class BattleModel(val map:GameField) extends BattleModelEventHandler {
     }
      
     def possibleMoves(soldier:Soldier, currentHex:TerrainHex):Set[TerrainHex] = {
-      val possible = PossibleMovesFinder.findPossibleMoves(map.gridForSoldier(soldier), currentHex, soldier.movePointsRemain, soldier.movedThisTurn)
-      possible filter (validateMovementEvent(soldier, currentHex, _, false, false))
+      val movePoints = if (soldier.player == currentPlayer) {
+        soldier.movePointsRemain
+      } else {
+        soldier.soldierType.movement
+      }
+      
+      PossibleMovesFinder.findPossibleMoves(map.gridForSoldier(soldier), currentHex, 
+          movePoints, soldier.movedThisTurn).filterNot(_ == currentHex)
     }
     
     def possibleAttacksWhenThereAreNoMoves(soldier:Soldier, currentHex:TerrainHex):Set[TerrainHex] = {

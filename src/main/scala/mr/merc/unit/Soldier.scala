@@ -22,14 +22,6 @@ class Soldier(val name:String, var soldierType:SoldierType, val player:Player) {
 	var attackedThisTurn = false
 	def movedThisTurn = movePointsRemain != soldierType.movement
 	def needsHealing = hp != soldierType.hp
-	def endMove() {
-	  movePointsRemain = soldierType.movement
-	  attackedThisTurn = false
-	  
-	  if (state.contains(Slowed)) {
-	    removeState(Slowed)
-	  }
-	}
 	
 	def addState(state:SoldierState) {
 	  _state += state
@@ -40,6 +32,15 @@ class Soldier(val name:String, var soldierType:SoldierType, val player:Player) {
 	}
 	
 	def state = _state
+	
+	def beforeTurnRenowation() {
+	  movePointsRemain = soldierType.movement
+	  attackedThisTurn = false
+	  
+	  if (state.contains(Slowed)) {
+	    removeState(Slowed)
+	  }
+	}
 	
 	// TODO split into methods
 	def beforeTurnActions(field:TerrainHexField, x:Int, y:Int):List[BeforeTurnAction] = {

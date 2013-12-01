@@ -198,12 +198,13 @@ class BattleControllerTest extends FunSuite with BeforeAndAfter {
 	  assert(controller.selectedSoldier.get.attackedThisTurn === false)
 	}
 	
-	test("move points are regenerated after turn end") {
+	test("move points are regenerated after new turn begins") {
 	  leftClick(0, 0)
 	  val soldier = controller.selectedSoldier.get
 	  soldier.movePointsRemain = 0
 	  soldier.attackedThisTurn = true
 	  assert(soldier.movedThisTurn === true)
+	  controller.endTurnButton()
 	  controller.endTurnButton()
 	  assert(soldier.movedThisTurn === false)
 	  assert(soldier.attackedThisTurn === false)
