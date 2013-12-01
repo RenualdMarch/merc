@@ -16,6 +16,10 @@ libraryDependencies += "org.scalamock" %% "scalamock-scalatest-support" % "3.0.1
 
 libraryDependencies += "org.mockito" % "mockito-core" % "1.9.5"
 
+libraryDependencies += "com.projectdarkstar.ext.jorbis" % "jorbis" % "0.0.17"
+
+libraryDependencies += "de.huxhorn.sulky" % "de.huxhorn.sulky.3rdparty.jlayer" % "1.0"
+
 unmanagedJars in Compile += Attributed.blank(file(System.getenv("JAVA_HOME") + "/jre/lib/jfxrt.jar"))
 
 mainClass := Some("mr.merc.main.Main")
