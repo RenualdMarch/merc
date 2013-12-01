@@ -247,6 +247,19 @@ class BattleModelTest extends FunSuite with BeforeAndAfter {
 	  assert(possible === Set(field.hex(1, 0)))
 	}
 	
+	test("possible moves for player which move isn't now should think that he hasn't moved or attacked") {
+	  val simpleSoldierType = new SoldierType("1", 1, 20, 4, 5, 1, 
+			List(), Map(Grass -> 2), 
+			Map(), Map())
+	  val soldier = new Soldier("1", simpleSoldierType, Player("2"))
+	  field.hex(0, 0).soldier = Some(soldier)
+	  val moves = model.possibleMoves(soldier, field.hex(0, 0))
+	  val currentField = field
+	  import currentField.hex
+	  assert(moves === Set(hex(0, 1), hex(1, 0), hex(2, 0), hex(2, 1), hex(1, 1), hex(0, 2)))
+
+	}
+	
 	test("after battle soldier with 0 hp dissapear from field") {
 	  val soldier = new Soldier("1", simpleSoldierType, Player("1"))
 	  field.hex(0, 0).soldier = Some(soldier)

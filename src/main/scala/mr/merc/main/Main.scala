@@ -47,7 +47,7 @@ import java.util.PropertyResourceBundle
 import mr.merc.local.MercResourceBundle
 
 object Main extends JFXApp {  
-  val location = getClass.getResource("/mr/merc/ui/battle/battleFrame.fxml")
+  val location = getClass.getResource("/fxml/battleFrame.fxml")
   val localization = new MercResourceBundle("ru")
   val loader = new jfxf.FXMLLoader(location, localization)
   val rootPane: jfxs.Parent = loader.load().asInstanceOf[jfxs.Parent]

@@ -119,8 +119,14 @@ class BattleModel(val map:GameField) extends BattleModelEventHandler {
         soldier.soldierType.movement
       }
       
+      val movedThisTurn = if (soldier.player == currentPlayer) {
+        soldier.movedThisTurn
+      } else {
+        false
+      }
+      
       PossibleMovesFinder.findPossibleMoves(map.gridForSoldier(soldier), currentHex, 
-          movePoints, soldier.movedThisTurn).filterNot(_ == currentHex)
+          movePoints, movedThisTurn).filterNot(_ == currentHex)
     }
     
     def possibleAttacksWhenThereAreNoMoves(soldier:Soldier, currentHex:TerrainHex):Set[TerrainHex] = {
