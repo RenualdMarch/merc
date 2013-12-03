@@ -10,6 +10,7 @@ Soldier status ball - can move, can only attack, can do nothing
 Sounds
 Music
 Minimap
+Any number of attacks in config
 Attack selection dialog
 Add damage numbers during attack
 UI - improve soldier panel

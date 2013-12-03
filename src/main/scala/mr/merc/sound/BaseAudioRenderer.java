@@ -2,6 +2,7 @@ package mr.merc.sound;
 
 import java.net.URL;
 
+// TODO rewrite this class into scala
 public abstract class BaseAudioRenderer {
 
 	public enum Status {

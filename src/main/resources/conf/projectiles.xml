@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectiles>
+	<projectile name="Fireball-succ">
+		<start>
+			<n>
+				<image name="fireball-n-1.png"/>
+				<image name="fireball-n-2.png"/>
+				<image name="fireball-n.png"/>
+			</n>
+			<ne>
+				<image name="fireball-nw-1.png"/>
+				<image name="fireball-nw-2.png"/>
+				<image name="fireball-nw.png"/>
+			</ne>
+		</start>
+		<move>
+			<n>
+				<image name="fireball-n.png"/>
+			</n>
+			<ne>
+				<image name="fireball-nw.png"/>
+			</ne>
+		</move>
+		<end>
+			<all>
+				<image name="fireball-impact-1.png"/>
+				<image name="fireball-impact-2.png"/>
+				<image name="fireball-impact-3.png"/>
+				<image name="fireball-impact-4.png"/>
+				<image name="fireball-impact-5.png"/>
+				<image name="fireball-impact-6.png"/>
+				<image name="fireball-impact-7.png"/>
+				<image name="fireball-impact-8.png"/>
+				<image name="fireball-impact-9.png"/>
+				<image name="fireball-impact-10.png"/>
+				<image name="fireball-impact-11.png"/>
+				<image name="fireball-impact-12.png"/>
+				<image name="fireball-impact-13.png"/>
+				<image name="fireball-impact-14.png"/>
+				<image name="fireball-impact-15.png"/>
+				<image name="fireball-impact-16.png"/>				
+			</all>
+		</end>
+	</projectile>
+	<projectile name="Fireball-fail">
+		<start>
+			<all>
+				<image name="fireball-fail-1.png"/>
+				<image name="fireball-fail-2.png"/>
+				<image name="fireball-fail-3.png"/>
+				<image name="fireball-fail-4.png"/>
+				<image name="fireball-fail-5.png"/>
+				<image name="fireball-fail-6.png"/>
+				<image name="fireball-fail-7.png"/>
+			</all>
+		</start>
+	</projectile>
+</projectiles>

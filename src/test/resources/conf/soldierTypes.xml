@@ -3,7 +3,7 @@
 	<soldierType name="testSoldier" cost="2" hp="3" movement="10" exp="45" level="3">
 		<attacks>
 			<attack imageName="attack1" damage="3" count="4" attackType="Impact" ranged="false"/>
-			<attack imageName="attack2" damage="2" count="3" attackType="Fire" ranged="true" attributes="Drain, Firststrike"/>
+			<attack imageName="attack2" damage="2" count="3" attackType="Fire" ranged="true" attributes="Drain, Firststrike" projectile="projectileName"/>
 		</attacks>
 		<moveCosts>
 			<moveCost type="Sand" cost="1"/>

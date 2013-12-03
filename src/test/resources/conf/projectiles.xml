@@ -28,27 +28,57 @@
 		</end>
 	</projectile>
 	<projectile name="testProjectile2">
+		<start>
+			<all>
+				<image name="im10"/>
+			</all>
+		</start>
 		<move>
 			<all>
 				<image name="im10"/>
 				<image name="im11"/>
 			</all>
 		</move>
+		<end>
+			<all>
+				<image name="im11"/>
+			</all>
+		</end>
 	</projectile>
 	<projectile name="testProjectile3-succ">
+		<start>
+			<all>
+				<image name="im0"/>
+			</all>
+		</start>
 		<move>
 			<all>
 				<image name="im0"/>
 				<image name="im1"/>
 			</all>
 		</move>
+		<end>
+			<all>
+				<image name="im1"/>
+			</all>
+		</end>		
 	</projectile>
 	<projectile name="testProjectile3-fail">
+		<start>
+			<all>
+				<image name="im0"/>
+			</all>
+		</start>	
 		<move>
 			<all>
 				<image name="im0"/>
 				<image name="im1"/>
 			</all>
 		</move>
+		<end>
+			<all>
+				<image name="im1"/>
+			</all>
+		</end>			
 	</projectile>
 </projectiles>

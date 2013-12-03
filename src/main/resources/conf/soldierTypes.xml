@@ -2,7 +2,7 @@
 <soldierTypes>
 	<soldierType name="Human-Horseman" cost="23" hp="48" movement="8" exp="44" level="1">
 		<attacks>
-			<attack imageName="spear" damage="9" count="2" attackType="Pierce" ranged="false"/>
+			<attack imageName="spear" damage="9" count="2" attackType="Pierce" ranged="false" attributes="Charge"/>
 		</attacks>
 		<moveCosts>
 			<moveCost type="Water" cost="3"/>
@@ -29,6 +29,40 @@
 			<resistance type="Impact" resistance="30"/>
 			<resistance type="Cold" resistance="0"/>
 			<resistance type="Pierce" resistance="-20"/>
+			<resistance type="Fire" resistance="0"/>
+			<resistance type="Arcane" resistance="20"/>			
+		</resistances>
+	</soldierType>
+	<soldierType name="Human-Mage" cost="20" hp="24" movement="5" exp="54" level="1">
+		<attacks>
+			<attack imageName="staff" damage="5" count="1" attackType="Impact" ranged="false"/>
+			<attack imageName="fireball" damage="7" count="3" attackType="Fire" ranged="true" attributes="Magical" projectile="Fireball"/>
+		</attacks>
+		<moveCosts>
+			<moveCost type="Water" cost="3"/>
+			<moveCost type="Forest" cost="2"/>
+			<moveCost type="Swamp" cost="3"/>
+			<moveCost type="Hill" cost="2"/>
+			<moveCost type="Mountain" cost="3"/>
+			<moveCost type="Road" cost="1"/>
+			<moveCost type="Sand" cost="2"/>
+			<moveCost type="Grass" cost="1"/>
+		</moveCosts>
+		<defences>
+			<defence type="Water" defence="20"/>
+			<defence type="Forest" defence="50"/>
+			<defence type="Swamp" defence="20"/>
+			<defence type="Hill" defence="50"/>
+			<defence type="Mountain" defence="60"/>
+			<defence type="Road" defence="40"/>
+			<defence type="Sand" defence="30"/>
+			<defence type="Grass" defence="40"/>
+		</defences>
+		<resistances>
+			<resistance type="Blade" resistance="0"/>
+			<resistance type="Impact" resistance="0"/>
+			<resistance type="Cold" resistance="0"/>
+			<resistance type="Pierce" resistance="0"/>
 			<resistance type="Fire" resistance="0"/>
 			<resistance type="Arcane" resistance="20"/>			
 		</resistances>
