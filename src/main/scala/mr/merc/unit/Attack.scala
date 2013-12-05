@@ -174,6 +174,19 @@ object Attack {
 
   def apply(imageName: String, damage: Int, count: Int, attackType: AttackType,
     ranged: Boolean, projectile: String) = new Attack(imageName, damage, count, attackType, ranged, projectile = Some(projectile))
+
+  def selectBestAttackForDefender(attacker: Soldier, defender: Soldier, attackersAttack: Attack): Option[Attack] = {
+    val ranged = attackersAttack.ranged
+    val rangedAttacks = defender.soldierType.attacks.filter(_.ranged == ranged)
+    if (rangedAttacks.isEmpty) {
+      None
+    } else if (rangedAttacks.size == 1) {
+      Some(rangedAttacks(0))
+    } else {
+      val sorted = rangedAttacks.sortBy(ra => Attack.possibleAttackersDamage(false, defender, attacker, ra, Some(attackersAttack)) * ra.count)
+      Some(sorted.last)
+    }
+  }
 }
 
 // TODO move image name and projectile name to view configuration

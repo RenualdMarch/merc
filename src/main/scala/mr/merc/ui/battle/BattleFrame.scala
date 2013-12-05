@@ -1,16 +1,15 @@
 package mr.merc.ui.battle
 
-
-import javafx.scene.{layout => jfxsl}
-import javafx.scene.{text => jfxt}
-import javafx.{fxml => jfxf}
+import javafx.scene.{ layout => jfxsl }
+import javafx.scene.{ text => jfxt }
+import javafx.{ fxml => jfxf }
 import java.net.URL
 import java.util.ResourceBundle
-import javafx.scene.{canvas => jfxc}
-import javafx.scene.{control => jfxctr}
-import javafx.scene.{image => jfxi}
-import javafx.{event => jfxe}
-import javafx.scene.{input => jfxin}
+import javafx.scene.{ canvas => jfxc }
+import javafx.scene.{ control => jfxctr }
+import javafx.scene.{ image => jfxi }
+import javafx.{ event => jfxe }
+import javafx.scene.{ input => jfxin }
 import scalafx.scene.layout.VBox
 import scalafx.scene.canvas.Canvas
 import scalafx.scene.layout.BorderPane
@@ -41,65 +40,63 @@ class BattleFrame extends jfxf.Initializable with BattleControllerParent {
   val player2 = Player("2", Color.YELLOW)
   val soldier = new Soldier("1", SoldierType("Human-Horseman"), player1)
   soldier.exp = 10
-  val enemy = new Soldier("2", SoldierType("Human-Horseman"), player2)
+  val enemy = new Soldier("2", SoldierType("Human-Mage"), player2)
   field.hex(4, 1).soldier = Some(soldier)
   field.hex(4, 3).soldier = Some(enemy)
   val gameField = new GameField(field, List(player1, player2))
-  private def mapInit(x:Int, y:Int) = 
+  private def mapInit(x: Int, y: Int) =
     if (x == 1 || x == 2) {
       new TerrainHex(x, y, Water, if (y == 2) Some(WoodenBridge) else None)
-    } else if (y == 2){
+    } else if (y == 2) {
       new TerrainHex(x, y, Forest)
-    } else if (x == 4 && y == 3){
+    } else if (x == 4 && y == 3) {
       new TerrainHex(x, y, Grass, Some(House))
     } else {
       new TerrainHex(x, y, Sand)
     }
-  
-  
-  
+
   val controller = new BattleController(gameField, this)
-  
+
   @jfxf.FXML
   private var rightPanelDelegate: jfxsl.VBox = _
   private var rightPanel: VBox = _
-  
+
   @jfxf.FXML
   private var battleCanvasDelegate: jfxc.Canvas = _
-  private var battleCanvas:Canvas = _
-  
+  private var battleCanvas: Canvas = _
+
   @jfxf.FXML
   private var parentPaneDelegate: jfxsl.BorderPane = _
-  private var parentPane:BorderPane = _
-  
+  private var parentPane: BorderPane = _
+
   @jfxf.FXML
   private var miniMapCanvasDelegate: jfxc.Canvas = _
   private var miniMapCanvas: Canvas = _
-  
+
   @jfxf.FXML
   private var soldierImageViewDelegate: jfxi.ImageView = _
-  private var soldierImageView : ImageView = _
-  
+  private var soldierImageView: ImageView = _
+
   @jfxf.FXML
   private var soldierNameDelegate: jfxt.Text = _
-  private var soldierName : Text = _
-  
+  private var soldierName: Text = _
+
   @jfxf.FXML
   private var soldierLevelDelegate: jfxt.Text = _
-  private var soldierLevel : Text = _
-  
+  private var soldierLevel: Text = _
+
   @jfxf.FXML
   private var soldierHPDelegate: jfxt.Text = _
-  private var soldierHP : Text = _
-  
+  private var soldierHP: Text = _
+
   @jfxf.FXML
-  private var endTurnButtonDelegate : jfxctr.Button = _
+  private var endTurnButtonDelegate: jfxctr.Button = _
   private var endTurnButton: Button = _
-  
+
   private val soldierWrapper = controller.soldierToShow
-  
+
   private def gc = battleCanvas.graphicsContext2D
-  
+
   def initialize(url: URL, rb: ResourceBundle) {
     rightPanel = new VBox(rightPanelDelegate)
     battleCanvas = new Canvas(battleCanvasDelegate)
@@ -109,16 +106,16 @@ class BattleFrame extends jfxf.Initializable with BattleControllerParent {
     soldierLevel = new Text(soldierLevelDelegate)
     soldierHP = new Text(soldierHPDelegate)
     endTurnButton = new Button(endTurnButtonDelegate)
-    
+
     battleCanvas.width <== parentPane.width - rightPanel.width
     battleCanvas.height <== parentPane.height
     soldierName.text <== soldierWrapper.name
     soldierLevel.text <== soldierWrapper.level
     soldierHP.text <== soldierWrapper.hp
-    
+
     // Yeah, java style
     battleCanvasDelegate.addEventHandler(jfxin.MouseEvent.MOUSE_CLICKED, new jfxe.EventHandler[jfxin.MouseEvent] {
-      def handle(event:jfxin.MouseEvent) {
+      def handle(event: jfxin.MouseEvent) {
         val x = event.getX().toInt
         val y = event.getY().toInt
         controller.moveMouse(x, y)
@@ -127,37 +124,36 @@ class BattleFrame extends jfxf.Initializable with BattleControllerParent {
         } else if (event.getButton() == jfxin.MouseButton.SECONDARY) {
           controller.rightClickMouse()
         }
-      }            
+      }
     })
-    
+
     battleCanvas.onMouseMoved = new jfxe.EventHandler[jfxin.MouseEvent] {
-      def handle(event:jfxin.MouseEvent) {
+      def handle(event: jfxin.MouseEvent) {
         val x = event.getX().toInt
         val y = event.getY().toInt
         controller.moveMouse(x, y)
-      }            
+      }
     }
-    
+
     endTurnButton.onAction = new jfxe.EventHandler[ActionEvent] {
-      def handle(event:ActionEvent) {
+      def handle(event: ActionEvent) {
         controller.endTurnButton()
       }
     }
-    
+
     import scalafx.Includes._
     val timeline = Timeline(KeyFrame(50 ms, onFinished = gameLoop))
     timeline.cycleCount = Animation.INDEFINITE
     timeline.play()
   }
-  
-  
+
   private def reset(color: Color) {
     gc.save()
     gc.fill = color
-    gc.fillRect(0, 0, battleCanvas.width.get, battleCanvas.height.get);    
+    gc.fillRect(0, 0, battleCanvas.width.get, battleCanvas.height.get);
     gc.restore()
-  }  
-  
+  }
+
   var lastUpdateTime = System.currentTimeMillis()
   def gameLoop() {
     val currentTime = System.currentTimeMillis
