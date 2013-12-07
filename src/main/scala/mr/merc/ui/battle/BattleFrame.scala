@@ -33,6 +33,8 @@ import mr.merc.map.objects._
 import mr.merc.map.terrain._
 import scalafx.scene.control.Button
 import javafx.event.ActionEvent
+import javafx.scene.Node
+import scalafx.stage.Window
 
 class BattleFrame extends jfxf.Initializable with BattleControllerParent {
   val field = new TerrainHexField(5, 5, mapInit)
@@ -56,6 +58,8 @@ class BattleFrame extends jfxf.Initializable with BattleControllerParent {
     }
 
   val controller = new BattleController(gameField, this)
+
+  override def window = rightPanelDelegate.asInstanceOf[Node].getScene().getWindow()
 
   @jfxf.FXML
   private var rightPanelDelegate: jfxsl.VBox = _

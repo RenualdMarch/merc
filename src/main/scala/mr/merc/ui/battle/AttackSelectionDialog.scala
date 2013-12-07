@@ -17,40 +17,47 @@ import scalafx.scene.control.TableColumn
 import scalafx.beans.property.StringProperty
 import scalafx.beans.property.ObjectProperty
 import mr.merc.unit.Attack
+import scalafx.scene.control.TableView.TableViewSelectionModel
 
-object AttackSelectionDialog {
+class AttackSelectionDialog(attacker: Soldier, defender: Soldier, attackerHex: TerrainHex,
+  defenderHex: TerrainHex) extends Stage {
+
+  var selectedAttack: Option[Attack] = None
+
   private case class AttackChoice(image: String, damage: Int, count: Int, chance: Int)
   private type AttackPair = (AttackChoice, Option[AttackChoice])
 
-  def apply(attacker: Soldier, defender: Soldier, attackerHex: TerrainHex,
-    defenderHex: TerrainHex) {
+  private val data = new ObservableBuffer[AttackPair]()
+  data ++= attacks(attacker, defender, attackerHex, defenderHex)
 
-    val data = new ObservableBuffer[AttackPair]()
-    data ++= attacks(attacker, defender, attackerHex, defenderHex)
+  private val table = new TableView[AttackPair](data) {
+    tableColumns foreach (c => columns += c)
+    selectionModel.value.cellSelectionEnabled = false
+    selectionModel.value.select(0)
+  }
 
-    val table = new TableView[AttackPair](data) {
-      tableColumns foreach (c => columns += c)
+  val okButton = new Button {
+    text = Localization("common.ok")
+    onAction = { e: ActionEvent =>
+      val index = table.selectionModel.value.selectedIndex.value
+      selectedAttack = Some(attacker.soldierType.attacks(index))
+      AttackSelectionDialog.this.close()
     }
+  }
+  val cancelButton = new Button {
+    text = Localization("common.cancel")
+    onAction = { e: ActionEvent =>
+      AttackSelectionDialog.this.close()
+    }
+  }
 
-    val okButton = new Button {
-      text = Localization("common.ok")
-      onAction = { e: ActionEvent => }
+  this.scene = new Scene {
+    content = new VBox {
+      content = List(table, new HBox() {
+        content = List(okButton, cancelButton)
+        alignment = Pos.CENTER_RIGHT
+      })
     }
-    val cancelButton = new Button {
-      text = Localization("common.cancel")
-      onAction = { e: ActionEvent => }
-    }
-    val dialog = new Stage {
-      scene = new Scene {
-        content = new VBox {
-          content = List(table, new HBox() {
-            content = List(okButton, cancelButton)
-            alignment = Pos.CENTER_RIGHT
-          })
-        }
-      }
-    }
-
   }
 
   private def tableColumns: List[TableColumn[AttackPair, _]] = {

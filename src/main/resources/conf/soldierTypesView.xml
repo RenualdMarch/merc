@@ -85,21 +85,21 @@
 		<attack1>
 			<all>
 				<succ>
-					<image name="mage-attack-staff1.png"/>
-					<image name="mage-attack-staff2.png"/>
+					<image name="mage-attack-staff1"/>
+					<image name="mage-attack-staff2"/>
 				</succ>
 			</all>
 		</attack1>
 		<attack2>
 			<all>
 				<succ>
-					<image name="mage-attack-magic1.png"/>
-					<image name="mage-attack-magic2.png"/>
+					<image name="mage-attack-magic1"/>
+					<image name="mage-attack-magic2"/>
 				</succ>
 			</all>
 		</attack2>
 		<stand>
-			<image name="mage.png"/>
+			<image name="mage"/>
 		</stand>
 	</view>
 	

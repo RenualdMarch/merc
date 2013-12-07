@@ -1,5 +1,7 @@
 package mr.merc.battle
 
-trait BattleControllerParent {
+import javafx.stage.Window
 
+trait BattleControllerParent {
+  def window: Window
 }
