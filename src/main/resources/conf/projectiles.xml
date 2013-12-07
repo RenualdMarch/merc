@@ -3,55 +3,55 @@
 	<projectile name="Fireball-succ">
 		<start>
 			<n>
-				<image name="fireball-n-1.png"/>
-				<image name="fireball-n-2.png"/>
-				<image name="fireball-n.png"/>
+				<image name="fireball-n-1"/>
+				<image name="fireball-n-2"/>
+				<image name="fireball-n"/>
 			</n>
 			<ne>
-				<image name="fireball-nw-1.png"/>
-				<image name="fireball-nw-2.png"/>
-				<image name="fireball-nw.png"/>
+				<image name="fireball-nw-1"/>
+				<image name="fireball-nw-2"/>
+				<image name="fireball-nw"/>
 			</ne>
 		</start>
 		<move>
 			<n>
-				<image name="fireball-n.png"/>
+				<image name="fireball-n"/>
 			</n>
 			<ne>
-				<image name="fireball-nw.png"/>
+				<image name="fireball-nw"/>
 			</ne>
 		</move>
 		<end>
 			<all>
-				<image name="fireball-impact-1.png"/>
-				<image name="fireball-impact-2.png"/>
-				<image name="fireball-impact-3.png"/>
-				<image name="fireball-impact-4.png"/>
-				<image name="fireball-impact-5.png"/>
-				<image name="fireball-impact-6.png"/>
-				<image name="fireball-impact-7.png"/>
-				<image name="fireball-impact-8.png"/>
-				<image name="fireball-impact-9.png"/>
-				<image name="fireball-impact-10.png"/>
-				<image name="fireball-impact-11.png"/>
-				<image name="fireball-impact-12.png"/>
-				<image name="fireball-impact-13.png"/>
-				<image name="fireball-impact-14.png"/>
-				<image name="fireball-impact-15.png"/>
-				<image name="fireball-impact-16.png"/>				
+				<image name="fireball-impact-1"/>
+				<image name="fireball-impact-2"/>
+				<image name="fireball-impact-3"/>
+				<image name="fireball-impact-4"/>
+				<image name="fireball-impact-5"/>
+				<image name="fireball-impact-6"/>
+				<image name="fireball-impact-7"/>
+				<image name="fireball-impact-8"/>
+				<image name="fireball-impact-9"/>
+				<image name="fireball-impact-10"/>
+				<image name="fireball-impact-11"/>
+				<image name="fireball-impact-12"/>
+				<image name="fireball-impact-13"/>
+				<image name="fireball-impact-14"/>
+				<image name="fireball-impact-15"/>
+				<image name="fireball-impact-16"/>				
 			</all>
 		</end>
 	</projectile>
 	<projectile name="Fireball-fail">
 		<start>
 			<all>
-				<image name="fireball-fail-1.png"/>
-				<image name="fireball-fail-2.png"/>
-				<image name="fireball-fail-3.png"/>
-				<image name="fireball-fail-4.png"/>
-				<image name="fireball-fail-5.png"/>
-				<image name="fireball-fail-6.png"/>
-				<image name="fireball-fail-7.png"/>
+				<image name="fireball-fail-1"/>
+				<image name="fireball-fail-2"/>
+				<image name="fireball-fail-3"/>
+				<image name="fireball-fail-4"/>
+				<image name="fireball-fail-5"/>
+				<image name="fireball-fail-6"/>
+				<image name="fireball-fail-7"/>
 			</all>
 		</start>
 	</projectile>

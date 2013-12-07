@@ -5,13 +5,15 @@ For M3, these things should be completed:
 +Add attributes to configuration
 +Configuration
 +add healing 2 points for not moving
-Add mage to units and test his attack
++Add mage to units and test his attack
+Attack selection dialog
 Soldier status ball - can move, can only attack, can do nothing
 Sounds
 Music
 Minimap
 Any number of attacks in config
-Attack selection dialog
 Add damage numbers during attack
 UI - improve soldier panel
+add tip for attack selection
+Fix bug with movement state still present even when movement is over(movement withiout attack)
 Add showing before turn actions???(really low priority now)

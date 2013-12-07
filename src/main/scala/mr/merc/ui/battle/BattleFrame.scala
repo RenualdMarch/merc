@@ -40,9 +40,9 @@ class BattleFrame extends jfxf.Initializable with BattleControllerParent {
   val field = new TerrainHexField(5, 5, mapInit)
   val player1 = Player("1", Color.BLUE)
   val player2 = Player("2", Color.YELLOW)
-  val soldier = new Soldier("1", SoldierType("Human-Horseman"), player1)
+  val soldier = new Soldier("1", SoldierType("Human-Horseman"), player2)
   soldier.exp = 10
-  val enemy = new Soldier("2", SoldierType("Human-Mage"), player2)
+  val enemy = new Soldier("2", SoldierType("Human-Mage"), player1)
   field.hex(4, 1).soldier = Some(soldier)
   field.hex(4, 3).soldier = Some(enemy)
   val gameField = new GameField(field, List(player1, player2))

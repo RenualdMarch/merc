@@ -1,0 +1,16 @@
+.table-row-cell {
+    -fx-cell-size: 60px;
+    
+}
+
+.table-cell {
+	-fx-alignment: CENTER;
+}
+
+.table-row-cell:empty {
+    -fx-background-color: white;
+}
+
+.table-row-cell:empty .table-cell {
+    -fx-border-width: 0px;
+}

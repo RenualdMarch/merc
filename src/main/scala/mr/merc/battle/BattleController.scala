@@ -22,6 +22,7 @@ import mr.merc.ui.battle.BattleFrame
 import mr.merc.battle.event.EndMoveModelEvent
 import mr.merc.ui.battle.AttackSelectionDialog
 import scalafx.stage.Modality
+import mr.merc.unit.Attack
 
 class BattleController(gameField: GameField, parent: BattleControllerParent) {
   val battleModel = new BattleModel(gameField)
@@ -103,19 +104,21 @@ class BattleController(gameField: GameField, parent: BattleControllerParent) {
             if (visitedHexesList.isDefined && battleModel.validateMovementAndAttack(attacker, attackerHex,
               visitedHexesList.prev.get, visitedHexesList.current.get, 0)) {
 
-              val dialog = new AttackSelectionDialog(attacker, hex.soldier.get, visitedHexesList.prev.get, hex)
-              dialog.initModality(Modality.WINDOW_MODAL)
-              dialog.initOwner(parent.window)
-              dialog.showAndWait()
+              val attackOpt = selectAttack(attacker, hex.soldier.get, visitedHexesList.prev.get, hex)
+              attackOpt match {
+                case Some(attack) => {
+                  if (attackerHex != visitedHexesList.prev.get) {
+                    val moveResult = battleModel.handleMovementEvent(attacker, attackerHex, visitedHexesList.prev.get)
+                    battleView.handleEvent(moveResult.buildBattleViewEvent)
+                  }
 
-              if (attackerHex != visitedHexesList.prev.get) {
-                val moveResult = battleModel.handleMovementEvent(attacker, attackerHex, visitedHexesList.prev.get)
-                battleView.handleEvent(moveResult.buildBattleViewEvent)
+                  val attackIndex = attacker.soldierType.attacks.indexOf(attack)
+                  val attackResult = battleModel.handleEvent(AttackModelEvent(attacker,
+                    visitedHexesList.prev.get, hex, attackIndex))
+                  battleView.handleEvent(attackResult.buildBattleViewEvent)
+                }
+                case None => // do nothing
               }
-
-              // TODO IMPORTANT!!! Here add attack selection via dialog
-              val attackResult = battleModel.handleEvent(AttackModelEvent(attacker, visitedHexesList.prev.get, hex, 0))
-              battleView.handleEvent(attackResult.buildBattleViewEvent)
             }
 
           }
@@ -140,6 +143,17 @@ class BattleController(gameField: GameField, parent: BattleControllerParent) {
       }
     }
   })
+
+  def selectAttack(attacker: Soldier, defender: Soldier, attackerHex: TerrainHex,
+    defenderHex: TerrainHex): Option[Attack] = {
+
+    val dialog = new AttackSelectionDialog(attacker, defender, attackerHex, defenderHex)
+    dialog.initModality(Modality.WINDOW_MODAL)
+    dialog.initOwner(parent.window)
+    dialog.showAndWait()
+
+    dialog.selectedAttack
+  }
 
   def endTurnButton() {
     if (battleModel.validateEndTurn) {

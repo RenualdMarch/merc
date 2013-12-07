@@ -4,11 +4,11 @@ import mr.merc.map.hex.TerrainHex
 import scala.util.Random
 
 object Attack {
-  private val maxDefence = 100
-  private def resolveAttack(defence: Int) = Random.nextInt(maxDefence) >= defence
+  private val maxChance = 100
+  def resolveAttack(chance: ChanceOfSuccess) = chance.chanceNumber >= Random.nextInt(maxChance)
 
   def battle(attackerHex: TerrainHex, defenderHex: TerrainHex, attackerSelection: Attack, defenderSelection: Option[Attack],
-    f: Int => Boolean = resolveAttack): List[AttackResult] = {
+    f: ChanceOfSuccess => Boolean = resolveAttack): List[AttackResult] = {
     require(attackerHex.soldier.isDefined)
     require(defenderHex.soldier.isDefined)
 
@@ -44,7 +44,7 @@ object Attack {
     filteredAttacks
   }
 
-  private def generateAttacks(attackerIsAttacking: Boolean, attacker: Soldier, defender: Soldier, defence: Int, attackersAttack: Attack, defendersAttack: Option[Attack], f: Int => Boolean): List[AttackResult] = {
+  private def generateAttacks(attackerIsAttacking: Boolean, attacker: Soldier, defender: Soldier, defence: Int, attackersAttack: Attack, defendersAttack: Option[Attack], f: ChanceOfSuccess => Boolean): List[AttackResult] = {
     val retVal = for (i <- 0 until attackersAttack.count) yield {
       val damage = Attack.possibleAttackersDamage(attackerIsAttacking, attacker, defender, attackersAttack, defendersAttack)
       val drained = if (attackersAttack.attributes.contains(Drain)) {
@@ -197,11 +197,13 @@ class Attack(val imageName: String, val damage: Int, val count: Int, val attackT
     case false => projectile map (_ + "-fail")
   }
 
-  def chanceOfSuccess(enemysDefence: Int) = if (attributes.contains(Magical)) {
-    30
+  def chanceOfSuccess(enemysDefence: Int): ChanceOfSuccess = if (attributes.contains(Magical)) {
+    ChanceOfSuccess(70)
   } else if (attributes.contains(Marksman) && enemysDefence > 40) {
-    40
+    ChanceOfSuccess(60)
   } else {
-    enemysDefence
+    ChanceOfSuccess(100 - enemysDefence)
   }
 }
+
+case class ChanceOfSuccess(val chanceNumber: Int) extends AnyVal

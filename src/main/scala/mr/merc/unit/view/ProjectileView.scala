@@ -5,6 +5,7 @@ import mr.merc.view.move.LinearMovement
 import mr.merc.view.move.Movement
 import mr.merc.view.Sprite
 import mr.merc.view.SpriteState
+import scalafx.scene.canvas.GraphicsContext
 
 class ProjectileView(start: Option[List[MImage]], move: Option[List[MImage]], end: Option[List[MImage]],
   from: (Int, Int), to: (Int, Int), speed: Int) extends Sprite[ProjectileState](
@@ -16,6 +17,8 @@ class ProjectileView(start: Option[List[MImage]], move: Option[List[MImage]], en
 
   val movement = new LinearMovement(from._1, from._2, to._1, to._2, speed)
   movement.start()
+  x = from._1
+  y = from._2
 
   override def updateTime(time: Int): Int = {
     val result = super.updateTime(time)
@@ -26,7 +29,7 @@ class ProjectileView(start: Option[List[MImage]], move: Option[List[MImage]], en
       y = movement.y
     }
 
-    if (result != 0 && index == 0) {
+    if (result != 0 && index == 0 || movement.isOver && this.state == ProjectileMovement) {
       state match {
         case ProjectileStart => {
           if (move.isDefined) {
@@ -55,6 +58,10 @@ class ProjectileView(start: Option[List[MImage]], move: Option[List[MImage]], en
     }
 
     result
+  }
+
+  override def drawItself(gc: GraphicsContext) {
+    imageToDraw.drawCenteredImage(gc, x, y, 72, 72)
   }
 }
 

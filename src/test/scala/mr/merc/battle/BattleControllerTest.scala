@@ -35,7 +35,10 @@ class BattleControllerTest extends FunSuite with BeforeAndAfter {
 
     controller = new BattleController(gameField, new BattleControllerParent() {
       def window = ???
-    })
+    }) {
+      override def selectAttack(attacker: Soldier, defender: Soldier,
+        attackerHex: TerrainHex, defenderHex: TerrainHex) = Some(attacker.soldierType.attacks(0))
+    }
   }
 
   def moveMouse(hexX: Int, hexY: Int) = controller.moveMouse _ tupled fieldView.hex(hexX, hexY).center
