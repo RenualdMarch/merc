@@ -9,11 +9,19 @@ import mr.merc.map.terrain.TerrainType
 import mr.merc.unit.Attack
 import mr.merc.map.pathfind.PossibleMovesFinder
 import mr.merc.unit.BeforeTurnAction
+import mr.merc.unit.SoldierTurnState
+import mr.merc.unit.NotHisTurn
+import mr.merc.unit.HaveAttacked
+import mr.merc.unit.CanntMoveAnyMore
+import mr.merc.unit.HaventMoved
+import mr.merc.unit.StillCanMove
+import mr.merc.unit.HaventMoved
 
 class BattleModel(val map: GameField) extends BattleModelEventHandler {
   private var currentPlayerIndex = 0
   def currentPlayer = map.players(currentPlayerIndex)
   private def soldiers = map.hexField.hexes.flatMap(_.soldier)
+  setSoldierTurnState()
 
   def handleEvent(event: BattleModelEvent): BattleModelEventResult = {
     event match {
@@ -31,8 +39,16 @@ class BattleModel(val map: GameField) extends BattleModelEventHandler {
     soldier.movePointsRemain -= movePrice
     from.soldier = None
     to.soldier = Some(soldier)
+    soldier.turnState = soldierTurnState(to)
 
     new MovementModelEventResult(soldier, path.get)
+  }
+
+  private def setSoldierTurnState() {
+    map.hexField.hexes.filter(_.soldier.isDefined).map(h => (h, h.soldier.get)).foreach {
+      case (hex, soldier) =>
+        soldier.turnState = soldierTurnState(hex)
+    }
   }
 
   private[battle] def handleEndTurnEvent(): EndMoveModelEventResult = {
@@ -43,7 +59,7 @@ class BattleModel(val map: GameField) extends BattleModelEventHandler {
     val filteredActions = BeforeTurnAction.filterActions(beforeTurnActions.toSet)
     filteredActions foreach (_.action())
     soldiers.filter(_.player == currentPlayer).foreach(_.beforeTurnRenowation())
-
+    setSoldierTurnState()
     EndMoveModelEventResult(currentPlayer)
   }
 
@@ -61,6 +77,9 @@ class BattleModel(val map: GameField) extends BattleModelEventHandler {
       target.soldier = None
     }
 
+    if (soldier.hp != 0) {
+      soldier.turnState = soldierTurnState(from)
+    }
     new AttackModelEventResult(from, target, soldier, defender, result)
   }
 
@@ -172,4 +191,25 @@ class BattleModel(val map: GameField) extends BattleModelEventHandler {
   private def pathPrice(cost: Map[TerrainType, Int], path: List[TerrainHex]): Int = {
     path.tail.map(t => cost(t.terrain)).sum
   }
+
+  private[battle] def soldierTurnState(hex: TerrainHex): SoldierTurnState = {
+    val soldier = hex.soldier.get
+    if (soldier.player != currentPlayer) {
+      return NotHisTurn
+    }
+
+    if (soldier.attackedThisTurn) {
+      return HaveAttacked
+    }
+
+    val moves = possibleMoves(soldier, hex)
+    if (moves.isEmpty) {
+      CanntMoveAnyMore
+    } else if (soldier.movedThisTurn) {
+      StillCanMove
+    } else {
+      HaventMoved
+    }
+  }
+
 }

@@ -20,52 +20,53 @@ import scalafx.scene.paint.Color
 import mr.merc.unit.SoldierType
 import scalafx.scene.canvas.GraphicsContext
 import scalafx.scene.shape.Ellipse
+import mr.merc.unit._
 
-object SoldierView {  
-  private [view] val attackDistancePercentage = 0.6
-  
-  private [view] def coordsCorrection(dir:Direction):(Int, Int) = {
+object SoldierView {
+  private[view] val attackDistancePercentage = 0.6
+
+  private[view] def coordsCorrection(dir: Direction): (Int, Int) = {
     val hexField = new TerrainHexField(4, 4, (x, y) => new TerrainHex(x, y, Grass))
     val center = hexField.hex(1, 1)
     val centerView = new TerrainHexView(center, hexField)
     val neig = hexField.neighboursWithDirections(1, 1)(dir)
     val neigView = new TerrainHexView(neig, hexField)
-    
+
     (neigView.x - centerView.x, neigView.y - centerView.y)
   }
-  
+
 }
 
-class SoldierView (val soldier:Soldier) extends Sprite[SoldierViewState](SoldierTypeViewInfo(soldier.soldierType.name, soldier.player.color).images, StandState) {
+class SoldierView(val soldier: Soldier) extends Sprite[SoldierViewState](SoldierTypeViewInfo(soldier.soldierType.name, soldier.player.color).images, StandState) {
   private val maxHp = 100
   private val healthBarHeight = Math.min(soldier.soldierType.hp, maxHp) * TerrainHexView.Side / maxHp
   private val healthBarWidth = 4
-  
+
   private val maxXp = 200
   private val xpBarHeight = Math.min(soldier.soldierType.exp, maxXp) * TerrainHexView.Side / maxXp
   private val xpBarWidth = 4
-  
+
   val healthBar = new VerticalBarView(healthBarWidth, healthBarHeight, Color.WHITE, Color.RED, hpPercent)
   val xpBar = new VerticalBarView(xpBarWidth, xpBarHeight, Color.WHITE, Color.WHITE, xpPercent)
-  val ellipse = new Ellipse
-  
+
   def hpPercent = soldier.hp.toDouble / soldier.soldierType.hp
   def xpPercent = soldier.exp.toDouble / soldier.soldierType.exp
-  
-  override def drawItself(gc:GraphicsContext) {
+
+  override def drawItself(gc: GraphicsContext) {
     if (state != DeathState && state != NoState && !state.isInstanceOf[SoldierViewAttackState]) {
       drawOvalUnderSoldier(gc)
     }
-    
+
+    drawAttackStatusCircleNearSoldier(gc)
     super.drawItself(gc)
-    
+
     if (state != DeathState && state != NoState) {
       healthBar.draw(x, y + TerrainHexView.Side - healthBarHeight, gc)
       xpBar.draw(x + 6, y + TerrainHexView.Side - xpBarHeight, gc)
     }
   }
-  
-  override def updateTime(delta:Int):Int = {
+
+  override def updateTime(delta: Int): Int = {
     val result = super.updateTime(delta)
     if (result > 0 && index == 0) {
       if (state == DeathState) {
@@ -76,8 +77,8 @@ class SoldierView (val soldier:Soldier) extends Sprite[SoldierViewState](Soldier
     }
     result
   }
-  
-  private def drawOvalUnderSoldier(gc:GraphicsContext) {
+
+  private def drawOvalUnderSoldier(gc: GraphicsContext) {
     gc.save()
     gc.fill = soldier.player.color
     gc.globalAlpha = 0.2
@@ -87,16 +88,30 @@ class SoldierView (val soldier:Soldier) extends Sprite[SoldierViewState](Soldier
     gc.strokeOval(x + 9, y + 48, 48, 24)
     gc.restore()
   }
-  
-  def moveMovement(path:List[TerrainHexView]):Movement = {
+
+  private def drawAttackStatusCircleNearSoldier(gc: GraphicsContext) {
+    gc.save()
+    val color = soldier.turnState match {
+      case NotHisTurn => Color.GRAY
+      case HaventMoved | StillCanMove => Color.GREEN
+      case CanntMoveAnyMore => Color.BLUE
+      case HaveAttacked => Color.RED
+    }
+
+    gc.fill = color
+    gc.fillOval(x, y, 12, 12)
+    gc.restore()
+
+  }
+
+  def moveMovement(path: List[TerrainHexView]): Movement = {
     val list = path zip path.tail map (p => new SoldierMoveMovement(p._1, p._2, this))
     new MovementList(list)
   }
-  
+
   def refreshBars() {
     healthBar.fillPercentage = hpPercent
     xpBar.fillPercentage = xpPercent
   }
 }
-
 

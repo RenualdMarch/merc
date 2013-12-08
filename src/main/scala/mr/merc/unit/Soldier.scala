@@ -7,6 +7,8 @@ class Soldier(val name: String, val soldierType: SoldierType, val player: Player
   private var _hp = soldierType.hp
   private var _state = Set[SoldierState]()
 
+  var turnState: SoldierTurnState = NotHisTurn
+
   def hp = _hp
   def hp_=(newHp: Int) {
     _hp = newHp
@@ -81,3 +83,10 @@ class Soldier(val name: String, val soldierType: SoldierType, val player: Player
     result toList
   }
 }
+
+sealed trait SoldierTurnState
+case object NotHisTurn extends SoldierTurnState
+case object HaventMoved extends SoldierTurnState
+case object StillCanMove extends SoldierTurnState
+case object CanntMoveAnyMore extends SoldierTurnState
+case object HaveAttacked extends SoldierTurnState

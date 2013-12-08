@@ -18,6 +18,11 @@ import mr.merc.battle.event.MovementModelEventResult
 import mr.merc.unit.Cures
 import mr.merc.unit.Heals4
 import mr.merc.unit.Poisoned
+import mr.merc.unit.NotHisTurn
+import mr.merc.unit.HaventMoved
+import mr.merc.unit.CanntMoveAnyMore
+import mr.merc.unit.HaveAttacked
+import mr.merc.unit.StillCanMove
 
 class BattleModelTest extends FunSuite with BeforeAndAfter {
   var field: TerrainHexField = _
@@ -300,4 +305,55 @@ class BattleModelTest extends FunSuite with BeforeAndAfter {
     assert(poisonedSoldier.state === Set())
     assert(damagedSoldier.hp === 14)
   }
+
+  test("not his turn is returned when it's not this soldier turn despite anything") {
+    val soldier = new Soldier("1", simpleSoldierType, Player("2"))
+    val hisEnemy = new Soldier("1", simpleSoldierType, Player("1"))
+    field.hex(0, 0).soldier = Some(soldier)
+    assert(model.soldierTurnState(field.hex(0, 0)) === NotHisTurn)
+    field.hex(0, 1).soldier = Some(hisEnemy)
+    assert(model.soldierTurnState(field.hex(0, 0)) === NotHisTurn)
+    soldier.movePointsRemain -= 1
+    assert(model.soldierTurnState(field.hex(0, 0)) === NotHisTurn)
+    soldier.attackedThisTurn = true
+    assert(model.soldierTurnState(field.hex(0, 0)) === NotHisTurn)
+  }
+
+  test("haven't moved turn state is returned when it's soldier turn and he haven't moved") {
+    val soldier = new Soldier("1", simpleSoldierType, Player("1"))
+    field.hex(0, 0).soldier = Some(soldier)
+    assert(model.soldierTurnState(field.hex(0, 0)) === HaventMoved)
+  }
+
+  test("cann't move is returned when soldier is near enemy and moved") {
+    val soldier = new Soldier("1", simpleSoldierType, Player("1"))
+    val enemy = new Soldier("2", simpleSoldierType, Player("2"))
+    field.hex(0, 0).soldier = Some(soldier)
+    field.hex(0, 1).soldier = Some(enemy)
+    assert(model.soldierTurnState(field.hex(0, 0)) === HaventMoved)
+    soldier.movePointsRemain -= 1
+    assert(model.soldierTurnState(field.hex(0, 0)) === CanntMoveAnyMore)
+  }
+
+  test("cann't move is returned when soldier cann't move any more") {
+    val soldier = new Soldier("1", simpleSoldierType, Player("1"))
+    field.hex(0, 0).soldier = Some(soldier)
+    soldier.movePointsRemain = 1
+    assert(model.soldierTurnState(field.hex(0, 0)) === CanntMoveAnyMore)
+  }
+
+  test("attacked returned when soldier attacked") {
+    val soldier = new Soldier("1", simpleSoldierType, Player("1"))
+    field.hex(0, 0).soldier = Some(soldier)
+    soldier.attackedThisTurn = true
+    assert(model.soldierTurnState(field.hex(0, 0)) === HaveAttacked)
+  }
+
+  test("still can't move return when soldier moved but have enough move points to continue moving") {
+    val soldier = new Soldier("1", simpleSoldierType, Player("1"))
+    field.hex(0, 0).soldier = Some(soldier)
+    soldier.movePointsRemain -= 1
+    assert(model.soldierTurnState(field.hex(0, 0)) === StillCanMove)
+  }
 }
+
