@@ -4,8 +4,8 @@ package mr.merc.view.move
 class LinearMovement(x1: Int, y1: Int, x2: Int, y2: Int, speed: Int, percentage: Double = 1.0) extends Movement {
   private var timePassed = 0 // in ms
 
-  def update(time: Int) {
-    require(!isOver)
+  override def update(time: Int) {
+    super.update(time)
     timePassed += time
   }
 

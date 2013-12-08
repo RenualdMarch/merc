@@ -7,6 +7,7 @@ class MovementList(val list: List[Movement]) extends Movement {
   def currentMovement = moves(current)
 
   override def start() {
+    super.start()
     if (!isOver) {
       callStartWhileNotIsOver()
     }
@@ -30,9 +31,11 @@ class MovementList(val list: List[Movement]) extends Movement {
   override def drawables = currentMovement.drawables
 
   override def update(time: Int) {
-    require(!isOver, "Action already over")
+    super.update(time)
 
+    callStartWhileNotIsOver()
     currentMovement.update(time)
+
     if (currentMovement.isOver) {
       current += 1
       if (!isOver) {

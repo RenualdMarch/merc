@@ -38,6 +38,7 @@ class SoldiersDrawer {
       case Some(move) => if (move.isOver) {
         executeAllMomentaryMovesAndStartFirstNonMomentary()
       } else {
+        executeAllMomentaryMovesAndStartFirstNonMomentary()
         move.update(time)
         executeAllMomentaryMovesAndStartFirstNonMomentary()
       }

@@ -21,7 +21,8 @@ class SoldierRangedAttackMovement(val from: (Int, Int), val to: (Int, Int), val 
     attacker.state = SoldierViewAttackState(success, dir, attackNumber)
   }
 
-  def update(time: Int) = {
+  override def update(time: Int) = {
+    super.update(time)
     if (attackerFinishedHisThrowingMove) {
       projectileView.updateTime(time)
     } else {

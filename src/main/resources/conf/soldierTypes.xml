@@ -35,7 +35,7 @@
 	</soldierType>
 	<soldierType name="Human-Mage" cost="20" hp="24" movement="5" exp="54" level="1">
 		<attacks>
-			<attack imageName="staff" damage="5" count="1" attackType="Impact" ranged="false"/>
+			<attack imageName="staff-magic" damage="5" count="1" attackType="Impact" ranged="false"/>
 			<attack imageName="fireball" damage="7" count="3" attackType="Fire" ranged="true" attributes="Magical" projectile="Fireball"/>
 		</attacks>
 		<moveCosts>

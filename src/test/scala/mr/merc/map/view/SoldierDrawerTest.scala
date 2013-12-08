@@ -97,7 +97,8 @@ class SoldierDrawerTest extends FunSuite with MockitoSugar with BeforeAndAfter {
 class ExampleMovement(override val drawables: List[SoldierView]) extends Movement {
   private var updatedCount = 0
 
-  def update(time: Int) {
+  override def update(time: Int) {
+    super.update(time)
     updatedCount += 1
   }
 

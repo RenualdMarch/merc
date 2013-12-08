@@ -20,7 +20,8 @@ class SoldierMoveMovement(val from: TerrainHexView, val to: TerrainHexView, val 
     soldier.y = linearMovement.y
   }
 
-  def update(time: Int) {
+  override def update(time: Int) {
+    super.update(time)
     linearMovement.update(time)
     updateSoldierCoords()
   }

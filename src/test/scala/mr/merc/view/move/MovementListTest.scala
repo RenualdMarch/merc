@@ -62,7 +62,7 @@ class MovementListTest extends FunSuite {
 }
 
 class MomentaryTestMovement extends Movement {
-  def update(time: Int) {
+  override def update(time: Int) {
     throw new IllegalStateException("This method mustn't be called, this move is momentary")
   }
   def isOver = isStarted
@@ -71,8 +71,8 @@ class MomentaryTestMovement extends Movement {
 class TimeTakingTestMovement(time: Int) extends Movement {
   private var timePassed = 0
 
-  def update(time: Int) {
-    require(isStarted && !isOver)
+  override def update(time: Int) {
+    super.update(time)
     timePassed += time
   }
   def isOver = timePassed >= time

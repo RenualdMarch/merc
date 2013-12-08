@@ -20,13 +20,19 @@ import mr.merc.unit.Attack
 import scalafx.scene.control.TableView.TableViewSelectionModel
 import scalafx.beans.property.DoubleProperty
 import mr.merc.unit.ChanceOfSuccess
+import scalafx.scene.control.TableCell
+import scalafx.scene.image.ImageView
+import scalafx.scene.control.ContentDisplay
+import mr.merc.image.MImage
+import mr.merc.unit.AttackAttribute
 
 class AttackSelectionDialog(attacker: Soldier, defender: Soldier, attackerHex: TerrainHex,
   defenderHex: TerrainHex) extends Stage {
 
+  title = Localization("attack.dialog.title")
   var selectedAttack: Option[Attack] = None
 
-  private case class AttackChoice(image: String, damage: Int, count: Int, chance: ChanceOfSuccess)
+  private case class AttackChoice(image: String, damage: Int, count: Int, chance: ChanceOfSuccess, attributes: Set[AttackAttribute])
   private type AttackPair = (AttackChoice, Option[AttackChoice])
 
   private val data = new ObservableBuffer[AttackPair]()
@@ -67,13 +73,22 @@ class AttackSelectionDialog(attacker: Soldier, defender: Soldier, attackerHex: T
     }
   }
 
-  this.width = 500
+  this.width = 700
   table.prefWidth <== scene.width
 
   private def tableColumns: List[TableColumn[AttackPair, _]] = {
-    val attackersAttackColumn = new TableColumn[AttackPair, String] {
+
+    val attackersAttackColumn = new TableColumn[AttackPair, Option[String]] {
       text = Localization("attack.attack")
-      cellValueFactory = { c => StringProperty(c.value._1.image) }
+      cellValueFactory = { c =>
+        val name = c.value._1.image
+        if (name == "") {
+          ObjectProperty(None)
+        } else {
+          ObjectProperty(Some(attackImagePath(name)))
+        }
+      }
+      cellFactory = imageCellFactory
       prefWidth = 60
     }
 
@@ -83,7 +98,16 @@ class AttackSelectionDialog(attacker: Soldier, defender: Soldier, attackerHex: T
         val str = c.value._1.damage + " * " + c.value._1.count
         StringProperty(str)
       }
-      prefWidth <== tableWidth / 4 - 31
+      prefWidth <== tableWidth / 6 - 21
+    }
+
+    val attackersAttributesColumn = new TableColumn[AttackPair, String] {
+      text = Localization("attack.attributes")
+      cellValueFactory = { c =>
+        val str = c.value._1.attributes.map(_.localizedName).mkString(", ")
+        StringProperty(str)
+      }
+      prefWidth <== tableWidth / 6 - 20
     }
 
     val attackersChanceColumn = new TableColumn[AttackPair, String] {
@@ -92,14 +116,16 @@ class AttackSelectionDialog(attacker: Soldier, defender: Soldier, attackerHex: T
         val str = c.value._1.chance.chanceNumber + "%"
         StringProperty(str)
       }
-      prefWidth <== tableWidth / 4 - 31
+      prefWidth <== tableWidth / 6 - 21
     }
 
-    val defendersAttackColumn = new TableColumn[AttackPair, String] {
+    val defendersAttackColumn = new TableColumn[AttackPair, Option[String]] {
       text = Localization("attack.attack")
       cellValueFactory = { c =>
-        StringProperty(c.value._2.map(_.image).getOrElse(""))
+        val path = c.value._2.map(_.image).map(attackImagePath)
+        ObjectProperty(path)
       }
+      cellFactory = imageCellFactory
       prefWidth = 60
     }
 
@@ -112,7 +138,7 @@ class AttackSelectionDialog(attacker: Soldier, defender: Soldier, attackerHex: T
         }
         StringProperty(str)
       }
-      prefWidth <== tableWidth / 4 - 30
+      prefWidth <== tableWidth / 6 - 21
     }
 
     val defendersChanceColumn = new TableColumn[AttackPair, String] {
@@ -121,11 +147,20 @@ class AttackSelectionDialog(attacker: Soldier, defender: Soldier, attackerHex: T
         val str = c.value._2.map(_.chance.chanceNumber).getOrElse("0") + "%"
         StringProperty(str)
       }
-      prefWidth <== tableWidth / 4 - 30
+      prefWidth <== tableWidth / 6 - 20
     }
 
-    List(attackersAttackColumn, attackersDamageColumn, attackersChanceColumn,
-      defendersAttackColumn, defendersDamageColumn, defendersChanceColumn)
+    val defendersAttributesColumn = new TableColumn[AttackPair, String] {
+      text = Localization("attack.attributes")
+      cellValueFactory = { c =>
+        val str = c.value._2.map(_.attributes).getOrElse(Set()).map(_.localizedName).mkString(", ")
+        StringProperty(str)
+      }
+      prefWidth <== tableWidth / 6 - 21
+    }
+
+    List(attackersAttackColumn, attackersDamageColumn, attackersAttributesColumn, attackersChanceColumn,
+      defendersAttackColumn, defendersDamageColumn, defendersAttributesColumn, defendersChanceColumn)
   }
 
   private def attacks(attacker: Soldier, defender: Soldier, attackerHex: TerrainHex,
@@ -136,12 +171,13 @@ class AttackSelectionDialog(attacker: Soldier, defender: Soldier, attackerHex: T
       val attackDamage = Attack.possibleAttackersDamage(true, attacker, defender, a, defendersAttackOpt)
       val attackesChance = a.chanceOfSuccess(defender.soldierType.defence(defenderHex.terrain))
 
-      val attackerChoice = AttackChoice(a.imageName, attackDamage, a.count, attackesChance)
+      val attackerChoice = AttackChoice(a.imageName, attackDamage, a.count, attackesChance, a.attributes)
       defendersAttackOpt match {
         case Some(defendersAttack) => {
           val defenderDamage = Attack.possibleAttackersDamage(false, defender, attacker, defendersAttack, Some(a))
           val defenderChance = defendersAttack.chanceOfSuccess(attacker.soldierType.defence(attackerHex.terrain))
-          val defenderChoice = AttackChoice(defendersAttack.imageName, defenderDamage, defendersAttack.count, defenderChance)
+          val defenderChoice = AttackChoice(defendersAttack.imageName, defenderDamage, defendersAttack.count,
+            defenderChance, defendersAttack.attributes)
           (attackerChoice, Some(defenderChoice))
         }
         case None => {
@@ -150,4 +186,27 @@ class AttackSelectionDialog(attacker: Soldier, defender: Soldier, attackerHex: T
       }
     })
   }
+
+  private def imageCellFactory(col: TableColumn[AttackPair, Option[String]]): TableCell[AttackPair, Option[String]] = {
+    new TableCell[AttackPair, Option[String]](new javafx.scene.control.TableCell[AttackPair, Option[String]]() {
+      val imageview = new ImageView()
+      imageview.fitHeight = 60
+      imageview.fitWidth = 60
+      setContentDisplay(ContentDisplay.GRAPHIC_ONLY)
+      setGraphic(imageview)
+
+      override def updateItem(itemOpt: Option[String], empty: Boolean) {
+        super.updateItem(itemOpt, empty);
+        if (!empty) {
+          itemOpt match {
+            case Some(item) => imageview.image = MImage(item).image
+            case None => imageview.image = MImage.emptyImage.image
+          }
+
+        }
+      }
+    })
+  }
+
+  private def attackImagePath(name: String) = "/images/attacks/" + name + ".png"
 }

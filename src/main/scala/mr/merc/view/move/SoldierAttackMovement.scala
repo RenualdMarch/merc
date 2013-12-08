@@ -31,9 +31,11 @@ class SoldierAttackMovement(val from: (Int, Int), val to: (Int, Int), val dir: D
 
   // attack sequence is played
   private val linearMovementToEnemy = new LinearMovement(from._1, from._2, to._1, to._2, attackSpeed, attackMovementPercentage)
+  linearMovementToEnemy.start()
   private val dest = linearMovementToEnemy.destination
   // last frame of attack animation is here
   private val linearMovementFromEnemy = new LinearMovement(dest._1, dest._2, from._1, from._2, attackSpeed)
+  linearMovementFromEnemy.start()
 
   override def start() {
     super.start()
@@ -62,8 +64,8 @@ class SoldierAttackMovement(val from: (Int, Int), val to: (Int, Int), val dir: D
     }
   }
 
-  def update(time: Int) {
-    require(!isOver)
+  override def update(time: Int) {
+    super.update(time)
     if (linearMovementToEnemy.isOver) {
       handleMoveFromEnemy(time)
     } else {
