@@ -84,6 +84,20 @@
 				</succ>
 			</all>
 		</attack1>
+		<attack2>
+			<all>
+				<succ>
+					<image name="im14"/>
+				</succ>
+			</all>
+		</attack2>
+		<attack3>
+			<all>
+				<succ>
+					<image name="im15"/>
+				</succ>
+			</all>
+		</attack3>
 		<stand>
 			<image name="im15"/>
 		</stand>

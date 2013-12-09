@@ -8,7 +8,7 @@ For M3, these things should be completed and tested!!!!
 +Add mage to units and test his attack
 +Attack selection dialog
 +Soldier status ball - can move, can only attack, can do nothing
-Any number of attacks in config
++Any number of attacks in config
 Add damage numbers during attack
 add tip for attack selection
 Sounds
