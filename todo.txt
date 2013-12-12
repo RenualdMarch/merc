@@ -9,12 +9,12 @@ For M3, these things should be completed and tested!!!!
 +Attack selection dialog
 +Soldier status ball - can move, can only attack, can do nothing
 +Any number of attacks in config
-Add damage numbers during attack
-add tip for attack selection
++Add damage numbers during attack
+Minimap
 Sounds
 Music
-Minimap
 UI - improve soldier panel
 Fix bug with movement state still present even when movement is over(movement without attack)
+add tip for attack selection
 Using mage image, center circle
 Village defence

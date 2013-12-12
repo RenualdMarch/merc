@@ -54,7 +54,7 @@ object Attack {
       }
       val success = f(attackersAttack.chanceOfSuccess(defence))
 
-      AttackResult(attackerIsAttacking, attacker, defender, attackersAttack, defendersAttack, success, damage, drained)
+      AttackResult(attackerIsAttacking, attacker, defender, attackersAttack, success, damage, drained)
     }
 
     retVal.toList
@@ -106,11 +106,11 @@ object Attack {
             val finalDrain = fixDrain(attacker.hp, attackerState, drain)
             attackerState += finalDrain
 
-            Some(AttackResult(res.isAttackerAttackingThisRound, res.attacker, res.defender, res.attackersAttack, res.defendersAttack, res.success, actualDamage, finalDrain))
+            Some(AttackResult(res.isAttackerAttackingThisRound, res.attacker, res.defender, res.attackersAttack, res.success, actualDamage, finalDrain))
           } else {
             val finalDrain = fixDrain(attacker.hp, attackerState, res.drained)
             attackerState += finalDrain
-            Some(AttackResult(res.isAttackerAttackingThisRound, res.attacker, res.defender, res.attackersAttack, res.defendersAttack, res.success, res.damage, finalDrain))
+            Some(AttackResult(res.isAttackerAttackingThisRound, res.attacker, res.defender, res.attackersAttack, res.success, res.damage, finalDrain))
           }
         } else {
           val possibleDamage = possibleAttackersDamage(false, defender, attacker, defenderAttack.get, Some(attackerAttack))
@@ -130,11 +130,11 @@ object Attack {
 
             val finalDrain = fixDrain(defender.hp, defenderState, drain)
             defenderState += finalDrain
-            Some(AttackResult(res.isAttackerAttackingThisRound, res.attacker, res.defender, res.attackersAttack, res.defendersAttack, res.success, actualDamage, finalDrain))
+            Some(AttackResult(res.isAttackerAttackingThisRound, res.attacker, res.defender, res.attackersAttack, res.success, actualDamage, finalDrain))
           } else {
             val finalDrain = fixDrain(defender.hp, defenderState, res.drained)
             defenderState += finalDrain
-            Some(AttackResult(res.isAttackerAttackingThisRound, res.attacker, res.defender, res.attackersAttack, res.defendersAttack, res.success, res.damage, finalDrain))
+            Some(AttackResult(res.isAttackerAttackingThisRound, res.attacker, res.defender, res.attackersAttack, res.success, res.damage, finalDrain))
           }
         }
       } else {

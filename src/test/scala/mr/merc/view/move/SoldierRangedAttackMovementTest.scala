@@ -12,6 +12,7 @@ import mr.merc.unit.view.ProjectileStart
 import mr.merc.unit.view.ProjectileMovement
 import mr.merc.unit.view.ProjectileEnd
 import mr.merc.unit.view.ProjectileNotRender
+import mr.merc.unit.AttackResult
 
 class SoldierRangedAttackMovementTest extends FunSuite {
   val simpleSoldierType = new SoldierType("testSoldier2", 1, 20, 10, 5, 1,
@@ -23,8 +24,9 @@ class SoldierRangedAttackMovementTest extends FunSuite {
     val attackerView = new SoldierView(attackerSoldier)
     val defenderView = new SoldierView(defenderSoldier)
 
+    val result = AttackResult(true, attackerSoldier, defenderSoldier, simpleSoldierType.attacks(0), false, 0, 0)
     val movement = new SoldierRangedAttackMovement((10, 20), (110, 20), NE,
-      false, attackerView, defenderView, 0)
+      attackerView, defenderView, result)
     movement.start()
     assert(movement.projectileView.state === ProjectileNotRender)
     assert(attackerView.index === 0)

@@ -41,35 +41,30 @@ class AttackTest extends FunSuite with BeforeAndAfter {
     assert(results(0).attacker === firstSoldier)
     assert(results(0).defender === secondSoldier)
     assert(results(0).attackersAttack === firstType.attacks(0))
-    assert(results(0).defendersAttack.get === secondType.attacks(0))
     assert(results(0).success === false)
 
     assert(results(1).isAttackerAttackingThisRound === false)
     assert(results(1).attacker === secondSoldier)
     assert(results(1).defender === firstSoldier)
     assert(results(1).attackersAttack === secondType.attacks(0))
-    assert(results(1).defendersAttack.get === firstType.attacks(0))
     assert(results(1).success === false)
 
     assert(results(2).isAttackerAttackingThisRound === true)
     assert(results(2).attacker === firstSoldier)
     assert(results(2).defender === secondSoldier)
     assert(results(2).attackersAttack === firstType.attacks(0))
-    assert(results(2).defendersAttack.get === secondType.attacks(0))
     assert(results(2).success === false)
 
     assert(results(3).isAttackerAttackingThisRound === false)
     assert(results(3).attacker === secondSoldier)
     assert(results(3).defender === firstSoldier)
     assert(results(3).attackersAttack === secondType.attacks(0))
-    assert(results(3).defendersAttack.get === firstType.attacks(0))
     assert(results(3).success === false)
 
     assert(results(4).isAttackerAttackingThisRound === false)
     assert(results(4).attacker === secondSoldier)
     assert(results(4).defender === firstSoldier)
     assert(results(4).attackersAttack === secondType.attacks(0))
-    assert(results(4).defendersAttack.get === firstType.attacks(0))
     assert(results(4).success === false)
   }
 
@@ -80,14 +75,12 @@ class AttackTest extends FunSuite with BeforeAndAfter {
     assert(results(0).attacker === firstSoldier)
     assert(results(0).defender === secondSoldier)
     assert(results(0).attackersAttack === firstType.attacks(1))
-    assert(results(0).defendersAttack === None)
     assert(results(0).success === false)
 
     assert(results(1).isAttackerAttackingThisRound === true)
     assert(results(1).attacker === firstSoldier)
     assert(results(1).defender === secondSoldier)
     assert(results(1).attackersAttack === firstType.attacks(1))
-    assert(results(1).defendersAttack === None)
     assert(results(1).success === false)
   }
 
@@ -99,35 +92,30 @@ class AttackTest extends FunSuite with BeforeAndAfter {
     assert(firstResults(0).attacker === firstSoldier)
     assert(firstResults(0).defender === secondSoldier)
     assert(firstResults(0).attackersAttack === firstType.attacks(0))
-    assert(firstResults(0).defendersAttack.get === secondType.attacks(0))
     assert(firstResults(0).success === true)
 
     assert(firstResults(1).isAttackerAttackingThisRound === false)
     assert(firstResults(1).attacker === secondSoldier)
     assert(firstResults(1).defender === firstSoldier)
     assert(firstResults(1).attackersAttack === secondType.attacks(0))
-    assert(firstResults(1).defendersAttack.get === firstType.attacks(0))
     assert(firstResults(1).success === false)
 
     assert(firstResults(2).isAttackerAttackingThisRound === true)
     assert(firstResults(2).attacker === firstSoldier)
     assert(firstResults(2).defender === secondSoldier)
     assert(firstResults(2).attackersAttack === firstType.attacks(0))
-    assert(firstResults(2).defendersAttack.get === secondType.attacks(0))
     assert(firstResults(2).success === true)
 
     assert(firstResults(3).isAttackerAttackingThisRound === false)
     assert(firstResults(3).attacker === secondSoldier)
     assert(firstResults(3).defender === firstSoldier)
     assert(firstResults(3).attackersAttack === secondType.attacks(0))
-    assert(firstResults(3).defendersAttack.get === firstType.attacks(0))
     assert(firstResults(3).success === false)
 
     assert(firstResults(4).isAttackerAttackingThisRound === false)
     assert(firstResults(4).attacker === secondSoldier)
     assert(firstResults(4).defender === firstSoldier)
     assert(firstResults(4).attackersAttack === secondType.attacks(0))
-    assert(firstResults(4).defendersAttack.get === firstType.attacks(0))
     assert(firstResults(4).success === false)
 
     val secondResults = Attack.battle(attackerHex, defenderHex, firstType.attacks(0), Some(secondType.attacks(0)), firstHitsSecondMisses)
@@ -137,21 +125,18 @@ class AttackTest extends FunSuite with BeforeAndAfter {
     assert(secondResults(0).attacker === firstSoldier)
     assert(secondResults(0).defender === secondSoldier)
     assert(secondResults(0).attackersAttack === firstType.attacks(0))
-    assert(secondResults(0).defendersAttack.get === secondType.attacks(0))
     assert(secondResults(0).success === true)
 
     assert(secondResults(1).isAttackerAttackingThisRound === false)
     assert(secondResults(1).attacker === secondSoldier)
     assert(secondResults(1).defender === firstSoldier)
     assert(secondResults(1).attackersAttack === secondType.attacks(0))
-    assert(secondResults(1).defendersAttack.get === firstType.attacks(0))
     assert(secondResults(1).success === false)
 
     assert(secondResults(2).isAttackerAttackingThisRound === true)
     assert(secondResults(2).attacker === firstSoldier)
     assert(secondResults(2).defender === secondSoldier)
     assert(secondResults(2).attackersAttack === firstType.attacks(0))
-    assert(secondResults(2).defendersAttack.get === secondType.attacks(0))
     assert(secondResults(2).success === true)
 
     assert(secondSoldier.hp === 0)

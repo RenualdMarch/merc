@@ -22,7 +22,6 @@ object Util extends FunSuite {
     assert(result.attacker === attacker)
     assert(result.defender === defender)
     assert(result.attackersAttack === attackerType.attacks(0))
-    assert(result.defendersAttack.get === defenderType.attacks(0))
     assert(result.isAttackerAttackingThisRound === isAttackerAttackingThisRound)
     assert(result.success === success)
   }
@@ -34,7 +33,6 @@ object Util extends FunSuite {
     assert(result.attacker === defender)
     assert(result.defender === attacker)
     assert(result.attackersAttack === defenderType.attacks(0))
-    assert(result.defendersAttack.get === attackerType.attacks(0))
     assert(result.isAttackerAttackingThisRound === isAttackerAttackingThisRound)
     assert(result.success === success)
   }

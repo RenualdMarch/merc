@@ -4,7 +4,16 @@ class MovementList(val list: List[Movement]) extends Movement {
   private val moves = list.toVector
   private var current = 0
 
-  def currentMovement = moves(current)
+  def currentMovement = {
+    try {
+      moves(current)
+    } catch {
+      case ex: Exception => {
+        println(this.isOver)
+        throw ex
+      }
+    }
+  }
 
   override def start() {
     super.start()

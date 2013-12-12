@@ -40,7 +40,7 @@ class DrainAttributeTest extends FunSuite {
     attacker.hp = 7
     attackerHex.soldier = Some(attacker)
     defenderHex.soldier = Some(defender)
-    val result = new AttackResult(true, attacker, defender, someType.attacks(0), Some(someType.attacks(0)), true, 10, 5)
+    val result = new AttackResult(true, attacker, defender, someType.attacks(0), true, 10, 5)
     result.applyDamage()
     assert(attacker.hp === 12)
     assert(defender.hp === 5)
@@ -64,7 +64,7 @@ class DrainAttributeTest extends FunSuite {
     attacker.hp = 7
     attackerHex.soldier = Some(attacker)
     defenderHex.soldier = Some(defender)
-    val result = new AttackResult(true, attacker, defender, someType.attacks(0), Some(someType.attacks(0)), false, 10, 5)
+    val result = new AttackResult(true, attacker, defender, someType.attacks(0), false, 10, 5)
     result.applyDamage()
     assert(attacker.hp === 7)
     assert(defender.hp === 15)
@@ -77,7 +77,7 @@ class DrainAttributeTest extends FunSuite {
     attacker.hp = 14
     attackerHex.soldier = Some(attacker)
     defenderHex.soldier = Some(defender)
-    val result = new AttackResult(true, attacker, defender, someType.attacks(0), Some(someType.attacks(0)), true, 10, 5)
+    val result = new AttackResult(true, attacker, defender, someType.attacks(0), true, 10, 5)
     result.applyDamage()
     assert(attacker.hp === 15)
     assert(defender.hp === 5)

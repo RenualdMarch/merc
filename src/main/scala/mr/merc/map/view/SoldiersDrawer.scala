@@ -32,7 +32,7 @@ class SoldiersDrawer {
   })
 
   def update(time: Int) {
-    (_soldiers -- soldiersInMovements) foreach (_.updateTime(time))
+    updateAllSoldiersExceptForInMovement(time)
 
     currentMovement match {
       case Some(move) => if (move.isOver) {
@@ -44,6 +44,14 @@ class SoldiersDrawer {
       }
       case None => // do nothing by now
     }
+  }
+
+  private def updateAllSoldiersExceptForInMovement(time: Int) {
+    val inMovements = currentMovement match {
+      case Some(move) => if (move.isOver) Nil else soldiersInMovements
+      case None => Nil
+    }
+    (_soldiers -- inMovements) foreach (_.updateTime(time))
   }
 
   def executeAllMomentaryMovesAndStartFirstNonMomentary() {
