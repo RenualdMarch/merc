@@ -120,7 +120,7 @@ class BattleController(gameField: GameField, parent: BattleControllerParent) {
                 case None => // do nothing
               }
             }
-
+            parent.onMinimapChange()
           }
           case None => // TODO do something, do nothing by now
         }
@@ -137,6 +137,7 @@ class BattleController(gameField: GameField, parent: BattleControllerParent) {
             selectedSoldier = None
             soldierToShow.soldier = None
             removeMovementOptions()
+            parent.onMinimapChange()
           }
           case None => // do nothing
         }

@@ -10,7 +10,7 @@ For M3, these things should be completed and tested!!!!
 +Soldier status ball - can move, can only attack, can do nothing
 +Any number of attacks in config
 +Add damage numbers during attack
-Minimap
++Simple minimap
 Sounds
 Music
 UI - improve soldier panel

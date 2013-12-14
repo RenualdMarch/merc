@@ -4,4 +4,5 @@ import javafx.stage.Window
 
 trait BattleControllerParent {
   def window: Window
+  def onMinimapChange(): Unit
 }

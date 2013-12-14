@@ -39,19 +39,18 @@ import scalafx.animation.KeyFrame
 import scalafx.util.Duration
 import scalafx.animation.Animation
 import mr.merc.players.Player
-import javafx.{fxml => jfxf}
-import javafx.{scene => jfxs}
+import javafx.{ fxml => jfxf }
+import javafx.{ scene => jfxs }
 import java.util.ResourceBundle
 import java.io.FileInputStream
 import java.util.PropertyResourceBundle
 import mr.merc.local.MercResourceBundle
+import mr.merc.ui.battle.BattleFrame
 
-object Main extends JFXApp {  
-  val location = getClass.getResource("/fxml/battleFrame.fxml")
-  val localization = new MercResourceBundle("ru")
-  val loader = new jfxf.FXMLLoader(location, localization)
-  val rootPane: jfxs.Parent = loader.load().asInstanceOf[jfxs.Parent]
-  
+object Main extends JFXApp {
+  val battleFrame = new BattleFrame
+  val rootPane = battleFrame.parentPane
+
   val screenRect = Screen.primary.visualBounds
 
   stage = new PrimaryStage {
@@ -60,5 +59,5 @@ object Main extends JFXApp {
       root = rootPane
     }
   }
-  
+
 }

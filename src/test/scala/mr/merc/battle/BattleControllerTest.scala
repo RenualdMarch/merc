@@ -35,6 +35,7 @@ class BattleControllerTest extends FunSuite with BeforeAndAfter {
 
     controller = new BattleController(gameField, new BattleControllerParent() {
       def window = ???
+      def onMinimapChange() {}
     }) {
       override def selectAttack(attacker: Soldier, defender: Soldier,
         attackerHex: TerrainHex, defenderHex: TerrainHex) = Some(attacker.soldierType.attacks(0))
