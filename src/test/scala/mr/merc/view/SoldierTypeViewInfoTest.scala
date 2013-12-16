@@ -11,6 +11,7 @@ import mr.merc.unit.view.MoveState
 import mr.merc.unit.view.StandState
 import mr.merc.image.LazyMirroredVerticallyImage
 import mr.merc.unit.view.SoldierTypeViewInfo
+import mr.merc.unit.sound._
 
 class SoldierTypeViewInfoTest extends FunSuite with ShouldMatchers {
 
@@ -163,5 +164,27 @@ class SoldierTypeViewInfoTest extends FunSuite with ShouldMatchers {
     death(3).alpha should be(0.4f plusOrMinus 0.01f)
     assert(death(4).imagePath.get === "/images/units/testType2/im15.png")
     death(4).alpha should be(0.2f plusOrMinus 0.01f)
+  }
+
+  test("sounds") {
+    val sounds = SoldierTypeViewInfo("testType1").sounds
+    assert(sounds(MovementSound) === "5")
+    assert(sounds(PainSound) === "7")
+    assert(sounds(DeathSound) === "6")
+    assert(sounds(AttackSound(0, true)) === "1")
+    assert(sounds(AttackSound(0, false)) === "2")
+    assert(sounds(AttackSound(1, true)) === "3")
+    assert(sounds(AttackSound(1, false)) === "4")
+  }
+
+  test("absent sounds") {
+    val sounds = SoldierTypeViewInfo("testType2").sounds
+    assert(sounds(MovementSound) === "50")
+    assert(sounds.get(PainSound) === None)
+    assert(sounds.get(DeathSound) === None)
+    assert(sounds(AttackSound(0, true)) === "10")
+    assert(sounds(AttackSound(0, false)) === "20")
+    assert(sounds.get(AttackSound(1, true)) === None)
+    assert(sounds.get(AttackSound(1, false)) === None)
   }
 }

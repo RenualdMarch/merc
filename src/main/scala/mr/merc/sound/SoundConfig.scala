@@ -3,10 +3,10 @@ package mr.merc.sound
 import xml.XML
 import java.io.File
 
-object SoundConfigLoader {
+object SoundConfig {
   private val pathToSounds = "/sounds/"
 
-  lazy val soundsMap = loadSounds
+  val soundsMap = loadSounds
 
   private def loadSounds: Map[String, Sound] = {
     val path = getClass.getResource("/conf/sounds.xml").toURI

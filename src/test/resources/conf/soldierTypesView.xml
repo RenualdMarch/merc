@@ -75,6 +75,13 @@
 		<defence>
 			<image name="im13"/>
 		</defence>
+		<sounds>
+			<attack1 succ="1" fail="2"/>
+			<attack2 succ="3" fail="4"/>
+			<move sound="5"/>
+			<death sound="6"/>
+			<pain sound="7"/>
+		</sounds>
 	</view>
 	<view name="testType2">
 		<attack1>
@@ -101,6 +108,10 @@
 		<stand>
 			<image name="im15"/>
 		</stand>
+		<sounds>
+			<attack1 succ="10" fail="20"/>
+			<move sound="50"/>
+		</sounds>
 	</view>
 	<view name="testSoldier">
 		<attack1>

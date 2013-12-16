@@ -8,6 +8,7 @@ import scala.xml.NodeSeq
 import mr.merc.map.hex._
 import scalafx.scene.paint.Color
 import mr.merc.unit.Attack
+import mr.merc.unit.sound._
 
 object SoldierTypeViewInfo {
   val rootPath = "/images/units/"
@@ -44,10 +45,42 @@ object SoldierTypeViewInfo {
         StandState -> stand, DeathState -> death, NoState -> List(MImage.emptyImage))
       val attacks = attacksMap(node, typeName)
 
-      SoldierTypeViewInfo(typeName, images ++ attacks)
+      SoldierTypeViewInfo(typeName, images ++ attacks, parseSounds(node \ "sounds"))
     })
 
     parsed.toList
+  }
+
+  private def parseSounds(node: NodeSeq): Map[SoldierSound, String] = {
+    val move = getNode(node, "move").map(_ \ "@sound").map(_.toString)
+    val death = getNode(node, "death").map(_ \ "@sound").map(_.toString)
+    val pain = getNode(node, "pain").map(_ \ "@sound").map(_.toString)
+
+    val map = collection.mutable.Map[SoldierSound, String]()
+    move foreach (m => map += (MovementSound -> m))
+    death foreach (m => map += (DeathSound -> m))
+    pain foreach (m => map += (PainSound -> m))
+
+    var number = 0
+    while (getNode(node, "attack" + (number + 1)).isDefined) {
+      val attackNode = getNode(node, "attack" + (number + 1)).get
+      val succ = (attackNode \ "@succ").toString()
+      val fail = (attackNode \ "@fail").toString()
+      map += AttackSound(number, true) -> succ
+      map += AttackSound(number, false) -> fail
+      number += 1
+    }
+
+    map.toMap
+  }
+
+  private def getNode(node: NodeSeq, name: String): Option[Node] = {
+    val seq = node \ name
+    if (seq.isEmpty) {
+      None
+    } else {
+      Some(seq(0))
+    }
   }
 
   private def attacksMap(typeNode: Node, typeName: String): Map[SoldierViewAttackState, List[MImage]] = {
@@ -176,9 +209,9 @@ object SoldierTypeViewInfo {
   }
 }
 
-case class SoldierTypeViewInfo(name: String, images: Map[SoldierViewState, List[MImage]]) {
+case class SoldierTypeViewInfo(name: String, images: Map[SoldierViewState, List[MImage]], sounds: Map[SoldierSound, String]) {
   def toColor(color: Color): SoldierTypeViewInfo = {
     val newImages = images.mapValues(_.map(_.changeSoldierColor(color))).toSeq.toMap
-    SoldierTypeViewInfo(name, newImages)
+    SoldierTypeViewInfo(name, newImages, sounds)
   }
 }
