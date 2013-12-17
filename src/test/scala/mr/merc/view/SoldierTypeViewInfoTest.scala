@@ -168,22 +168,22 @@ class SoldierTypeViewInfoTest extends FunSuite with ShouldMatchers {
 
   test("sounds") {
     val sounds = SoldierTypeViewInfo("testType1").sounds
-    assert(sounds(MovementSound) === "5")
-    assert(sounds(PainSound) === "7")
-    assert(sounds(DeathSound) === "6")
-    assert(sounds(AttackSound(0, true)) === "1")
-    assert(sounds(AttackSound(0, false)) === "2")
-    assert(sounds(AttackSound(1, true)) === "3")
-    assert(sounds(AttackSound(1, false)) === "4")
+    assert(sounds(MovementSound).path === "/sounds/5.mp3")
+    assert(sounds(PainSound).path === "/sounds/7.mp3")
+    assert(sounds(DeathSound).path === "/sounds/6.mp3")
+    assert(sounds(AttackSound(0, true)).path === "/sounds/1.mp3")
+    assert(sounds(AttackSound(0, false)).path === "/sounds/2.mp3")
+    assert(sounds(AttackSound(1, true)).path === "/sounds/3.mp3")
+    assert(sounds(AttackSound(1, false)).path === "/sounds/4.mp3")
   }
 
   test("absent sounds") {
     val sounds = SoldierTypeViewInfo("testType2").sounds
-    assert(sounds(MovementSound) === "50")
+    assert(sounds(MovementSound).path === "/sounds/50.mp3")
     assert(sounds.get(PainSound) === None)
     assert(sounds.get(DeathSound) === None)
-    assert(sounds(AttackSound(0, true)) === "10")
-    assert(sounds(AttackSound(0, false)) === "20")
+    assert(sounds(AttackSound(0, true)).path === "/sounds/10.mp3")
+    assert(sounds(AttackSound(0, false)).path === "/sounds/20.mp3")
     assert(sounds.get(AttackSound(1, true)) === None)
     assert(sounds.get(AttackSound(1, false)) === None)
   }

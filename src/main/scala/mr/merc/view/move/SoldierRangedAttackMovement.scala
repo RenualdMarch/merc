@@ -11,6 +11,9 @@ import mr.merc.unit.view.StandState
 import mr.merc.unit.view.SoldierViewAttackState
 import mr.merc.unit.AttackResult
 import mr.merc.unit.view.ProjectileEnd
+import mr.merc.unit.view.SoldierTypeViewInfo
+import mr.merc.unit.sound.AttackSound
+import mr.merc.unit.sound.PainSound
 
 class SoldierRangedAttackMovement(val from: (Int, Int), val to: (Int, Int), val dir: Direction,
   val attacker: SoldierView, val defender: SoldierView, result: AttackResult) extends Movement {
@@ -33,6 +36,7 @@ class SoldierRangedAttackMovement(val from: (Int, Int), val to: (Int, Int), val 
 
   override def start() {
     super.start()
+    SoldierTypeViewInfo(attacker.soldier.soldierType.name).sounds.get(AttackSound(result.attackIndex, result.success))
     attacker.state = SoldierViewAttackState(result.success, dir, result.attackIndex)
   }
 
@@ -44,6 +48,10 @@ class SoldierRangedAttackMovement(val from: (Int, Int), val to: (Int, Int), val 
       val indexChanged = attacker.updateTime(time)
       if (indexChanged > 0 && attacker.index == 0) {
         attackerFinishedHisThrowingMove = true
+        if (result.success) {
+          val sound = SoldierTypeViewInfo(defender.soldier.soldierType.name).sounds.get(PainSound)
+          sound foreach (_.play)
+        }
         attacker.state = StandState
         projectileView.state = ProjectileStart
       }

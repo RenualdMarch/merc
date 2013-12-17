@@ -9,6 +9,8 @@ import mr.merc.map.hex._
 import scalafx.scene.paint.Color
 import mr.merc.unit.Attack
 import mr.merc.unit.sound._
+import mr.merc.sound.Sound
+import mr.merc.sound.SoundConfig
 
 object SoldierTypeViewInfo {
   val rootPath = "/images/units/"
@@ -45,7 +47,7 @@ object SoldierTypeViewInfo {
         StandState -> stand, DeathState -> death, NoState -> List(MImage.emptyImage))
       val attacks = attacksMap(node, typeName)
 
-      SoldierTypeViewInfo(typeName, images ++ attacks, parseSounds(node \ "sounds"))
+      SoldierTypeViewInfo(typeName, images ++ attacks, parseSounds(node \ "sounds") mapValues SoundConfig.soundsMap)
     })
 
     parsed.toList
@@ -209,7 +211,7 @@ object SoldierTypeViewInfo {
   }
 }
 
-case class SoldierTypeViewInfo(name: String, images: Map[SoldierViewState, List[MImage]], sounds: Map[SoldierSound, String]) {
+case class SoldierTypeViewInfo(name: String, images: Map[SoldierViewState, List[MImage]], sounds: Map[SoldierSound, Sound]) {
   def toColor(color: Color): SoldierTypeViewInfo = {
     val newImages = images.mapValues(_.map(_.changeSoldierColor(color))).toSeq.toMap
     SoldierTypeViewInfo(name, newImages, sounds)

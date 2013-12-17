@@ -3,6 +3,8 @@ package mr.merc.view.move
 import mr.merc.map.hex.view.TerrainHexView
 import mr.merc.unit.view.SoldierView
 import mr.merc.unit.view.MoveState
+import mr.merc.unit.sound.MovementSound
+import mr.merc.sound.Sound
 
 class SoldierMoveMovement(val from: TerrainHexView, val to: TerrainHexView, val soldier: SoldierView) extends Movement {
   private val movementSpeed = 100
@@ -13,6 +15,7 @@ class SoldierMoveMovement(val from: TerrainHexView, val to: TerrainHexView, val 
     soldier.state = MoveState
     linearMovement.start()
     updateSoldierCoords()
+    soldier.sounds.get(MovementSound).foreach(_.play)
   }
 
   private def updateSoldierCoords() {

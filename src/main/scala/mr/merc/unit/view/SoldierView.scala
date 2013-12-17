@@ -46,6 +46,8 @@ class SoldierView(val soldier: Soldier) extends Sprite[SoldierViewState](Soldier
   private val xpBarHeight = Math.min(soldier.soldierType.exp, maxXp) * TerrainHexView.Side / maxXp
   private val xpBarWidth = 4
 
+  lazy val sounds = SoldierTypeViewInfo(soldier.soldierType.name).sounds
+
   val healthBar = new VerticalBarView(healthBarWidth, healthBarHeight, Color.WHITE, Color.RED, hpPercent)
   val xpBar = new VerticalBarView(xpBarWidth, xpBarHeight, Color.WHITE, Color.WHITE, xpPercent)
 
