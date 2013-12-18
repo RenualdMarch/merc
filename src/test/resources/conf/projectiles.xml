@@ -26,6 +26,11 @@
 				<image name="im9"/>
 			</all>
 		</end>
+		<sounds>
+			<start name="1"/>
+			<move name="2"/>
+			<end name="3"/>
+		</sounds>
 	</projectile>
 	<projectile name="testProjectile2">
 		<start>
@@ -44,6 +49,10 @@
 				<image name="im11"/>
 			</all>
 		</end>
+		<sounds>
+			<start name="4"/>
+			<end name="5"/>
+		</sounds>
 	</projectile>
 	<projectile name="testProjectile3-succ">
 		<start>

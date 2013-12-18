@@ -65,4 +65,15 @@ class ProjectileTest extends FunSuite {
       assert(list(1).imagePath.get === "/images/projectiles/testProjectile2/im11.png")
     })
   }
+
+  test("parse sounds") {
+    val sounds1 = Projectile("testProjectile").sounds
+    assert(sounds1(ProjectileStartSound).path === "/sounds/1.mp3")
+    assert(sounds1(ProjectileMoveStartSound).path === "/sounds/2.mp3")
+    assert(sounds1(ProjectileEndSound).path === "/sounds/3.mp3")
+    val sounds2 = Projectile("testProjectile2").sounds
+    assert(sounds2(ProjectileStartSound).path === "/sounds/4.mp3")
+    assert(sounds2.get(ProjectileMoveStartSound) === None)
+    assert(sounds2(ProjectileEndSound).path === "/sounds/5.mp3")
+  }
 }

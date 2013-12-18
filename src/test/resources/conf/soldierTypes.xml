@@ -38,4 +38,18 @@
 			<resistance type="Arcane" resistance="-30"/>
 		</resistances>
 	</soldierType>
+	
+	<!-- FAKE SOLDIER TYPES FOR TESTS -->
+	<soldierType name="testType1" cost="1" hp="1" movement="1" exp="1" level="1">
+		<attacks>
+			<attack imageName="attack1" damage="3" count="4" attackType="Impact" ranged="false" attributes="Poison"/>
+			<attack imageName="attack2" damage="2" count="3" attackType="Fire" ranged="true"/>
+		</attacks>
+	</soldierType>
+	<soldierType name="testType2" cost="1" hp="1" movement="1" exp="1" level="1">
+		<attacks>
+			<attack imageName="attack1" damage="3" count="4" attackType="Impact" ranged="false" attributes="Poison"/>
+			<attack imageName="attack2" damage="2" count="3" attackType="Fire" ranged="true"/>
+		</attacks>
+	</soldierType>	
 </soldierTypes>

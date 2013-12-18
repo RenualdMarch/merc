@@ -8,6 +8,8 @@ import scala.xml.XML
 import java.io.File
 import scala.xml.Node
 import scala.xml.NodeSeq
+import mr.merc.sound.Sound
+import mr.merc.sound.SoundConfig
 
 object Projectile {
   private val rootPath = "/images/projectiles/"
@@ -26,7 +28,9 @@ object Projectile {
       val start = parseState(name, node \ "start")
       val end = parseState(name, node \ "end")
 
-      new Projectile(name, start, move, end)
+      val sounds = parseSounds(node \ "sounds") mapValues SoundConfig.soundsMap
+
+      new Projectile(name, start, move, end, sounds)
     })
 
     parsed map (p => (p.name, p)) toMap
@@ -49,6 +53,23 @@ object Projectile {
     val x = if ((node \ "@x").isEmpty) 0 else (node \ "@x").toString.toInt
     val y = if ((node \ "@y").isEmpty) 0 else (node \ "@y").toString.toInt
     MImage(rootPath + projectileName.replace("-succ", "").replace("-fail", "") + "/" + name + ".png", x, y)
+  }
+
+  private def parseSounds(node: NodeSeq): Map[ProjectileSoundState, String] = {
+    def getName(state: String): Option[String] = {
+      val nodes = node \ state
+      if (nodes.nonEmpty) {
+        Some((nodes \ "@name") toString)
+      } else {
+        None
+      }
+    }
+
+    val map = Map(ProjectileStartSound -> getName("start"),
+      ProjectileMoveStartSound -> getName("move"),
+      ProjectileEndSound -> getName("end"))
+
+    map.filter { case (k, v) => v.isDefined } mapValues (_.get)
   }
 
   private def parseState(name: String, node: NodeSeq): Option[Map[Direction, List[MImage]]] = {
@@ -74,10 +95,15 @@ object Projectile {
 
 class Projectile(val name: String, val start: Option[Map[Direction, List[MImage]]],
   val move: Option[Map[Direction, List[MImage]]],
-  val end: Option[Map[Direction, List[MImage]]]) {
+  val end: Option[Map[Direction, List[MImage]]], val sounds: Map[ProjectileSoundState, Sound]) {
   private val speed = 100
 
   def buildView(dir: Direction, from: (Int, Int), to: (Int, Int)) =
     new ProjectileView(start.map(_(dir)), move.map(_(dir)), end.map(_(dir)),
-      from, to, speed)
+      from, to, speed, sounds)
 }
+
+sealed trait ProjectileSoundState
+object ProjectileStartSound extends ProjectileSoundState
+object ProjectileMoveStartSound extends ProjectileSoundState
+object ProjectileEndSound extends ProjectileSoundState

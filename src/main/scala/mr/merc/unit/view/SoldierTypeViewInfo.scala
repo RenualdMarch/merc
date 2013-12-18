@@ -11,6 +11,7 @@ import mr.merc.unit.Attack
 import mr.merc.unit.sound._
 import mr.merc.sound.Sound
 import mr.merc.sound.SoundConfig
+import mr.merc.unit.SoldierType
 
 object SoldierTypeViewInfo {
   val rootPath = "/images/units/"
@@ -47,13 +48,13 @@ object SoldierTypeViewInfo {
         StandState -> stand, DeathState -> death, NoState -> List(MImage.emptyImage))
       val attacks = attacksMap(node, typeName)
 
-      SoldierTypeViewInfo(typeName, images ++ attacks, parseSounds(node \ "sounds") mapValues SoundConfig.soundsMap)
+      SoldierTypeViewInfo(typeName, images ++ attacks, parseSounds(typeName, node \ "sounds") mapValues SoundConfig.soundsMap)
     })
 
     parsed.toList
   }
 
-  private def parseSounds(node: NodeSeq): Map[SoldierSound, String] = {
+  private def parseSounds(name: String, node: NodeSeq): Map[SoldierSound, String] = {
     val move = getNode(node, "move").map(_ \ "@sound").map(_.toString)
     val death = getNode(node, "death").map(_ \ "@sound").map(_.toString)
     val pain = getNode(node, "pain").map(_ \ "@sound").map(_.toString)
@@ -63,14 +64,17 @@ object SoldierTypeViewInfo {
     death foreach (m => map += (DeathSound -> m))
     pain foreach (m => map += (PainSound -> m))
 
-    var number = 0
-    while (getNode(node, "attack" + (number + 1)).isDefined) {
-      val attackNode = getNode(node, "attack" + (number + 1)).get
-      val succ = (attackNode \ "@succ").toString()
-      val fail = (attackNode \ "@fail").toString()
-      map += AttackSound(number, true) -> succ
-      map += AttackSound(number, false) -> fail
-      number += 1
+    for (number <- 0 until SoldierType(name).attacks.size) {
+      val attackNodeOpt = getNode(node, "attack" + (number + 1))
+      attackNodeOpt match {
+        case Some(attackNode) => {
+          val succ = (attackNode \ "@succ").toString()
+          val fail = (attackNode \ "@fail").toString()
+          map += AttackSound(number, true) -> succ
+          map += AttackSound(number, false) -> fail
+        }
+        case None => // do nothing
+      }
     }
 
     map.toMap

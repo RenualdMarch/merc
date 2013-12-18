@@ -6,9 +6,10 @@ import mr.merc.view.move.Movement
 import mr.merc.view.Sprite
 import mr.merc.view.SpriteState
 import scalafx.scene.canvas.GraphicsContext
+import mr.merc.sound.Sound
 
 class ProjectileView(start: Option[List[MImage]], move: Option[List[MImage]], end: Option[List[MImage]],
-  from: (Int, Int), to: (Int, Int), speed: Int) extends Sprite[ProjectileState](
+  from: (Int, Int), to: (Int, Int), speed: Int, sounds: Map[ProjectileSoundState, Sound]) extends Sprite[ProjectileState](
   Map((ProjectileStart -> start.getOrElse(List(MImage.emptyImage))),
     (ProjectileMovement -> move.getOrElse(List(MImage.emptyImage))),
     (ProjectileEnd -> end.getOrElse(List(MImage.emptyImage))),
@@ -19,6 +20,18 @@ class ProjectileView(start: Option[List[MImage]], move: Option[List[MImage]], en
   movement.start()
   x = from._1
   y = from._2
+
+  override def state_=(st: ProjectileState) {
+    super.state = st
+    val soundState = st match {
+      case ProjectileStart => Some(ProjectileStartSound)
+      case ProjectileEnd => Some(ProjectileEndSound)
+      case ProjectileMovement => Some(ProjectileMoveStartSound)
+      case _ => None
+    }
+
+    soundState flatMap (s => sounds.get(s)) foreach (_.play)
+  }
 
   override def updateTime(time: Int): Int = {
     val result = super.updateTime(time)
