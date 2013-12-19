@@ -41,6 +41,9 @@
 				<image name="fireball-impact-16"/>				
 			</all>
 		</end>
+		<sounds>
+			<end name="fireExplosion"/>
+		</sounds>
 	</projectile>
 	<projectile name="Fireball-fail">
 		<start>

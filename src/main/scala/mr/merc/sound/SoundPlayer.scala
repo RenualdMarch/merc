@@ -4,7 +4,7 @@ import scala.concurrent._
 import ExecutionContext.Implicits.global
 
 object SoundPlayer {
-  private val soundsEnabled = false
+  private val soundsEnabled = true
 
   def playSound(path: String) {
     if (soundsEnabled) {

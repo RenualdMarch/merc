@@ -7,6 +7,8 @@ import mr.merc.map.hex._
 import mr.merc.unit.view.SoldierViewAttackState
 import mr.merc.unit.view.StandState
 import mr.merc.unit.AttackResult
+import mr.merc.unit.sound.AttackSound
+import mr.merc.unit.sound.PainSound
 
 object SoldierAttackMovement {
   private val frameCount = 20
@@ -23,8 +25,9 @@ object SoldierAttackMovement {
 
 class SoldierAttackMovement(val from: (Int, Int), val to: (Int, Int), val dir: Direction,
   val attacker: SoldierView, val defender: SoldierView,
-  val result: AttackResult, val attackSpeed: Int = 100) extends Movement {
+  val result: AttackResult, val attackSpeed: Int = 150) extends Movement {
 
+  private var defenderPainSoundPlayed = false
   private val attackMovementPercentage = 0.7
   private val state = SoldierViewAttackState(result.success, dir, result.attackIndex)
   private val attackImagesSize = attacker.images(state).size
@@ -67,6 +70,8 @@ class SoldierAttackMovement(val from: (Int, Int), val to: (Int, Int), val dir: D
 
     attacker.state = state
     attacker.index = 0
+
+    attacker.sounds.get(AttackSound(result.attackIndex, result.success)).foreach(_.play)
   }
 
   private def frameListIndex: Int = {
@@ -88,6 +93,11 @@ class SoldierAttackMovement(val from: (Int, Int), val to: (Int, Int), val dir: D
 
     if (isOver) {
       changeSoldierConfigurationBack()
+    }
+
+    if (result.success && !defenderPainSoundPlayed && linearMovementToEnemy.isOver) {
+      defenderPainSoundPlayed = true
+      defender.sounds.get(PainSound).foreach(_.play)
     }
   }
 

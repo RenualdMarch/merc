@@ -14,12 +14,14 @@ import mr.merc.unit.view.ProjectileEnd
 import mr.merc.unit.view.SoldierTypeViewInfo
 import mr.merc.unit.sound.AttackSound
 import mr.merc.unit.sound.PainSound
+import mr.merc.unit.sound.AttackSound
 
 class SoldierRangedAttackMovement(val from: (Int, Int), val to: (Int, Int), val dir: Direction,
   val attacker: SoldierView, val defender: SoldierView, result: AttackResult) extends Movement {
   private val projectileName = attacker.soldier.soldierType.attacks(result.attackIndex).projectileName(result.success).get
   val projectileView = Projectile(projectileName).buildView(dir, from, to)
   private var attackerFinishedHisThrowingMove = false
+  private var painSoundPlayed = false
 
   private val damageNumberMovement: Option[ShowingNumberDrawerMovement] = if (result.success) {
     Some(ShowingNumberDrawerMovement.damage(to._1, to._2, result.damage))
@@ -37,6 +39,7 @@ class SoldierRangedAttackMovement(val from: (Int, Int), val to: (Int, Int), val 
   override def start() {
     super.start()
     attacker.state = SoldierViewAttackState(result.success, dir, result.attackIndex)
+    attacker.sounds.get(AttackSound(result.attackIndex, result.success)).foreach(_.play)
   }
 
   override def update(time: Int) = {
@@ -50,6 +53,12 @@ class SoldierRangedAttackMovement(val from: (Int, Int), val to: (Int, Int), val 
         attacker.state = StandState
         projectileView.state = ProjectileStart
       }
+    }
+
+    if (Set(ProjectileNotRender, ProjectileEnd).contains(projectileView.state) &&
+      !painSoundPlayed && attackerFinishedHisThrowingMove && result.success) {
+      defender.sounds.get(PainSound).foreach(_.play)
+      painSoundPlayed = true
     }
 
     if (!numbersAreOver) {

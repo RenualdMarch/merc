@@ -68,10 +68,15 @@ object SoldierTypeViewInfo {
       val attackNodeOpt = getNode(node, "attack" + (number + 1))
       attackNodeOpt match {
         case Some(attackNode) => {
-          val succ = (attackNode \ "@succ").toString()
-          val fail = (attackNode \ "@fail").toString()
-          map += AttackSound(number, true) -> succ
-          map += AttackSound(number, false) -> fail
+          if ((attackNode \ "@succ").nonEmpty) {
+            val succ = (attackNode \ "@succ").toString()
+            map += AttackSound(number, true) -> succ
+          }
+
+          if ((attackNode \ "@fail").nonEmpty) {
+            val fail = (attackNode \ "@fail").toString()
+            map += AttackSound(number, false) -> fail
+          }
         }
         case None => // do nothing
       }

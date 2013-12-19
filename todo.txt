@@ -11,10 +11,12 @@ For M3, these things should be completed and tested!!!!
 +Any number of attacks in config
 +Add damage numbers during attack
 +Simple minimap
-Sounds
++Sounds
 Music
+Use config for everything needed
 UI - improve soldier panel
 Fix bug with movement state still present even when movement is over(movement without attack)
 add tip for attack selection
 Using mage image, center circle
 Village defence
+

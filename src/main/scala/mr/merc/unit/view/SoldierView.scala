@@ -59,7 +59,10 @@ class SoldierView(val soldier: Soldier) extends Sprite[SoldierViewState](Soldier
       drawOvalUnderSoldier(gc)
     }
 
-    drawAttackStatusCircleNearSoldier(gc)
+    if (state != DeathState && state != NoState) {
+      drawAttackStatusCircleNearSoldier(gc)
+    }
+
     super.drawItself(gc)
 
     if (state != DeathState && state != NoState) {

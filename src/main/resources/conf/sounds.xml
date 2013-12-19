@@ -1,3 +1,18 @@
 <sounds>
-	<sound name="" path=""/>
+	<!-- effects -->
+	<sound name="fireExplosion" path="fire.wav"/>
+	
+	<!-- attacks -->
+	<sound name="magicAttack1" path="magic-missile-1.ogg"/>
+	<sound name="magicAttack1Fail" path="magic-missile-1-miss.ogg"/>
+	<sound name="spear" path="spear.wav"/>
+	<sound name="spearFail" path="spear-miss.ogg"/>
+	<sound name="staff" path="staff.wav"/>
+		
+	<!-- movements -->
+	<sound name="horseMovement" path="horse-elf-canter.wav"/>
+	
+	<!-- pain -->
+	<sound name="horsePain" path="horse-die.ogg"/>
+	<sound name="humanPain1" path="human-die-1.ogg"/>
 </sounds>
