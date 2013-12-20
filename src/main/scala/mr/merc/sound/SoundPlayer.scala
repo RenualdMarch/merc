@@ -2,35 +2,25 @@ package mr.merc.sound
 
 import scala.concurrent._
 import ExecutionContext.Implicits.global
+import mr.merc.conf.Conf
 
 object SoundPlayer {
-  private val soundsEnabled = true
-
-  def playSound(path: String, s: BaseAudioRenderer.Status => Unit): AudioEventsListener = {
-    if (soundsEnabled) {
-      val r = renderer(path)
-      r.setAudioEventsListener(new AudioEventsListener {
-        def apply(newStatus: BaseAudioRenderer.Status) = {
-          s(newStatus)
-        }
-      })
+  def playSound(path: String, s: Status => Unit) {
+    if (Conf.bool("Sound")) {
       future {
-        r.play(getClass.getResource(path))
+        renderer(path, s).play(getClass.getResource(path))
       }
-      r.getAudioEventsListener()
-    } else {
-      null
     }
   }
 
-  private def renderer(path: String): BaseAudioRenderer = {
+  private def renderer(path: String, s: Status => Unit): BaseAudioRenderer = {
     val lowercase = path.toLowerCase
     if (lowercase.endsWith("wav")) {
-      new WaveRenderer
+      new WavRenderer(s)
     } else if (lowercase.endsWith("ogg")) {
-      new JOrbisOggRenderer
+      new JOrbisOggRenderer(s)
     } else if (lowercase.endsWith("mp3")) {
-      new JavaLayerMp3Renderer
+      new JavaLayerMp3Renderer(s)
     } else {
       throw new IllegalArgumentException("Renderer for path " + path + " is not found!")
     }

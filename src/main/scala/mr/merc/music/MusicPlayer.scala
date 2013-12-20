@@ -5,6 +5,7 @@ import scala.util.Random
 import mr.merc.sound.Sound
 import mr.merc.sound.BaseAudioRenderer
 import mr.merc.conf.Conf
+import mr.merc.sound.EndOfSound
 
 object MusicPlayer {
 
@@ -19,12 +20,12 @@ object MusicPlayer {
   def playMusic() {
     if (!Conf.bool("Music")) {
       _musicPlaying = false
-      return ;
+      return
     }
 
     _musicPlaying = true
     new Sound(randomSong, s => {
-      if (s == BaseAudioRenderer.Status.END_OF_SOUND) {
+      if (s == EndOfSound) {
         playMusic()
       }
     }).play()

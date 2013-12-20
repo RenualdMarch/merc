@@ -13,7 +13,7 @@ For M3, these things should be completed and tested!!!!
 +Simple minimap
 +Sounds
 +Music
-rewrite java classes to scala
++rewrite java classes to scala()
 Use config for everything needed(Sound and Music enabling)
 UI - improve soldier panel
 add tip for attack selection

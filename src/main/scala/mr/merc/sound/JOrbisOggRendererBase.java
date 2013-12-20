@@ -19,12 +19,23 @@ import com.jcraft.jorbis.Comment;
 import com.jcraft.jorbis.DspState;
 import com.jcraft.jorbis.Info;
 
-public class JOrbisOggRenderer extends BaseAudioRenderer {
+// TODO remove this terrible mess!!! And replace it with something simple
+public class JOrbisOggRendererBase {
+
+	private final JOrbisOggRenderer parent;
+
+	public JOrbisOggRendererBase(JOrbisOggRenderer parent) {
+		this.parent = parent;
+	}
+
+	public void setStatus(Status status) {
+		parent.setStatus(status);
+	}
 
 	private static final int BUFSIZE = 4096 * 2;
 
-	private static int convsize = JOrbisOggRenderer.BUFSIZE * 2;
-	private static byte[] convbuffer = new byte[JOrbisOggRenderer.convsize];
+	private static int convsize = BUFSIZE * 2;
+	private static byte[] convbuffer = new byte[convsize];
 
 	private SyncState oy;
 	private StreamState os;
@@ -44,8 +55,7 @@ public class JOrbisOggRenderer extends BaseAudioRenderer {
 
 	private InputStream bitStream;
 
-	@Override
-	protected void playSound(URL audiofile) {
+	public void playSound(URL audiofile) {
 		try {
 			bitStream = audiofile.openStream();
 		} catch (Exception e) {
@@ -125,23 +135,22 @@ public class JOrbisOggRenderer extends BaseAudioRenderer {
 		loop: while (true) {
 			int eos = 0;
 
-			int index = oy.buffer(JOrbisOggRenderer.BUFSIZE);
+			int index = oy.buffer(BUFSIZE);
 			buffer = oy.data;
 			try {
-				bytes = bitStream
-						.read(buffer, index, JOrbisOggRenderer.BUFSIZE);
+				bytes = bitStream.read(buffer, index, BUFSIZE);
 			} catch (Exception e) {
-				setStatus(Status.ERROR);
+				setStatus(SoundError$.MODULE$);
 				System.err.println(e);
 				return;
 			}
 			oy.wrote(bytes);
 
 			if (oy.pageout(og) != 1) {
-				if (bytes < JOrbisOggRenderer.BUFSIZE) {
+				if (bytes < BUFSIZE) {
 					break;
 				}
-				setStatus(Status.ERROR);
+				setStatus(SoundError$.MODULE$);
 				System.err
 						.println("Input does not appear to be an Ogg bitstream.");
 				return;
@@ -155,7 +164,7 @@ public class JOrbisOggRenderer extends BaseAudioRenderer {
 
 			if (os.pagein(og) < 0) {
 				// error; stream version mismatch perhaps
-				setStatus(Status.ERROR);
+				setStatus(SoundError$.MODULE$);
 				System.err
 						.println("Error reading first page of Ogg bitstream data.");
 				return;
@@ -163,7 +172,7 @@ public class JOrbisOggRenderer extends BaseAudioRenderer {
 
 			if (os.packetout(op) != 1) {
 				// no page? must not be vorbis
-				setStatus(Status.ERROR);
+				setStatus(SoundError$.MODULE$);
 				System.err.println("Error reading initial header packet.");
 				break;
 				// return;
@@ -171,7 +180,7 @@ public class JOrbisOggRenderer extends BaseAudioRenderer {
 
 			if (vi.synthesis_headerin(vc, op) < 0) {
 				// error case; not a vorbis header
-				setStatus(Status.ERROR);
+				setStatus(SoundError$.MODULE$);
 				System.err
 						.println("This Ogg bitstream does not contain Vorbis audio data.");
 				return;
@@ -193,7 +202,7 @@ public class JOrbisOggRenderer extends BaseAudioRenderer {
 								break;
 							}
 							if (result == -1) {
-								setStatus(Status.ERROR);
+								setStatus(SoundError$.MODULE$);
 								System.err
 										.println("Corrupt secondary header.  Exiting.");
 								// return;
@@ -205,19 +214,18 @@ public class JOrbisOggRenderer extends BaseAudioRenderer {
 					}
 				}
 
-				index = oy.buffer(JOrbisOggRenderer.BUFSIZE);
+				index = oy.buffer(BUFSIZE);
 				buffer = oy.data;
 				try {
-					bytes = bitStream.read(buffer, index,
-							JOrbisOggRenderer.BUFSIZE);
+					bytes = bitStream.read(buffer, index, BUFSIZE);
 				} catch (Exception e) {
-					setStatus(Status.ERROR);
+					setStatus(SoundError$.MODULE$);
 					System.err.println(e);
 					return;
 				}
 
 				if (bytes == 0 && i < 2) {
-					setStatus(Status.ERROR);
+					setStatus(SoundError$.MODULE$);
 					System.err
 							.println("End of file before finding all Vorbis headers!");
 					return;
@@ -226,8 +234,7 @@ public class JOrbisOggRenderer extends BaseAudioRenderer {
 				oy.wrote(bytes);
 			}
 
-			JOrbisOggRenderer.convsize = JOrbisOggRenderer.BUFSIZE
-					/ vi.channels;
+			convsize = BUFSIZE / vi.channels;
 
 			vd.synthesis_init(vi);
 			vb.init(vd);
@@ -240,7 +247,7 @@ public class JOrbisOggRenderer extends BaseAudioRenderer {
 			while (eos == 0) {
 				while (eos == 0) {
 
-					if (getStatus() != Status.PLAYING) {
+					if (!parent.getStatus().equals(Playing$.MODULE$)) {
 						try {
 							// outputLine.drain();
 							// outputLine.stop();
@@ -283,8 +290,8 @@ public class JOrbisOggRenderer extends BaseAudioRenderer {
 								while ((samples = vd.synthesis_pcmout(_pcmf,
 										_index)) > 0) {
 									float[][] pcmf = _pcmf[0];
-									int bout = (samples < JOrbisOggRenderer.convsize ? samples
-											: JOrbisOggRenderer.convsize);
+									int bout = (samples < convsize ? samples
+											: convsize);
 
 									// convert doubles to 16 bit signed ints
 									// (host order) and
@@ -304,14 +311,13 @@ public class JOrbisOggRenderer extends BaseAudioRenderer {
 											if (val < 0) {
 												val = val | 0x8000;
 											}
-											JOrbisOggRenderer.convbuffer[ptr] = (byte) (val);
-											JOrbisOggRenderer.convbuffer[ptr + 1] = (byte) (val >>> 8);
+											convbuffer[ptr] = (byte) (val);
+											convbuffer[ptr + 1] = (byte) (val >>> 8);
 											ptr += 2 * (vi.channels);
 										}
 									}
-									outputLine.write(
-											JOrbisOggRenderer.convbuffer, 0, 2
-													* vi.channels * bout);
+									outputLine.write(convbuffer, 0, 2
+											* vi.channels * bout);
 									vd.synthesis_read(bout);
 								}
 							}
@@ -323,13 +329,12 @@ public class JOrbisOggRenderer extends BaseAudioRenderer {
 				}
 
 				if (eos == 0) {
-					index = oy.buffer(JOrbisOggRenderer.BUFSIZE);
+					index = oy.buffer(BUFSIZE);
 					buffer = oy.data;
 					try {
-						bytes = bitStream.read(buffer, index,
-								JOrbisOggRenderer.BUFSIZE);
+						bytes = bitStream.read(buffer, index, BUFSIZE);
 					} catch (Exception e) {
-						setStatus(Status.ERROR);
+						setStatus(SoundError$.MODULE$);
 						System.err.println(e);
 						return;
 					}
@@ -358,7 +363,7 @@ public class JOrbisOggRenderer extends BaseAudioRenderer {
 		} catch (Exception e) {
 		}
 
-		setStatus(Status.END_OF_SOUND);
+		setStatus(EndOfSound$.MODULE$);
 	}
 
 }
