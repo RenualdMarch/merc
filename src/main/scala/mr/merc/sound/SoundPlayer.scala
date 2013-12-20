@@ -6,11 +6,20 @@ import ExecutionContext.Implicits.global
 object SoundPlayer {
   private val soundsEnabled = true
 
-  def playSound(path: String) {
+  def playSound(path: String, s: BaseAudioRenderer.Status => Unit): AudioEventsListener = {
     if (soundsEnabled) {
+      val r = renderer(path)
+      r.setAudioEventsListener(new AudioEventsListener {
+        def apply(newStatus: BaseAudioRenderer.Status) = {
+          s(newStatus)
+        }
+      })
       future {
-        renderer(path).play(getClass.getResource(path))
+        r.play(getClass.getResource(path))
       }
+      r.getAudioEventsListener()
+    } else {
+      null
     }
   }
 

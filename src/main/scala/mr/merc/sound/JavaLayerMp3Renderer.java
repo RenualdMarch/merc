@@ -8,18 +8,29 @@ import java.net.URL;
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.FactoryRegistry;
 import javazoom.jl.player.Player;
+import javazoom.jl.player.advanced.AdvancedPlayer;
+import javazoom.jl.player.advanced.PlaybackEvent;
+import javazoom.jl.player.advanced.PlaybackListener;
 
+// TODO rewrite into scala
 public class JavaLayerMp3Renderer extends BaseAudioRenderer {
 
-	private Player player;
+	private AdvancedPlayer player;
 
 	@Override
 	protected void playSound(final URL audiofile) {
 		try {
-			player = new Player(
-					new BufferedInputStream(audiofile.openStream()),
-					FactoryRegistry.systemRegistry().createAudioDevice());
+			player = new AdvancedPlayer(new BufferedInputStream(
+					audiofile.openStream()), FactoryRegistry.systemRegistry()
+					.createAudioDevice());
 
+			player.setPlayBackListener(new PlaybackListener() {
+				@Override
+				public void playbackFinished(PlaybackEvent pe) {
+					super.playbackFinished(pe);
+					setStatus(Status.END_OF_SOUND);
+				}
+			});
 			player.play();
 		} catch (IOException e) {
 			setStatus(Status.ERROR);
@@ -29,16 +40,5 @@ public class JavaLayerMp3Renderer extends BaseAudioRenderer {
 			setStatus(Status.ERROR);
 			System.err.println("Problem playing audio: " + e);
 		}
-	}
-
-	@Override
-	public Status getStatus() {
-		if (player != null) {
-			// return EOS if the sound has been completed played
-			return (player.isComplete()) ? Status.END_OF_SOUND : super
-					.getStatus();
-		}
-
-		return super.getStatus();
 	}
 }

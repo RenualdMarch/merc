@@ -41,7 +41,7 @@ public abstract class BaseAudioRenderer {
 			this.status = status;
 
 			if (getAudioEventsListener() != null) {
-				getAudioEventsListener().notifyStatusChange(status);
+				getAudioEventsListener().apply(status);
 				if (status == Status.END_OF_SOUND || status == Status.ERROR) {
 					setAudioEventsListener(null);
 				}

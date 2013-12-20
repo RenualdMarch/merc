@@ -1,5 +1,6 @@
 package mr.merc.sound
 
+// TODO make into function
 trait AudioEventsListener {
-  def notifyStatusChange(newStatus: BaseAudioRenderer.Status)
+  def apply(newStatus: BaseAudioRenderer.Status)
 }

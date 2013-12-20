@@ -12,11 +12,14 @@ For M3, these things should be completed and tested!!!!
 +Add damage numbers during attack
 +Simple minimap
 +Sounds
-Music
-Use config for everything needed
++Music
+rewrite java classes to scala
+Use config for everything needed(Sound and Music enabling)
 UI - improve soldier panel
-Fix bug with movement state still present even when movement is over(movement without attack)
 add tip for attack selection
 Using mage image, center circle
 Village defence
+Minimap must be same shape as field and with square cells
+
+play testing, bug fixing
 

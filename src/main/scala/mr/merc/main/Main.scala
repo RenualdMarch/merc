@@ -46,6 +46,7 @@ import java.io.FileInputStream
 import java.util.PropertyResourceBundle
 import mr.merc.local.MercResourceBundle
 import mr.merc.ui.battle.BattleFrame
+import mr.merc.music.MusicPlayer
 
 object Main extends JFXApp {
   val battleFrame = new BattleFrame
@@ -59,5 +60,6 @@ object Main extends JFXApp {
       root = rootPane
     }
   }
+  MusicPlayer.playMusic()
 
 }
