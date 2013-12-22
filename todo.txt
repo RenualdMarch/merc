@@ -26,7 +26,9 @@ play testing, bug fixing
 For M4 following features are planned:
 Move attack view configures to attack view
 Shown map of any size
-Show defence when select where to move - in color
+Make default resistance zero
+Use Grass movement and defence for Road and Bridges
+Show defence when select where to move - in colour
 All human soldiers of 0 and 1 level are present
 Game menu
 Game option
@@ -35,7 +37,6 @@ AI - tournament mode
 Primitive map generation
 Changing position on minimap
 Create assembly for different platforms
-Use Grass movement and defence for Road and Bridges
 long play testing, bug fixing
 
 M5 going to be 0.1 - Vertical slice of game 
