@@ -23,6 +23,7 @@
 			<defence type="Road" defence="40"/>
 			<defence type="Sand" defence="30"/>
 			<defence type="Grass" defence="40"/>
+			<defence type="Village" defence="40"/>
 		</defences>
 		<resistances>
 			<resistance type="Blade" resistance="20"/>
@@ -57,6 +58,7 @@
 			<defence type="Road" defence="40"/>
 			<defence type="Sand" defence="30"/>
 			<defence type="Grass" defence="40"/>
+			<defence type="Village" defence="60"/>
 		</defences>
 		<resistances>
 			<resistance type="Blade" resistance="0"/>

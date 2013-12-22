@@ -171,13 +171,13 @@ class AttackSelectionDialog(attacker: Soldier, defender: Soldier, attackerHex: T
     attacks map (a => {
       val defendersAttackOpt = Attack.selectBestAttackForDefender(attacker, defender, a)
       val attackDamage = Attack.possibleAttackersDamage(true, attacker, defender, a, defendersAttackOpt)
-      val attackesChance = a.chanceOfSuccess(defender.soldierType.defence(defenderHex.terrain))
+      val attackesChance = a.chanceOfSuccess(Attack.calculateSoldierDefence(defender, defenderHex))
 
       val attackerChoice = AttackChoice(a.imageName, attackDamage, a.count, attackesChance, a.attributes)
       defendersAttackOpt match {
         case Some(defendersAttack) => {
           val defenderDamage = Attack.possibleAttackersDamage(false, defender, attacker, defendersAttack, Some(a))
-          val defenderChance = defendersAttack.chanceOfSuccess(attacker.soldierType.defence(attackerHex.terrain))
+          val defenderChance = defendersAttack.chanceOfSuccess(Attack.calculateSoldierDefence(attacker, attackerHex))
           val defenderChoice = AttackChoice(defendersAttack.imageName, defenderDamage, defendersAttack.count,
             defenderChance, defendersAttack.attributes)
           (attackerChoice, Some(defenderChoice))

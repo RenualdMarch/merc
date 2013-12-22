@@ -13,7 +13,7 @@ object AttackSelectionHelper {
         case (a, n) =>
           val defenderAttack = Attack.selectBestAttackForDefender(attacker, defender, a)
           val damage = Attack.possibleAttackersDamage(true, attacker, defender, a, defenderAttack) * a.count
-          val chance = a.chanceOfSuccess(defender.soldierType.defence(defenderHex.terrain))
+          val chance = a.chanceOfSuccess(Attack.calculateSoldierDefence(defender, defenderHex))
           (damage * chance.chanceNumber, n)
       }.sortBy(-_._1).head._2
     }

@@ -2,6 +2,8 @@ package mr.merc.unit
 
 import mr.merc.map.hex.TerrainHex
 import scala.util.Random
+import mr.merc.map.terrain.Village
+import mr.merc.map.objects.House
 
 object Attack {
   private val maxChance = 100
@@ -23,9 +25,11 @@ object Attack {
     }
 
     val resultAttacks = for (i <- 0 until rounds) yield {
-      val attackerStrikes = generateAttacks(true, attacker, defender, defender.soldierType.defence(defenderHex.terrain), attackerSelection, defenderSelection, f)
+      val attackerDefence = calculateSoldierDefence(attacker, attackerHex)
+      val defenderDefence = calculateSoldierDefence(defender, defenderHex)
+      val attackerStrikes = generateAttacks(true, attacker, defender, defenderDefence, attackerSelection, defenderSelection, f)
       val defenderStrikes = defenderSelection match {
-        case Some(attack) => generateAttacks(false, defender, attacker, attacker.soldierType.defence(attackerHex.terrain), attack, Some(attackerSelection), f)
+        case Some(attack) => generateAttacks(false, defender, attacker, attackerDefence, attack, Some(attackerSelection), f)
         case None => Nil
       }
 
@@ -44,7 +48,7 @@ object Attack {
     filteredAttacks
   }
 
-  private def generateAttacks(attackerIsAttacking: Boolean, attacker: Soldier, defender: Soldier, defence: Int, attackersAttack: Attack, defendersAttack: Option[Attack], f: ChanceOfSuccess => Boolean): List[AttackResult] = {
+  private def generateAttacks(attackerIsAttacking: Boolean, attacker: Soldier, defender: Soldier, defence: SoldierDefence, attackersAttack: Attack, defendersAttack: Option[Attack], f: ChanceOfSuccess => Boolean): List[AttackResult] = {
     val retVal = for (i <- 0 until attackersAttack.count) yield {
       val damage = Attack.possibleAttackersDamage(attackerIsAttacking, attacker, defender, attackersAttack, defendersAttack)
       val drained = if (attackersAttack.attributes.contains(Drain)) {
@@ -58,6 +62,14 @@ object Attack {
     }
 
     retVal.toList
+  }
+
+  def calculateSoldierDefence(soldier: Soldier, hex: TerrainHex): SoldierDefence = {
+    if (hex.mapObj == Some(House)) {
+      SoldierDefence(soldier.soldierType.defence(Village))
+    } else {
+      SoldierDefence(soldier.soldierType.defence(hex.terrain))
+    }
   }
 
   private def mergeAttacks(attacker: List[AttackResult], defender: List[AttackResult], acc: List[AttackResult] = Nil): List[AttackResult] = {
@@ -197,13 +209,14 @@ class Attack(val imageName: String, val damage: Int, val count: Int, val attackT
     case false => projectile map (_ + "-fail")
   }
 
-  def chanceOfSuccess(enemysDefence: Int): ChanceOfSuccess = if (attributes.contains(Magical)) {
+  def chanceOfSuccess(enemysDefence: SoldierDefence): ChanceOfSuccess = if (attributes.contains(Magical)) {
     ChanceOfSuccess(70)
-  } else if (attributes.contains(Marksman) && enemysDefence > 40) {
+  } else if (attributes.contains(Marksman) && enemysDefence.defence > 40) {
     ChanceOfSuccess(60)
   } else {
-    ChanceOfSuccess(100 - enemysDefence)
+    ChanceOfSuccess(100 - enemysDefence.defence)
   }
 }
 
 case class ChanceOfSuccess(val chanceNumber: Int) extends AnyVal
+case class SoldierDefence(val defence: Int) extends AnyVal
