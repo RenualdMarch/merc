@@ -13,6 +13,10 @@ object Util extends FunSuite {
     new SoldierType("type0", 1, hp, 1, 10, 1,
       List(new Attack("name", attackDamage, attackCount, Impact, false, attributes)),
       Map(), Map(Sand -> defence), Map(Impact -> resistance))
+  def soldierType(defence: Int, attacks: List[Attack]) =
+    new SoldierType("type0", 1, 100, 1, 10, 1,
+      attacks, Map(), Map(Sand -> defence), Map(Impact -> 0))
+
   def f(t: Int)(c: ChanceOfSuccess): Boolean = t <= c.chanceNumber
 
   def attackByAttackerGeneric(results: List[AttackResult], attacker: Soldier, defender: Soldier,

@@ -1,9 +1,14 @@
 package mr.merc.local
 
-
 import org.scalatest.FunSuite
+import org.scalatest.BeforeAndAfterAll
+import mr.merc.conf.Conf
 
-class LocalizationTest extends FunSuite {
+class LocalizationTest extends FunSuite with BeforeAndAfterAll {
+
+  override def beforeAll() {
+    Conf.writeChanges(Map("Language" -> "en"), true, false)
+  }
 
   test("message without parameters") {
     val actualMessage: String = Localization("default.message")

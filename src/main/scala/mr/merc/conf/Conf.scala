@@ -7,11 +7,23 @@ import java.io.FileOutputStream
 import collection.JavaConversions._
 import scala.concurrent._
 import java.util.concurrent.Executors
+import java.util.Locale
+import mr.merc.local.Localization
 
 object Conf {
   private implicit val executor = ExecutionContext.fromExecutor(Executors.newSingleThreadExecutor())
   val confPath = "merc.properties"
-  val defaultConf = Map("Sound" -> "true", "Music" -> "true", "devMode" -> "true")
+  val defaultConf = Map("Sound" -> "true", "Music" -> "true", "DevMode" -> "true") ++ localizationProps
+
+  private def localizationProps: Map[String, String] = {
+    val currentLanguage = Locale.getDefault().getLanguage()
+    if (Localization.languages.contains(currentLanguage)) {
+      Map("Language" -> currentLanguage)
+    } else {
+      Map("Language" -> "en")
+    }
+
+  }
 
   private var conf: Conf = readProperties
   def string(name: String) = conf.properties(name)
@@ -35,16 +47,22 @@ object Conf {
     new Conf(defaultConf ++ values)
   }
 
-  def writeChanges(changes: Map[String, String]) {
-    conf = new Conf(conf.properties ++ changes)
-    val f = future {
-      val props = new Properties
-      conf.properties foreach { case (k, v) => props.put(k, v) }
-      val out = new FileOutputStream(confPath)
-      try {
-        props.store(out, null)
-      } finally {
-        out.close()
+  def writeChanges(changes: Map[String, String], applyChanges: Boolean, writeToFile: Boolean = true) {
+    if (applyChanges) {
+      conf = new Conf(conf.properties ++ changes)
+    }
+
+    if (writeToFile) {
+      future {
+        conf = new Conf(readProperties.properties ++ changes)
+        val props = new Properties
+        conf.properties.foreach { case (k, v) => props.put(k, v) }
+        val out = new FileOutputStream(confPath)
+        try {
+          props.store(out, null)
+        } finally {
+          out.close()
+        }
       }
     }
 

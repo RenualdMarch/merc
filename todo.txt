@@ -13,13 +13,24 @@ For M3, these things should be completed and tested!!!!
 +Simple minimap
 +Sounds
 +Music
-+rewrite java classes to scala()
-Use config for everything needed(Sound and Music enabling)
++rewrite java classes to scala
++Use config for everything needed(Sound and Music enabling)
++Minimap must be same shape as field and with square cells
++add tip for attack selection
 UI - improve soldier panel
-add tip for attack selection
 Using mage image, center circle
 Village defence
-Minimap must be same shape as field and with square cells
-
 play testing, bug fixing
 
+
+For M4 following features are planned:
+Move attack view configures to attack view
+Shown map of any size
+All human soldiers of 0 and 1 level are present
+Game menu
+Game option
+AI - different implementations
+AI - tournament mode
+Primitive map generation
+Changing position on minimap
+long play testing, bug fixing

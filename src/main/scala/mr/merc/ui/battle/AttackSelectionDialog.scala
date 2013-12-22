@@ -25,6 +25,7 @@ import scalafx.scene.image.ImageView
 import scalafx.scene.control.ContentDisplay
 import mr.merc.image.MImage
 import mr.merc.unit.AttackAttribute
+import mr.merc.ai.AttackSelectionHelper
 
 class AttackSelectionDialog(attacker: Soldier, defender: Soldier, attackerHex: TerrainHex,
   defenderHex: TerrainHex) extends Stage {
@@ -42,7 +43,8 @@ class AttackSelectionDialog(attacker: Soldier, defender: Soldier, attackerHex: T
   private val table = new TableView[AttackPair](data) {
     tableColumns foreach (c => columns += c)
     selectionModel.value.cellSelectionEnabled = false
-    selectionModel.value.select(0)
+    val bestAttack = AttackSelectionHelper.selectBestAttack(attacker, defender, attackerHex, defenderHex)
+    selectionModel.value.select(bestAttack)
   }
 
   tableWidth <== table.width

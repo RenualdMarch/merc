@@ -22,27 +22,33 @@ class Minimap(field: TerrainHexField) extends VBox {
   }
 
   private def draw() {
+    val size = MinimapSize(field.width, field.height, width.value.toInt, height.value.toInt)
+
     val w = width.value
     val h = height.value
     if (w == 0 || h == 0) {
       return ;
     }
 
+    val xOffset = (w - size.minimapUsefulWidth) / 2
+    val yOffset = (h - size.minimapUsefulHeight) / 2
+
     val gc = canvas.graphicsContext2D
     gc.save()
     gc.fill = Color.BLACK
     gc.fillRect(0, 0, w, h)
 
-    val horizontalSide = w / field.width
-    val verticalSide = h / field.height
-
+    val side = size.cellSide
     field.hexes.foreach { hex =>
-      val x = hex.x * horizontalSide
-      val offset = if (hex.x % 2 == 0) 0 else verticalSide / 2
-      val y = hex.y * verticalSide + offset
+      val x = hex.x * side + xOffset
+      val offset = if (hex.x % 2 == 0) 0 else side / 2
+      val y = hex.y * side + offset + yOffset
       gc.fill = color(hex)
-      gc.fillRect(x, y, horizontalSide, verticalSide)
+      gc.fillRect(x, y, side, side)
     }
+
+    gc.stroke = Color.GRAY
+    gc.strokeRect(xOffset, yOffset, size.minimapUsefulWidth, size.minimapUsefulHeight)
 
     gc.restore()
   }

@@ -3,29 +3,30 @@ package mr.merc.local
 import scala.io.Source
 import java.net.URI
 import scala.io.Codec
+import mr.merc.conf.Conf
 
 object Localization {
-  private [local] lazy val messages: Map[String, Map[String, String]] = initMessages()
+  private[local] lazy val messages: Map[String, Map[String, String]] = initMessages()
+
+  def languages = List("en", "ua", "ru")
 
   private val MessageSeparator = "="
   private val ParamHolder = "%s"
 
   //TODO take from configuration
-  private val currentLanguage = "en"
+  private def currentLanguage = Conf.string("Language")
   private val filenamePattern = "/local/messages"
-  private val languages = List("en", "ua", "ru")
+  def apply(key: String, params: Any*) = getMessage(currentLanguage, key, params: _*)
 
-  def apply(key: String, params: Any*) = getMessage(currentLanguage, key, params:_*)
-
-  private def getMessage(language:String, key: String, params: Any*) = {
+  private def getMessage(language: String, key: String, params: Any*) = {
     messages(language).get(key) match {
-      case Some(message) => putParamsInMessage(message, params:_*)
+      case Some(message) => putParamsInMessage(message, params: _*)
       case None => key
     }
   }
 
   private def putParamsInMessage(message: String, params: Any*) = {
-    params.foldLeft(message) ((msg, p) =>
+    params.foldLeft(message)((msg, p) =>
       msg.replaceFirst(ParamHolder, p.toString))
   }
 
@@ -43,9 +44,8 @@ object Localization {
       val separatorIndex = line.indexOf(MessageSeparator)
       val key = line.take(separatorIndex)
       val message = line.drop(separatorIndex + MessageSeparator.size)
-      key-> message
-      }).toMap
+      key -> message
+    }).toMap
   }
 
-  
 }
