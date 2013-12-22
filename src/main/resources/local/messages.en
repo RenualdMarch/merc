@@ -1,6 +1,7 @@
 soldier.hp=Hit Points
 soldier.name=Name
 soldier.level=Level
+soldier.type=Type
 turn.end=Turn end
 common.ok=Ok
 common.cancel=Cancel

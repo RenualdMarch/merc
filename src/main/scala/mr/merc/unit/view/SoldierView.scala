@@ -87,10 +87,10 @@ class SoldierView(val soldier: Soldier) extends Sprite[SoldierViewState](Soldier
     gc.save()
     gc.fill = soldier.player.color
     gc.globalAlpha = 0.2
-    gc.fillOval(x + 9, y + 48, 48, 24)
+    gc.fillOval(x + 9, y + 44, 48, 24)
     gc.globalAlpha = 1
     gc.stroke = soldier.player.color
-    gc.strokeOval(x + 9, y + 48, 48, 24)
+    gc.strokeOval(x + 9, y + 44, 48, 24)
     gc.restore()
   }
 

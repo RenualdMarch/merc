@@ -1,6 +1,7 @@
 soldier.hp=Хит Поинты
 soldier.name=Имя
 soldier.level=Уровень
+soldier.type=Тип
 turn.end=Конец хода
 common.ok=Ок
 common.cancel=Отмена

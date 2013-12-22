@@ -17,8 +17,8 @@ For M3, these things should be completed and tested!!!!
 +Use config for everything needed(Sound and Music enabling)
 +Minimap must be same shape as field and with square cells
 +add tip for attack selection
-UI - improve soldier panel
-Using mage image, center circle
++UI - improve soldier panel
++Using mage image, center circle
 Village defence
 play testing, bug fixing
 

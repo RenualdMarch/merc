@@ -61,15 +61,16 @@ class BattleFrame extends BattleControllerParent {
 
   private val battleCanvas = new Canvas()
   private val minimap = new Minimap(field)
-  private val soldierImageView = new ImageView()
   private val soldierName = new Text()
   private val soldierLevel = new Text()
   private val soldierHP = new Text()
+  private val soldierType = new Text()
   private val endTurnButton = new Button() {
     text = Localization("turn.end")
   }
 
   private val soldierWrapper = controller.soldierToShow
+  private val soldierViewControl = new SoldierViewControl(soldierWrapper)
 
   private def gc = battleCanvas.graphicsContext2D
 
@@ -78,23 +79,27 @@ class BattleFrame extends BattleControllerParent {
     style = "-fx-background-color: cyan"
     spacing = 20
     alignment = TOP_CENTER
-    content = List[Node](minimap, soldierImageView, new GridPane {
+    content = List[Node](minimap, soldierViewControl, new GridPane {
       vgap = 20
       hgap = 10
       alignment = TOP_LEFT
       style = "-fx-padding: 0 0 0 100;"
       add(new Text {
-        text = Localization("soldier.name")
+        text = Localization("soldier.type")
       }, 0, 0)
-      add(soldierName, 1, 0)
+      add(soldierType, 1, 0)
+      add(new Text {
+        text = Localization("soldier.name")
+      }, 0, 1)
+      add(soldierName, 1, 1)
       add(new Text {
         text = Localization("soldier.level")
-      }, 0, 1)
-      add(soldierLevel, 1, 1)
+      }, 0, 2)
+      add(soldierLevel, 1, 2)
       add(new Text {
         text = Localization("soldier.hp")
-      }, 0, 2)
-      add(soldierHP, 1, 2)
+      }, 0, 3)
+      add(soldierHP, 1, 3)
     }, endTurnButton)
   }
 
@@ -110,6 +115,7 @@ class BattleFrame extends BattleControllerParent {
   soldierName.text <== soldierWrapper.name
   soldierLevel.text <== soldierWrapper.level
   soldierHP.text <== soldierWrapper.hp
+  soldierType.text <== soldierWrapper.soldierType
 
   // TODO remove java style here and below
   battleCanvas.delegate.addEventHandler(jfxin.MouseEvent.MOUSE_CLICKED, new jfxe.EventHandler[jfxin.MouseEvent] {
