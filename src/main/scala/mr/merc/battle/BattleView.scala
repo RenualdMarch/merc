@@ -107,7 +107,8 @@ class BattleView(model: BattleModel, _soldierDrawer: SoldiersDrawer = new Soldie
     val destination = path.tail
     val departure = path.init
     val allMovements = for ((a, b) <- departure zip destination) yield new SoldierMoveMovement(a, b, soldier)
-    mapView.addMovement(new MovementList(allMovements))
+    val standAfterMove = MomentaryMovement(soldier.state = StandState)
+    mapView.addMovement(new MovementList(allMovements :+ standAfterMove))
   }
 
   private def handleEndMoveEvent(player: Player) {

@@ -216,4 +216,18 @@ class BattleControllerTest extends FunSuite with BeforeAndAfter {
     assert(soldier.attackedThisTurn === false)
   }
 
+  test("correctly select attack from wrong hex when there is no choice") {
+    leftClick(0, 0)
+    val attacker = controller.selectedSoldier.get
+    rightClick(0, 3)
+    assert(controller.battleView.mapView.terrainView.hex(0, 3).hex.soldier.get.name === "1")
+    leftClick(0, 3)
+    moveMouse(5, 5)
+    moveMouse(0, 4)
+    assert(controller.arrowIsShown === true)
+    assert(attacker.attackedThisTurn === false)
+    rightClick(0, 4)
+    assert(attacker.attackedThisTurn === true)
+  }
+
 }

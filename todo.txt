@@ -20,7 +20,7 @@ For M3, these things should be completed and tested!!!!
 +UI - improve soldier panel
 +Using mage image, center circle
 +Village defence
-play testing, bug fixing
++play testing, bug fixing
 
 
 For M4 following features are planned:

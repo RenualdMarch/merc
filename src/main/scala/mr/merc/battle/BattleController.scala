@@ -45,6 +45,8 @@ class BattleController(gameField: GameField, parent: BattleControllerParent) {
             soldierToShow.soldier = Some(soldier)
             if (canBeCurrentHexAttackedFromPrevious) {
               drawArrowForPrevToCurrent()
+            } else if (onlyChoiceForSelectedSoldierIsAttack) {
+              drawArrowWhenOnlyChoiceForSelectedSoldierIsAttack()
             } else {
               removeArrow()
             }
@@ -88,13 +90,18 @@ class BattleController(gameField: GameField, parent: BattleControllerParent) {
     }
   }
 
-  def rightClickMouse() = withCurrent(hex => {
-    hex.soldier match {
+  def rightClickMouse() = withCurrent(currentHex => {
+    currentHex.soldier match {
       case Some(soldier) => {
         selectedSoldier match {
           case Some(attacker) => {
             val attackerHex = battleModel.hexBySoldier(attacker)
 
+            val hexFromWhichAttack = if (onlyChoiceForSelectedSoldierIsAttack) {
+              attackerHex
+            } else {
+              visitedHexesList.prev.get
+            }
             // TODO think we should remove selected soldier
             selectedSoldier = None
 
@@ -102,19 +109,19 @@ class BattleController(gameField: GameField, parent: BattleControllerParent) {
             removeMovementOptions()
 
             if (visitedHexesList.isDefined && battleModel.validateMovementAndAttack(attacker, attackerHex,
-              visitedHexesList.prev.get, visitedHexesList.current.get, 0)) {
+              hexFromWhichAttack, currentHex, 0)) {
 
-              val attackOpt = selectAttack(attacker, hex.soldier.get, visitedHexesList.prev.get, hex)
+              val attackOpt = selectAttack(attacker, currentHex.soldier.get, hexFromWhichAttack, currentHex)
               attackOpt match {
                 case Some(attack) => {
-                  if (attackerHex != visitedHexesList.prev.get) {
-                    val moveResult = battleModel.handleMovementEvent(attacker, attackerHex, visitedHexesList.prev.get)
+                  if (attackerHex != hexFromWhichAttack) {
+                    val moveResult = battleModel.handleMovementEvent(attacker, attackerHex, hexFromWhichAttack)
                     battleView.handleEvent(moveResult.buildBattleViewEvent)
                   }
 
                   val attackIndex = attacker.soldierType.attacks.indexOf(attack)
                   val attackResult = battleModel.handleEvent(AttackModelEvent(attacker,
-                    visitedHexesList.prev.get, hex, attackIndex))
+                    hexFromWhichAttack, currentHex, attackIndex))
                   battleView.handleEvent(attackResult.buildBattleViewEvent)
                 }
                 case None => // do nothing
@@ -129,8 +136,8 @@ class BattleController(gameField: GameField, parent: BattleControllerParent) {
         selectedSoldier match {
           case Some(soldier) => {
             val from = battleModel.hexBySoldier(soldier)
-            if (battleModel.validateMovementEvent(soldier, from, hex)) {
-              val result = battleModel.handleEvent(MovementModelEvent(soldier, from, hex))
+            if (battleModel.validateMovementEvent(soldier, from, currentHex)) {
+              val result = battleModel.handleEvent(MovementModelEvent(soldier, from, currentHex))
               battleView.handleEvent(result.buildBattleViewEvent)
             }
 
@@ -185,13 +192,13 @@ class BattleController(gameField: GameField, parent: BattleControllerParent) {
 
   })
 
-  private def withCurrent[T](f: TerrainHex => T) {
+  private def withCurrent[T](f: TerrainHex => T, default: T = Unit): T = {
     val hexOpt = visitedHexesList.current
     hexOpt match {
       case Some(hex) => {
         f(hex)
       }
-      case None => // do nothing
+      case None => default // do nothing
     }
   }
 
@@ -209,12 +216,26 @@ class BattleController(gameField: GameField, parent: BattleControllerParent) {
     }
   }
 
+  private[battle] def onlyChoiceForSelectedSoldierIsAttack: Boolean = withCurrent(hex =>
+    selectedSoldier match {
+      case Some(soldier) => soldier.movedThisTurn && !soldier.attackedThisTurn &&
+        battleModel.validateAttackEvent(soldier, battleModel.hexBySoldier(soldier), hex, 0)
+      case None => false
+    }, false)
+
   private def drawArrowForPrevToCurrent() {
     if (visitedHexesList.isDefined) {
       arrowIsShown = true
       battleView.handleEvent(ShowArrow(visitedHexesList.prev.get,
         visitedHexesList.current.get))
     }
+  }
+
+  private def drawArrowWhenOnlyChoiceForSelectedSoldierIsAttack() {
+    val soldier = selectedSoldier.get
+    arrowIsShown = true
+    battleView.handleEvent(ShowArrow(battleModel.hexBySoldier(soldier),
+      visitedHexesList.current.get))
   }
 
   def update(time: Int) {
