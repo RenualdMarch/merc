@@ -1,34 +1,12 @@
-For M3, these things should be completed and tested!!!!
+For M4, these things should be completed and tested
 
-+Attack attributes
-+Soldier type attributes
-+Add attributes to configuration
-+Configuration
-+add healing 2 points for not moving
-+Add mage to units and test his attack
-+Attack selection dialog
-+Soldier status ball - can move, can only attack, can do nothing
-+Any number of attacks in config
-+Add damage numbers during attack
-+Simple minimap
-+Sounds
-+Music
-+rewrite java classes to scala
-+Use config for everything needed(Sound and Music enabling)
-+Minimap must be same shape as field and with square cells
-+add tip for attack selection
-+UI - improve soldier panel
-+Using mage image, center circle
-+Village defence
-+play testing, bug fixing
-
-
-For M4 following features are planned:
-Move attack view configures to attack view
-Shown map of any size
-Make default resistance zero
 Use Grass movement and defence for Road and Bridges
+Move attack view configures to attack view
+Make default resistance zero
+Logging support
 Show defence when select where to move - in colour
+Create assembly for different platforms
+Shown map of any size
 All human soldiers of 0 and 1 level are present
 Game menu
 Game option
@@ -38,6 +16,7 @@ Primitive map generation
 Changing position on minimap
 Create assembly for different platforms
 long play testing, bug fixing
+
 
 M5 going to be 0.1 - Vertical slice of game 
 global map with several kingdoms and cities
