@@ -6,10 +6,11 @@ import javax.sound.sampled.AudioSystem
 import javax.sound.sampled.Line
 import javax.sound.sampled.LineListener
 import javax.sound.sampled.LineEvent
+import java.io.InputStream
 
 class WavRenderer(listener: Status => Unit) extends BaseAudioRenderer(listener) {
 
-  def playSound(audiofile: URL) {
+  def playSound(audiofile: InputStream) {
     val clip = AudioSystem.getLine(new Line.Info(classOf[Clip])).asInstanceOf[Clip]
 
     clip.addLineListener(new LineListener() {

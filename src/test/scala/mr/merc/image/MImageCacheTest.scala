@@ -25,7 +25,7 @@ class MImageCacheTest extends FunSuite with BeforeAndAfter with MockFactory {
   }
 
   test("throw exception when image doesn't exist") {
-    intercept[IllegalArgumentException] {
+    intercept[NullPointerException] {
       val image = MImageCache.get("/testImages/noExistingImage.png")
     }
   }

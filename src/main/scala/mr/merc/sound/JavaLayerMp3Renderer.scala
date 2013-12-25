@@ -6,13 +6,13 @@ import java.io.BufferedInputStream
 import javazoom.jl.player.FactoryRegistry
 import javazoom.jl.player.advanced.PlaybackListener
 import javazoom.jl.player.advanced.PlaybackEvent
+import java.io.InputStream
 
 class JavaLayerMp3Renderer(listener: Status => Unit) extends BaseAudioRenderer(listener) {
 
-  def playSound(audiofile: URL) {
-    val player = new AdvancedPlayer(new BufferedInputStream(
-      audiofile.openStream()), FactoryRegistry.systemRegistry()
-      .createAudioDevice())
+  def playSound(audiofile: InputStream) {
+    val player = new AdvancedPlayer(new BufferedInputStream(audiofile),
+      FactoryRegistry.systemRegistry().createAudioDevice())
 
     player.setPlayBackListener(new PlaybackListener() {
       override def playbackFinished(pe: PlaybackEvent) {

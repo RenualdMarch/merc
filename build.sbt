@@ -14,24 +14,28 @@ libraryDependencies += "org.scalafx" % "scalafx_2.10" % "1.0.0-M6"
 
 libraryDependencies += "org.scalamock" %% "scalamock-scalatest-support" % "3.0.1" % "test"
 
-libraryDependencies += "org.mockito" % "mockito-core" % "1.9.5"
+libraryDependencies += "org.mockito" % "mockito-core" % "1.9.5" % "test"
 
 libraryDependencies += "com.projectdarkstar.ext.jorbis" % "jorbis" % "0.0.17"
 
 libraryDependencies += "de.huxhorn.sulky" % "de.huxhorn.sulky.3rdparty.jlayer" % "1.0"
 
-//unmanagedJars in Compile += Attributed.blank(file(System.getenv("JAVA_HOME") + "/jre/lib/jfxrt.jar"))
+// comment next two lines to build a release
 
-//mainClass := Some("mr.merc.main.Main")
+unmanagedJars in Compile += Attributed.blank(file(System.getenv("JAVA_HOME") + "/jre/lib/jfxrt.jar"))
+
+mainClass := Some("mr.merc.main.Main")
 
 scalacOptions ++= Seq("-feature", "-deprecation", "-language:postfixOps", "-language:implicitConversions")
 
-jfxSettings
+// uncomment next two lines to build a release
 
-JFX.mainClass := Some("mr.merc.main.Main")
+//jfxSettings
 
-JFX.devKit := JFX.jdk(System.getenv("JAVA_HOME"))
+//JFX.mainClass := Some("mr.merc.main.Main")
 
-JFX.addJfxrtToClasspath := true
+//JFX.devKit := JFX.jdk(System.getenv("JAVA_HOME"))
 
-JFX.nativeBundles := "image"
+//JFX.addJfxrtToClasspath := true
+
+//JFX.nativeBundles := "image"

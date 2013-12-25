@@ -33,8 +33,7 @@ object SoldierTypeViewInfo {
   }
 
   private def parse: List[SoldierTypeViewInfo] = {
-    val path = getClass.getResource("/conf/soldierTypesView.xml").toURI
-    val xml = XML.loadFile(new File(path))
+    val xml = XML.load(getClass.getResourceAsStream("/conf/soldierTypesView.xml"))
 
     val parsed = xml \ "view" map (node => {
       val typeName = (node \ "@name").toString()

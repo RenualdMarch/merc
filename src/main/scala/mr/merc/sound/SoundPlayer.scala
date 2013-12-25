@@ -8,7 +8,7 @@ object SoundPlayer {
   def playSound(path: String, s: Status => Unit) {
     if (Conf.bool("Sound")) {
       future {
-        renderer(path, s).play(getClass.getResource(path))
+        renderer(path, s).play(getClass.getResourceAsStream(path))
       }
     }
   }

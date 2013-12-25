@@ -9,8 +9,7 @@ object SoundConfig {
   val soundsMap = loadSounds
 
   private def loadSounds: Map[String, Sound] = {
-    val path = getClass.getResource("/conf/sounds.xml").toURI
-    val xml = XML.loadFile(new File(path))
+    val xml = XML.load(getClass.getResourceAsStream("/conf/sounds.xml"))
 
     val sounds = for (node <- xml \ "sound") yield {
       val name = (node \ "@name").toString()

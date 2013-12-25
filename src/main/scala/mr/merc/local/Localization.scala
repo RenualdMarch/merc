@@ -4,6 +4,7 @@ import scala.io.Source
 import java.net.URI
 import scala.io.Codec
 import mr.merc.conf.Conf
+import java.io.InputStream
 
 object Localization {
   private[local] lazy val messages: Map[String, Map[String, String]] = initMessages()
@@ -34,12 +35,11 @@ object Localization {
 
   private def parseMessages(language: String): Map[String, String] = {
     val fileName = filenamePattern + "." + language
-    val resource = getClass.getResource(fileName)
-    parseLines(resource.toURI)
+    parseLines(getClass.getResourceAsStream(fileName))
   }
 
-  private def parseLines(resourceUri: URI) = {
-    val lines = Source.fromFile(resourceUri)(Codec("UTF-8")).getLines()
+  private def parseLines(stream: InputStream) = {
+    val lines = Source.fromInputStream(stream)(Codec("UTF-8")).getLines()
     lines.map(line => {
       val separatorIndex = line.indexOf(MessageSeparator)
       val key = line.take(separatorIndex)

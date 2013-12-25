@@ -2,6 +2,7 @@ package mr.merc.sound
 
 import java.net.URL
 import scala.beans.BeanProperty
+import java.io.InputStream
 
 abstract class BaseAudioRenderer(listener: Status => Unit) {
   private var _status: Status = Stopped
@@ -12,11 +13,11 @@ abstract class BaseAudioRenderer(listener: Status => Unit) {
     listener(st)
   }
 
-  def playSound(audiofile: URL)
+  def playSound(audiofile: InputStream)
 
-  def play(audiofile: URL) {
+  def play(stream: InputStream) {
     status = Playing
-    playSound(audiofile)
+    playSound(stream)
   }
 }
 

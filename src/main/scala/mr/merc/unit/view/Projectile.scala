@@ -19,8 +19,7 @@ object Projectile {
   def apply(name: String) = map(name)
 
   private def parseProjectiles: Map[String, Projectile] = {
-    val path = getClass.getResource("/conf/projectiles.xml").toURI
-    val xml = XML.loadFile(new File(path))
+    val xml = XML.load(getClass.getResourceAsStream("/conf/projectiles.xml"))
     val parsed = (xml \ "projectile") map (node => {
       val name = (node \ "@name").toString()
 

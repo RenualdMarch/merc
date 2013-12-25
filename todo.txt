@@ -1,5 +1,6 @@
 For M4, these things should be completed and tested
 
++Create assembly for different platforms
 Use Grass movement and defence for Road and Bridges
 Move attack view configures to attack view
 Make default resistance zero
@@ -14,7 +15,7 @@ AI - different implementations
 AI - tournament mode
 Primitive map generation
 Changing position on minimap
-Create assembly for different platforms
+
 long play testing, bug fixing
 
 

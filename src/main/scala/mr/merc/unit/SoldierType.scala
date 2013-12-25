@@ -12,8 +12,7 @@ object SoldierType {
   def apply(name: String) = map(name)
 
   private def parseTypes: List[SoldierType] = {
-    val path = getClass.getResource("/conf/soldierTypes.xml").toURI
-    val xml = XML.loadFile(new File(path))
+    val xml = XML.load(getClass.getResourceAsStream("/conf/soldierTypes.xml"))
     val parsed = (xml \ "soldierType").map(node => {
       val name = (node \ "@name").toString()
       val cost = (node \ "@cost").toString().toInt

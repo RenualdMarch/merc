@@ -55,14 +55,8 @@ public class JOrbisOggRendererBase {
 
 	private InputStream bitStream;
 
-	public void playSound(URL audiofile) {
-		try {
-			bitStream = audiofile.openStream();
-		} catch (Exception e) {
-			e.printStackTrace();
-			return;
-		}
-
+	public void playSound(InputStream audiofile) {
+		bitStream = audiofile;
 		run();
 	}
 
