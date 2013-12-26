@@ -2,6 +2,12 @@ package mr.merc.unit
 
 import mr.merc.players.Player
 import mr.merc.map.hex.TerrainHexField
+import mr.merc.map.hex.TerrainHex
+import mr.merc.map.objects.House
+import mr.merc.map.objects.WoodenBridge
+import mr.merc.map.terrain.Village
+import mr.merc.map.terrain.Road
+import mr.merc.map.terrain.Grass
 
 class Soldier(val name: String, val soldierType: SoldierType, val player: Player) {
   private var _hp = soldierType.hp
@@ -81,6 +87,16 @@ class Soldier(val name: String, val soldierType: SoldierType, val player: Player
     }
 
     result toList
+  }
+
+  def movementCostFunction(hex: TerrainHex): Int = {
+    if (hex.mapObj == Some(House)) {
+      soldierType.moveCost(Village)
+    } else if (hex.mapObj == Some(WoodenBridge) || hex.terrain == Road) {
+      soldierType.moveCost(Grass)
+    } else {
+      soldierType.moveCost(hex.terrain)
+    }
   }
 }
 

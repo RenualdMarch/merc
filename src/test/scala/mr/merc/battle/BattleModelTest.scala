@@ -4,7 +4,7 @@ import org.scalatest.FunSuite
 import org.scalatest.BeforeAndAfter
 import mr.merc.map.hex.TerrainHexField
 import mr.merc.map.hex.TerrainHex
-import mr.merc.map.terrain.Grass
+import mr.merc.map.terrain._
 import mr.merc.unit.SoldierType
 import mr.merc.unit.Impact
 import mr.merc.unit.Attack
@@ -23,11 +23,12 @@ import mr.merc.unit.HaventMoved
 import mr.merc.unit.CanntMoveAnyMore
 import mr.merc.unit.HaveAttacked
 import mr.merc.unit.StillCanMove
+import mr.merc.map.objects._
 
 class BattleModelTest extends FunSuite with BeforeAndAfter {
   var field: TerrainHexField = _
   val simpleSoldierType = new SoldierType("1", 1, 20, 10, 5, 1,
-    List(Attack("", 10, 1, Impact, false), Attack("", 6, 2, Impact, false)), Map(Grass -> 2),
+    List(Attack("", 10, 1, Impact, false), Attack("", 6, 2, Impact, false)), Map(Grass -> 2, Village -> 3, Sand -> 5),
     Map(Grass -> 60), Map(Impact -> 0))
   var model: BattleModel = _
 
@@ -351,6 +352,60 @@ class BattleModelTest extends FunSuite with BeforeAndAfter {
     field.hex(0, 0).soldier = Some(soldier)
     soldier.movePointsRemain -= 1
     assert(model.soldierTurnState(field.hex(0, 0)) === StillCanMove)
+  }
+
+  test("road and wooden bridge terrain units are counted as grass") {
+    def terrainHex(x: Int, y: Int) = if (x == 1 && y == 0) {
+      new TerrainHex(x, y, Road)
+    } else if (x == 0 && y == 1) {
+      new TerrainHex(x, y, Water, Some(WoodenBridge))
+    } else {
+      new TerrainHex(x, y, Sand)
+    }
+
+    field = new TerrainHexField(10, 10, terrainHex)
+    model = new BattleModel(new GameField(field, List(Player("1"), Player("2"))))
+    val soldier = new Soldier("1", simpleSoldierType, Player("1"))
+    field.hex(0, 0).soldier = Some(soldier)
+    soldier.movePointsRemain = 2
+    val canMove1 = model.validateMovementEvent(soldier, field.hex(0, 0), field.hex(0, 1), true, true)
+    assert(canMove1 === true)
+    val canMove2 = model.validateMovementEvent(soldier, field.hex(0, 0), field.hex(1, 0), true, true)
+    assert(canMove2 === true)
+    soldier.movePointsRemain = 1
+    val canntMove1 = model.validateMovementEvent(soldier, field.hex(0, 0), field.hex(0, 1), true, true)
+    assert(canntMove1 === false)
+    val canntMove2 = model.validateMovementEvent(soldier, field.hex(0, 0), field.hex(1, 0), true, true)
+    assert(canntMove2 === false)
+    soldier.movePointsRemain = 2
+    model.handleMovementEvent(soldier, field.hex(0, 0), field.hex(1, 0))
+    assert(field.hex(1, 0).soldier === Some(soldier))
+    assert(soldier.movePointsRemain === 0)
+  }
+
+  test("village movement takes its price disregardly to terrain type") {
+    def terrainHex(x: Int, y: Int) = if (x == 1 && y == 0) {
+      new TerrainHex(x, y, Road)
+    } else if (x == 0 && y == 1) {
+      new TerrainHex(x, y, Water, Some(House))
+    } else {
+      new TerrainHex(x, y, Sand)
+    }
+
+    field = new TerrainHexField(10, 10, terrainHex)
+    model = new BattleModel(new GameField(field, List(Player("1"), Player("2"))))
+    val soldier = new Soldier("1", simpleSoldierType, Player("1"))
+    field.hex(0, 0).soldier = Some(soldier)
+    soldier.movePointsRemain = 3
+    val canMove = model.validateMovementEvent(soldier, field.hex(0, 0), field.hex(0, 1), true, true)
+    assert(canMove === true)
+    soldier.movePointsRemain = 2
+    val cantMove = model.validateMovementEvent(soldier, field.hex(0, 0), field.hex(0, 1), true, true)
+    assert(cantMove === false)
+    soldier.movePointsRemain = 3
+    model.handleMovementEvent(soldier, field.hex(0, 0), field.hex(0, 1))
+    assert(field.hex(0, 1).soldier === Some(soldier))
+    assert(soldier.movePointsRemain === 0)
   }
 }
 

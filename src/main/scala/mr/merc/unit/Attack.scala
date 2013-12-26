@@ -1,9 +1,13 @@
 package mr.merc.unit
 
-import mr.merc.map.hex.TerrainHex
+import scala.Option.option2Iterable
 import scala.util.Random
-import mr.merc.map.terrain.Village
+import mr.merc.map.hex.TerrainHex
 import mr.merc.map.objects.House
+import mr.merc.map.terrain.Village
+import mr.merc.map.objects.WoodenBridge
+import mr.merc.map.terrain.Road
+import mr.merc.map.terrain.Grass
 
 object Attack {
   private val maxChance = 100
@@ -67,6 +71,8 @@ object Attack {
   def calculateSoldierDefence(soldier: Soldier, hex: TerrainHex): SoldierDefence = {
     if (hex.mapObj == Some(House)) {
       SoldierDefence(soldier.soldierType.defence(Village))
+    } else if (hex.mapObj == Some(WoodenBridge) || hex.terrain == Road) {
+      SoldierDefence(soldier.soldierType.defence(Grass))
     } else {
       SoldierDefence(soldier.soldierType.defence(hex.terrain))
     }

@@ -2,7 +2,6 @@ package mr.merc.sound;
 
 //JFC
 import java.io.InputStream;
-import java.net.URL;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;

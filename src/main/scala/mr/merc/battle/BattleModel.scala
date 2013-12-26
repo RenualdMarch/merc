@@ -16,6 +16,11 @@ import mr.merc.unit.CanntMoveAnyMore
 import mr.merc.unit.HaventMoved
 import mr.merc.unit.StillCanMove
 import mr.merc.unit.HaventMoved
+import mr.merc.map.objects.House
+import mr.merc.map.terrain.Village
+import mr.merc.map.objects.WoodenBridge
+import mr.merc.map.terrain.Grass
+import mr.merc.map.terrain.Road
 
 class BattleModel(val map: GameField) extends BattleModelEventHandler {
   private var currentPlayerIndex = 0
@@ -35,7 +40,7 @@ class BattleModel(val map: GameField) extends BattleModelEventHandler {
     require(validateMovementEvent(soldier, from, to))
     require(to.soldier == None)
     val path = PathFinder.findPath(map.gridForSoldier(soldier), from, to, soldier.movePointsRemain, soldier.movedThisTurn)
-    val movePrice = pathPrice(soldier.soldierType.moveCost, path.get)
+    val movePrice = pathPrice(soldier.movementCostFunction, path.get)
     soldier.movePointsRemain -= movePrice
     from.soldier = None
     to.soldier = Some(soldier)
@@ -108,7 +113,7 @@ class BattleModel(val map: GameField) extends BattleModelEventHandler {
       val pathOpt = PathFinder.findPath(map.gridForSoldier(soldier), from, to, soldier.movePointsRemain, soldier.movedThisTurn)
       pathOpt match {
         case Some(path) => {
-          val price = pathPrice(soldier.soldierType.moveCost, path)
+          val price = pathPrice(soldier.movementCostFunction, path)
           price <= soldier.movePointsRemain
         }
         case None => false
@@ -188,8 +193,8 @@ class BattleModel(val map: GameField) extends BattleModelEventHandler {
     }
   }
 
-  private def pathPrice(cost: Map[TerrainType, Int], path: List[TerrainHex]): Int = {
-    path.tail.map(t => cost(t.terrain)).sum
+  private def pathPrice(cost: TerrainHex => Int, path: List[TerrainHex]): Int = {
+    path.tail.map(cost).sum
   }
 
   private[battle] def soldierTurnState(hex: TerrainHex): SoldierTurnState = {
@@ -211,5 +216,4 @@ class BattleModel(val map: GameField) extends BattleModelEventHandler {
       HaventMoved
     }
   }
-
 }

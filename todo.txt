@@ -1,9 +1,9 @@
 For M4, these things should be completed and tested
 
 +Create assembly for different platforms
-Use Grass movement and defence for Road and Bridges
++Use Grass movement and defence for Road and Bridges
++Make default resistance zero
 Move attack view configures to attack view
-Make default resistance zero
 Logging support
 Show defence when select where to move - in colour
 Create assembly for different platforms

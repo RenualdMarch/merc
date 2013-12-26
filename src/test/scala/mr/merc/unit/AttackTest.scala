@@ -1,13 +1,11 @@
 package mr.merc.unit
 
 import org.scalatest.FunSuite
-import mr.merc.map.terrain.TerrainType
-import mr.merc.map.terrain.Sand
 import org.scalatest.BeforeAndAfter
 import mr.merc.map.hex.TerrainHex
 import mr.merc.players.Player
-import mr.merc.map.terrain.Village
-import mr.merc.map.objects.House
+import mr.merc.map.terrain._
+import mr.merc.map.objects._
 
 class AttackTest extends FunSuite with BeforeAndAfter {
   val player1 = Player("1")
@@ -155,6 +153,19 @@ class AttackTest extends FunSuite with BeforeAndAfter {
 
     val soldier = new Soldier("1", someType, Player("1"))
     assert(Attack.calculateSoldierDefence(soldier, hex1).defence === 50)
+    assert(Attack.calculateSoldierDefence(soldier, hex2).defence === 60)
+  }
+
+  test("wooden bridge and road defence same as grass") {
+    val hex1 = new TerrainHex(0, 0, Road)
+    val hex2 = new TerrainHex(0, 0, Water, Some(WoodenBridge))
+
+    val someType = new SoldierType("type1", 1, 10, 1, 10, 1,
+      List(), Map(), Map(Sand -> 50, Grass -> 60),
+      Map(Impact -> 0, Pierce -> 0))
+
+    val soldier = new Soldier("1", someType, Player("1"))
+    assert(Attack.calculateSoldierDefence(soldier, hex1).defence === 60)
     assert(Attack.calculateSoldierDefence(soldier, hex2).defence === 60)
   }
 }

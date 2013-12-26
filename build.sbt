@@ -20,22 +20,16 @@ libraryDependencies += "com.projectdarkstar.ext.jorbis" % "jorbis" % "0.0.17"
 
 libraryDependencies += "de.huxhorn.sulky" % "de.huxhorn.sulky.3rdparty.jlayer" % "1.0"
 
-// comment next two lines to build a release
-
-unmanagedJars in Compile += Attributed.blank(file(System.getenv("JAVA_HOME") + "/jre/lib/jfxrt.jar"))
-
-mainClass := Some("mr.merc.main.Main")
+unmanagedJars in Test += Attributed.blank(file(System.getenv("JAVA_HOME") + "/jre/lib/jfxrt.jar"))
 
 scalacOptions ++= Seq("-feature", "-deprecation", "-language:postfixOps", "-language:implicitConversions")
 
-// uncomment next two lines to build a release
+jfxSettings
 
-//jfxSettings
+JFX.mainClass := Some("mr.merc.main.Main")
 
-//JFX.mainClass := Some("mr.merc.main.Main")
+JFX.devKit := JFX.jdk(System.getenv("JAVA_HOME"))
 
-//JFX.devKit := JFX.jdk(System.getenv("JAVA_HOME"))
+JFX.addJfxrtToClasspath := true
 
-//JFX.addJfxrtToClasspath := true
-
-//JFX.nativeBundles := "image"
+JFX.nativeBundles := "image"
