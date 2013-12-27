@@ -187,11 +187,8 @@ object Attack {
     if (attacker.state.contains(Slowed)) damage / 2 else damage
   }
 
-  def apply(imageName: String, damage: Int, count: Int, attackType: AttackType,
-    ranged: Boolean) = new Attack(imageName, damage, count, attackType, ranged)
-
-  def apply(imageName: String, damage: Int, count: Int, attackType: AttackType,
-    ranged: Boolean, projectile: String) = new Attack(imageName, damage, count, attackType, ranged, projectile = Some(projectile))
+  def apply(index: Int, damage: Int, count: Int, attackType: AttackType,
+    ranged: Boolean) = new Attack(index, damage, count, attackType, ranged)
 
   def selectBestAttackForDefender(attacker: Soldier, defender: Soldier, attackersAttack: Attack): Option[Attack] = {
     val ranged = attackersAttack.ranged
@@ -207,13 +204,8 @@ object Attack {
   }
 }
 
-// TODO move image name and projectile name to view configuration
-class Attack(val imageName: String, val damage: Int, val count: Int, val attackType: AttackType,
-  val ranged: Boolean, val attributes: Set[AttackAttribute] = Set(), private val projectile: Option[String] = None) {
-  def projectileName(success: Boolean) = success match {
-    case true => projectile map (_ + "-succ")
-    case false => projectile map (_ + "-fail")
-  }
+class Attack(val index: Int, val damage: Int, val count: Int, val attackType: AttackType,
+  val ranged: Boolean, val attributes: Set[AttackAttribute] = Set()) {
 
   def chanceOfSuccess(enemysDefence: SoldierDefence): ChanceOfSuccess = if (attributes.contains(Magical)) {
     ChanceOfSuccess(70)

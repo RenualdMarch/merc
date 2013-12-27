@@ -22,8 +22,8 @@ object SoldierType {
       val level = (node \ "@level").toString().toInt
       val attributes = split((node \ "@attributes").toString()).map(SoldierTypeAttribute.apply)
 
+      var index = -1
       val attacks = (node \ "attacks" \ "attack").map(attackNode => {
-        val imageName = (attackNode \ "@imageName").toString()
         val damage = (attackNode \ "@damage").toString().toInt
         val count = (attackNode \ "@count").toString().toInt
         val ranged = (attackNode \ "@ranged").toString().toBoolean
@@ -32,7 +32,8 @@ object SoldierType {
         val attributes = split((attackNode \ "@attributes").toString()).map(AttackAttribute.apply)
         val projectileStr = (attackNode \ "@projectile").toString()
         val projectile = if (projectileStr.isEmpty()) None else Some(projectileStr)
-        new Attack(imageName, damage, count, attackType, ranged, attributes, projectile)
+        index += 1
+        new Attack(index, damage, count, attackType, ranged, attributes)
       }).toList
 
       val moveCostsMap = (node \ "moveCosts" \ "moveCost").map(costNode => {

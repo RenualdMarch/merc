@@ -46,11 +46,27 @@ object SoldierTypeViewInfo {
       val images: Map[SoldierViewState, List[mr.merc.image.MImage]] = Map(DefenceState -> defence, IdleState -> idle, MoveState -> move,
         StandState -> stand, DeathState -> death, NoState -> List(MImage.emptyImage))
       val attacks = attacksMap(node, typeName)
+      val attacksInfo = parseAttackViews(typeName, node)
 
-      SoldierTypeViewInfo(typeName, images ++ attacks, parseSounds(typeName, node \ "sounds") mapValues SoundConfig.soundsMap)
+      SoldierTypeViewInfo(typeName, images ++ attacks, parseSounds(typeName, node \ "sounds") mapValues SoundConfig.soundsMap, attacksInfo)
     })
 
     parsed.toList
+  }
+
+  private def parseAttackViews(name: String, node: NodeSeq): List[AttackView] = {
+    var index = 0
+    val list = collection.mutable.ArrayBuffer[AttackView]()
+    while (getNode(node, "attack" + (index + 1)).nonEmpty) {
+      val attackNode = getNode(node, "attack" + (index + 1)).get
+      val imageName = (attackNode \ "@imageName").toString()
+      val projectileName = (attackNode \ "@projectile").toString
+      val attack = AttackView(index, imageName, if (projectileName == "") None else Some(projectileName))
+      list += attack
+      index += 1
+    }
+
+    list.toList
   }
 
   private def parseSounds(name: String, node: NodeSeq): Map[SoldierSound, String] = {
@@ -219,9 +235,9 @@ object SoldierTypeViewInfo {
   }
 }
 
-case class SoldierTypeViewInfo(name: String, images: Map[SoldierViewState, List[MImage]], sounds: Map[SoldierSound, Sound]) {
+case class SoldierTypeViewInfo(name: String, images: Map[SoldierViewState, List[MImage]], sounds: Map[SoldierSound, Sound], attacks: List[AttackView]) {
   def toColor(color: Color): SoldierTypeViewInfo = {
     val newImages = images.mapValues(_.map(_.changeSoldierColor(color))).toSeq.toMap
-    SoldierTypeViewInfo(name, newImages, sounds)
+    SoldierTypeViewInfo(name, newImages, sounds, attacks)
   }
 }

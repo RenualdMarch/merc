@@ -20,7 +20,7 @@ class BattleControllerTest extends FunSuite with BeforeAndAfter {
   before {
     val hexField = new TerrainHexField(10, 10, (x, y) => new TerrainHex(x, y, Grass))
     val simpleSoldierType = new SoldierType("testType1", 1, 20, 6, 5, 1,
-      List(Attack("", 10, 1, Impact, false)), Map(Grass -> 2),
+      List(Attack(1, 10, 1, Impact, false)), Map(Grass -> 2),
       Map(Grass -> 60), Map(Impact -> 0))
     val soldier1 = new Soldier("1", simpleSoldierType, Player("1"))
     val soldier2 = new Soldier("2", simpleSoldierType, Player("1"))

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <views>
 	<view name="testType1">
-		<attack1>
+		<attack1 imageName="image1" projectile="testProjectile3">
 			<!-- should be used either <all> tag or all tags <n,ne,se,s> they cann't be skipped -->
 			<n>
 				<succ>
@@ -42,7 +42,7 @@
 			</s>
 		</attack1>
 		<!-- the same as attack1, optional if character doesn't have second attack -->
-		<attack2>
+		<attack2 imageName="image10" >
 			<all>
 				<!-- effects have ther's own configuration in special file -->
 				<succ>
@@ -114,7 +114,7 @@
 		</sounds>
 	</view>
 	<view name="testSoldier">
-		<attack1>
+		<attack1 imageName="image100" projectile="testProjectile3">
 			<all>
 				<succ>
 					<image name="im14"/>
@@ -126,7 +126,7 @@
 		</stand>
 	</view>
 	<view name="testSoldier2">
-		<attack1>
+		<attack1 imageName="111" projectile="testProjectile3">
 			<all>
 				<succ>
 					<image name="im14"/>

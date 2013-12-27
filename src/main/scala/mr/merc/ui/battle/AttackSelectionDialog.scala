@@ -26,6 +26,7 @@ import scalafx.scene.control.ContentDisplay
 import mr.merc.image.MImage
 import mr.merc.unit.AttackAttribute
 import mr.merc.ai.AttackSelectionHelper
+import mr.merc.unit.view.SoldierTypeViewInfo
 
 class AttackSelectionDialog(attacker: Soldier, defender: Soldier, attackerHex: TerrainHex,
   defenderHex: TerrainHex) extends Stage {
@@ -167,18 +168,23 @@ class AttackSelectionDialog(attacker: Soldier, defender: Soldier, attackerHex: T
 
   private def attacks(attacker: Soldier, defender: Soldier, attackerHex: TerrainHex,
     defenderHex: TerrainHex): List[AttackPair] = {
+    val attackersAttackViews = SoldierTypeViewInfo(attacker.soldierType.name).attacks
+    val defendersAttackViews = SoldierTypeViewInfo(defender.soldierType.name).attacks
+
     val attacks = attacker.soldierType.attacks
     attacks map (a => {
       val defendersAttackOpt = Attack.selectBestAttackForDefender(attacker, defender, a)
       val attackDamage = Attack.possibleAttackersDamage(true, attacker, defender, a, defendersAttackOpt)
       val attackesChance = a.chanceOfSuccess(Attack.calculateSoldierDefence(defender, defenderHex))
 
-      val attackerChoice = AttackChoice(a.imageName, attackDamage, a.count, attackesChance, a.attributes)
+      val imageName = attackersAttackViews.find(a.index == _.index).get.imageName
+      val attackerChoice = AttackChoice(imageName, attackDamage, a.count, attackesChance, a.attributes)
       defendersAttackOpt match {
         case Some(defendersAttack) => {
           val defenderDamage = Attack.possibleAttackersDamage(false, defender, attacker, defendersAttack, Some(a))
           val defenderChance = defendersAttack.chanceOfSuccess(Attack.calculateSoldierDefence(attacker, attackerHex))
-          val defenderChoice = AttackChoice(defendersAttack.imageName, defenderDamage, defendersAttack.count,
+          val defenderImageName = defendersAttackViews.find(defendersAttack.index == _.index).get.imageName
+          val defenderChoice = AttackChoice(defenderImageName, defenderDamage, defendersAttack.count,
             defenderChance, defendersAttack.attributes)
           (attackerChoice, Some(defenderChoice))
         }

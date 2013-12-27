@@ -11,7 +11,7 @@ import org.scalatest.FunSuite
 object Util extends FunSuite {
   def soldierType(hp: Int, defence: Int, attackDamage: Int, attackCount: Int, attributes: Set[AttackAttribute], resistance: Int = 0) =
     new SoldierType("type0", 1, hp, 1, 10, 1,
-      List(new Attack("name", attackDamage, attackCount, Impact, false, attributes)),
+      List(new Attack(1, attackDamage, attackCount, Impact, false, attributes)),
       Map(), Map(Sand -> defence), Map(Impact -> resistance))
   def soldierType(defence: Int, attacks: List[Attack]) =
     new SoldierType("type0", 1, 100, 1, 10, 1,

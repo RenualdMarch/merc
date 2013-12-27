@@ -35,9 +35,9 @@ class BattleViewTest extends FunSuite with BeforeAndAfter with MockitoSugar {
   val simpleSoldierType = new SoldierType("testType1", 1, 20, 10, 5, 1,
     List(), Map(Grass -> 2), Map(), Map())
   val rangedSoldierType = new SoldierType("testType1", 1, 20, 10, 5, 1,
-    List(Attack("", 1, 2, Impact, true, "testProjectile3")), Map(), Map(), Map())
+    List(Attack(0, 1, 2, Impact, true)), Map(), Map(), Map())
   val closedSoldierType = new SoldierType("testType1", 1, 20, 10, 5, 1,
-    List(Attack("", 1, 2, Impact, false, "testProjectile3")), Map(), Map(), Map())
+    List(Attack(0, 1, 2, Impact, false)), Map(), Map(), Map())
 
   val soldierDrawer = mock[SoldiersDrawer]
 

@@ -18,7 +18,8 @@ import mr.merc.unit.sound.AttackSound
 
 class SoldierRangedAttackMovement(val from: (Int, Int), val to: (Int, Int), val dir: Direction,
   val attacker: SoldierView, val defender: SoldierView, result: AttackResult) extends Movement {
-  private val projectileName = attacker.soldier.soldierType.attacks(result.attackIndex).projectileName(result.success).get
+  private val attackViews = SoldierTypeViewInfo(attacker.soldier.soldierType.name).attacks
+  private val projectileName = attackViews.find(_.index == result.attackIndex).get.projectileName(result.success).get
   val projectileView = Projectile(projectileName).buildView(dir, from, to)
   private var attackerFinishedHisThrowingMove = false
   private var painSoundPlayed = false

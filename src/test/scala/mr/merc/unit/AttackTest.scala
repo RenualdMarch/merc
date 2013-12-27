@@ -11,11 +11,11 @@ class AttackTest extends FunSuite with BeforeAndAfter {
   val player1 = Player("1")
   val player2 = Player("2")
   val firstType = new SoldierType("type1", 1, 10, 1, 10, 1,
-    List(new Attack("name", 3, 2, Impact, false), new Attack("name", 1, 2, Pierce, true)),
+    List(new Attack(1, 3, 2, Impact, false), new Attack(2, 1, 2, Pierce, true)),
     Map(), Map(Sand -> 50), Map(Impact -> 0, Pierce -> 0))
 
   val secondType = new SoldierType("type2", 1, 12, 1, 10, 1,
-    List(new Attack("name", 2, 3, Impact, false)),
+    List(new Attack(1, 2, 3, Impact, false)),
     Map(), Map(Sand -> 30), Map(Impact -> 0, Pierce -> 0))
 
   var firstSoldier: Soldier = _

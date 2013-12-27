@@ -28,7 +28,7 @@ import mr.merc.map.objects._
 class BattleModelTest extends FunSuite with BeforeAndAfter {
   var field: TerrainHexField = _
   val simpleSoldierType = new SoldierType("1", 1, 20, 10, 5, 1,
-    List(Attack("", 10, 1, Impact, false), Attack("", 6, 2, Impact, false)), Map(Grass -> 2, Village -> 3, Sand -> 5),
+    List(Attack(1, 10, 1, Impact, false), Attack(2, 6, 2, Impact, false)), Map(Grass -> 2, Village -> 3, Sand -> 5),
     Map(Grass -> 60), Map(Impact -> 0))
   var model: BattleModel = _
 
@@ -98,16 +98,16 @@ class BattleModelTest extends FunSuite with BeforeAndAfter {
   // TODO move this test to its class, cause here Attack class is under test
   test("defender weapon selection") {
     val attackerSoldierType = new SoldierType("1", 1, 50, 10, 5, 1,
-      List(Attack("", 10, 1, Impact, false), Attack("", 20, 1, Impact, true)),
+      List(Attack(1, 10, 1, Impact, false), Attack(2, 20, 1, Impact, true)),
       Map(Grass -> 2), Map(Grass -> 60), Map(Impact -> 0))
 
     val defenderSoldierTypeOnlyCloseCombat = new SoldierType("2", 1, 50, 10, 5, 1,
-      List(Attack("", 10, 1, Impact, false), Attack("", 6, 2, Impact, false),
-        Attack("", 3, 3, Impact, false)),
+      List(Attack(1, 10, 1, Impact, false), Attack(2, 6, 2, Impact, false),
+        Attack(3, 3, 3, Impact, false)),
       Map(Grass -> 2), Map(Grass -> 60), Map(Impact -> 0))
 
     val defenderSoldierTypeOnlyOneAttack = new SoldierType("3", 1, 50, 10, 5, 1,
-      List(Attack("", 10, 1, Impact, true)),
+      List(Attack(1, 10, 1, Impact, true)),
       Map(Grass -> 2), Map(Grass -> 60), Map(Impact -> 0))
 
     val attacker = new Soldier("1", attackerSoldierType, Player("1"))
@@ -283,7 +283,7 @@ class BattleModelTest extends FunSuite with BeforeAndAfter {
 
   test("end turn and before turn events") {
     val curer = new SoldierType("1", 1, 20, 10, 5, 1,
-      List(Attack("", 10, 1, Impact, false), Attack("", 6, 2, Impact, false)), Map(Grass -> 2),
+      List(Attack(0, 10, 1, Impact, false), Attack(1, 6, 2, Impact, false)), Map(Grass -> 2),
       Map(Grass -> 60), Map(Impact -> 0), Set(Cures, Heals4))
     val poisonedSoldier = new Soldier("1", curer, Player("1"))
     val enemy = new Soldier("1", simpleSoldierType, Player("2"))

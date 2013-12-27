@@ -16,7 +16,7 @@ import mr.merc.unit.AttackResult
 
 class SoldierRangedAttackMovementTest extends FunSuite {
   val simpleSoldierType = new SoldierType("testSoldier2", 1, 20, 10, 5, 1,
-    List(Attack("", 5, 2, Impact, true, "testProjectile3")), Map(), Map(), Map())
+    List(Attack(0, 5, 2, Impact, true)), Map(), Map(), Map())
 
   test("simple attack") {
     val attackerSoldier = new Soldier("1", simpleSoldierType, Player("1"))

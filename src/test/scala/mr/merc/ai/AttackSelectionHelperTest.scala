@@ -24,8 +24,8 @@ class AttackSelectionHelperTest extends FunSuite {
   }
 
   test("attack with bigger math expectation is selected by default") {
-    val attackerType = soldierType(40, List(new Attack("", 10, 2, Impact,
-      false), new Attack("", 5, 5, Impact, false)))
+    val attackerType = soldierType(40, List(new Attack(1, 10, 2, Impact,
+      false), new Attack(2, 5, 5, Impact, false)))
 
     val attacker = new Soldier("1", attackerType, Player("1"))
     val defender = new Soldier("2", attackerType, Player("2"))
@@ -38,8 +38,8 @@ class AttackSelectionHelperTest extends FunSuite {
 
   // magical attribute has different chance
   test("chance is taken into account when calculating math expectation") {
-    val attackerType = soldierType(80, List(new Attack("", 10, 2, Impact, false,
-      Set(Magical)), new Attack("", 5, 5, Impact, false)))
+    val attackerType = soldierType(80, List(new Attack(1, 10, 2, Impact, false,
+      Set(Magical)), new Attack(2, 5, 5, Impact, false)))
 
     val attacker = new Soldier("1", attackerType, Player("1"))
     val defender = new Soldier("2", attackerType, Player("2"))
@@ -51,9 +51,9 @@ class AttackSelectionHelperTest extends FunSuite {
   }
 
   test("should select ranged/melee attack when defender doesn't have this attack") {
-    val attackerType = soldierType(80, List(new Attack("", 10, 2, Impact, false,
-      Set(Magical)), new Attack("", 1, 1, Impact, true)))
-    val defenderType = soldierType(80, List(new Attack("", 10, 2, Impact, false)))
+    val attackerType = soldierType(80, List(new Attack(1, 10, 2, Impact, false,
+      Set(Magical)), new Attack(2, 1, 1, Impact, true)))
+    val defenderType = soldierType(80, List(new Attack(1, 10, 2, Impact, false)))
     val attacker = new Soldier("1", attackerType, Player("1"))
     val defender = new Soldier("2", defenderType, Player("2"))
     val attackerHex = new TerrainHex(0, 0, Sand)
@@ -64,9 +64,9 @@ class AttackSelectionHelperTest extends FunSuite {
   }
 
   ignore("should use most effective attack when chances to kill enemy > 50%") {
-    val attackerType = soldierType(80, List(new Attack("", 10, 2, Impact, false,
-      Set(Magical)), new Attack("", 1, 1, Impact, true)))
-    val defenderType = soldierType(80, List(new Attack("", 10, 2, Impact, false)))
+    val attackerType = soldierType(80, List(new Attack(1, 10, 2, Impact, false,
+      Set(Magical)), new Attack(2, 1, 1, Impact, true)))
+    val defenderType = soldierType(80, List(new Attack(1, 10, 2, Impact, false)))
     val attacker = new Soldier("1", attackerType, Player("1"))
     val defender = new Soldier("2", defenderType, Player("2"))
     val attackerHex = new TerrainHex(0, 0, Sand)

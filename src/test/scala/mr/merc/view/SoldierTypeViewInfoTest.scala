@@ -187,4 +187,15 @@ class SoldierTypeViewInfoTest extends FunSuite with ShouldMatchers {
     assert(sounds.get(AttackSound(1, true)) === None)
     assert(sounds.get(AttackSound(1, false)) === None)
   }
+
+  test("attack views") {
+    val attacks1 = SoldierTypeViewInfo("testType1").attacks
+    assert(attacks1.size === 2)
+    assert(attacks1(0).index === 0)
+    assert(attacks1(0).imageName === "image1")
+    assert(attacks1(0).projectile === Some("testProjectile3"))
+    assert(attacks1(1).index === 1)
+    assert(attacks1(1).imageName === "image10")
+    assert(attacks1(1).projectile === None)
+  }
 }
