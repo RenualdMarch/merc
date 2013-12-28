@@ -60,6 +60,6 @@ object Main extends JFXApp {
       root = rootPane
     }
   }
-  MusicPlayer.playMusic()
 
+  MusicPlayer.playMusic()
 }

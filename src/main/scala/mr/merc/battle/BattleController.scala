@@ -23,6 +23,8 @@ import mr.merc.battle.event.EndMoveModelEvent
 import mr.merc.ui.battle.AttackSelectionDialog
 import scalafx.stage.Modality
 import mr.merc.unit.Attack
+import mr.merc.battle.event.HideDefence
+import mr.merc.battle.event.ShowDefence
 
 class BattleController(gameField: GameField, parent: BattleControllerParent) {
   val battleModel = new BattleModel(gameField)
@@ -32,6 +34,7 @@ class BattleController(gameField: GameField, parent: BattleControllerParent) {
 
   private[battle] var selectedSoldier: Option[Soldier] = None
   private[battle] var arrowIsShown = false
+  private[battle] var defenceIsShown = false
   private[battle] var movementOptionsAreShown = false
   private[battle] val visitedHexesList = new VisitedHexesList()
 
@@ -42,9 +45,11 @@ class BattleController(gameField: GameField, parent: BattleControllerParent) {
         visitedHexesList.visitHex(hexView.hex)
         hexView.hex.soldier match {
           case Some(soldier) => {
+            removeDefence()
             soldierToShow.soldier = Some(soldier)
             if (canBeCurrentHexAttackedFromPrevious) {
               drawArrowForPrevToCurrent()
+              drawDefenceForHexFromWhichAttack()
             } else if (onlyChoiceForSelectedSoldierIsAttack) {
               drawArrowWhenOnlyChoiceForSelectedSoldierIsAttack()
             } else {
@@ -53,12 +58,14 @@ class BattleController(gameField: GameField, parent: BattleControllerParent) {
           }
           case None => {
             removeArrow()
+            drawDefenceForSelectedTerrainHex()
             soldierToShow.soldier = selectedSoldier
           }
         }
       }
       case None => {
         removeArrow()
+        removeDefence()
       }
     }
   }
@@ -74,6 +81,13 @@ class BattleController(gameField: GameField, parent: BattleControllerParent) {
     if (movementOptionsAreShown) {
       movementOptionsAreShown = false
       battleView.handleEvent(HideMovementOptions)
+    }
+  }
+
+  private def removeDefence() {
+    if (defenceIsShown) {
+      defenceIsShown = false
+      battleView.handleEvent(HideDefence)
     }
   }
 
@@ -106,6 +120,7 @@ class BattleController(gameField: GameField, parent: BattleControllerParent) {
             selectedSoldier = None
 
             removeArrow()
+            removeDefence()
             removeMovementOptions()
 
             if (visitedHexesList.isDefined && battleModel.validateMovementAndAttack(attacker, attackerHex,
@@ -144,6 +159,7 @@ class BattleController(gameField: GameField, parent: BattleControllerParent) {
             selectedSoldier = None
             soldierToShow.soldier = None
             removeMovementOptions()
+            removeDefence()
             parent.onMinimapChange()
           }
           case None => // do nothing
@@ -168,6 +184,7 @@ class BattleController(gameField: GameField, parent: BattleControllerParent) {
       val result = battleModel.handleEvent(EndMoveModelEvent())
       battleView.handleEvent(result.buildBattleViewEvent)
       removeArrow()
+      removeDefence()
       removeMovementOptions()
       selectedSoldier = None
       soldierToShow.soldier = None
@@ -181,10 +198,12 @@ class BattleController(gameField: GameField, parent: BattleControllerParent) {
         // TODO add if soldier player is human player
         addMovementOptionsForSelectedSoldier()
         removeArrow()
+        removeDefence()
       }
       case None => {
         selectedSoldier = None
         removeArrow()
+        removeDefence()
         removeMovementOptions()
       }
     }
@@ -236,6 +255,33 @@ class BattleController(gameField: GameField, parent: BattleControllerParent) {
     arrowIsShown = true
     battleView.handleEvent(ShowArrow(battleModel.hexBySoldier(soldier),
       visitedHexesList.current.get))
+  }
+
+  private def drawDefenceForHexFromWhichAttack() {
+    if (!selectedSoldier.isDefined ||
+      visitedHexesList.prev.map(_.soldier.isDefined).getOrElse(true)) {
+      return
+    }
+
+    val hexFromWhichAttack = visitedHexesList.prev.get
+    val soldier = selectedSoldier.get
+
+    defenceIsShown = true
+    val defence = battleModel.defenceForSoldier(selectedSoldier.get, hexFromWhichAttack)
+    battleView.handleEvent(ShowDefence(hexFromWhichAttack, defence, false))
+
+  }
+
+  private def drawDefenceForSelectedTerrainHex() {
+    withCurrent { hex =>
+      if (!selectedSoldier.isDefined || hex.soldier.isDefined) {
+        return
+      }
+
+      defenceIsShown = true
+      val defence = battleModel.defenceForSoldier(selectedSoldier.get, hex)
+      battleView.handleEvent(ShowDefence(hex, defence, true))
+    }
   }
 
   def update(time: Int) {

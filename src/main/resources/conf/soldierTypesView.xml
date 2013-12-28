@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <views>
 	<view name="Human-Horseman">
-		<attack1>
+		<attack1 imageName="spear">
 			<n>
 				<succ>
 					<image name="horseman-n-attack1"/>
@@ -87,7 +87,7 @@
 		</sounds>
 	</view>
 	<view name="Human-Mage">
-		<attack1>
+		<attack1 imageName="staff-magic">
 			<all>
 				<succ>
 					<image name="mage-attack-staff1"/>
@@ -95,7 +95,7 @@
 				</succ>
 			</all>
 		</attack1>
-		<attack2>
+		<attack2 imageName="fireball" projectile="Fireball">
 			<all>
 				<succ>
 					<image name="mage-attack-magic1"/>

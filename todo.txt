@@ -4,17 +4,17 @@ For M4, these things should be completed and tested
 +Use Grass movement and defence for Road and Bridges
 +Make default resistance zero
 +Move attack view configures to attack view
-Logging support
-Show defence when select where to move - in color
-Create assembly for different platforms
++Show defence when select where to move - in color
 Shown map of any size
-All human soldiers of 0 and 1 level are present
 Game menu
 Game option
+AI - battle chances
+All human soldiers of 0 and 1 level are present
 AI - different implementations
 AI - tournament mode
 Primitive map generation
 Changing position on minimap
+Logging support
 
 long play testing, bug fixing
 

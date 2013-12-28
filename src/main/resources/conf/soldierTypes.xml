@@ -2,7 +2,7 @@
 <soldierTypes>
 	<soldierType name="Human-Horseman" cost="23" hp="48" movement="8" exp="44" level="1">
 		<attacks>
-			<attack imageName="spear" damage="9" count="2" attackType="Pierce" ranged="false" attributes="Charge"/>
+			<attack damage="9" count="2" attackType="Pierce" ranged="false" attributes="Charge"/>
 		</attacks>
 		<moveCosts>
 			<moveCost type="Water" cost="3"/>
@@ -13,6 +13,7 @@
 			<moveCost type="Road" cost="1"/>
 			<moveCost type="Sand" cost="2"/>
 			<moveCost type="Grass" cost="1"/>
+			<moveCost type="Village" cost="2"/>
 		</moveCosts>
 		<defences>
 			<defence type="Water" defence="30"/>
@@ -36,8 +37,8 @@
 	</soldierType>
 	<soldierType name="Human-Mage" cost="20" hp="24" movement="5" exp="54" level="1">
 		<attacks>
-			<attack imageName="staff-magic" damage="5" count="1" attackType="Impact" ranged="false"/>
-			<attack imageName="fireball" damage="7" count="3" attackType="Fire" ranged="true" attributes="Magical" projectile="Fireball"/>
+			<attack damage="5" count="1" attackType="Impact" ranged="false"/>
+			<attack damage="7" count="3" attackType="Fire" ranged="true" attributes="Magical"/>
 		</attacks>
 		<moveCosts>
 			<moveCost type="Water" cost="3"/>
@@ -48,6 +49,7 @@
 			<moveCost type="Road" cost="1"/>
 			<moveCost type="Sand" cost="2"/>
 			<moveCost type="Grass" cost="1"/>
+			<moveCost type="Village" cost="2"/>
 		</moveCosts>
 		<defences>
 			<defence type="Water" defence="20"/>

@@ -21,6 +21,7 @@ import mr.merc.map.terrain.Village
 import mr.merc.map.objects.WoodenBridge
 import mr.merc.map.terrain.Grass
 import mr.merc.map.terrain.Road
+import mr.merc.unit.SoldierDefence
 
 class BattleModel(val map: GameField) extends BattleModelEventHandler {
   private var currentPlayerIndex = 0
@@ -216,4 +217,6 @@ class BattleModel(val map: GameField) extends BattleModelEventHandler {
       HaventMoved
     }
   }
+
+  def defenceForSoldier(soldier: Soldier, hex: TerrainHex) = Attack.calculateSoldierDefence(soldier, hex)
 }

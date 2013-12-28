@@ -230,4 +230,93 @@ class BattleControllerTest extends FunSuite with BeforeAndAfter {
     assert(attacker.attackedThisTurn === true)
   }
 
+  test("soldier is selected and when looking another cell, defence is shown") {
+    leftClick(0, 0)
+    val selected = controller.selectedSoldier.get
+    assert(controller.defenceIsShown === false)
+    moveMouse(0, 1)
+    assert(controller.defenceIsShown === true)
+    moveMouse(1, 0)
+    assert(controller.defenceIsShown === true)
+  }
+
+  test("soldier is selected and when looking cell out of reach, defence is shown") {
+    leftClick(0, 0)
+    val selected = controller.selectedSoldier.get
+    moveMouse(8, 8)
+    assert(controller.defenceIsShown === true)
+  }
+
+  test("soldier is selected, when another cell is occupied defence is not shown") {
+    leftClick(0, 0)
+    val selected = controller.selectedSoldier.get
+    moveMouse(3, 0)
+    assert(controller.defenceIsShown === false)
+    moveMouse(1, 0)
+    assert(controller.defenceIsShown === true)
+    moveMouse(0, 0)
+    assert(controller.defenceIsShown === false)
+  }
+
+  test("soldier not selected - defence is not shown") {
+    leftClick(1, 0)
+    assert(controller.defenceIsShown === false)
+    moveMouse(3, 0)
+    assert(controller.defenceIsShown === false)
+    moveMouse(0, 0)
+    assert(controller.defenceIsShown === false)
+  }
+
+  test("soldier is deselected - defence is hidden") {
+    leftClick(0, 0)
+    val selected = controller.selectedSoldier.get
+    moveMouse(1, 0)
+    assert(controller.defenceIsShown === true)
+    rightClick(0, 1)
+    assert(controller.defenceIsShown === false)
+    assert(controller.selectedSoldier === None)
+  }
+
+  test("when enemy soldier selected, defence is shown") {
+    leftClick(0, 4)
+    val selected = controller.selectedSoldier.get
+    moveMouse(1, 0)
+    assert(controller.defenceIsShown === true)
+    rightClick(0, 1)
+    assert(controller.defenceIsShown === false)
+    assert(controller.selectedSoldier === None)
+  }
+
+  test("when soldier moved, selection is lost and so lost defence") {
+    leftClick(0, 0)
+    moveMouse(1, 0)
+    assert(controller.defenceIsShown === true)
+    rightClick(1, 0)
+    assert(controller.battleView.mapView.terrainView.hex(1, 0).hex.soldier.get.name === "1")
+    assert(controller.defenceIsShown === false)
+  }
+
+  test("when soldier attacks, selection is lost and so lost defence") {
+    leftClick(0, 0)
+    moveMouse(0, 3)
+    assert(controller.defenceIsShown === true)
+    moveMouse(0, 4)
+    assert(controller.selectedSoldier.get.name === "1")
+    assert(controller.defenceIsShown === true)
+    val attacker = controller.selectedSoldier.get
+    assert(controller.soldierToShow.soldier.get.name === "3")
+    rightClick(0, 4)
+    assert(attacker.attackedThisTurn === true)
+    assert(controller.defenceIsShown === false)
+  }
+
+  test("when soldier moves and then attacks, defence is not shown") {
+    leftClick(0, 0)
+    rightClick(0, 3)
+    assert(controller.defenceIsShown === false)
+    moveMouse(0, 4)
+    assert(controller.defenceIsShown === false)
+    assert(controller.soldierToShow.soldier.get.name === "3")
+  }
+
 }

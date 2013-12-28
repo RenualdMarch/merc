@@ -61,6 +61,12 @@ class BattleView(model: BattleModel, _soldierDrawer: SoldiersDrawer = new Soldie
       case HideArrow => {
         mapView.terrainView.arrow = None
       }
+      case ShowDefence(view, defence, drawPolygon) => {
+        mapView.terrainView.defence = Some(wrap(view), defence, drawPolygon)
+      }
+      case HideDefence => {
+        mapView.terrainView.defence = None
+      }
     }
   }
 
