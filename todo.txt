@@ -5,8 +5,8 @@ For M4, these things should be completed and tested
 +Make default resistance zero
 +Move attack view configures to attack view
 +Show defence when select where to move - in color
-Shown map of any size
-Game menu
++Logging
++Game menu
 Game option
 AI - battle chances
 All human soldiers of 0 and 1 level are present
@@ -14,6 +14,7 @@ AI - different implementations
 AI - tournament mode
 Primitive map generation
 Changing position on minimap
+Shown map of any size
 Logging support
 
 long play testing, bug fixing

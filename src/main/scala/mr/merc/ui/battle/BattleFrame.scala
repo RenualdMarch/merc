@@ -33,8 +33,9 @@ import scalafx.scene.layout.GridPane
 import mr.merc.local.Localization
 import javafx.{ event => jfxe }
 import javafx.scene.{ input => jfxin }
+import mr.merc.ui.common.ConversionUtils._
 
-class BattleFrame extends BattleControllerParent {
+class BattleFrame extends BorderPane with BattleControllerParent {
   val field = new TerrainHexField(5, 5, mapInit)
   val player1 = Player("1", Color.BLUE)
   val player2 = Player("2", Color.YELLOW)
@@ -103,13 +104,12 @@ class BattleFrame extends BattleControllerParent {
     }, endTurnButton)
   }
 
-  val parentPane = new BorderPane() {
-    center = battleCanvas
-    right = rightPanel
-  }
+  // Initialization
+  center = battleCanvas
+  right = rightPanel
 
-  battleCanvas.width <== parentPane.width - rightPanel.width
-  battleCanvas.height <== parentPane.height
+  battleCanvas.width <== this.width - rightPanel.width
+  battleCanvas.height <== this.height
   minimap.prefWidth <== rightPanel.width / 2
   minimap.prefHeight <== rightPanel.width / 2
   soldierName.text <== soldierWrapper.name
@@ -117,33 +117,26 @@ class BattleFrame extends BattleControllerParent {
   soldierHP.text <== soldierWrapper.hp
   soldierType.text <== soldierWrapper.soldierType
 
-  // TODO remove java style here and below
-  battleCanvas.delegate.addEventHandler(jfxin.MouseEvent.MOUSE_CLICKED, new jfxe.EventHandler[jfxin.MouseEvent] {
-    def handle(event: jfxin.MouseEvent) {
-      val x = event.getX().toInt
-      val y = event.getY().toInt
-      controller.moveMouse(x, y)
-      if (event.getButton() == jfxin.MouseButton.PRIMARY) {
-        controller.leftClickMouse()
-      } else if (event.getButton() == jfxin.MouseButton.SECONDARY) {
-        controller.rightClickMouse()
-      }
-    }
-  })
-
-  battleCanvas.onMouseMoved = new jfxe.EventHandler[jfxin.MouseEvent] {
-    def handle(event: jfxin.MouseEvent) {
-      val x = event.getX().toInt
-      val y = event.getY().toInt
-      controller.moveMouse(x, y)
+  private def canvasMouseClicked(event: jfxin.MouseEvent) {
+    val x = event.getX().toInt
+    val y = event.getY().toInt
+    controller.moveMouse(x, y)
+    if (event.getButton() == jfxin.MouseButton.PRIMARY) {
+      controller.leftClickMouse()
+    } else if (event.getButton() == jfxin.MouseButton.SECONDARY) {
+      controller.rightClickMouse()
     }
   }
 
-  endTurnButton.onAction = new jfxe.EventHandler[ActionEvent] {
-    def handle(event: ActionEvent) {
-      controller.endTurnButton()
-    }
+  battleCanvas.delegate.addEventHandler(jfxin.MouseEvent.MOUSE_CLICKED, canvasMouseClicked _)
+
+  battleCanvas.onMouseMoved = { event: jfxin.MouseEvent =>
+    val x = event.getX().toInt
+    val y = event.getY().toInt
+    controller.moveMouse(x, y)
   }
+
+  endTurnButton.onAction = { e: ActionEvent => controller.endTurnButton() }
 
   import scalafx.Includes._
   val timeline = Timeline(KeyFrame(50 ms, onFinished = gameLoop))

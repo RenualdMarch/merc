@@ -47,19 +47,19 @@ import java.util.PropertyResourceBundle
 import mr.merc.local.MercResourceBundle
 import mr.merc.ui.battle.BattleFrame
 import mr.merc.music.MusicPlayer
+import mr.merc.ui.menu.MainMenu
+import mr.merc.ui.common.SceneManager
 
 object Main extends JFXApp {
-  val battleFrame = new BattleFrame
-  val rootPane = battleFrame.parentPane
 
   val screenRect = Screen.primary.visualBounds
 
   stage = new PrimaryStage {
     title = "Mercenary"
-    scene = new Scene(screenRect.width, screenRect.height) {
-      root = rootPane
-    }
+    scene = new Scene(screenRect.width, screenRect.height)
   }
+  val sceneManager = new SceneManager(stage)
+  sceneManager.showMainMenu()
 
   MusicPlayer.playMusic()
 }

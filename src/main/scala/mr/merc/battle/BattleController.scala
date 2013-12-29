@@ -25,8 +25,9 @@ import scalafx.stage.Modality
 import mr.merc.unit.Attack
 import mr.merc.battle.event.HideDefence
 import mr.merc.battle.event.ShowDefence
+import mr.merc.log.Logging
 
-class BattleController(gameField: GameField, parent: BattleControllerParent) {
+class BattleController(gameField: GameField, parent: BattleControllerParent) extends Logging {
   val battleModel = new BattleModel(gameField)
   val battleView = new BattleView(battleModel)
 
@@ -39,6 +40,7 @@ class BattleController(gameField: GameField, parent: BattleControllerParent) {
   private[battle] val visitedHexesList = new VisitedHexesList()
 
   def moveMouse(x: Int, y: Int) {
+    debug(s"Mouse moved to ($x, $y)")
     val hexOpt = battleView.hexByPixel(x, y)
     hexOpt match {
       case Some(hexView) => {
@@ -105,6 +107,7 @@ class BattleController(gameField: GameField, parent: BattleControllerParent) {
   }
 
   def rightClickMouse() = withCurrent(currentHex => {
+    debug(s"Mouse right clicked in hex (${currentHex.x}, ${currentHex.y})")
     currentHex.soldier match {
       case Some(soldier) => {
         selectedSoldier match {
@@ -180,6 +183,7 @@ class BattleController(gameField: GameField, parent: BattleControllerParent) {
   }
 
   def endTurnButton() {
+    debug(s"End turn button clicked")
     if (battleModel.validateEndTurn) {
       val result = battleModel.handleEvent(EndMoveModelEvent())
       battleView.handleEvent(result.buildBattleViewEvent)
@@ -192,6 +196,7 @@ class BattleController(gameField: GameField, parent: BattleControllerParent) {
   }
 
   def leftClickMouse() = withCurrent(hex => {
+    debug(s"Mouse left clicked in hex (${hex.x}, ${hex.y})")
     hex.soldier match {
       case Some(soldier) => {
         selectedSoldier = Some(soldier)

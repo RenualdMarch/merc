@@ -18,3 +18,6 @@ attackAttribute.magical=Магический
 attackAttribute.marksman=Снайпер
 attackAttribute.poison=Яд
 attackAttribute.slow=Замедляет
+menu.newBattle=Новая битва
+menu.options=Настройки
+menu.exit=Выход

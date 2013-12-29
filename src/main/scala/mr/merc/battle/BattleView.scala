@@ -20,9 +20,10 @@ import mr.merc.view.move.SoldierRangedAttackMovement
 import mr.merc.view.move.MomentaryMovement
 import mr.merc.view.move.MomentaryMovement
 import mr.merc.unit.view._
+import mr.merc.log.Logging
 
 // injecting soldier drawer for test purposes only
-class BattleView(model: BattleModel, _soldierDrawer: SoldiersDrawer = new SoldiersDrawer) {
+class BattleView(model: BattleModel, _soldierDrawer: SoldiersDrawer = new SoldiersDrawer) extends Logging {
   val mapView = new MapView(model.map.hexField, _soldierDrawer)
 
   private val hexesViewMap = mapView.terrainView.hexes.map(v => (v.hex -> v)) toMap
@@ -43,6 +44,7 @@ class BattleView(model: BattleModel, _soldierDrawer: SoldiersDrawer = new Soldie
   def wrap(t: TerrainHex) = hexesViewMap(t)
 
   def handleEvent(event: BattleViewEvent) {
+    info(s"Battle view received event $event")
     event match {
       case AttackBattleViewEvent(attackerTerrainHex, defenderTerrainHex, attacker, defender, result) =>
         handleAttackEvent(wrap(attackerTerrainHex), wrap(defenderTerrainHex), attacker, defender, result)

@@ -22,14 +22,16 @@ import mr.merc.map.objects.WoodenBridge
 import mr.merc.map.terrain.Grass
 import mr.merc.map.terrain.Road
 import mr.merc.unit.SoldierDefence
+import mr.merc.log.Logging
 
-class BattleModel(val map: GameField) extends BattleModelEventHandler {
+class BattleModel(val map: GameField) extends BattleModelEventHandler with Logging {
   private var currentPlayerIndex = 0
   def currentPlayer = map.players(currentPlayerIndex)
   private def soldiers = map.hexField.hexes.flatMap(_.soldier)
   setSoldierTurnState()
 
   def handleEvent(event: BattleModelEvent): BattleModelEventResult = {
+    info(s"Battle model recevied event $event")
     event match {
       case MovementModelEvent(soldier, from, to) => handleMovementEvent(soldier, from, to)
       case AttackModelEvent(soldier, from, target, attackNumber) => handleAttackEvent(soldier, from, target, attackNumber)
