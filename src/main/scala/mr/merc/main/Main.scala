@@ -57,6 +57,8 @@ object Main extends JFXApp {
   stage = new PrimaryStage {
     title = "Mercenary"
     scene = new Scene(screenRect.width, screenRect.height)
+    // TODO check on java 8
+    // fullScreen = true
   }
   val sceneManager = new SceneManager(stage)
   sceneManager.showMainMenu()

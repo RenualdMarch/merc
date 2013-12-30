@@ -34,8 +34,10 @@ import mr.merc.local.Localization
 import javafx.{ event => jfxe }
 import javafx.scene.{ input => jfxin }
 import mr.merc.ui.common.ConversionUtils._
+import mr.merc.ui.common.SceneManager
 
-class BattleFrame extends BorderPane with BattleControllerParent {
+// TODO move all styling to css
+class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleControllerParent {
   val field = new TerrainHexField(5, 5, mapInit)
   val player1 = Player("1", Color.BLUE)
   val player2 = Player("2", Color.YELLOW)
@@ -58,7 +60,7 @@ class BattleFrame extends BorderPane with BattleControllerParent {
 
   val controller = new BattleController(gameField, this)
 
-  override def window = battleCanvas.asInstanceOf[Node].getScene().getWindow()
+  override def window = sceneManager.stage
 
   private val battleCanvas = new Canvas()
   private val minimap = new Minimap(field)

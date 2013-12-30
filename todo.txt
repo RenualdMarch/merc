@@ -7,7 +7,7 @@ For M4, these things should be completed and tested
 +Show defence when select where to move - in color
 +Logging
 +Game menu
-Game option
++Game options
 AI - battle chances
 All human soldiers of 0 and 1 level are present
 AI - different implementations
@@ -16,7 +16,8 @@ Primitive map generation
 Changing position on minimap
 Shown map of any size
 Logging support
-
+investigate MigLayout - a lot of UI ahead
+Levels of difficulty
 long play testing, bug fixing
 
 

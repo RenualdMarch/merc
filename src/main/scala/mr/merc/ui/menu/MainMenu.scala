@@ -19,17 +19,23 @@ class MainMenu(sceneManager: SceneManager) extends BorderPane {
 
   val newBattleButton = new Button {
     text = Localization("menu.newBattle")
-  }
-  newBattleButton.onAction = { e: ActionEvent =>
-    sceneManager.startNewBattle()
+    onAction = { e: ActionEvent =>
+      sceneManager.startNewBattle()
+    }
   }
 
   val optionsButton = new Button {
     text = Localization("menu.options")
+    onAction = { e: ActionEvent =>
+      sceneManager.showOptionsMenu()
+    }
   }
 
   val exitButton = new Button {
     text = Localization("menu.exit")
+    onAction = { e: ActionEvent =>
+      sceneManager.exit()
+    }
   }
 
   val menuPane = new VBox {
@@ -40,7 +46,6 @@ class MainMenu(sceneManager: SceneManager) extends BorderPane {
 
   menuPane.spacing <== height / (5 * menuPane.children.size())
 
-  menuPane.padding = Insets(10)
   menuPane.maxWidth <== width / 5
   menuPane.maxHeight <== height / 2
   menuPane.minHeight <== height / 2

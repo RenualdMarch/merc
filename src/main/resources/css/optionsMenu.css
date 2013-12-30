@@ -1,0 +1,16 @@
+.optionsMenuContainer {
+	-fx-background-image: url("../images/ui/mainMenuBackgroundImage.png");
+	-fx-background-repeat: stretch;
+	-fx-background-size: stretch;
+	-fx-background-position: center center;
+}
+
+.optionsPane {
+	-fx-background-color: Blue;
+    -fx-border-radius: 50 50 50 50;
+    -fx-background-radius: 50 50 50 50;
+}
+
+.textLabels {
+	-fx-fill: white;
+}

@@ -21,3 +21,6 @@ attackAttribute.slow=Замедляет
 menu.newBattle=Новая битва
 menu.options=Настройки
 menu.exit=Выход
+options.soundsEnabled=Звуки
+options.musicEnabled=Музыка
+options.language=Язык

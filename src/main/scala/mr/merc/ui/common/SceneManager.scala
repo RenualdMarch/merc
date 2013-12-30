@@ -6,17 +6,28 @@ import scalafx.scene.Parent
 import mr.merc.ui.battle.BattleFrame
 import mr.merc.ui.menu.MainMenu
 import mr.merc.log.Logging
+import mr.merc.ui.menu.OptionsMenu
 
 class SceneManager(val stage: Stage) extends Logging {
 
   def startNewBattle() {
     info("starting new battle")
-    sceneRoot = new BattleFrame
+    sceneRoot = new BattleFrame(this)
   }
 
   def showMainMenu() {
     info("showing main menu")
     sceneRoot = new MainMenu(this)
+  }
+
+  def showOptionsMenu() {
+    info("showing options menu")
+    sceneRoot = new OptionsMenu(this)
+  }
+
+  def exit() {
+    info("exit")
+    stage.close()
   }
 
   private def sceneRoot_=(parent: Parent) {

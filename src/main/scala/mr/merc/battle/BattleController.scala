@@ -177,6 +177,7 @@ class BattleController(gameField: GameField, parent: BattleControllerParent) ext
     val dialog = new AttackSelectionDialog(attacker, defender, attackerHex, defenderHex)
     dialog.initModality(Modality.WINDOW_MODAL)
     dialog.initOwner(parent.window)
+    dialog.centerOnScreen()
     dialog.showAndWait()
 
     dialog.selectedAttack
