@@ -20,6 +20,8 @@ libraryDependencies += "com.projectdarkstar.ext.jorbis" % "jorbis" % "0.0.17"
 
 libraryDependencies += "de.huxhorn.sulky" % "de.huxhorn.sulky.3rdparty.jlayer" % "1.0"
 
+libraryDependencies += "com.miglayout" % "miglayout-javafx" % "4.2"
+
 unmanagedJars in Test += Attributed.blank(file(System.getenv("JAVA_HOME") + "/jre/lib/jfxrt.jar"))
 
 scalacOptions ++= Seq("-feature", "-deprecation", "-language:postfixOps", "-language:implicitConversions")

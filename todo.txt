@@ -8,11 +8,11 @@ For M4, these things should be completed and tested
 +Logging
 +Game menu
 +Game options
-AI - battle chances
-All human soldiers of 0 and 1 level are present
++AI - battle chances
 AI - different implementations
-AI - tournament mode
 Primitive map generation
+All human soldiers of 0 and 1 level are present
+AI - tournament mode
 Changing position on minimap
 Shown map of any size
 Logging support
