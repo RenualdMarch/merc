@@ -186,7 +186,7 @@ class BattleController(gameField: GameField, parent: BattleControllerParent) ext
   def endTurnButton() {
     debug(s"End turn button clicked")
     if (battleModel.validateEndTurn) {
-      val result = battleModel.handleEvent(EndMoveModelEvent())
+      val result = battleModel.handleEvent(EndMoveModelEvent)
       battleView.handleEvent(result.buildBattleViewEvent)
       removeArrow()
       removeDefence()

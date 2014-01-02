@@ -10,23 +10,23 @@ sealed trait BattleModelEvent {
 }
 
 sealed trait BattleModelEventResult {
-  def buildBattleViewEvent:BattleViewEvent
+  def buildBattleViewEvent: BattleViewEvent
 }
 
 trait BattleModelEventHandler {
-  def handleEvent(event:BattleModelEvent):BattleModelEventResult
+  def handleEvent(event: BattleModelEvent): BattleModelEventResult
 }
 
-case class MovementModelEvent(soldier:Soldier, from:TerrainHex, to:TerrainHex) extends BattleModelEvent
-case class AttackModelEvent(soldier:Soldier, from:TerrainHex, target:TerrainHex, attackNumber:Int) extends BattleModelEvent
-case class EndMoveModelEvent() extends BattleModelEvent
+case class MovementModelEvent(soldier: Soldier, from: TerrainHex, to: TerrainHex) extends BattleModelEvent
+case class AttackModelEvent(soldier: Soldier, from: TerrainHex, target: TerrainHex, attackNumber: Int) extends BattleModelEvent
+case object EndMoveModelEvent extends BattleModelEvent
 
-case class AttackModelEventResult(attackerTerrainHex:TerrainHex, defenterTerrainHex:TerrainHex, attacker:Soldier, defender:Soldier, result:List[AttackResult]) extends BattleModelEventResult {
+case class AttackModelEventResult(attackerTerrainHex: TerrainHex, defenterTerrainHex: TerrainHex, attacker: Soldier, defender: Soldier, result: List[AttackResult]) extends BattleModelEventResult {
   def buildBattleViewEvent = AttackBattleViewEvent(attackerTerrainHex, defenterTerrainHex, attacker, defender, result)
 }
-case class MovementModelEventResult(soldier:Soldier, path:List[TerrainHex]) extends BattleModelEventResult {
+case class MovementModelEventResult(soldier: Soldier, path: List[TerrainHex]) extends BattleModelEventResult {
   def buildBattleViewEvent = MoveBattleViewEvent(soldier, path)
 }
-case class EndMoveModelEventResult(nextPlayer:Player) extends BattleModelEventResult {
+case class EndMoveModelEventResult(nextPlayer: Player) extends BattleModelEventResult {
   def buildBattleViewEvent = EndMoveViewEvent(nextPlayer)
 }

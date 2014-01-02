@@ -407,5 +407,15 @@ class BattleModelTest extends FunSuite with BeforeAndAfter {
     assert(field.hex(0, 1).soldier === Some(soldier))
     assert(soldier.movePointsRemain === 0)
   }
+
+  test("all soldiers") {
+    val soldier = new Soldier("1", simpleSoldierType, Player("1"))
+    assert(model.allSoldiers.isEmpty === true)
+    field.hex(0, 0).soldier = Some(soldier)
+    assert(model.allSoldiers.size === 1)
+    assert(model.allSoldiers(0) === soldier)
+    assert(model.allSoldiersWithHexes.size === 1)
+    assert(model.allSoldiersWithHexes(0) === (soldier, field.hex(0, 0)))
+  }
 }
 

@@ -27,7 +27,19 @@ import mr.merc.log.Logging
 class BattleModel(val map: GameField) extends BattleModelEventHandler with Logging {
   private var currentPlayerIndex = 0
   def currentPlayer = map.players(currentPlayerIndex)
-  private def soldiers = map.hexField.hexes.flatMap(_.soldier)
+  private var prevSoldiersWithHexes: Option[List[(Soldier, TerrainHex)]] = None
+  map.hexField.soldierChangeListener = (_, _) => { prevSoldiersWithHexes = None }
+  def allSoldiersWithHexes = {
+    prevSoldiersWithHexes match {
+      case Some(soldiers) => soldiers
+      case None => {
+        val sh = map.hexField.hexes.filter(_.soldier.isDefined).map(h => (h.soldier.get, h)).toList
+        prevSoldiersWithHexes = Some(sh)
+        prevSoldiersWithHexes.get
+      }
+    }
+  }
+  def allSoldiers = allSoldiersWithHexes.map(_._1)
   setSoldierTurnState()
 
   def handleEvent(event: BattleModelEvent): BattleModelEventResult = {
@@ -35,7 +47,7 @@ class BattleModel(val map: GameField) extends BattleModelEventHandler with Loggi
     event match {
       case MovementModelEvent(soldier, from, to) => handleMovementEvent(soldier, from, to)
       case AttackModelEvent(soldier, from, target, attackNumber) => handleAttackEvent(soldier, from, target, attackNumber)
-      case EndMoveModelEvent() => handleEndTurnEvent()
+      case EndMoveModelEvent => handleEndTurnEvent()
     }
   }
 
@@ -66,7 +78,7 @@ class BattleModel(val map: GameField) extends BattleModelEventHandler with Loggi
       filter(_._3.player == currentPlayer).flatMap { case (x, y, s) => s.beforeTurnActions(map.hexField, x, y) }
     val filteredActions = BeforeTurnAction.filterActions(beforeTurnActions.toSet)
     filteredActions foreach (_.action())
-    soldiers.filter(_.player == currentPlayer).foreach(_.beforeTurnRenowation())
+    allSoldiers.filter(_.player == currentPlayer).foreach(_.beforeTurnRenowation())
     setSoldierTurnState()
     EndMoveModelEventResult(currentPlayer)
   }
