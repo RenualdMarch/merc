@@ -8,13 +8,13 @@ import mr.merc.unit.Soldier
 import mr.merc.players.Player
 import mr.merc.unit.Attack
 import mr.merc.unit.Impact
-import mr.merc.map.terrain.Grass
+import mr.merc.map.terrain._
 import mr.merc.map.GameField
 import mr.merc.battle.BattleModel
 import org.scalatest.BeforeAndAfter
 
 class AIAgentTest extends FunSuite with BeforeAndAfter {
-  val conf = AIConfiguration(0.4)
+  val conf = AIConfiguration(0.4, 0, 0, 1, 10, 1)
   val field = new TerrainHexField(10, 10, TerrainHex.grassInit)
   val model = new BattleModel(new GameField(field, List(Player("1"), Player("2"))))
   val soldierType = new SoldierType("", 20, 40, 4, 1, 1,
@@ -60,5 +60,27 @@ class AIAgentTest extends FunSuite with BeforeAndAfter {
     val agent = new AIAgent(attacker, hex(0, 0), conf)
     val bestTarget = agent.bestTarget(model)
     assert(bestTarget === None)
+  }
+
+  test("move closer to enemy") {
+    def hexInit(x: Int, y: Int) = if (y == 4) new TerrainHex(x, y, Sand) else new TerrainHex(x, y, Grass)
+    val field = new TerrainHexField(1, 10, hexInit)
+    val model = new BattleModel(new GameField(field, List(Player("1"), Player("2"))))
+    val soldierType = new SoldierType("", 20, 40, 10, 1, 1,
+      List(new Attack(0, 10, 2, Impact, false)), Map(Grass -> 2, Sand -> 2), Map(Grass -> 50, Sand -> 60), Map(Impact -> 0))
+    val conf1 = AIConfiguration(0.4, 0, 0, 1, 10, 1)
+    val soldier = new Soldier("1", soldierType, Player("1"))
+    field.hex(0, 0).soldier = Some(soldier)
+    val agent1 = new AIAgent(soldier, field.hex(0, 0), conf1)
+    val move1 = agent1.moveCloserToEnemy(field.hex(0, 9), model)
+    assert(move1.from === field.hex(0, 0))
+    assert(move1.to === field.hex(0, 4))
+    assert(move1.soldier === soldier)
+    val conf0 = AIConfiguration(0.4, 0, 0, 0, 10, 1)
+    val agent0 = new AIAgent(soldier, field.hex(0, 0), conf0)
+    val move0 = agent0.moveCloserToEnemy(field.hex(0, 9), model)
+    assert(move0.from === field.hex(0, 0))
+    assert(move0.to === field.hex(0, 5))
+    assert(move0.soldier === soldier)
   }
 }
