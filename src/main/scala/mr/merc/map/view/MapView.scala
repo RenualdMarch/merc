@@ -51,4 +51,7 @@ class MapView(field: TerrainHexField, val soldiersDrawer: SoldiersDrawer = new S
   def addMovement(movement: Movement) {
     soldiersDrawer.addMovement(movement)
   }
+
+  def pixelWidth = terrainView.hex(field.width - 1, 0).x + TerrainHexView.Side
+  def pixelHeight = terrainView.hex(0, field.height - 1).y + TerrainHexView.Side
 }

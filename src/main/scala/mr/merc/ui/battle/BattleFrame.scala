@@ -35,10 +35,11 @@ import javafx.{ event => jfxe }
 import javafx.scene.{ input => jfxin }
 import mr.merc.ui.common.ConversionUtils._
 import mr.merc.ui.common.SceneManager
+import scalafx.scene.control.ScrollPane
 
 // TODO move all styling to css
 class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleControllerParent {
-  val field = new TerrainHexField(5, 5, mapInit)
+  val field = new TerrainHexField(20, 20, mapInit)
   val player1 = Player("1", Color.BLUE)
   val player2 = Player("2", Color.YELLOW)
   val soldier = new Soldier("1", SoldierType("Human-Horseman"), player2)
@@ -63,7 +64,12 @@ class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleCont
   override def window = sceneManager.stage
 
   private val battleCanvas = new Canvas()
-  private val minimap = new Minimap(field)
+
+  private val battleCanvasScrollPane = new ScrollPane {
+    content = battleCanvas
+    style = "-fx-background-color:BLACK;"
+  }
+  private val minimap = new Minimap(field, battleCanvasScrollPane)
   private val soldierName = new Text()
   private val soldierLevel = new Text()
   private val soldierHP = new Text()
@@ -107,11 +113,13 @@ class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleCont
   }
 
   // Initialization
-  center = battleCanvas
+  center = battleCanvasScrollPane
   right = rightPanel
 
-  battleCanvas.width <== this.width - rightPanel.width
-  battleCanvas.height <== this.height
+  battleCanvasScrollPane.prefWidth <== this.width - rightPanel.width
+  battleCanvasScrollPane.prefHeight <== this.height
+  battleCanvas.width.value = controller.battleView.mapView.pixelWidth
+  battleCanvas.height.value = controller.battleView.mapView.pixelHeight
   minimap.prefWidth <== rightPanel.width / 2
   minimap.prefHeight <== rightPanel.width / 2
   soldierName.text <== soldierWrapper.name
@@ -158,7 +166,7 @@ class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleCont
     val timePassed = currentTime - lastUpdateTime
     lastUpdateTime = currentTime
     controller.update(timePassed.toInt)
-    reset(Color.BLUE)
+    reset(Color.BLACK)
     controller.drawBattleCanvas(gc)
   }
 

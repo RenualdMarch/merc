@@ -8,10 +8,26 @@ import mr.merc.map.terrain._
 import javafx.beans.property.SimpleDoubleProperty
 import scala.beans.BeanProperty
 import scalafx.scene.layout.VBox
+import scalafx.scene.control.ScrollPane
+import mr.merc.map.view.MapView
+import scalafx.beans.binding.Bindings._
 
-class Minimap(field: TerrainHexField) extends VBox {
+class Minimap(field: TerrainHexField, pane: ScrollPane) extends VBox {
   private val canvas = new Canvas()
-  content = canvas
+  private val mapView = new MapView(field)
+  private var updateOnPaneChange = true
+
+  // proportion is pane side / this side, expected to be more than 1
+  private val mapToMinimapWidthProportion = when(this.width.isEqualTo(0)).choose(0).otherwise(pane.width / this.width)
+  private val mapToMinimapHeightProportion = when(this.height.isEqualTo(0)).choose(0).otherwise(pane.height / this.height)
+  private val visiblePartWidth = pane.width / mapView.pixelWidth
+  private val visiblePartHeight = pane.height / mapView.pixelHeight
+  private val rectWidth = visiblePartWidth * this.width
+  private val rectHeight = visiblePartHeight * this.height
+
+  private var rectPosX = 0
+  private var rectPosY = 0
+
   canvas.width <== width
   canvas.height <== height
   canvas.width.onChange(redraw())
@@ -50,7 +66,80 @@ class Minimap(field: TerrainHexField) extends VBox {
     gc.stroke = Color.GRAY
     gc.strokeRect(xOffset, yOffset, size.minimapUsefulWidth, size.minimapUsefulHeight)
 
+    gc.stroke = Color.WHITE
+    gc.strokeRect(rectPosX, rectPosY, rectWidth.toDouble, rectHeight.toDouble)
+
     gc.restore()
+  }
+
+  def clickOnMinimap(x: Int, y: Int) {
+    if (rectWidth.intValue == 0 || rectHeight.intValue == 0) {
+      return
+    }
+
+    rectPosX = x - rectWidth.intValue / 2
+    rectPosY = y - rectHeight.intValue / 2
+
+    if (rectPosY < 0) {
+      rectPosY = 0
+    }
+
+    if (rectPosY < 0) {
+      rectPosY = 0
+    }
+
+    if (rectPosX + rectWidth.intValue > this.width.value) {
+      rectPosX = this.width.value.toInt - rectWidth.intValue
+    }
+
+    if (rectPosY + rectHeight.intValue > this.height.value) {
+      rectPosY = this.height.value.toInt - rectHeight.intValue
+    }
+
+    updatePositionOnMap()
+  }
+
+  def updatePositionOnMinimap() {
+    val y = pane.vvalue.value.toInt
+    val x = pane.hvalue.value.toInt
+    val coords = positionOnMapToMinimap(x, y)
+    rectPosX = coords._1
+    rectPosY = coords._2
+    redraw()
+  }
+
+  def updatePositionOnMap() {
+    val coords = positionOnMinimapToMap(rectPosX, rectPosY)
+    pane.hvalue.value = coords._1
+    pane.vvalue.value = coords._2
+  }
+
+  pane.hvalue.onChange {
+    if (updateOnPaneChange) {
+      updatePositionOnMinimap()
+    }
+  }
+
+  pane.vvalue.onChange {
+    if (updateOnPaneChange) {
+      updatePositionOnMinimap()
+    }
+  }
+
+  private def positionOnMapToMinimap(x: Int, y: Int): (Int, Int) = {
+    if (mapToMinimapWidthProportion.doubleValue == 0 || mapToMinimapWidthProportion.doubleValue == 0) {
+      (0, 0)
+    } else {
+      val newX = x / mapToMinimapWidthProportion.doubleValue()
+      val newY = y / mapToMinimapWidthProportion.doubleValue()
+      (newX.toInt, newY.toInt)
+    }
+  }
+
+  private def positionOnMinimapToMap(x: Int, y: Int): (Int, Int) = {
+    val newX = x * mapToMinimapWidthProportion.doubleValue()
+    val newY = y * mapToMinimapWidthProportion.doubleValue()
+    (newX.toInt, newY.toInt)
   }
 
   private def color(hex: TerrainHex): Color = {
