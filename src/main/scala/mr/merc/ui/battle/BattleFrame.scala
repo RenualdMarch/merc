@@ -36,10 +36,14 @@ import javafx.scene.{ input => jfxin }
 import mr.merc.ui.common.ConversionUtils._
 import mr.merc.ui.common.SceneManager
 import scalafx.scene.control.ScrollPane
+import mr.merc.map.generator.RandomTerrainGenerator
+import mr.merc.log.Logging
+import scalafx.scene.CacheHint
 
 // TODO move all styling to css
-class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleControllerParent {
-  val field = new TerrainHexField(40, 40, mapInit)
+class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleControllerParent with Logging {
+  val generator = new RandomTerrainGenerator
+  val field = generator.generateMap(10, 10, 0) //new TerrainHexField(40, 40, mapInit)
   val player1 = Player("1", Color.BLUE)
   val player2 = Player("2", Color.YELLOW)
   val soldier = new Soldier("1", SoldierType("Human-Horseman"), player2)
@@ -64,7 +68,6 @@ class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleCont
   override def window = sceneManager.stage
 
   private val battleCanvas = new Canvas()
-
   private val battleCanvasScrollPane = new ScrollPane {
     content = battleCanvas
     style = "-fx-background-color:BLACK;"
@@ -165,7 +168,9 @@ class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleCont
     val currentTime = System.currentTimeMillis
     val timePassed = currentTime - lastUpdateTime
     lastUpdateTime = currentTime
+    debug(s"in game loot $timePassed ms passed since previous call")
     controller.update(timePassed.toInt)
+
     reset(Color.BLACK)
     controller.drawBattleCanvas(gc)
   }

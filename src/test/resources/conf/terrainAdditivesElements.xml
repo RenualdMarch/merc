@@ -17,4 +17,17 @@
 	<element type="Sand" from="S" to="S"/>
 	<element type="Sand" from="SE" to="SE"/>
 	<element type="Sand" from="SW" to="SW"/>
+	
+	<element type="BankInside" from="N" to="N"/>
+	<element type="BankInside" from="NE" to="NE"/>
+	<element type="BankInside" from="NW" to="NW"/>
+	<element type="BankInside" from="S" to="S"/>
+	<element type="BankInside" from="SE" to="SE"/>
+	<element type="BankInside" from="SW" to="SW"/>
+	<element type="BankInside" from="NE" to="SE"/>
+	<element type="BankInside" from="N" to="NE"/>
+	<element type="BankInside" from="NW" to="N"/>
+	<element type="BankInside" from="SE" to="S"/>
+	<element type="BankInside" from="S" to="SW"/>
+	<element type="BankInside" from="SW" to="NW"/>
 </elements>

@@ -11,12 +11,17 @@ For M4, these things should be completed and tested
 +AI - battle chances
 +Changing position on minimap
 +Shown map of any size
-Primitive map generation
++Primitive map generation
+Allies
+Draw trees above bridges
+agressive performance optimizations
+Hills and mountains borders
 AI - different implementations
 All human soldiers of 0 and 1 level are present
 AI - tournament mode
 Logging support
 investigate MigLayout - a lot of UI ahead
+experiment with no changes on canvas if nothing is changed
 Levels of difficulty
 long play testing, bug fixing
 
