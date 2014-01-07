@@ -11,97 +11,108 @@ import scalafx.scene.layout.VBox
 import scalafx.scene.control.ScrollPane
 import mr.merc.map.view.MapView
 import scalafx.beans.binding.Bindings._
+import javafx.scene.{ input => jfxin }
+import mr.merc.ui.common.ConversionUtils._
 
 class Minimap(field: TerrainHexField, pane: ScrollPane) extends VBox {
   private val canvas = new Canvas()
+  content = canvas
   private val mapView = new MapView(field)
   private var updateOnPaneChange = true
 
-  // proportion is pane side / this side, expected to be more than 1
-  private val mapToMinimapWidthProportion = when(this.width.isEqualTo(0)).choose(0).otherwise(pane.width / this.width)
-  private val mapToMinimapHeightProportion = when(this.height.isEqualTo(0)).choose(0).otherwise(pane.height / this.height)
-  private val visiblePartWidth = pane.width / mapView.pixelWidth
-  private val visiblePartHeight = pane.height / mapView.pixelHeight
-  private val rectWidth = visiblePartWidth * this.width
-  private val rectHeight = visiblePartHeight * this.height
+  private def xOffset = (width.value - minimapSize.minimapUsefulWidth) / 2
+  private def yOffset = (height.value - minimapSize.minimapUsefulHeight) / 2
 
-  private var rectPosX = 0
-  private var rectPosY = 0
+  private def visiblePartWidth = Math.min(1, pane.width.value / mapView.pixelWidth)
+  private def visiblePartHeight = Math.min(1, pane.height.value / mapView.pixelHeight)
+  private def rectWidth = visiblePartWidth * minimapSize.minimapUsefulWidth
+  private def rectHeight = visiblePartHeight * minimapSize.minimapUsefulHeight
+  private def scrollableWidth = minimapSize.minimapUsefulWidth - rectWidth
+  private def scrollableHeight = minimapSize.minimapUsefulHeight - rectHeight
+
+  private var rectPosX = 0d
+  private var rectPosY = 0d
 
   canvas.width <== width
   canvas.height <== height
   canvas.width.onChange(redraw())
   canvas.height.onChange(redraw())
 
+  def minimapSize = MinimapSize(field.width, field.height, width.value.toInt, height.value.toInt)
+
   def redraw() {
-    draw()
-  }
-
-  private def draw() {
-    val size = MinimapSize(field.width, field.height, width.value.toInt, height.value.toInt)
-
     val w = width.value
     val h = height.value
     if (w == 0 || h == 0) {
+
       return ;
     }
-
-    val xOffset = (w - size.minimapUsefulWidth) / 2
-    val yOffset = (h - size.minimapUsefulHeight) / 2
 
     val gc = canvas.graphicsContext2D
     gc.save()
     gc.fill = Color.BLACK
     gc.fillRect(0, 0, w, h)
 
-    val side = size.cellSide
+    val side = minimapSize.cellSide
     field.hexes.foreach { hex =>
       val x = hex.x * side + xOffset
       val offset = if (hex.x % 2 == 0) 0 else side / 2
-      val y = hex.y * side + offset + yOffset
+      val y = hex.y * side + offset.ceil + yOffset
       gc.fill = color(hex)
       gc.fillRect(x, y, side, side)
     }
 
     gc.stroke = Color.GRAY
-    gc.strokeRect(xOffset, yOffset, size.minimapUsefulWidth, size.minimapUsefulHeight)
+    gc.strokeRect(xOffset, yOffset, minimapSize.minimapUsefulWidth, minimapSize.minimapUsefulHeight)
 
     gc.stroke = Color.WHITE
-    gc.strokeRect(rectPosX, rectPosY, rectWidth.toDouble, rectHeight.toDouble)
+    gc.lineWidth = 2
+    gc.strokeRect(xOffset + rectPosX, yOffset + rectPosY,
+      rectWidth, rectHeight)
 
     gc.restore()
   }
 
+  canvas.delegate.addEventHandler(jfxin.MouseEvent.MOUSE_CLICKED, canvasMouseClicked _)
+  canvas.delegate.addEventHandler(jfxin.MouseEvent.MOUSE_DRAGGED, canvasMouseClicked _)
+
+  private def canvasMouseClicked(event: jfxin.MouseEvent) {
+    val x = event.getX().toInt
+    val y = event.getY().toInt
+    clickOnMinimap(x, y)
+    redraw()
+  }
+
   def clickOnMinimap(x: Int, y: Int) {
-    if (rectWidth.intValue == 0 || rectHeight.intValue == 0) {
+    if (rectWidth == 0 || rectHeight == 0) {
       return
     }
 
-    rectPosX = x - rectWidth.intValue / 2
-    rectPosY = y - rectHeight.intValue / 2
+    rectPosX = x - xOffset - rectWidth / 2
+    rectPosY = y - yOffset - rectHeight / 2
 
-    if (rectPosY < 0) {
-      rectPosY = 0
+    if (rectPosX + rectWidth > minimapSize.minimapUsefulWidth) {
+      rectPosX = minimapSize.minimapUsefulWidth - rectWidth
+    }
+
+    if (rectPosY + rectHeight.intValue > minimapSize.minimapUsefulHeight) {
+      rectPosY = minimapSize.minimapUsefulHeight - rectHeight.intValue
+    }
+
+    if (rectPosX < 0) {
+      rectPosX = 0
     }
 
     if (rectPosY < 0) {
       rectPosY = 0
-    }
-
-    if (rectPosX + rectWidth.intValue > this.width.value) {
-      rectPosX = this.width.value.toInt - rectWidth.intValue
-    }
-
-    if (rectPosY + rectHeight.intValue > this.height.value) {
-      rectPosY = this.height.value.toInt - rectHeight.intValue
     }
 
     updatePositionOnMap()
   }
 
   def updatePositionOnMinimap() {
-    val y = pane.vvalue.value.toInt
-    val x = pane.hvalue.value.toInt
+    val y = pane.vvalue.value
+    val x = pane.hvalue.value
     val coords = positionOnMapToMinimap(x, y)
     rectPosX = coords._1
     rectPosY = coords._2
@@ -110,8 +121,10 @@ class Minimap(field: TerrainHexField, pane: ScrollPane) extends VBox {
 
   def updatePositionOnMap() {
     val coords = positionOnMinimapToMap(rectPosX, rectPosY)
+    updateOnPaneChange = false
     pane.hvalue.value = coords._1
     pane.vvalue.value = coords._2
+    updateOnPaneChange = true
   }
 
   pane.hvalue.onChange {
@@ -126,20 +139,16 @@ class Minimap(field: TerrainHexField, pane: ScrollPane) extends VBox {
     }
   }
 
-  private def positionOnMapToMinimap(x: Int, y: Int): (Int, Int) = {
-    if (mapToMinimapWidthProportion.doubleValue == 0 || mapToMinimapWidthProportion.doubleValue == 0) {
-      (0, 0)
-    } else {
-      val newX = x / mapToMinimapWidthProportion.doubleValue()
-      val newY = y / mapToMinimapWidthProportion.doubleValue()
-      (newX.toInt, newY.toInt)
-    }
+  private def positionOnMapToMinimap(w: Double, h: Double): (Int, Int) = {
+    val newX = scrollableWidth * w
+    val newY = scrollableHeight * h
+    (newX.toInt, newY.toInt)
   }
 
-  private def positionOnMinimapToMap(x: Int, y: Int): (Int, Int) = {
-    val newX = x * mapToMinimapWidthProportion.doubleValue()
-    val newY = y * mapToMinimapWidthProportion.doubleValue()
-    (newX.toInt, newY.toInt)
+  private def positionOnMinimapToMap(x: Double, y: Double): (Double, Double) = {
+    val w = rectPosX.toDouble / scrollableWidth
+    val h = rectPosY.toDouble / scrollableHeight
+    (w, h)
   }
 
   private def color(hex: TerrainHex): Color = {

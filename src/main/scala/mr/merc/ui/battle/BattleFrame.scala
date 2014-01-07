@@ -39,7 +39,7 @@ import scalafx.scene.control.ScrollPane
 
 // TODO move all styling to css
 class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleControllerParent {
-  val field = new TerrainHexField(20, 20, mapInit)
+  val field = new TerrainHexField(40, 40, mapInit)
   val player1 = Player("1", Color.BLUE)
   val player2 = Player("2", Color.YELLOW)
   val soldier = new Soldier("1", SoldierType("Human-Horseman"), player2)

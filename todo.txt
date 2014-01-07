@@ -9,12 +9,12 @@ For M4, these things should be completed and tested
 +Game menu
 +Game options
 +AI - battle chances
-AI - different implementations
++Changing position on minimap
++Shown map of any size
 Primitive map generation
+AI - different implementations
 All human soldiers of 0 and 1 level are present
 AI - tournament mode
-Changing position on minimap
-Shown map of any size
 Logging support
 investigate MigLayout - a lot of UI ahead
 Levels of difficulty

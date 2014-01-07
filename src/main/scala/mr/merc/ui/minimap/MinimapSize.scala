@@ -9,4 +9,4 @@ object MinimapSize {
   }
 }
 
-case class MinimapSize(cellSide: Double, minimapUsefulHeight: Int, minimapUsefulWidth: Int)
+case class MinimapSize(cellSide: Double, minimapUsefulWidth: Int, minimapUsefulHeight: Int)
