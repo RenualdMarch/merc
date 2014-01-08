@@ -42,8 +42,10 @@ import scalafx.scene.CacheHint
 
 // TODO move all styling to css
 class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleControllerParent with Logging {
+  import scalafx.Includes._
+  val pulse = 25 ms
   val generator = new RandomTerrainGenerator
-  val field = generator.generateMap(10, 10, 0) //new TerrainHexField(40, 40, mapInit)
+  val field = generator.generateMap(50, 50, 0) //new TerrainHexField(40, 40, mapInit)
   val player1 = Player("1", Color.BLUE)
   val player2 = Player("2", Color.YELLOW)
   val soldier = new Soldier("1", SoldierType("Human-Horseman"), player2)
@@ -151,8 +153,7 @@ class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleCont
 
   endTurnButton.onAction = { e: ActionEvent => controller.endTurnButton() }
 
-  import scalafx.Includes._
-  val timeline = Timeline(KeyFrame(50 ms, onFinished = gameLoop))
+  val timeline = Timeline(KeyFrame(pulse, onFinished = gameLoop))
   timeline.cycleCount = Animation.INDEFINITE
   timeline.play()
 
@@ -168,7 +169,7 @@ class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleCont
     val currentTime = System.currentTimeMillis
     val timePassed = currentTime - lastUpdateTime
     lastUpdateTime = currentTime
-    debug(s"in game loot $timePassed ms passed since previous call")
+    debug(s"in game loop $timePassed ms passed since previous call")
     controller.update(timePassed.toInt)
 
     reset(Color.BLACK)

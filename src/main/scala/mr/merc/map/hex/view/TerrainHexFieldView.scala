@@ -8,13 +8,38 @@ import mr.merc.map.hex.InfiniteHexField
 import mr.merc.map.hex.TerrainHex
 import mr.merc.map.terrain._
 import mr.merc.unit.SoldierDefence
+import scalafx.scene.image.Image
+import scalafx.scene.canvas.Canvas
+import scalafx.scene.image.WritableImage
+import scalafx.scene.SnapshotParameters
+import scalafx.scene.paint.Color
 
 class TerrainHexFieldView(field: TerrainHexField) {
   val hexes = field.hexes.map(th => new TerrainHexView(th, field))
   private val hexSet = hexes toSet
-  var movementOptions: Option[Set[TerrainHexView]] = None
+  private var movementOptionsPicture: Option[Image] = None
+  private var _movementOptions: Option[Set[TerrainHexView]] = None
   var arrow: Option[(TerrainHexView, TerrainHexView)] = None
   var defence: Option[(TerrainHexView, SoldierDefence, Boolean)] = None
+
+  def movementOptions = _movementOptions
+
+  def movementOptions_=(mo: Option[Set[TerrainHexView]]) {
+    _movementOptions = mo
+    if (mo.isEmpty) {
+      movementOptionsPicture = None
+    } else {
+      val canvas = new Canvas
+      canvas.width = pixelWidth
+      canvas.height = pixelHeight
+      val gc = canvas.graphicsContext2D
+      drawMovementImpossible(gc)
+      val image = new WritableImage(pixelWidth, pixelHeight)
+      val params = new SnapshotParameters
+      params.fill = Color.apply(0, 0, 0, 0)
+      movementOptionsPicture = Some(canvas.snapshot(params, image))
+    }
+  }
 
   private val map = hexes map (h => ((h.hex.x, h.hex.y), h)) toMap
 
@@ -27,9 +52,14 @@ class TerrainHexFieldView(field: TerrainHexField) {
   def drawMovementImpossible(gc: GraphicsContext) {
     movementOptions match {
       case Some(actualMovementOptions) => {
-        val arrowHexes = arrow.map(p => Set(p._1, p._2)).getOrElse(Set())
-        val darkHexes = hexSet -- actualMovementOptions -- arrowHexes
-        darkHexes.foreach(_.drawMovementImpossible(gc))
+        val pic = movementOptionsPicture
+        if (pic.isDefined) {
+          gc.drawImage(pic.get, 0, 0)
+        } else {
+          val arrowHexes = arrow.map(p => Set(p._1, p._2)).getOrElse(Set())
+          val darkHexes = hexSet -- actualMovementOptions -- arrowHexes
+          darkHexes.foreach(_.drawMovementImpossible(gc))
+        }
       }
       case None =>
     }
@@ -75,4 +105,7 @@ class TerrainHexFieldView(field: TerrainHexField) {
 
     map.get(min.hex.x, min.hex.y)
   }
+
+  def pixelWidth = hex(field.width - 1, 0).x + TerrainHexView.Side
+  def pixelHeight = hex(0, field.height - 1).y + TerrainHexView.Side
 }

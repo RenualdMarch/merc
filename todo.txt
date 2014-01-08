@@ -14,8 +14,10 @@ For M4, these things should be completed and tested
 +Primitive map generation
 Allies
 Draw trees above bridges
+when draw terrain additives, guarantee that same additives are drawn in same situations.
 agressive performance optimizations
 Hills and mountains borders
+Check all borders
 AI - different implementations
 All human soldiers of 0 and 1 level are present
 AI - tournament mode

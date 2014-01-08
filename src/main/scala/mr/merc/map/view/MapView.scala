@@ -6,12 +6,28 @@ import scalafx.scene.canvas.GraphicsContext
 import mr.merc.unit.view.SoldierView
 import mr.merc.map.hex.view.TerrainHexView
 import mr.merc.view.move.Movement
+import scalafx.scene.image.Image
+import scalafx.scene.image.WritableImage
+import scalafx.scene.canvas.Canvas
+import scalafx.scene.image.ImageView
+import scalafx.scene.SnapshotParameters
+import scalafx.scene.paint.Color
 
-// TODO replace all arguments with one object which represents model
 // TODO add update method which handles case when soldiers changed
 class MapView(field: TerrainHexField, val soldiersDrawer: SoldiersDrawer = new SoldiersDrawer()) {
   val terrainView = new TerrainHexFieldView(field)
 
+  lazy val mapImage: Image = {
+    val canvas = new Canvas
+    canvas.width.value = pixelWidth
+    canvas.height.value = pixelHeight
+    val image = new WritableImage(pixelWidth, pixelHeight)
+    val gc = canvas.graphicsContext2D
+    terrainView.drawItself(gc)
+    val params = new SnapshotParameters
+    params.fill = Color.BLACK
+    canvas.snapshot(params, image)
+  }
   createSoldiers foreach (soldiersDrawer.addSoldier)
 
   def hexByPixel(x: Int, y: Int) = terrainView.hexByPixelCoords(x, y)
@@ -41,7 +57,7 @@ class MapView(field: TerrainHexField, val soldiersDrawer: SoldiersDrawer = new S
   }
 
   def drawItself(gc: GraphicsContext) {
-    terrainView.drawItself(gc)
+    gc.drawImage(mapImage, 0, 0)
     soldiersDrawer.drawSoldiers(gc)
     terrainView.drawMovementImpossible(gc)
     terrainView.drawDefence(gc)
@@ -52,6 +68,6 @@ class MapView(field: TerrainHexField, val soldiersDrawer: SoldiersDrawer = new S
     soldiersDrawer.addMovement(movement)
   }
 
-  def pixelWidth = terrainView.hex(field.width - 1, 0).x + TerrainHexView.Side
-  def pixelHeight = terrainView.hex(0, field.height - 1).y + TerrainHexView.Side
+  def pixelWidth = terrainView.pixelWidth
+  def pixelHeight = terrainView.pixelHeight
 }

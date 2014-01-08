@@ -13,9 +13,32 @@ import mr.merc.image.MImageCache
 import mr.merc.unit.SoldierDefence
 import scalafx.scene.text.Font
 import scalafx.scene.text.FontWeight
+import scalafx.scene.image.Image
+import scalafx.scene.canvas.Canvas
+import scalafx.scene.image.WritableImage
+import scalafx.scene.SnapshotParameters
 
 object TerrainHexView {
   val Side = 72
+  val movementImpossibleImage: Image = {
+    val canvas = new Canvas
+    canvas.width.value = Side
+    canvas.height.value = Side
+    val gc = canvas.graphicsContext2D
+    gc.globalAlpha = 0.3
+    gc.fill = Color.BLACK
+    gc.fillPolygon(angles)
+    val image = new WritableImage(Side, Side)
+    val params = new SnapshotParameters
+    params.fill = Color.apply(0, 0, 0, 0)
+    canvas.snapshot(params, image)
+  }
+
+  private def angles: Seq[(Double, Double)] = {
+    val a = Side / 4 toDouble
+    val coef = Seq((1, 0), (3, 0), (4, 2), (3, 4), (1, 4), (0, 2))
+    coef.map { case (x, y) => (x * a, y * a) }
+  }
 }
 
 class TerrainHexView(val hex: TerrainHex, field: TerrainHexField) {
@@ -82,11 +105,7 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField) {
   }
 
   def drawMovementImpossible(gc: GraphicsContext) {
-    gc.save()
-    gc.globalAlpha = 0.3
-    gc.fill = Color.BLACK
-    gc.fillPolygon(angles)
-    gc.restore()
+    gc.drawImage(TerrainHexView.movementImpossibleImage, x, y)
   }
 
   def drawArrowStart(gc: GraphicsContext, dir: Direction) {
