@@ -45,7 +45,7 @@ class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleCont
   import scalafx.Includes._
   val pulse = 25 ms
   val generator = new RandomTerrainGenerator
-  val field = generator.generateMap(50, 50, 0) //new TerrainHexField(40, 40, mapInit)
+  val field = generator.generateMap(20, 15, 0) //new TerrainHexField(40, 40, mapInit)
   val player1 = Player("1", Color.BLUE)
   val player2 = Player("2", Color.YELLOW)
   val soldier = new Soldier("1", SoldierType("Human-Horseman"), player2)
