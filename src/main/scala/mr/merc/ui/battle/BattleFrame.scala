@@ -157,13 +157,6 @@ class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleCont
   timeline.cycleCount = Animation.INDEFINITE
   timeline.play()
 
-  private def reset(color: Color) {
-    gc.save()
-    gc.fill = color
-    gc.fillRect(0, 0, battleCanvas.width.get, battleCanvas.height.get);
-    gc.restore()
-  }
-
   var lastUpdateTime = System.currentTimeMillis()
   def gameLoop() {
     val currentTime = System.currentTimeMillis
@@ -171,8 +164,6 @@ class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleCont
     lastUpdateTime = currentTime
     debug(s"in game loop $timePassed ms passed since previous call")
     controller.update(timePassed.toInt)
-
-    reset(Color.BLACK)
     controller.drawBattleCanvas(gc)
   }
 
