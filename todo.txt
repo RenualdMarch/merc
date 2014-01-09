@@ -15,7 +15,8 @@ For M4, these things should be completed and tested
 Allies
 Draw trees above bridges
 when draw terrain additives, guarantee that same additives are drawn in same situations.
-agressive performance optimizations
+1 way of performance improvement - LAZY REDRAW
+2 way of performance improvement - CANVAS SIZE REDUCTION
 Hills and mountains borders
 Check all borders
 AI - different implementations

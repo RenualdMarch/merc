@@ -20,7 +20,7 @@ import scalafx.scene.SnapshotParameters
 
 object TerrainHexView {
   val Side = 72
-  val movementImpossibleImage: Image = {
+  lazy val movementImpossibleImage: Image = {
     val canvas = new Canvas
     canvas.width.value = Side
     canvas.height.value = Side
