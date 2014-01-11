@@ -51,6 +51,8 @@ class SoldierView(val soldier: Soldier) extends Sprite[SoldierViewState](Soldier
   val healthBar = new VerticalBarView(healthBarWidth, healthBarHeight, Color.WHITE, Color.RED, hpPercent)
   val xpBar = new VerticalBarView(xpBarWidth, xpBarHeight, Color.WHITE, Color.WHITE, xpPercent)
 
+  var hexView: Option[TerrainHexView] = None
+
   def hpPercent = soldier.hp.toDouble / soldier.soldierType.hp
   def xpPercent = soldier.exp.toDouble / soldier.soldierType.exp
 
@@ -73,6 +75,12 @@ class SoldierView(val soldier: Soldier) extends Sprite[SoldierViewState](Soldier
 
   override def updateTime(delta: Int): Int = {
     val result = super.updateTime(delta)
+
+    if (result > 0) {
+      // TODO optimize it in case of 1-frame states
+      markHexAsDirty()
+    }
+
     if (result > 0 && index == 0) {
       if (state == DeathState) {
         state = NoState
@@ -81,6 +89,15 @@ class SoldierView(val soldier: Soldier) extends Sprite[SoldierViewState](Soldier
       }
     }
     result
+  }
+
+  override def state_=(st: SoldierViewState) {
+    super.state = st
+    markHexAsDirty()
+  }
+
+  def markHexAsDirty() {
+    hexView.foreach(_.isDirty = true)
   }
 
   private def drawOvalUnderSoldier(gc: GraphicsContext) {
@@ -117,6 +134,7 @@ class SoldierView(val soldier: Soldier) extends Sprite[SoldierViewState](Soldier
   def refreshBars() {
     healthBar.fillPercentage = hpPercent
     xpBar.fillPercentage = xpPercent
+    markHexAsDirty()
   }
 }
 

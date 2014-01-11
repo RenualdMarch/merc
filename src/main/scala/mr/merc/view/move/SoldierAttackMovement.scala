@@ -23,9 +23,14 @@ object SoldierAttackMovement {
   }
 }
 
-class SoldierAttackMovement(val from: (Int, Int), val to: (Int, Int), val dir: Direction,
+class SoldierAttackMovement(val fromHex: TerrainHexView, val toHex: TerrainHexView, val dir: Direction,
   val attacker: SoldierView, val defender: SoldierView,
   val result: AttackResult, val attackSpeed: Int = 150) extends Movement {
+
+  val fromX = fromHex.coords._1
+  val fromY = fromHex.coords._2
+  val toX = toHex.coords._1
+  val toY = toHex.coords._2
 
   private var defenderPainSoundPlayed = false
   private val attackMovementPercentage = 0.7
@@ -34,23 +39,23 @@ class SoldierAttackMovement(val from: (Int, Int), val to: (Int, Int), val dir: D
   val frames = SoldierAttackMovement.imagesList(attackImagesSize)
 
   private val damageNumberMovement: Option[ShowingNumberDrawerMovement] = if (result.success) {
-    Some(ShowingNumberDrawerMovement.damage(to._1, to._2, result.damage))
+    Some(ShowingNumberDrawerMovement.damage(toX, toY, result.damage))
   } else {
     None
   }
 
   private val drainNumberMovement: Option[ShowingNumberDrawerMovement] = if (result.drained != 0) {
-    Some(ShowingNumberDrawerMovement.damage(from._1, from._2, result.drained))
+    Some(ShowingNumberDrawerMovement.damage(fromX, fromY, result.drained))
   } else {
     None
   }
 
   // attack sequence is played
-  private val linearMovementToEnemy = new LinearMovement(from._1, from._2, to._1, to._2, attackSpeed, attackMovementPercentage)
+  private val linearMovementToEnemy = new LinearMovement(fromX, fromY, toX, toY, attackSpeed, attackMovementPercentage)
   linearMovementToEnemy.start()
   private val dest = linearMovementToEnemy.destination
   // last frame of attack animation is here
-  private val linearMovementFromEnemy = new LinearMovement(dest._1, dest._2, from._1, from._2, attackSpeed)
+  private val linearMovementFromEnemy = new LinearMovement(dest._1, dest._2, fromX, fromY, attackSpeed)
   linearMovementFromEnemy.start()
   (damageNumberMovement ++ drainNumberMovement).foreach(_.start())
 
@@ -58,6 +63,8 @@ class SoldierAttackMovement(val from: (Int, Int), val to: (Int, Int), val dir: D
     super.start()
     attacker.animationEnabled = false
     attacker.mirroringEnabled = false
+    fromHex.soldier = None
+    toHex.soldier = None
 
     if (dir == SE || dir == NE) {
       attacker.rightDirection = true
@@ -65,8 +72,8 @@ class SoldierAttackMovement(val from: (Int, Int), val to: (Int, Int), val dir: D
       attacker.rightDirection = false
     }
 
-    attacker.x = from._1
-    attacker.y = from._2
+    attacker.x = fromX
+    attacker.y = fromY
 
     attacker.state = state
     attacker.index = 0
@@ -105,6 +112,8 @@ class SoldierAttackMovement(val from: (Int, Int), val to: (Int, Int), val dir: D
     attacker.animationEnabled = true
     attacker.mirroringEnabled = true
     attacker.state = StandState
+    fromHex.soldier = Some(attacker)
+    toHex.soldier = Some(defender)
   }
 
   private def handleMoveToEnemy(time: Int) {
@@ -137,6 +146,8 @@ class SoldierAttackMovement(val from: (Int, Int), val to: (Int, Int), val dir: D
     drainNumberMovement.map(_.isOver).getOrElse(true)
 
   override def drawables = List(defender, attacker) ++ numberMovements
+
+  override def dirtyHexes = List(fromHex, toHex)
 
   def isOver = linearMovementToEnemy.isOver && linearMovementFromEnemy.isOver && numbersAreOver
 }

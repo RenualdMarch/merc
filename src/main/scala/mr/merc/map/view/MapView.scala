@@ -12,22 +12,12 @@ import scalafx.scene.canvas.Canvas
 import scalafx.scene.image.ImageView
 import scalafx.scene.SnapshotParameters
 import scalafx.scene.paint.Color
+import scalafx.geometry.Rectangle2D
 
 // TODO add update method which handles case when soldiers changed
 class MapView(field: TerrainHexField, val soldiersDrawer: SoldiersDrawer = new SoldiersDrawer()) {
   val terrainView = new TerrainHexFieldView(field)
 
-  lazy val mapImage: Image = {
-    val canvas = new Canvas
-    canvas.width.value = pixelWidth
-    canvas.height.value = pixelHeight
-    val image = new WritableImage(pixelWidth, pixelHeight)
-    val gc = canvas.graphicsContext2D
-    terrainView.drawItself(gc)
-    val params = new SnapshotParameters
-    params.fill = Color.BLACK
-    canvas.snapshot(params, image)
-  }
   createSoldiers foreach (soldiersDrawer.addSoldier)
 
   def hexByPixel(x: Int, y: Int) = terrainView.hexByPixelCoords(x, y)
@@ -42,6 +32,7 @@ class MapView(field: TerrainHexField, val soldiersDrawer: SoldiersDrawer = new S
           val view = new SoldierView(soldier)
           view.x = h.x
           view.y = h.y
+          h.soldier = Some(view)
           Some(view)
         }
         case None => None
@@ -56,12 +47,10 @@ class MapView(field: TerrainHexField, val soldiersDrawer: SoldiersDrawer = new S
     soldiersDrawer.update(time)
   }
 
-  def drawItself(gc: GraphicsContext) {
-    gc.drawImage(mapImage, 0, 0)
-    soldiersDrawer.drawSoldiers(gc)
-    terrainView.drawMovementImpossible(gc)
-    terrainView.drawDefence(gc)
-    terrainView.drawArrow(gc)
+  def drawItself(gc: GraphicsContext, viewPort: Rectangle2D) {
+    soldiersDrawer.dirtyHexesInMovements.foreach(_.isDirty = true)
+    terrainView.drawItself(gc, viewPort)
+    soldiersDrawer.drawDrawablesInMovements(gc)
   }
 
   def addMovement(movement: Movement) {

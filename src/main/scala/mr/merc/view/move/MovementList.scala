@@ -39,6 +39,8 @@ class MovementList(val list: List[Movement]) extends Movement {
 
   override def drawables = currentMovement.drawables
 
+  override def dirtyHexes = currentMovement.dirtyHexes
+
   override def update(time: Int) {
     super.update(time)
 

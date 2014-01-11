@@ -13,6 +13,9 @@ import mr.merc.unit.view.ProjectileMovement
 import mr.merc.unit.view.ProjectileEnd
 import mr.merc.unit.view.ProjectileNotRender
 import mr.merc.unit.AttackResult
+import mr.merc.map.hex.TerrainHexField
+import mr.merc.map.hex.TerrainHex
+import mr.merc.map.hex.view.TerrainHexView
 
 class SoldierRangedAttackMovementTest extends FunSuite {
   val simpleSoldierType = new SoldierType("testSoldier2", 1, 20, 10, 5, 1,
@@ -25,7 +28,16 @@ class SoldierRangedAttackMovementTest extends FunSuite {
     val defenderView = new SoldierView(defenderSoldier)
 
     val result = AttackResult(true, attackerSoldier, defenderSoldier, simpleSoldierType.attacks(0), false, 0, 0)
-    val movement = new SoldierRangedAttackMovement((10, 20), (110, 20), NE,
+    val field = new TerrainHexField(10, 10, TerrainHex.grassInit)
+    val from = new TerrainHexView(field.hex(0, 0), field) {
+      override def coords = (10, 20)
+    }
+
+    val to = new TerrainHexView(field.hex(1, 0), field) {
+      override def coords = (110, 20)
+    }
+
+    val movement = new SoldierRangedAttackMovement(from, to, NE,
       attackerView, defenderView, result)
     movement.start()
     assert(movement.projectileView.state === ProjectileNotRender)

@@ -26,6 +26,7 @@ class SoldiersDrawer {
   def movements = _movements
 
   private def drawablesInMovements = currentMovement.map(_.drawables).getOrElse(Nil)
+  def dirtyHexesInMovements = currentMovement.map(_.dirtyHexes).getOrElse(Nil)
   private def soldiersInMovements = drawablesInMovements flatMap (d => d match {
     case soldier: SoldierView => Some(soldier)
     case _ => None
@@ -68,8 +69,7 @@ class SoldiersDrawer {
     }
   }
 
-  def drawSoldiers(gc: GraphicsContext) {
-    _soldiers -- soldiersInMovements foreach (_.drawItself(gc))
+  def drawDrawablesInMovements(gc: GraphicsContext) {
     drawablesInMovements foreach (_.drawItself(gc))
   }
 }

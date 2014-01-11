@@ -26,6 +26,7 @@ import mr.merc.unit.Attack
 import mr.merc.battle.event.HideDefence
 import mr.merc.battle.event.ShowDefence
 import mr.merc.log.Logging
+import scalafx.geometry.Rectangle2D
 
 class BattleController(gameField: GameField, parent: BattleControllerParent) extends Logging {
   val battleModel = new BattleModel(gameField)
@@ -294,8 +295,8 @@ class BattleController(gameField: GameField, parent: BattleControllerParent) ext
     battleView.update(time)
   }
 
-  def drawBattleCanvas(gc: GraphicsContext) {
-    battleView.drawItself(gc)
+  def drawBattleCanvas(gc: GraphicsContext, viewPort: Rectangle2D) {
+    battleView.drawItself(gc, viewPort)
   }
 }
 

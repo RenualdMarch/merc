@@ -15,9 +15,13 @@ import mr.merc.unit.view.SoldierTypeViewInfo
 import mr.merc.unit.sound.AttackSound
 import mr.merc.unit.sound.PainSound
 import mr.merc.unit.sound.AttackSound
+import mr.merc.map.hex.view.TerrainHexView
 
-class SoldierRangedAttackMovement(val from: (Int, Int), val to: (Int, Int), val dir: Direction,
+class SoldierRangedAttackMovement(val fromHex: TerrainHexView, val toHex: TerrainHexView, val dir: Direction,
   val attacker: SoldierView, val defender: SoldierView, result: AttackResult) extends Movement {
+
+  val from = fromHex.coords
+  val to = toHex.coords
   private val attackViews = SoldierTypeViewInfo(attacker.soldier.soldierType.name).attacks
   private val projectileName = attackViews.find(_.index == result.attackIndex).get.projectileName(result.success).get
   val projectileView = Projectile(projectileName).buildView(dir, from, to)
@@ -80,4 +84,6 @@ class SoldierRangedAttackMovement(val from: (Int, Int), val to: (Int, Int), val 
 
   // who is first should be rendered first
   override def drawables = List(defender, attacker, projectileView) ++ numberMovements
+
+  override def dirtyHexes = List(fromHex, toHex)
 }

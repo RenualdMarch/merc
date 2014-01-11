@@ -17,27 +17,60 @@ import scalafx.scene.image.Image
 import scalafx.scene.canvas.Canvas
 import scalafx.scene.image.WritableImage
 import scalafx.scene.SnapshotParameters
+import mr.merc.ui.common.ImageHelper._
+import mr.merc.unit.SoldierDefence
+import mr.merc.unit.view.SoldierView
 
 object TerrainHexView {
   val Side = 72
+  val textLength = 36
+
   lazy val movementImpossibleImage: Image = {
-    val canvas = new Canvas
-    canvas.width.value = Side
-    canvas.height.value = Side
-    val gc = canvas.graphicsContext2D
-    gc.globalAlpha = 0.3
-    gc.fill = Color.BLACK
-    gc.fillPolygon(angles)
-    val image = new WritableImage(Side, Side)
-    val params = new SnapshotParameters
-    params.fill = Color.apply(0, 0, 0, 0)
-    canvas.snapshot(params, image)
+    drawImage(Side, Side) { gc =>
+      gc.globalAlpha = 0.3
+      gc.fill = Color.BLACK
+      gc.fillPolygon(angles)
+    }
   }
 
   private def angles: Seq[(Double, Double)] = {
     val a = Side / 4 toDouble
     val coef = Seq((1, 0), (3, 0), (4, 2), (3, 4), (1, 4), (0, 2))
     coef.map { case (x, y) => (x * a, y * a) }
+  }
+
+  lazy val defenceImages: Map[(Int, Boolean), Image] = {
+    val list = for (d <- 0 to 100 by 10; drawPolygon <- List(true, false)) yield {
+      ((d, drawPolygon), drawImage(Side, Side) { gc =>
+        if (drawPolygon) {
+          gc.stroke = Color.YELLOW
+          gc.lineWidth = 2
+          gc.strokePolygon(angles)
+        }
+
+        gc.font = Font.font(Font.default.getFamily, FontWeight.NORMAL, 30)
+        gc.fill = defenceColor(d)
+        gc.fillText(d.toString, Side / 2 - textLength / 2, Side / 2 + 10, textLength)
+      })
+    }
+
+    list toMap
+  }
+
+  private def defenceColor(d: Int): Color = {
+    if (d <= 20) {
+      Color.DARKRED
+    } else if (d <= 30) {
+      Color.RED
+    } else if (d <= 40) {
+      Color.YELLOW
+    } else if (d <= 50) {
+      Color.LIGHTGREEN
+    } else if (d <= 60) {
+      Color.GREEN
+    } else {
+      Color.GREEN
+    }
   }
 }
 
@@ -49,6 +82,45 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField) {
   val side = TerrainHexView.Side
   val x = findX
   val y = findY
+  var isDirty = true
+  var isDarkened = false
+  private var currentDarkened = false
+  private var _arrowStart: Option[Direction] = None
+  def arrowStart = _arrowStart
+  def arrowStart_=(as: Option[Direction]) {
+    if (as != _arrowStart) {
+      _arrowStart = as
+      isDirty = true
+    }
+  }
+  private var _arrowEnd: Option[Direction] = None
+  def arrowEnd = _arrowEnd
+  def arrowEnd_=(ae: Option[Direction]) {
+    if (ae != _arrowEnd) {
+      _arrowEnd = ae
+      isDirty = true
+    }
+  }
+
+  private var _defence: Option[(SoldierDefence, Boolean)] = None
+  def defence = _defence
+  def defence_=(d: Option[(SoldierDefence, Boolean)]) {
+    if (_defence != d) {
+      _defence = d
+      isDirty = true
+    }
+  }
+
+  private var _soldier: Option[SoldierView] = None
+  def soldier = _soldier
+  def soldier_=(s: Option[SoldierView]) {
+    if (_soldier != s) {
+      _soldier.foreach(_.hexView = None)
+      _soldier = s
+      _soldier.foreach(_.hexView = Some(this))
+      isDirty = true
+    }
+  }
 
   override def toString = s"TerrainHexView[coords=($hex.x, $hex.y), pixels=($x,$y)]"
 
@@ -96,68 +168,68 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField) {
     neigMapObj.flatMap(p => p.mapObj.get.images(hex, field)).toList
   }
 
+  // TODO cache it based on neighbors, elements, etc
+  lazy val hexImage: Image = {
+    drawImage(TerrainHexView.Side, TerrainHexView.Side) { gc =>
+      image.drawImage(gc, 0, 0)
+      elements foreach (_.drawItself(gc, 0, 0))
+      neighbourMapObjects foreach (_.drawImage(gc, 0, 0))
+      secondaryImage.map(_.drawImage(gc, 0, 0))
+      mapObject foreach (_.drawImage(gc, 0, 0))
+    }
+  }
+
   def drawItself(gc: GraphicsContext) {
-    image.drawCenteredImage(gc, x, y, side, side)
-    elements foreach (_.drawItself(gc, x, y))
-    neighbourMapObjects foreach (_.drawCenteredImage(gc, x, y, side, side))
-    secondaryImage.map(_.drawCenteredImage(gc, x, y, side, side))
-    mapObject foreach (_.drawCenteredImage(gc, x, y, side, side))
+    if (isDirty || isDarkened != currentDarkened) {
+      gc.drawImage(hexImage, x, y)
+      drawSoldierIfNeeded(gc)
+      drawMovementImpossibleIfNeeded(gc)
+      drawArrowStartIfNeeded(gc)
+      drawArrowEndIfNeeded(gc)
+      drawDefenceIfNeeded(gc)
+      isDirty = false
+    }
+
   }
 
-  def drawMovementImpossible(gc: GraphicsContext) {
-    gc.drawImage(TerrainHexView.movementImpossibleImage, x, y)
+  private def drawMovementImpossibleIfNeeded(gc: GraphicsContext) {
+    if (currentDarkened != isDarkened) {
+      if (isDarkened) {
+        gc.drawImage(TerrainHexView.movementImpossibleImage, x, y)
+      }
+      currentDarkened = isDarkened
+    }
   }
 
-  def drawArrowStart(gc: GraphicsContext, dir: Direction) {
-    val path = arrowPath + "attack-indicator-src-" + dir.toString.toLowerCase() + ".png"
-    MImage(path).drawImage(gc, x, y)
+  private def drawArrowStartIfNeeded(gc: GraphicsContext) {
+    arrowStart foreach { dir =>
+      val path = arrowPath + "attack-indicator-src-" + dir.toString.toLowerCase() + ".png"
+      MImage(path).drawImage(gc, x, y)
+    }
   }
 
-  def drawArrowEnd(gc: GraphicsContext, dir: Direction) {
-    val path = arrowPath + "attack-indicator-dst-" + dir.toString.toLowerCase() + ".png"
-    MImage(path).drawImage(gc, x, y)
+  private def drawArrowEndIfNeeded(gc: GraphicsContext) {
+    arrowEnd foreach { dir =>
+      val path = arrowPath + "attack-indicator-dst-" + dir.toString.toLowerCase() + ".png"
+      MImage(path).drawImage(gc, x, y)
+    }
+  }
+
+  private def drawDefenceIfNeeded(gc: GraphicsContext) {
+    defence foreach {
+      case (d, drawPolygon) =>
+        val image = TerrainHexView.defenceImages(d.defence, drawPolygon)
+        gc.drawImage(image, x, y)
+    }
+  }
+
+  private def drawSoldierIfNeeded(gc: GraphicsContext) {
+    soldier foreach { s =>
+      s.drawItself(gc)
+    }
   }
 
   def center = (x + side / 2, y + side / 2)
   def coords = (x, y)
-  def angles: Seq[(Double, Double)] = {
-    val a = side / 4 toDouble
-    val coef = Seq((1, 0), (3, 0), (4, 2), (3, 4), (1, 4), (0, 2))
-    coef.map { case (x1, y1) => (x + x1 * a, y + y1 * a) }
-  }
 
-  def drawDefence(gc: GraphicsContext, defence: SoldierDefence, drawPolygon: Boolean) {
-    gc.save()
-
-    val textLength = 36
-    if (drawPolygon) {
-      gc.stroke = Color.YELLOW
-      gc.lineWidth = 2
-      gc.strokePolygon(angles)
-    }
-
-    gc.font = Font.font(Font.default.getFamily, FontWeight.NORMAL, 30)
-    gc.fill = defenceColor(defence)
-    gc.fillText(defence.defence.toString, center._1 - textLength / 2, center._2 + 10, textLength)
-
-    gc.restore()
-
-  }
-
-  private def defenceColor(defence: SoldierDefence): Color = {
-    val d = defence.defence
-    if (d <= 20) {
-      Color.DARKRED
-    } else if (d <= 30) {
-      Color.RED
-    } else if (d <= 40) {
-      Color.YELLOW
-    } else if (d <= 50) {
-      Color.LIGHTGREEN
-    } else if (d <= 60) {
-      Color.GREEN
-    } else {
-      Color.GREEN
-    }
-  }
 }

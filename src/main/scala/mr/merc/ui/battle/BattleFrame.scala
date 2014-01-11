@@ -39,13 +39,30 @@ import scalafx.scene.control.ScrollPane
 import mr.merc.map.generator.RandomTerrainGenerator
 import mr.merc.log.Logging
 import scalafx.scene.CacheHint
+import scalafx.geometry.Rectangle2D
 
 // TODO move all styling to css
 class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleControllerParent with Logging {
+  implicit class ScrollPaneViewport(scrollPane: ScrollPane) {
+    def viewport: Rectangle2D = {
+      val vPercent = scrollPane.vvalue.value
+      val hPercent = scrollPane.hvalue.value
+      val contentWidth = scrollPane.width.value
+      val contentHeight = scrollPane.height.value
+      val canvasHeight = battleCanvas.height.value
+      val canvasWidth = battleCanvas.width.value
+      val invisibleWidth = canvasWidth - contentWidth
+      val invisibleHeight = canvasHeight - contentHeight
+      val x = invisibleWidth * hPercent
+      val y = invisibleHeight * vPercent
+      new Rectangle2D(x, y, canvasWidth, canvasHeight)
+    }
+  }
+
   import scalafx.Includes._
   val pulse = 25 ms
   val generator = new RandomTerrainGenerator
-  val field = generator.generateMap(20, 15, 0) //new TerrainHexField(40, 40, mapInit)
+  val field = generator.generateMap(50, 50, 0) //new TerrainHexField(40, 40, mapInit)
   val player1 = Player("1", Color.BLUE)
   val player2 = Player("2", Color.YELLOW)
   val soldier = new Soldier("1", SoldierType("Human-Horseman"), player2)
@@ -164,7 +181,7 @@ class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleCont
     lastUpdateTime = currentTime
     debug(s"in game loop $timePassed ms passed since previous call")
     controller.update(timePassed.toInt)
-    controller.drawBattleCanvas(gc)
+    controller.drawBattleCanvas(gc, battleCanvasScrollPane.viewport)
   }
 
   def onMinimapChange() {

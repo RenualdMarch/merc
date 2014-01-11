@@ -21,6 +21,7 @@ import mr.merc.view.move.MomentaryMovement
 import mr.merc.view.move.MomentaryMovement
 import mr.merc.unit.view._
 import mr.merc.log.Logging
+import scalafx.geometry.Rectangle2D
 
 // injecting soldier drawer for test purposes only
 class BattleView(model: BattleModel, _soldierDrawer: SoldiersDrawer = new SoldiersDrawer) extends Logging {
@@ -33,8 +34,8 @@ class BattleView(model: BattleModel, _soldierDrawer: SoldiersDrawer = new Soldie
     mapView.update(time)
   }
 
-  def drawItself(gc: GraphicsContext) {
-    mapView.drawItself(gc)
+  def drawItself(gc: GraphicsContext, viewPort: Rectangle2D) {
+    mapView.drawItself(gc, viewPort)
   }
 
   def hexByPixel(x: Int, y: Int) = mapView.hexByPixel(x, y)
@@ -83,8 +84,8 @@ class BattleView(model: BattleModel, _soldierDrawer: SoldiersDrawer = new Soldie
       val ranged = attack.ranged
       val attackNumber = res.attacker.soldierType.attacks.indexOf(attack)
 
-      val attackPos = if (attacker == currentAttacker) attackerTerrainHex.coords else defenderTerrainHex.coords
-      val defenderPos = if (defender == currendDefender) defenderTerrainHex.coords else attackerTerrainHex.coords
+      val attackPos = if (attacker == currentAttacker) attackerTerrainHex else defenderTerrainHex
+      val defenderPos = if (defender == currendDefender) defenderTerrainHex else attackerTerrainHex
       val currentDirection = if (attacker == currentAttacker) dir else dir.opposite
 
       if (ranged) {

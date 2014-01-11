@@ -12,6 +12,7 @@ class SoldierMoveMovement(val from: TerrainHexView, val to: TerrainHexView, val 
 
   override def start() {
     super.start()
+    from.soldier = None
     soldier.state = MoveState
     linearMovement.start()
     updateSoldierCoords()
@@ -27,9 +28,14 @@ class SoldierMoveMovement(val from: TerrainHexView, val to: TerrainHexView, val 
     super.update(time)
     linearMovement.update(time)
     updateSoldierCoords()
+    if (isOver) {
+      to.soldier = Some(soldier)
+    }
   }
 
   def isOver = linearMovement.isOver
 
   override def drawables = List(soldier)
+
+  override def dirtyHexes = List(from, to)
 }

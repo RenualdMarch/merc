@@ -1,6 +1,8 @@
 package mr.merc.view.move
 
 import mr.merc.view.Drawable
+import mr.merc.map.hex.TerrainHex
+import mr.merc.map.hex.view.TerrainHexView
 
 trait Movement {
   var isStarted = false
@@ -15,4 +17,7 @@ trait Movement {
   def isOver: Boolean
   // who is first should be rendered first
   def drawables: List[Drawable] = Nil
+
+  // hexes that must be rewritten during this move execution
+  def dirtyHexes: List[TerrainHexView] = Nil
 }

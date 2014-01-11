@@ -60,4 +60,6 @@ class ShowingNumberDrawerMovement(target: (Int, Int), speed: Int, height: Int, f
     gc.fillText(text, movement.x + textLength / 2, movement.y, textLength)
     gc.restore()
   }
+
+  override def dirtyHexes = Nil // Seems like attack movement must take care of it alredy
 }

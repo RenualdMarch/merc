@@ -39,22 +39,16 @@ class SoldierDrawerTest extends FunSuite with MockitoSugar with BeforeAndAfter {
     soldiersDrawer.addMovement(move)
 
     assert(soldiersDrawer.movements === List(move))
-    soldiersDrawer.drawSoldiers(gc)
-    val inOrder1 = org.mockito.Mockito.inOrder(soldier1, soldier3, soldier2);
-    inOrder1.verify(soldier1).drawItself(gc)
-    inOrder1.verify(soldier3).drawItself(gc)
-    inOrder1.verify(soldier2).drawItself(gc)
-
+    soldiersDrawer.drawDrawablesInMovements(gc)
     soldiersDrawer.update(50)
     assert(soldiersDrawer.movements === List(move))
 
     soldiersDrawer.update(50)
     assert(soldiersDrawer.movements === Nil)
-    soldiersDrawer.drawSoldiers(gc)
-    val inOrder2 = org.mockito.Mockito.inOrder(soldier1, soldier3, soldier2);
-    inOrder1.verify(soldier1).drawItself(gc)
-    inOrder1.verify(soldier2).drawItself(gc)
-    inOrder1.verify(soldier3).drawItself(gc)
+    soldiersDrawer.drawDrawablesInMovements(gc)
+    verify(soldier2, times(1)).drawItself(gc)
+    verify(soldier1, never()).drawItself(gc)
+    verify(soldier3, never()).drawItself(gc)
   }
 
   test("movement with two soldiers") {
@@ -63,11 +57,11 @@ class SoldierDrawerTest extends FunSuite with MockitoSugar with BeforeAndAfter {
 
     val move = new ExampleMovement(List(soldier1, soldier2))
     soldiersDrawer.addMovement(move)
-    soldiersDrawer.drawSoldiers(gc)
-    val inOrder = org.mockito.Mockito.inOrder(soldier1, soldier3, soldier2);
-    inOrder.verify(soldier3).drawItself(gc)
+    soldiersDrawer.drawDrawablesInMovements(gc)
+    val inOrder = org.mockito.Mockito.inOrder(soldier1, soldier2);
     inOrder.verify(soldier1).drawItself(gc)
     inOrder.verify(soldier2).drawItself(gc)
+    verify(soldier3, never()).drawItself(gc)
   }
 
   test("two separate movements with 1 soldier each") {
@@ -81,11 +75,11 @@ class SoldierDrawerTest extends FunSuite with MockitoSugar with BeforeAndAfter {
 
     assert(soldiersDrawer.movements.toList === List(move1, move2))
 
-    soldiersDrawer.drawSoldiers(gc)
+    soldiersDrawer.drawDrawablesInMovements(gc)
     val inOrder = org.mockito.Mockito.inOrder(soldier1, soldier2, soldier3);
-    inOrder.verify(soldier3).drawItself(gc)
     inOrder.verify(soldier1).drawItself(gc)
     inOrder.verify(soldier2).drawItself(gc)
+    verify(soldier3, never()).drawItself(gc)
 
   }
 
