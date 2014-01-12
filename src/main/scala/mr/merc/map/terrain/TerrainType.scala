@@ -24,5 +24,6 @@ case object Mountain extends TerrainType("mountain")
 case object Road extends TerrainType("road")
 case object Forest extends TerrainType("forest")
 
-// THIS TYPE IS FORBIDDEN TO USE IN MAP
+// THIS TYPES ARE FORBIDDEN TO USE ON MAP
 case object Village extends TerrainType("village")
+case object Empty extends TerrainType("void")

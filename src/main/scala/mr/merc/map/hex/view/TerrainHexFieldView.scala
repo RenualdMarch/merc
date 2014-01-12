@@ -16,7 +16,7 @@ import scalafx.scene.paint.Color
 import scalafx.geometry.Rectangle2D
 
 class TerrainHexFieldView(field: TerrainHexField) {
-  private val infiniteField = new InfiniteHexField(TerrainHex.grassInit)
+  private val infiniteField = new InfiniteHexField((x, y) => new TerrainHex(x, y, Empty))
 
   val hexes = field.hexes.map(new TerrainHexView(_, field)) ++ blackHexes
   val hexMap = hexes.map(h => ((h.hex.x, h.hex.y), h)).toMap
