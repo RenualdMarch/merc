@@ -13,7 +13,7 @@ class GameField(val hexField: TerrainHexField, val players: List[Player]) {
       private val mustStopHere = if (soldier.soldierType.attributes.contains(Skirmisher)) {
         Set.empty[TerrainHex]
       } else {
-        players.filterNot(_ == soldier.player).map(zoneOfControlFor).reduce(_ ++ _)
+        players.filterNot(_.isSamePlayer(soldier.owner)).map(zoneOfControlFor).reduce(_ ++ _)
       }
 
       override def isBlocked(t: TerrainHex) = isBlockedFor(soldier, t)
@@ -26,7 +26,7 @@ class GameField(val hexField: TerrainHexField, val players: List[Player]) {
   }
 
   def isBlockedFor(soldier: Soldier, t: TerrainHex): Boolean = {
-    t.soldier.map(_.player != soldier.player).getOrElse(false)
+    t.soldier.map(_.owner.isEnemy(soldier.owner)).getOrElse(false)
   }
 
   def zoneOfControlFor(player: Player): Set[TerrainHex] = {
@@ -41,7 +41,7 @@ class GameField(val hexField: TerrainHexField, val players: List[Player]) {
   }
 
   private def hasPlayerOnHex(hex: TerrainHex, player: Player): Boolean = {
-    hex.soldier.map(_.player == player).getOrElse(false)
+    hex.soldier.map(_.owner.isSamePlayer(player)).getOrElse(false)
   }
 
   private def hasPlayerOnNeighborHex(hex: TerrainHex, player: Player): Boolean = {

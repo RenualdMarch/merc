@@ -80,6 +80,13 @@ object TerrainHexView {
       Color.GREEN
     }
   }
+
+  lazy val blackImage: Image = {
+    drawImage(Side, Side) { gc =>
+      gc.fill = Color.BLACK
+      gc.fillPolygon(angles())
+    }
+  }
 }
 
 class TerrainHexView(val hex: TerrainHex, field: TerrainHexField) {
@@ -244,5 +251,4 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField) {
 
   def center = (x + side / 2, y + side / 2)
   def coords = (x, y)
-
 }

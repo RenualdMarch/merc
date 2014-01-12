@@ -38,7 +38,7 @@ object SoldierView {
 
 }
 
-class SoldierView(val soldier: Soldier) extends Sprite[SoldierViewState](SoldierTypeViewInfo(soldier.soldierType.name, soldier.player.color).images, StandState) {
+class SoldierView(val soldier: Soldier) extends Sprite[SoldierViewState](SoldierTypeViewInfo(soldier.soldierType.name, soldier.owner.color).images, StandState) {
   private val maxHp = 100
   private val healthBarHeight = Math.min(soldier.soldierType.hp, maxHp) * 2 * TerrainHexView.Side / 3 / maxHp
   private val healthBarWidth = 4
@@ -103,11 +103,11 @@ class SoldierView(val soldier: Soldier) extends Sprite[SoldierViewState](Soldier
 
   private def drawOvalUnderSoldier(gc: GraphicsContext) {
     gc.save()
-    gc.fill = soldier.player.color
+    gc.fill = soldier.owner.color
     gc.globalAlpha = 0.2
     gc.fillOval(x + 12, y + 44, 48, 24)
     gc.globalAlpha = 1
-    gc.stroke = soldier.player.color
+    gc.stroke = soldier.owner.color
     gc.strokeOval(x + 12, y + 44, 48, 24)
     gc.restore()
   }

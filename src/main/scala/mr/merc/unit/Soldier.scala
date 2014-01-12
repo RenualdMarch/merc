@@ -9,7 +9,7 @@ import mr.merc.map.terrain.Village
 import mr.merc.map.terrain.Road
 import mr.merc.map.terrain.Grass
 
-class Soldier(val name: String, val soldierType: SoldierType, val player: Player) {
+class Soldier(val name: String, val soldierType: SoldierType, val owner: Player) {
   private var _hp = soldierType.hp
   private var _state = Set[SoldierState]()
 
@@ -55,7 +55,7 @@ class Soldier(val name: String, val soldierType: SoldierType, val player: Player
     val attributes = soldierType.attributes
     val result = collection.mutable.ArrayBuffer[BeforeTurnAction]()
 
-    val neighbours = field.neighbours(x, y).flatMap(_.soldier).filter(_.player == this.player)
+    val neighbours = field.neighbours(x, y).flatMap(_.soldier).filter(_.owner.isFriend(this.owner))
     if (attributes.contains(Cures)) {
       val allies = neighbours.filter(_.state.contains(Poisoned))
       result ++= allies.map(t => CureSoldier(this, t))

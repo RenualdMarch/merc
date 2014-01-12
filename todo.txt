@@ -14,8 +14,9 @@ For M4, these things should be completed and tested
 +Primitive map generation
 Lazy redraw - test everything
 Forest borders bug
+Borders fix
 Neighbours redraw when moving
-Allies
++Allies
 Draw trees above bridges
 when draw terrain additives, guarantee that same additives are drawn in same situations.
 

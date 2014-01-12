@@ -75,10 +75,10 @@ class BattleModel(val map: GameField) extends BattleModelEventHandler with Loggi
     require(validateEndTurn)
     nextPlayer()
     val beforeTurnActions = map.hexField.hexes.filter(_.soldier.isDefined).map(h => (h.x, h.y, h.soldier.get)).
-      filter(_._3.player == currentPlayer).flatMap { case (x, y, s) => s.beforeTurnActions(map.hexField, x, y) }
+      filter(_._3.owner.isSamePlayer(currentPlayer)).flatMap { case (x, y, s) => s.beforeTurnActions(map.hexField, x, y) }
     val filteredActions = BeforeTurnAction.filterActions(beforeTurnActions.toSet)
     filteredActions foreach (_.action())
-    allSoldiers.filter(_.player == currentPlayer).foreach(_.beforeTurnRenowation())
+    allSoldiers.filter(_.owner.isSamePlayer(currentPlayer)).foreach(_.beforeTurnRenowation())
     setSoldierTurnState()
     EndMoveModelEventResult(currentPlayer)
   }
@@ -108,7 +108,7 @@ class BattleModel(val map: GameField) extends BattleModelEventHandler with Loggi
   def hexBySoldier(soldier: Soldier) = map.hexField.hexes.find(h => h.soldier == Some(soldier)).get
 
   def validateMovementEvent(soldier: Soldier, from: TerrainHex, to: TerrainHex, validatePath: Boolean = true, checkPlayer: Boolean = true): Boolean = {
-    if (checkPlayer && soldier.player != currentPlayer) {
+    if (checkPlayer && soldier.owner.isSamePlayer(currentPlayer)) {
       return false
     }
 
@@ -120,7 +120,7 @@ class BattleModel(val map: GameField) extends BattleModelEventHandler with Loggi
       return false
     }
 
-    if (soldier.movedThisTurn && map.zoneOfControlForEnemys(soldier.player).contains(from)) {
+    if (soldier.movedThisTurn && map.zoneOfControlForEnemys(soldier.owner).contains(from)) {
       return false
     }
 
@@ -139,13 +139,13 @@ class BattleModel(val map: GameField) extends BattleModelEventHandler with Loggi
   }
 
   def possibleMoves(soldier: Soldier, currentHex: TerrainHex): Set[TerrainHex] = {
-    val movePoints = if (soldier.player == currentPlayer) {
+    val movePoints = if (soldier.owner.isSamePlayer(currentPlayer)) {
       soldier.movePointsRemain
     } else {
       soldier.soldierType.movement
     }
 
-    val movedThisTurn = if (soldier.player == currentPlayer) {
+    val movedThisTurn = if (soldier.owner.isSamePlayer(currentPlayer)) {
       soldier.movedThisTurn
     } else {
       false
@@ -157,7 +157,7 @@ class BattleModel(val map: GameField) extends BattleModelEventHandler with Loggi
 
   def possibleAttacksWhenThereAreNoMoves(soldier: Soldier, currentHex: TerrainHex): Set[TerrainHex] = {
     val neigbours = map.hexField.neighbours(currentHex)
-    val enemiesNear = neigbours.filter(_.soldier.map(_.player != soldier.player).getOrElse(false))
+    val enemiesNear = neigbours.filter(_.soldier.map(_.owner.isEnemy(soldier.owner)).getOrElse(false))
     if (enemiesNear.isEmpty) {
       return Set()
     }
@@ -180,7 +180,7 @@ class BattleModel(val map: GameField) extends BattleModelEventHandler with Loggi
 
   // TODO allies
   def validateAttackEvent(soldier: Soldier, from: TerrainHex, target: TerrainHex, attackNumber: Int): Boolean = {
-    if (soldier.player != currentPlayer) {
+    if (!soldier.owner.isSamePlayer(currentPlayer)) {
       return false
     }
 
@@ -193,7 +193,7 @@ class BattleModel(val map: GameField) extends BattleModelEventHandler with Loggi
     }
 
     target.soldier match {
-      case Some(enemy) => soldier.player != enemy.player
+      case Some(enemy) => soldier.owner.isEnemy(enemy.owner)
       case None => false
     }
   }
@@ -214,7 +214,7 @@ class BattleModel(val map: GameField) extends BattleModelEventHandler with Loggi
 
   private[battle] def soldierTurnState(hex: TerrainHex): SoldierTurnState = {
     val soldier = hex.soldier.get
-    if (soldier.player != currentPlayer) {
+    if (!soldier.owner.isSamePlayer(currentPlayer)) {
       return NotHisTurn
     }
 

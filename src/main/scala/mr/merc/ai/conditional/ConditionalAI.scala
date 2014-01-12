@@ -11,7 +11,7 @@ import mr.merc.ai.AIQueueAdapter
 class ConditionalAI(config: AIConfiguration) extends BattleAI with AIQueueAdapter {
   def nextTurns(model: BattleModel): List[BattleModelEvent] = {
     val command = new GlobalStrategy(config).decideGlobalCommand(model)
-    val soldiersAndHexes = model.friends.sortBy(_._1.movePointsRemain)
+    val soldiersAndHexes = model.currentSoldiers.sortBy(_._1.movePointsRemain)
     val stream = soldiersAndHexes.toStream.map {
       case (s, h) =>
         val agent = new AIAgent(s, h, config)

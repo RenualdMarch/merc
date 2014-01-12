@@ -153,7 +153,7 @@ class Minimap(field: TerrainHexField, pane: ScrollPane) extends VBox {
 
   private def color(hex: TerrainHex): Color = {
     if (hex.soldier.nonEmpty) {
-      return hex.soldier.get.player.color
+      return hex.soldier.get.owner.color
     }
 
     hex.terrain match {
