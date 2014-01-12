@@ -10,25 +10,25 @@ import mr.merc.map.hex.view.TerrainHexFieldView
 import mr.merc.players.Player
 
 class SoldierMoveMovementTest extends FunSuite {
-	val map = new TerrainHexField(5, 5, (x, y) => new TerrainHex(x, y, Grass))
-	val mapView = new TerrainHexFieldView(map)
-	val soldier = new Soldier("1", SoldierType("testSoldier"), Player("0"))
-	map.hex(0, 1).soldier = Some(soldier)
-	val soldierView = new SoldierView(soldier)
-	
-	test("simple movement") {
-	  // moving from (0, 1) to (1, 0)
-	  val from = mapView.hex(0, 1)
-	  val to = mapView.hex(1, 0)
-	  val movement = new SoldierMoveMovement(from, to, soldierView)
-	  movement.start()
-	  assert(soldierView.x === 0)
-	  assert(soldierView.y === 72)
-	  while (!movement.isOver) {
-	    movement.update(1000)
-	  }
-	  
-	  assert(soldierView.x === 72 * 3 / 4)
-	  assert(soldierView.y === 36)
-	}
+  val map = new TerrainHexField(5, 5, (x, y) => new TerrainHex(x, y, Grass))
+  val mapView = new TerrainHexFieldView(map)
+  val soldier = new Soldier("1", SoldierType("testSoldier"), Player("0"))
+  map.hex(0, 1).soldier = Some(soldier)
+  val soldierView = new SoldierView(soldier)
+
+  test("simple movement") {
+    // moving from (0, 1) to (1, 0)
+    val from = mapView.hex(0, 1)
+    val to = mapView.hex(1, 0)
+    val movement = new SoldierMoveMovement(from, to, soldierView, mapView)
+    movement.start()
+    assert(soldierView.x === 0)
+    assert(soldierView.y === 72)
+    while (!movement.isOver) {
+      movement.update(1000)
+    }
+
+    assert(soldierView.x === 72 * 3 / 4)
+    assert(soldierView.y === 36)
+  }
 }

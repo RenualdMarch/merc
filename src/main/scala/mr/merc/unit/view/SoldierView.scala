@@ -21,6 +21,7 @@ import mr.merc.unit.SoldierType
 import scalafx.scene.canvas.GraphicsContext
 import scalafx.scene.shape.Ellipse
 import mr.merc.unit._
+import mr.merc.map.hex.view.TerrainHexFieldView
 
 object SoldierView {
   private[view] val attackDistancePercentage = 0.6
@@ -39,7 +40,7 @@ object SoldierView {
 
 class SoldierView(val soldier: Soldier) extends Sprite[SoldierViewState](SoldierTypeViewInfo(soldier.soldierType.name, soldier.player.color).images, StandState) {
   private val maxHp = 100
-  private val healthBarHeight = Math.min(soldier.soldierType.hp, maxHp) * TerrainHexView.Side / maxHp
+  private val healthBarHeight = Math.min(soldier.soldierType.hp, maxHp) * 2 * TerrainHexView.Side / 3 / maxHp
   private val healthBarWidth = 4
 
   private val maxXp = 200
@@ -68,8 +69,8 @@ class SoldierView(val soldier: Soldier) extends Sprite[SoldierViewState](Soldier
     super.drawItself(gc)
 
     if (state != DeathState && state != NoState) {
-      healthBar.draw(x, y + TerrainHexView.Side - healthBarHeight, gc)
-      xpBar.draw(x + 6, y + TerrainHexView.Side - xpBarHeight, gc)
+      healthBar.draw(x + 12, y + 15, gc)
+      //xpBar.draw(x + 6, y + TerrainHexView.Side - xpBarHeight, gc)
     }
   }
 
@@ -77,7 +78,7 @@ class SoldierView(val soldier: Soldier) extends Sprite[SoldierViewState](Soldier
     val result = super.updateTime(delta)
 
     if (result > 0) {
-      // TODO optimize it in case of 1-frame states
+      // TODO optimize it in case of 1-frame 
       markHexAsDirty()
     }
 
@@ -104,10 +105,10 @@ class SoldierView(val soldier: Soldier) extends Sprite[SoldierViewState](Soldier
     gc.save()
     gc.fill = soldier.player.color
     gc.globalAlpha = 0.2
-    gc.fillOval(x + 9, y + 44, 48, 24)
+    gc.fillOval(x + 12, y + 44, 48, 24)
     gc.globalAlpha = 1
     gc.stroke = soldier.player.color
-    gc.strokeOval(x + 9, y + 44, 48, 24)
+    gc.strokeOval(x + 12, y + 44, 48, 24)
     gc.restore()
   }
 
@@ -121,13 +122,13 @@ class SoldierView(val soldier: Soldier) extends Sprite[SoldierViewState](Soldier
     }
 
     gc.fill = color
-    gc.fillOval(x, y, 12, 12)
+    gc.fillOval(x + 18, y, 8, 8)
     gc.restore()
 
   }
 
-  def moveMovement(path: List[TerrainHexView]): Movement = {
-    val list = path zip path.tail map (p => new SoldierMoveMovement(p._1, p._2, this))
+  def moveMovement(path: List[TerrainHexView], field: TerrainHexFieldView): Movement = {
+    val list = path zip path.tail map (p => new SoldierMoveMovement(p._1, p._2, this, field))
     new MovementList(list)
   }
 

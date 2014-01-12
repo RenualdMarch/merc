@@ -5,8 +5,9 @@ import mr.merc.unit.view.SoldierView
 import mr.merc.unit.view.MoveState
 import mr.merc.unit.sound.MovementSound
 import mr.merc.sound.Sound
+import mr.merc.map.hex.view.TerrainHexFieldView
 
-class SoldierMoveMovement(val from: TerrainHexView, val to: TerrainHexView, val soldier: SoldierView) extends Movement {
+class SoldierMoveMovement(val from: TerrainHexView, val to: TerrainHexView, val soldier: SoldierView, fieldView: TerrainHexFieldView) extends Movement {
   private val movementSpeed = 100
   private val linearMovement = new LinearMovement(from.x, from.y, to.x, to.y, movementSpeed)
 
@@ -37,5 +38,5 @@ class SoldierMoveMovement(val from: TerrainHexView, val to: TerrainHexView, val 
 
   override def drawables = List(soldier)
 
-  override def dirtyHexes = List(from, to)
+  override def dirtyHexes = List(from, to) ++ (fieldView.neighbours(from) & fieldView.neighbours(to))
 }

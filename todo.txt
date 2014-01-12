@@ -12,11 +12,13 @@ For M4, these things should be completed and tested
 +Changing position on minimap
 +Shown map of any size
 +Primitive map generation
+Lazy redraw - test everything
+Forest borders bug
+Neighbours redraw when moving
 Allies
 Draw trees above bridges
 when draw terrain additives, guarantee that same additives are drawn in same situations.
-1 way of performance improvement - LAZY REDRAW
-2 way of performance improvement - CANVAS SIZE REDUCTION
+
 Hills and mountains borders
 Check all borders
 AI - different implementations

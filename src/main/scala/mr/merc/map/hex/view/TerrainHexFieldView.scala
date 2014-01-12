@@ -16,7 +16,20 @@ import scalafx.scene.paint.Color
 import scalafx.geometry.Rectangle2D
 
 class TerrainHexFieldView(field: TerrainHexField) {
-  val hexes = field.hexes.map(th => new TerrainHexView(th, field))
+  private val infiniteField = new InfiniteHexField(TerrainHex.grassInit)
+
+  val hexes = field.hexes.map(new TerrainHexView(_, field)) ++ blackHexes
+  val hexMap = hexes.map(h => ((h.hex.x, h.hex.y), h)).toMap
+
+  def blackHexes: Set[TerrainHexView] = {
+    val hexSet = field.hexes.toSet
+    val blackHexes = hexSet.flatMap(h => infiniteField.neighbours(h.x, h.y)) -- hexSet
+    blackHexes.filterNot { h =>
+      (h.y == -1 && h.x % 2 == 0) ||
+        (h.y == field.height && h.x % 2 == 0)
+    }.map(new TerrainHexView(_, field))
+  }
+
   private val hexSet = hexes toSet
 
   private var _movementOptions: Option[Set[TerrainHexView]] = None
@@ -32,6 +45,10 @@ class TerrainHexFieldView(field: TerrainHexField) {
     }
 
     _movementOptions = viewsOpt
+  }
+
+  def neighbours(view: TerrainHexView): Set[TerrainHexView] = {
+    infiniteField.neighbours(view.hex).map(n => (n.x, n.y)).map(hexMap)
   }
 
   private var _arrow: Option[(TerrainHexView, TerrainHexView)] = None
@@ -82,7 +99,6 @@ class TerrainHexFieldView(field: TerrainHexField) {
     viewPort.intersects(hexRect) || viewPort.contains(hexRect)
   }
 
-  private val infiniteField = new InfiniteHexField((x, y) => new TerrainHex(x, y, Grass))
   def hexByPixelCoords(pixelX: Int, pixelY: Int): Option[TerrainHexView] = {
     val side = TerrainHexView.Side
     // first part is transform hexes into squares 

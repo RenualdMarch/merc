@@ -12,6 +12,7 @@ import mr.merc.unit.AttackResult
 import mr.merc.map.hex.view.TerrainHexView
 import mr.merc.map.hex.TerrainHexField
 import mr.merc.map.hex.TerrainHex
+import mr.merc.map.hex.view.TerrainHexFieldView
 
 class SoldierAttackMovementTest extends FunSuite {
   test("imagesList") {
@@ -29,6 +30,7 @@ class SoldierAttackMovementTest extends FunSuite {
     val direction = NE
 
     val field = new TerrainHexField(10, 10, TerrainHex.grassInit)
+    val fieldView = new TerrainHexFieldView(field)
     val from = new TerrainHexView(field.hex(0, 0), field) {
       override def coords = (0, 10)
     }
@@ -40,7 +42,7 @@ class SoldierAttackMovementTest extends FunSuite {
     // distance is 500, speed is 100, time is 5 sec
     val result = AttackResult(true, soldier, enemy, soldier.soldierType.attacks(0), true, 10, 0)
     val movement = new SoldierAttackMovement(from, to, direction, // from, to
-      soldierView, enemyView, result, 70)
+      soldierView, enemyView, result, fieldView, 70)
     movement.start()
     assert(soldierView.x === 0)
     assert(soldierView.y === 10)

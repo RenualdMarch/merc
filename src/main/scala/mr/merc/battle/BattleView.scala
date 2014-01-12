@@ -90,10 +90,10 @@ class BattleView(model: BattleModel, _soldierDrawer: SoldiersDrawer = new Soldie
 
       if (ranged) {
         new SoldierRangedAttackMovement(attackPos, defenderPos, currentDirection,
-          wrap(currentAttacker), wrap(currendDefender), res)
+          wrap(currentAttacker), wrap(currendDefender), res, mapView.terrainView)
       } else {
         new SoldierAttackMovement(attackPos, defenderPos, currentDirection,
-          wrap(currentAttacker), wrap(currendDefender), res)
+          wrap(currentAttacker), wrap(currendDefender), res, mapView.terrainView)
       }
     }
 
@@ -115,7 +115,7 @@ class BattleView(model: BattleModel, _soldierDrawer: SoldiersDrawer = new Soldie
   private def handleMovementEvent(soldier: SoldierView, path: List[TerrainHexView]) {
     val destination = path.tail
     val departure = path.init
-    val allMovements = for ((a, b) <- departure zip destination) yield new SoldierMoveMovement(a, b, soldier)
+    val allMovements = for ((a, b) <- departure zip destination) yield new SoldierMoveMovement(a, b, soldier, mapView.terrainView)
     val standAfterMove = MomentaryMovement(soldier.state = StandState)
     mapView.addMovement(new MovementList(allMovements :+ standAfterMove))
   }

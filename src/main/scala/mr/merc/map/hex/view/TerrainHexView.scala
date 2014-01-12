@@ -29,14 +29,22 @@ object TerrainHexView {
     drawImage(Side, Side) { gc =>
       gc.globalAlpha = 0.3
       gc.fill = Color.BLACK
-      gc.fillPolygon(angles)
+      gc.fillPolygon(angles())
     }
   }
 
-  private def angles: Seq[(Double, Double)] = {
+  lazy val hexGridImage: Image = {
+    drawImage(Side, Side) { gc =>
+      gc.stroke = Color.BLACK
+      gc.strokePolygon(angles())
+    }
+  }
+
+  private def angles(pix: Int = 0): Seq[(Double, Double)] = {
     val a = Side / 4 toDouble
     val coef = Seq((1, 0), (3, 0), (4, 2), (3, 4), (1, 4), (0, 2))
-    coef.map { case (x, y) => (x * a, y * a) }
+    val pixelCorrection = Seq((1, 1), (-1, 1), (-1, 0), (-1, -1), (1, -1), (1, 0))
+    (coef zip pixelCorrection).map { case ((x, y), (px, py)) => (x * a + px * pix, y * a + py * pix) }
   }
 
   lazy val defenceImages: Map[(Int, Boolean), Image] = {
@@ -45,7 +53,7 @@ object TerrainHexView {
         if (drawPolygon) {
           gc.stroke = Color.YELLOW
           gc.lineWidth = 2
-          gc.strokePolygon(angles)
+          gc.strokePolygon(angles(2))
         }
 
         gc.font = Font.font(Font.default.getFamily, FontWeight.NORMAL, 30)
@@ -174,7 +182,7 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField) {
       image.drawImage(gc, 0, 0)
       elements foreach (_.drawItself(gc, 0, 0))
       neighbourMapObjects foreach (_.drawImage(gc, 0, 0))
-      secondaryImage.map(_.drawImage(gc, 0, 0))
+      secondaryImage.map(_.drawCenteredImage(gc, 0, 0, TerrainHexView.Side, TerrainHexView.Side))
       mapObject foreach (_.drawImage(gc, 0, 0))
     }
   }
@@ -187,6 +195,7 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField) {
       drawArrowStartIfNeeded(gc)
       drawArrowEndIfNeeded(gc)
       drawDefenceIfNeeded(gc)
+      drawHexGrid(gc)
       isDirty = false
     }
 
@@ -227,6 +236,10 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField) {
     soldier foreach { s =>
       s.drawItself(gc)
     }
+  }
+
+  private def drawHexGrid(gc: GraphicsContext) {
+    gc.drawImage(TerrainHexView.hexGridImage, x, y)
   }
 
   def center = (x + side / 2, y + side / 2)

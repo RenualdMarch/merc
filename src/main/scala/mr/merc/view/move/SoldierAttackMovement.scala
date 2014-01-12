@@ -9,6 +9,7 @@ import mr.merc.unit.view.StandState
 import mr.merc.unit.AttackResult
 import mr.merc.unit.sound.AttackSound
 import mr.merc.unit.sound.PainSound
+import mr.merc.map.hex.view.TerrainHexFieldView
 
 object SoldierAttackMovement {
   private val frameCount = 20
@@ -25,7 +26,7 @@ object SoldierAttackMovement {
 
 class SoldierAttackMovement(val fromHex: TerrainHexView, val toHex: TerrainHexView, val dir: Direction,
   val attacker: SoldierView, val defender: SoldierView,
-  val result: AttackResult, val attackSpeed: Int = 150) extends Movement {
+  val result: AttackResult, field: TerrainHexFieldView, val attackSpeed: Int = 150) extends Movement {
 
   val fromX = fromHex.coords._1
   val fromY = fromHex.coords._2
@@ -147,7 +148,7 @@ class SoldierAttackMovement(val fromHex: TerrainHexView, val toHex: TerrainHexVi
 
   override def drawables = List(defender, attacker) ++ numberMovements
 
-  override def dirtyHexes = List(fromHex, toHex)
+  override def dirtyHexes = field.neighbours(fromHex) ++ field.neighbours(toHex) toList
 
   def isOver = linearMovementToEnemy.isOver && linearMovementFromEnemy.isOver && numbersAreOver
 }
