@@ -27,7 +27,7 @@ import scalafx.geometry.Rectangle2D
 class BattleView(model: BattleModel, _soldierDrawer: SoldiersDrawer = new SoldiersDrawer) extends Logging {
   val mapView = new MapView(model.map.hexField, _soldierDrawer)
 
-  private val hexesViewMap = mapView.terrainView.hexes.map(v => (v.hex -> v)) toMap
+  private val hexesViewMap = mapView.terrainView.realHexes.map(v => (v.hex -> v)) toMap
   private val soldiersMap = mapView.soldiers.map(s => (s.soldier -> s)) toMap
 
   def update(time: Int) {

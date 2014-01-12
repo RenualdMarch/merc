@@ -108,7 +108,7 @@ class BattleModel(val map: GameField) extends BattleModelEventHandler with Loggi
   def hexBySoldier(soldier: Soldier) = map.hexField.hexes.find(h => h.soldier == Some(soldier)).get
 
   def validateMovementEvent(soldier: Soldier, from: TerrainHex, to: TerrainHex, validatePath: Boolean = true, checkPlayer: Boolean = true): Boolean = {
-    if (checkPlayer && soldier.owner.isSamePlayer(currentPlayer)) {
+    if (checkPlayer && !soldier.owner.isSamePlayer(currentPlayer)) {
       return false
     }
 

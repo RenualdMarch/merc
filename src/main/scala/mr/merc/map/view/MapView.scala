@@ -25,7 +25,7 @@ class MapView(field: TerrainHexField, val soldiersDrawer: SoldiersDrawer = new S
   def soldiers = soldiersDrawer.soldiers
 
   private def createSoldiers: List[SoldierView] = {
-    val soldiers = terrainView.hexes.flatMap(h => {
+    val soldiers = terrainView.realHexes.flatMap(h => {
       val soldierOption = h.hex.soldier
       soldierOption match {
         case Some(soldier) => {

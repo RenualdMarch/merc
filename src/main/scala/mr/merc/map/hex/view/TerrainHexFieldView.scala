@@ -18,8 +18,9 @@ import scalafx.geometry.Rectangle2D
 class TerrainHexFieldView(field: TerrainHexField) {
   private val infiniteField = new InfiniteHexField((x, y) => new TerrainHex(x, y, Empty))
 
-  val hexes = field.hexes.map(new TerrainHexView(_, field)) ++ blackHexes
-  val hexMap = hexes.map(h => ((h.hex.x, h.hex.y), h)).toMap
+  val realHexes = field.hexes.map(new TerrainHexView(_, field))
+  val hexesToDraw = realHexes ++ blackHexes
+  val hexesToDrawMap = hexesToDraw.map(h => ((h.hex.x, h.hex.y), h)).toMap
 
   def blackHexes: Set[TerrainHexView] = {
     val hexSet = field.hexes.toSet
@@ -30,12 +31,10 @@ class TerrainHexFieldView(field: TerrainHexField) {
     }.map(new TerrainHexView(_, field))
   }
 
-  private val hexSet = hexes toSet
-
   private var _movementOptions: Option[Set[TerrainHexView]] = None
   def movementOptions = _movementOptions
   def movementOptions_=(viewsOpt: Option[Set[TerrainHexView]]) {
-    def darkHexes(opts: Set[TerrainHexView]) = hexSet -- opts -- arrowHexes
+    def darkHexes(opts: Set[TerrainHexView]) = realHexes.toSet -- opts -- arrowHexes
 
     _movementOptions.foreach(darkHexes(_).foreach(_.isDarkened = false))
 
@@ -48,7 +47,7 @@ class TerrainHexFieldView(field: TerrainHexField) {
   }
 
   def neighbours(view: TerrainHexView): Set[TerrainHexView] = {
-    infiniteField.neighbours(view.hex).map(n => (n.x, n.y)).map(hexMap)
+    infiniteField.neighbours(view.hex).map(n => (n.x, n.y)).map(hexesToDrawMap)
   }
 
   private var _arrow: Option[(TerrainHexView, TerrainHexView)] = None
@@ -86,12 +85,12 @@ class TerrainHexFieldView(field: TerrainHexField) {
     }
   }
 
-  private val map = hexes map (h => ((h.hex.x, h.hex.y), h)) toMap
+  private val realHexesMap = realHexes map (h => ((h.hex.x, h.hex.y), h)) toMap
 
-  def hex(x: Int, y: Int) = map(x, y)
+  def hex(x: Int, y: Int) = realHexesMap(x, y)
 
   def drawItself(gc: GraphicsContext, viewPort: Rectangle2D) {
-    hexes filter (isVisible(viewPort)) foreach (_.drawItself(gc))
+    hexesToDraw filter (isVisible(viewPort)) foreach (_.drawItself(gc))
   }
 
   def isVisible(viewPort: Rectangle2D)(hex: TerrainHexView): Boolean = {
@@ -119,7 +118,7 @@ class TerrainHexFieldView(field: TerrainHexField) {
     def distanceSquare(x: Int, y: Int) = (x - pixelX) * (x - pixelX) + (y - pixelY) * (y - pixelY)
     val min = candidates.minBy(c => distanceSquare(c.center._1, c.center._2))
 
-    map.get(min.hex.x, min.hex.y)
+    realHexesMap.get(min.hex.x, min.hex.y)
   }
 
   def pixelWidth = hex(field.width - 1, 0).x + TerrainHexView.Side
