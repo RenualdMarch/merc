@@ -20,6 +20,15 @@ import scalafx.scene.SnapshotParameters
 import mr.merc.ui.common.ImageHelper._
 import mr.merc.unit.SoldierDefence
 import mr.merc.unit.view.SoldierView
+import mr.merc.map.terrain.TerrainType
+import javafx.embed.swing.SwingFXUtils
+import java.awt.image.BufferedImage
+import java.awt.AlphaComposite
+import java.awt.Graphics2D
+import mr.merc.map.hex._
+import javax.imageio.ImageIO
+import java.io.File
+import java.util.UUID
 
 object TerrainHexView {
   val Side = 72
@@ -45,6 +54,10 @@ object TerrainHexView {
     val coef = Seq((1, 0), (3, 0), (4, 2), (3, 4), (1, 4), (0, 2))
     val pixelCorrection = Seq((1, 1), (-1, 1), (-1, 0), (-1, -1), (1, -1), (1, 0))
     (coef zip pixelCorrection).map { case ((x, y), (px, py)) => (x * a + px * pix, y * a + py * pix) }
+  }
+
+  private def anglesWithCorrection(xCorr: Int, yCorr: Int, pix: Int = 0): Seq[(Double, Double)] = {
+    angles(pix).map { case (x, y) => (x + xCorr, y + yCorr) }
   }
 
   lazy val defenceImages: Map[(Int, Boolean), Image] = {
@@ -86,6 +99,70 @@ object TerrainHexView {
       gc.fill = Color.BLACK
       gc.fillPolygon(angles())
     }
+  }
+
+  private def terrainTypeImage(terrain: TerrainType, direction: Option[Direction]): Image = {
+    val terrainImage = MImage(terrain.imagePath).image
+    val mask = maskForImage(terrainImage, direction)
+    val bufferedImage = SwingFXUtils.fromFXImage(terrainImage, null)
+    val afterMasking = leaveMaskedAreaOnly(bufferedImage, mask)
+    val cut = cutTerrainHex(afterMasking, direction)
+    new Image(SwingFXUtils.toFXImage(cut, null))
+  }
+
+  // will use mask to render on it
+  private def leaveMaskedAreaOnly(originalImage: BufferedImage, mask: BufferedImage): BufferedImage = {
+    val ac = AlphaComposite.getInstance(AlphaComposite.SRC_IN, 1.0F)
+    val g = mask.getGraphics().asInstanceOf[Graphics2D]
+    g.setComposite(ac)
+    g.drawImage(originalImage, 0, 0, null)
+    mask
+  }
+
+  private def maskForImage(image: Image, direction: Option[Direction]): BufferedImage = {
+    val center = centerByDirection(direction, image.width.value.toInt, image.height.value.toInt)
+    val result = maskImage(center._1, center._2, image.width.value.toInt,
+      image.height.value.toInt)
+
+    result
+  }
+
+  private def centerByDirection(direction: Option[Direction], width: Int, height: Int): (Int, Int) = {
+    val map = Map(N -> (0, -Side), NE -> (Side * 3 / 4, -Side / 2),
+      SE -> (Side * 3 / 4, Side / 2), S -> (0, Side), SW -> (-Side * 3 / 4, Side / 2),
+      NW -> (-Side * 3 / 4, -Side / 2))
+
+    val center = (width / 2, height / 2)
+    direction match {
+      case None => center
+      case Some(dir) => {
+        val m = map(dir)
+        (center._1 + m._1, center._2 + m._2)
+      }
+    }
+  }
+
+  /**
+   * hex with center in cords is black, other things are transparent
+   */
+  private def maskImage(centerX: Int, centerY: Int, width: Int, height: Int, pix: Int = 0): BufferedImage = {
+    val topLeftX = centerX - Side / 2
+    val topLeftY = centerY - Side / 2
+    val angles = anglesWithCorrection(topLeftX, topLeftY, pix)
+
+    val image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB_PRE)
+    val g = image.getGraphics()
+    g.setColor(java.awt.Color.BLACK)
+    g.fillPolygon(angles.map(_._1.toInt).toArray, angles.map(_._2.toInt).toArray, angles.size)
+    image
+  }
+
+  private def cutTerrainHex(image: BufferedImage, direction: Option[Direction]): BufferedImage = {
+    val center = centerByDirection(direction, image.getWidth(), image.getHeight())
+    val retImage = new BufferedImage(Side, Side, BufferedImage.TYPE_INT_ARGB_PRE)
+    val g = retImage.getGraphics()
+    g.drawImage(image, center._1 - Side / 2, center._2 - Side / 2, Side, Side, 0, 0, Side, Side, null)
+    retImage
   }
 }
 
@@ -157,17 +234,22 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField) {
     rule.transform(additives)
   }
 
-  val image: MImage = {
+  private lazy val neighbourParts: List[Image] = {
+    val neighboursWithDirections = field.neighboursWithDirections(this.hex)
+    neighboursWithDirections.toList.map { case (d, n) => TerrainHexView.terrainTypeImage(n.terrain, Some(d.opposite)) }
+  }
+
+  val image: Image = {
     if (hex.terrain == Forest) {
-      MImage(Grass.imagePath)
+      TerrainHexView.terrainTypeImage(Grass, None)
     } else {
-      MImage(hex.terrain.imagePath)
+      TerrainHexView.terrainTypeImage(hex.terrain, None)
     }
   }
 
-  val secondaryImage: Option[MImage] = {
+  val secondaryImage: Option[Image] = {
     if (hex.terrain == Forest) {
-      Some(MImage(Forest.imagePath))
+      Some(TerrainHexView.terrainTypeImage(Forest, None))
     } else {
       None
     }
@@ -186,11 +268,12 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField) {
   // TODO cache it based on neighbors, elements, etc
   lazy val hexImage: Image = {
     drawImage(TerrainHexView.Side, TerrainHexView.Side) { gc =>
-      image.drawImage(gc, 0, 0)
+      gc.drawImage(image, 0, 0)
       elements foreach (_.drawItself(gc, 0, 0))
       neighbourMapObjects foreach (_.drawImage(gc, 0, 0))
-      secondaryImage.map(_.drawCenteredImage(gc, 0, 0, TerrainHexView.Side, TerrainHexView.Side))
+      secondaryImage.foreach(gc.drawImage(_, 0, 0))
       mapObject foreach (_.drawImage(gc, 0, 0))
+      neighbourParts.foreach(gc.drawImage(_, 0, 0))
     }
   }
 

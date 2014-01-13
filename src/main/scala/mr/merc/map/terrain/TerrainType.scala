@@ -1,5 +1,10 @@
 package mr.merc.map.terrain
 
+import scalafx.scene.image.Image
+import mr.merc.map.hex.Direction
+import mr.merc.image.MImage
+import javafx.embed.swing.SwingFXUtils
+
 object TerrainType {
   val list = List[TerrainType](Water, Forest, Grass, Sand, Swamp, Hill, Mountain, Road)
   val helperTypesList = List[TerrainType](BankInside, BankOutside)
@@ -10,7 +15,6 @@ object TerrainType {
 
 abstract sealed class TerrainType(val name: String) {
   def imagePath = "/images/terrain/" + name + ".png"
-
 }
 
 case object Grass extends TerrainType("grass")
