@@ -11,7 +11,6 @@ class MomentaryMovement(f: => Unit, override val dirtyHexes: List[TerrainHexView
   override def start() {
     super.start()
     f
-    dirtyHexes.foreach(_.isDirty = true)
     _isOver = true
   }
   override def isOver = _isOver

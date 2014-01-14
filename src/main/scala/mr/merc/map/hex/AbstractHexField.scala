@@ -21,7 +21,7 @@ abstract class AbstractHexField[T <: Hex](init: (Int, Int) => T) extends Grid[T]
 
   private def neighboursListWithInvalid(x: Int, y: Int): List[(Int, Int)] = {
     // x % 2 == 1 is even because we start from zero
-    val corrections = correctionsList(x % 2 == 1)
+    val corrections = correctionsList(x % 2 != 0)
     corrections.map(h => (h._1 + x, h._2 + y))
   }
 

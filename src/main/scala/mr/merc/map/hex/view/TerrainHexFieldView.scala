@@ -14,11 +14,12 @@ import scalafx.scene.image.WritableImage
 import scalafx.scene.SnapshotParameters
 import scalafx.scene.paint.Color
 import scalafx.geometry.Rectangle2D
+import mr.merc.map.hex.Direction
 
 class TerrainHexFieldView(field: TerrainHexField) {
   private val infiniteField = new InfiniteHexField((x, y) => new TerrainHex(x, y, Empty))
 
-  val realHexes = field.hexes.map(new TerrainHexView(_, field))
+  val realHexes = field.hexes.map(new TerrainHexView(_, field, this))
   val hexesToDraw = realHexes ++ blackHexes
   val hexesToDrawMap = hexesToDraw.map(h => ((h.hex.x, h.hex.y), h)).toMap
 
@@ -28,7 +29,7 @@ class TerrainHexFieldView(field: TerrainHexField) {
     blackHexes.filterNot { h =>
       (h.y == -1 && h.x % 2 == 0) ||
         (h.y == field.height && h.x % 2 == 0)
-    }.map(new TerrainHexView(_, field))
+    }.map(new TerrainHexView(_, field, this))
   }
 
   private var _movementOptions: Option[Set[TerrainHexView]] = None
@@ -48,6 +49,12 @@ class TerrainHexFieldView(field: TerrainHexField) {
 
   def neighbours(view: TerrainHexView): Set[TerrainHexView] = {
     infiniteField.neighbours(view.hex).map(n => (n.x, n.y)).map(hexesToDrawMap)
+  }
+
+  def neighboursWithDirections(view: TerrainHexView): Map[Direction, TerrainHexView] = {
+    infiniteField.neighboursWithDirections(view.hex).filter {
+      case (d, h) => hexesToDrawMap.contains((h.x, h.y))
+    } mapValues { h => hexesToDrawMap((h.x, h.y)) }
   }
 
   private var _arrow: Option[(TerrainHexView, TerrainHexView)] = None
@@ -114,7 +121,7 @@ class TerrainHexFieldView(field: TerrainHexField) {
 
     val hex = infiniteField.hex(column, row)
     val neighbours = infiniteField.neighbours(hex)
-    val candidates = neighbours + hex map (h => new TerrainHexView(h, field))
+    val candidates = neighbours + hex map (h => new TerrainHexView(h, field, this))
     def distanceSquare(x: Int, y: Int) = (x - pixelX) * (x - pixelX) + (y - pixelY) * (y - pixelY)
     val min = candidates.minBy(c => distanceSquare(c.center._1, c.center._2))
 

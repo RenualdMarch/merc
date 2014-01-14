@@ -28,10 +28,11 @@ object SoldierView {
 
   private[view] def coordsCorrection(dir: Direction): (Int, Int) = {
     val hexField = new TerrainHexField(4, 4, (x, y) => new TerrainHex(x, y, Grass))
+    val hexFieldView = new TerrainHexFieldView(hexField)
     val center = hexField.hex(1, 1)
-    val centerView = new TerrainHexView(center, hexField)
+    val centerView = new TerrainHexView(center, hexField, hexFieldView)
     val neig = hexField.neighboursWithDirections(1, 1)(dir)
-    val neigView = new TerrainHexView(neig, hexField)
+    val neigView = new TerrainHexView(neig, hexField, hexFieldView)
 
     (neigView.x - centerView.x, neigView.y - centerView.y)
   }

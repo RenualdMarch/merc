@@ -94,20 +94,19 @@ object TerrainHexView {
     }
   }
 
-  lazy val blackImage: Image = {
-    drawImage(Side, Side) { gc =>
-      gc.fill = Color.BLACK
-      gc.fillPolygon(angles())
-    }
-  }
-
+  private val terrainTypeImageCache = collection.mutable.Map[(TerrainType, Option[Direction]), Image]()
   private def terrainTypeImage(terrain: TerrainType, direction: Option[Direction]): Image = {
-    val terrainImage = MImage(terrain.imagePath).image
-    val mask = maskForImage(terrainImage, direction)
-    val bufferedImage = SwingFXUtils.fromFXImage(terrainImage, null)
-    val afterMasking = leaveMaskedAreaOnly(bufferedImage, mask)
-    val cut = cutTerrainHex(afterMasking, direction)
-    new Image(SwingFXUtils.toFXImage(cut, null))
+    if (!terrainTypeImageCache.contains(terrain, direction)) {
+      val terrainImage = MImage(terrain.imagePath).image
+      val mask = maskForImage(terrainImage, direction)
+      val bufferedImage = SwingFXUtils.fromFXImage(terrainImage, null)
+      val afterMasking = leaveMaskedAreaOnly(bufferedImage, mask)
+      val cut = cutTerrainHex(afterMasking, direction)
+      val image = new Image(SwingFXUtils.toFXImage(cut, null))
+      terrainTypeImageCache += (terrain, direction) -> image
+    }
+
+    terrainTypeImageCache(terrain, direction)
   }
 
   // will use mask to render on it
@@ -161,12 +160,12 @@ object TerrainHexView {
     val center = centerByDirection(direction, image.getWidth(), image.getHeight())
     val retImage = new BufferedImage(Side, Side, BufferedImage.TYPE_INT_ARGB_PRE)
     val g = retImage.getGraphics()
-    g.drawImage(image, center._1 - Side / 2, center._2 - Side / 2, Side, Side, 0, 0, Side, Side, null)
+    g.drawImage(image, 0, 0, Side, Side, center._1 - Side / 2, center._2 - Side / 2, center._1 + Side / 2, center._2 + Side / 2, null)
     retImage
   }
 }
 
-class TerrainHexView(val hex: TerrainHex, field: TerrainHexField) {
+class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: TerrainHexFieldView) {
   private val arrowPath = "/images/arrows/"
 
   val neighbours = field.neighboursWithDirections(hex.x, hex.y)
@@ -235,8 +234,8 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField) {
   }
 
   private lazy val neighbourParts: List[Image] = {
-    val neighboursWithDirections = field.neighboursWithDirections(this.hex)
-    neighboursWithDirections.toList.map { case (d, n) => TerrainHexView.terrainTypeImage(n.terrain, Some(d.opposite)) }
+    val neighboursWithDirections = fieldView.neighboursWithDirections(this)
+    neighboursWithDirections.toList.map { case (d, n) => TerrainHexView.terrainTypeImage(n.hex.terrain, Some(d.opposite)) }
   }
 
   val image: Image = {

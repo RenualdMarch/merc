@@ -31,11 +31,11 @@ class SoldierRangedAttackMovementTest extends FunSuite {
     val result = AttackResult(true, attackerSoldier, defenderSoldier, simpleSoldierType.attacks(0), false, 0, 0)
     val field = new TerrainHexField(10, 10, TerrainHex.grassInit)
     val fieldView = new TerrainHexFieldView(field)
-    val from = new TerrainHexView(field.hex(0, 0), field) {
+    val from = new TerrainHexView(field.hex(0, 0), field, fieldView) {
       override def coords = (10, 20)
     }
 
-    val to = new TerrainHexView(field.hex(1, 0), field) {
+    val to = new TerrainHexView(field.hex(1, 0), field, fieldView) {
       override def coords = (110, 20)
     }
 

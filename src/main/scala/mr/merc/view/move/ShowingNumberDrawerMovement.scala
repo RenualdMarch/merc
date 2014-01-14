@@ -8,7 +8,7 @@ import scalafx.scene.text.FontWeight
 
 object ShowingNumberDrawerMovement {
   private val speed = 125
-  private val height = 90
+  private val height = 60
   private val fadingStart = 0.7
 
   def damage(x: Int, y: Int, number: Int): ShowingNumberDrawerMovement = {

@@ -31,11 +31,11 @@ class SoldierAttackMovementTest extends FunSuite {
 
     val field = new TerrainHexField(10, 10, TerrainHex.grassInit)
     val fieldView = new TerrainHexFieldView(field)
-    val from = new TerrainHexView(field.hex(0, 0), field) {
+    val from = new TerrainHexView(field.hex(0, 0), field, fieldView) {
       override def coords = (0, 10)
     }
 
-    val to = new TerrainHexView(field.hex(0, 1), field) {
+    val to = new TerrainHexView(field.hex(0, 1), field, fieldView) {
       override def coords = (300, 410)
     }
 

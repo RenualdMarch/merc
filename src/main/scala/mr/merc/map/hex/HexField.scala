@@ -13,7 +13,7 @@ class HexField[T <: Hex: ClassTag](val width: Int, val height: Int, init: (Int, 
   }
 
   def isLegalCoords(x: Int, y: Int): Boolean = {
-    if (x % 2 == 1 && y == height - 1) {
+    if (x % 2 != 0 && y == height - 1) {
       return false
     }
 

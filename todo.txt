@@ -12,27 +12,26 @@ For M4, these things should be completed and tested
 +Changing position on minimap
 +Shown map of any size
 +Primitive map generation
-Lazy redraw - test everything
-Forest borders bug
-Borders fix
-Neighbours redraw when moving
++Forest borders bug
++Borders fix
 +Allies
-Draw trees above bridges
-when draw terrain additives, guarantee that same additives are drawn in same situations.
-
++Neighbours redraw when moving
++Draw trees above bridges
++when draw terrain additives, guarantee that same additives are drawn in same situations.
+Lazy redraw - test everything
+When movement is over, still need to redraw all its hexes
 Hills and mountains borders
-Check all borders
 AI - different implementations
 All human soldiers of 0 and 1 level are present
-AI - tournament mode
+AI - tournament mode to test AI
 Logging support
-investigate MigLayout - a lot of UI ahead
-experiment with no changes on canvas if nothing is changed
-Levels of difficulty
+Rename soldiers drawer to smth more appropriate
 long play testing, bug fixing
 
 
-M5 going to be 0.1 - Vertical slice of game 
+M5 going to be vertical slice of game 
+Levels of difficulty
+investigate MigLayout - a lot of UI ahead
 global map with several kingdoms and cities
 ability to travel among cities and 4 seasons
 diplomacy among kingdoms - war, peace, alliance, cold war?

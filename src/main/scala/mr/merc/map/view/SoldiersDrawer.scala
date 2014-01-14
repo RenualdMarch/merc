@@ -4,6 +4,7 @@ import mr.merc.unit.view.SoldierView
 import mr.merc.view.move.Movement
 import scalafx.scene.canvas.GraphicsContext
 import scala.collection.mutable.Queue
+import mr.merc.map.hex.view.TerrainHexView
 
 class SoldiersDrawer {
   private var _soldiers = Set[SoldierView]()
@@ -25,14 +26,16 @@ class SoldiersDrawer {
   def soldiers = _soldiers
   def movements = _movements
 
+  private var momentaryAndPreviousDirtyHexes: List[TerrainHexView] = Nil
   private def drawablesInMovements = currentMovement.map(_.drawables).getOrElse(Nil)
-  def dirtyHexesInMovements = currentMovement.map(_.dirtyHexes).getOrElse(Nil)
+  def dirtyHexesInMovements = momentaryAndPreviousDirtyHexes ++ currentMovement.map(_.dirtyHexes).getOrElse(Nil)
   private def soldiersInMovements = drawablesInMovements flatMap (d => d match {
     case soldier: SoldierView => Some(soldier)
     case _ => None
   })
 
   def update(time: Int) {
+    momentaryAndPreviousDirtyHexes = Nil
     updateAllSoldiersExceptForInMovement(time)
 
     currentMovement match {
@@ -40,7 +43,7 @@ class SoldiersDrawer {
         executeAllMomentaryMovesAndStartFirstNonMomentary()
       } else {
         executeAllMomentaryMovesAndStartFirstNonMomentary()
-        move.update(time)
+        currentMovement.foreach(_.update(time))
         executeAllMomentaryMovesAndStartFirstNonMomentary()
       }
       case None => // do nothing by now
@@ -64,6 +67,7 @@ class SoldiersDrawer {
     }
 
     while (currentMovement.map(_.isOver).getOrElse(false)) {
+      momentaryAndPreviousDirtyHexes ++= currentMovement.get.dirtyHexes
       _movements.dequeue()
       currentMovement.map(_.start())
     }
