@@ -38,5 +38,5 @@ class SoldierMoveMovement(val from: TerrainHexView, val to: TerrainHexView, val 
 
   override def drawables = List(soldier)
 
-  override def dirtyHexes = List(from, to) ++ (fieldView.neighbours(from) & fieldView.neighbours(to))
+  override def dirtyHexes = (fieldView.neighbours(from) | fieldView.neighbours(to)) toList
 }

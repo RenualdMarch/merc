@@ -22,6 +22,7 @@ import scalafx.scene.canvas.GraphicsContext
 import scalafx.scene.shape.Ellipse
 import mr.merc.unit._
 import mr.merc.map.hex.view.TerrainHexFieldView
+import mr.merc.map.hex._
 
 object SoldierView {
   private[view] val attackDistancePercentage = 0.6
@@ -102,6 +103,14 @@ class SoldierView(val soldier: Soldier) extends Sprite[SoldierViewState](Soldier
     hexView.foreach(_.isDirty = true)
   }
 
+  def lookAtDirection(direction: Direction) {
+    if (direction == NE || direction == SE) {
+      rightDirection = true
+    } else if (direction == NW || direction == SW) {
+      rightDirection = false
+    }
+  }
+
   private def drawOvalUnderSoldier(gc: GraphicsContext) {
     gc.save()
     gc.fill = soldier.owner.color
@@ -125,7 +134,6 @@ class SoldierView(val soldier: Soldier) extends Sprite[SoldierViewState](Soldier
     gc.fill = color
     gc.fillOval(x + 18, y, 8, 8)
     gc.restore()
-
   }
 
   def moveMovement(path: List[TerrainHexView], field: TerrainHexFieldView): Movement = {

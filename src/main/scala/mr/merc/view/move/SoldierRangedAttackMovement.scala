@@ -40,12 +40,16 @@ class SoldierRangedAttackMovement(val fromHex: TerrainHexView, val toHex: Terrai
   } else {
     None
   }
-  (damageNumberMovement ++ drainNumberMovement).foreach(_.start())
 
   override def start() {
     super.start()
+    val direction = field.neighboursWithDirections(fromHex).toList.map { case (k, v) => v -> k }.toMap.apply(toHex)
+    attacker.lookAtDirection(direction)
+    (damageNumberMovement ++ drainNumberMovement).foreach(_.start())
     attacker.state = SoldierViewAttackState(result.success, dir, result.attackIndex)
     attacker.sounds.get(AttackSound(result.attackIndex, result.success)).foreach(_.play)
+    fromHex.soldier = None
+    toHex.soldier = None
   }
 
   override def update(time: Int) = {
@@ -69,6 +73,11 @@ class SoldierRangedAttackMovement(val fromHex: TerrainHexView, val toHex: Terrai
 
     if (!numbersAreOver) {
       numberMovements.foreach(_.update(time))
+    }
+
+    if (isOver) {
+      fromHex.soldier = Some(attacker)
+      toHex.soldier = Some(defender)
     }
   }
 

@@ -68,8 +68,8 @@ class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleCont
   val soldier = new Soldier("1", SoldierType("Human-Horseman"), player2)
   soldier.exp = 10
   val enemy = new Soldier("2", SoldierType("Human-Mage"), player1)
-  field.hex(4, 2).soldier = Some(soldier)
-  field.hex(4, 4).soldier = Some(enemy)
+  field.hex(4, 0).soldier = Some(soldier)
+  field.hex(4, 2).soldier = Some(enemy)
   val gameField = new GameField(field, List(player1, player2))
 
   val controller = new BattleController(gameField, this)

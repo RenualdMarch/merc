@@ -279,12 +279,12 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
   def drawItself(gc: GraphicsContext) {
     if (isDirty || isDarkened != currentDarkened) {
       gc.drawImage(hexImage, x, y)
+      drawHexGrid(gc)
       drawSoldierIfNeeded(gc)
       drawMovementImpossibleIfNeeded(gc)
       drawArrowStartIfNeeded(gc)
       drawArrowEndIfNeeded(gc)
       drawDefenceIfNeeded(gc)
-      drawHexGrid(gc)
       isDirty = false
     }
 

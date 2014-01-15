@@ -20,9 +20,6 @@ class TerrainHexFieldView(field: TerrainHexField) {
   private val infiniteField = new InfiniteHexField((x, y) => new TerrainHex(x, y, Empty))
 
   val realHexes = field.hexes.map(new TerrainHexView(_, field, this))
-  val hexesToDraw = realHexes ++ blackHexes
-  val hexesToDrawMap = hexesToDraw.map(h => ((h.hex.x, h.hex.y), h)).toMap
-
   def blackHexes: Set[TerrainHexView] = {
     val hexSet = field.hexes.toSet
     val blackHexes = hexSet.flatMap(h => infiniteField.neighbours(h.x, h.y)) -- hexSet
@@ -31,6 +28,10 @@ class TerrainHexFieldView(field: TerrainHexField) {
         (h.y == field.height && h.x % 2 == 0)
     }.map(new TerrainHexView(_, field, this))
   }
+
+  // sorting is make sure that hexes are drawn in correct order, back before first
+  val hexesToDraw = (realHexes ++ blackHexes).toList.sortBy(h => 10000 * h.hex.y + h.hex.x)
+  val hexesToDrawMap = hexesToDraw.map(h => ((h.hex.x, h.hex.y), h)).toMap
 
   private var _movementOptions: Option[Set[TerrainHexView]] = None
   def movementOptions = _movementOptions
@@ -48,13 +49,17 @@ class TerrainHexFieldView(field: TerrainHexField) {
   }
 
   def neighbours(view: TerrainHexView): Set[TerrainHexView] = {
-    infiniteField.neighbours(view.hex).map(n => (n.x, n.y)).map(hexesToDrawMap)
+    infiniteField.neighbours(view.hex).map(n => (n.x, n.y)).collect(hexesToDrawMap)
+  }
+
+  def neighboursOfNeighbours(view: TerrainHexView): Set[TerrainHexView] = {
+    neighbours(view).flatMap(neighbours)
   }
 
   def neighboursWithDirections(view: TerrainHexView): Map[Direction, TerrainHexView] = {
     infiniteField.neighboursWithDirections(view.hex).filter {
-      case (d, h) => hexesToDrawMap.contains((h.x, h.y))
-    } mapValues { h => hexesToDrawMap((h.x, h.y)) }
+      case (d, h) => hexesToDrawMap.contains(h.x, h.y)
+    } mapValues { h => hexesToDrawMap(h.x, h.y) }
   }
 
   private var _arrow: Option[(TerrainHexView, TerrainHexView)] = None
