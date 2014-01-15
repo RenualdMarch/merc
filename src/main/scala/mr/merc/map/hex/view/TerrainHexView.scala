@@ -97,12 +97,18 @@ object TerrainHexView {
   private val terrainTypeImageCache = collection.mutable.Map[(TerrainType, Option[Direction]), Image]()
   private def terrainTypeImage(terrain: TerrainType, direction: Option[Direction]): Image = {
     if (!terrainTypeImageCache.contains(terrain, direction)) {
-      val terrainImage = MImage(terrain.imagePath).image
-      val mask = maskForImage(terrainImage, direction)
-      val bufferedImage = SwingFXUtils.fromFXImage(terrainImage, null)
-      val afterMasking = leaveMaskedAreaOnly(bufferedImage, mask)
-      val cut = cutTerrainHex(afterMasking, direction)
-      val image = new Image(SwingFXUtils.toFXImage(cut, null))
+      val image = if (terrain == Forest) {
+        val terrainImage = MImage(terrain.imagePath).image
+        val mask = maskForImage(terrainImage, direction)
+        val bufferedImage = SwingFXUtils.fromFXImage(terrainImage, null)
+        val afterMasking = leaveMaskedAreaOnly(bufferedImage, mask)
+        val cut = cutTerrainHex(afterMasking, direction)
+        new Image(SwingFXUtils.toFXImage(cut, null))
+      } else if (direction == None) {
+        MImage(terrain.imagePath).image
+      } else {
+        MImage.emptyImage.image
+      }
       terrainTypeImageCache += (terrain, direction) -> image
     }
 
@@ -279,7 +285,7 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
   def drawItself(gc: GraphicsContext) {
     if (isDirty || isDarkened != currentDarkened) {
       gc.drawImage(hexImage, x, y)
-      //drawHexGrid(gc)
+      drawHexGrid(gc)
       drawMovementImpossibleIfNeeded(gc)
       drawArrowStartIfNeeded(gc)
       drawArrowEndIfNeeded(gc)
