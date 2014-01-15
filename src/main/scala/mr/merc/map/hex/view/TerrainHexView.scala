@@ -279,8 +279,7 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
   def drawItself(gc: GraphicsContext) {
     if (isDirty || isDarkened != currentDarkened) {
       gc.drawImage(hexImage, x, y)
-      drawHexGrid(gc)
-      drawSoldierIfNeeded(gc)
+      //drawHexGrid(gc)
       drawMovementImpossibleIfNeeded(gc)
       drawArrowStartIfNeeded(gc)
       drawArrowEndIfNeeded(gc)
@@ -291,12 +290,10 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
   }
 
   private def drawMovementImpossibleIfNeeded(gc: GraphicsContext) {
-    if (currentDarkened != isDarkened) {
-      if (isDarkened) {
-        gc.drawImage(TerrainHexView.movementImpossibleImage, x, y)
-      }
-      currentDarkened = isDarkened
+    if (isDarkened && !arrowEnd.isDefined) {
+      gc.drawImage(TerrainHexView.movementImpossibleImage, x, y)
     }
+    currentDarkened = isDarkened
   }
 
   private def drawArrowStartIfNeeded(gc: GraphicsContext) {
@@ -318,12 +315,6 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
       case (d, drawPolygon) =>
         val image = TerrainHexView.defenceImages(d.defence, drawPolygon)
         gc.drawImage(image, x, y)
-    }
-  }
-
-  private def drawSoldierIfNeeded(gc: GraphicsContext) {
-    soldier foreach { s =>
-      s.drawItself(gc)
     }
   }
 

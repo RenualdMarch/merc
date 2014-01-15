@@ -76,4 +76,8 @@ class SoldiersDrawer {
   def drawDrawablesInMovements(gc: GraphicsContext) {
     drawablesInMovements foreach (_.drawItself(gc))
   }
+
+  def drawSoldiers(gc: GraphicsContext, hexes: List[TerrainHexView]) {
+    hexes.flatMap(_.soldier).foreach(_.drawItself(gc))
+  }
 }

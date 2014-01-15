@@ -15,6 +15,7 @@ import scalafx.scene.SnapshotParameters
 import scalafx.scene.paint.Color
 import scalafx.geometry.Rectangle2D
 import mr.merc.map.hex.Direction
+import mr.merc.map.view.SoldiersDrawer
 
 class TerrainHexFieldView(field: TerrainHexField) {
   private val infiniteField = new InfiniteHexField((x, y) => new TerrainHex(x, y, Empty))
@@ -44,7 +45,7 @@ class TerrainHexFieldView(field: TerrainHexField) {
       case Some(views) => darkHexes(views).foreach(_.isDarkened = true)
       case None => // do nothing
     }
-
+    realHexes.filter(_.soldier.isDefined).foreach(_.isDirty = true)
     _movementOptions = viewsOpt
   }
 
@@ -101,8 +102,12 @@ class TerrainHexFieldView(field: TerrainHexField) {
 
   def hex(x: Int, y: Int) = realHexesMap(x, y)
 
-  def drawItself(gc: GraphicsContext, viewPort: Rectangle2D) {
-    hexesToDraw filter (isVisible(viewPort)) foreach (_.drawItself(gc))
+  def drawItself(gc: GraphicsContext, viewPort: Rectangle2D, soldiersDrawer: SoldiersDrawer) {
+    val visibleHexes = hexesToDraw filter (isVisible(viewPort))
+    val hexesWithSoldiers = visibleHexes.filter(h => h.isDirty && h.soldier.isDefined)
+    visibleHexes foreach (_.drawItself(gc))
+    soldiersDrawer.drawSoldiers(gc, hexesWithSoldiers)
+    soldiersDrawer.drawDrawablesInMovements(gc)
   }
 
   def isVisible(viewPort: Rectangle2D)(hex: TerrainHexView): Boolean = {

@@ -19,13 +19,12 @@ For M4, these things should be completed and tested
 +Draw trees above bridges
 +when draw terrain additives, guarantee that same additives are drawn in same situations.
 +When movement is over, still need to redraw all its hexes
-Lazy redraw - test everything
+Lazy redraw - test and fix everything
 Hills and mountains borders
 AI - different implementations
 All human soldiers of 0 and 1 level are present
 AI - tournament mode to test AI
 Logging support
-Rename soldiers drawer to smth more appropriate
 During attack for some reason oval under soldier color is more intensive
 long play testing, bug fixing
 

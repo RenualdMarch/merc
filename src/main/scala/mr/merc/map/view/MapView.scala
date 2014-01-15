@@ -49,8 +49,7 @@ class MapView(field: TerrainHexField, val soldiersDrawer: SoldiersDrawer = new S
 
   def drawItself(gc: GraphicsContext, viewPort: Rectangle2D) {
     soldiersDrawer.dirtyHexesInMovements.foreach(_.isDirty = true)
-    terrainView.drawItself(gc, viewPort)
-    soldiersDrawer.drawDrawablesInMovements(gc)
+    terrainView.drawItself(gc, viewPort, soldiersDrawer)
   }
 
   def addMovement(movement: Movement) {
