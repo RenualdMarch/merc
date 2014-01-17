@@ -34,14 +34,6 @@ object TerrainHexView {
   val Side = 72
   val textLength = 36
 
-  lazy val movementImpossibleImage: Image = {
-    drawImage(Side, Side) { gc =>
-      gc.globalAlpha = 0.3
-      gc.fill = Color.BLACK
-      gc.fillPolygon(angles())
-    }
-  }
-
   lazy val hexGridImage: Image = {
     drawImage(Side, Side) { gc =>
       gc.stroke = Color.BLACK
@@ -94,80 +86,12 @@ object TerrainHexView {
     }
   }
 
-  private val terrainTypeImageCache = collection.mutable.Map[(TerrainType, Option[Direction]), Image]()
-  private def terrainTypeImage(terrain: TerrainType, direction: Option[Direction]): Image = {
-    if (!terrainTypeImageCache.contains(terrain, direction)) {
-      val image = if (terrain == Forest) {
-        val terrainImage = MImage(terrain.imagePath).image
-        val mask = maskForImage(terrainImage, direction)
-        val bufferedImage = SwingFXUtils.fromFXImage(terrainImage, null)
-        val afterMasking = leaveMaskedAreaOnly(bufferedImage, mask)
-        val cut = cutTerrainHex(afterMasking, direction)
-        new Image(SwingFXUtils.toFXImage(cut, null))
-      } else if (direction == None) {
-        MImage(terrain.imagePath).image
-      } else {
-        MImage.emptyImage.image
-      }
-      terrainTypeImageCache += (terrain, direction) -> image
+  lazy val movementImpossibleImage: Image = {
+    drawImage(Side, Side) { gc =>
+      gc.globalAlpha = 0.3
+      gc.fill = Color.BLACK
+      gc.fillPolygon(angles())
     }
-
-    terrainTypeImageCache(terrain, direction)
-  }
-
-  // will use mask to render on it
-  private def leaveMaskedAreaOnly(originalImage: BufferedImage, mask: BufferedImage): BufferedImage = {
-    val ac = AlphaComposite.getInstance(AlphaComposite.SRC_IN, 1.0F)
-    val g = mask.getGraphics().asInstanceOf[Graphics2D]
-    g.setComposite(ac)
-    g.drawImage(originalImage, 0, 0, null)
-    mask
-  }
-
-  private def maskForImage(image: Image, direction: Option[Direction]): BufferedImage = {
-    val center = centerByDirection(direction, image.width.value.toInt, image.height.value.toInt)
-    val result = maskImage(center._1, center._2, image.width.value.toInt,
-      image.height.value.toInt)
-
-    result
-  }
-
-  private def centerByDirection(direction: Option[Direction], width: Int, height: Int): (Int, Int) = {
-    val map = Map(N -> (0, -Side), NE -> (Side * 3 / 4, -Side / 2),
-      SE -> (Side * 3 / 4, Side / 2), S -> (0, Side), SW -> (-Side * 3 / 4, Side / 2),
-      NW -> (-Side * 3 / 4, -Side / 2))
-
-    val center = (width / 2, height / 2)
-    direction match {
-      case None => center
-      case Some(dir) => {
-        val m = map(dir)
-        (center._1 + m._1, center._2 + m._2)
-      }
-    }
-  }
-
-  /**
-   * hex with center in cords is black, other things are transparent
-   */
-  private def maskImage(centerX: Int, centerY: Int, width: Int, height: Int, pix: Int = 0): BufferedImage = {
-    val topLeftX = centerX - Side / 2
-    val topLeftY = centerY - Side / 2
-    val angles = anglesWithCorrection(topLeftX, topLeftY, pix)
-
-    val image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB_PRE)
-    val g = image.getGraphics()
-    g.setColor(java.awt.Color.BLACK)
-    g.fillPolygon(angles.map(_._1.toInt).toArray, angles.map(_._2.toInt).toArray, angles.size)
-    image
-  }
-
-  private def cutTerrainHex(image: BufferedImage, direction: Option[Direction]): BufferedImage = {
-    val center = centerByDirection(direction, image.getWidth(), image.getHeight())
-    val retImage = new BufferedImage(Side, Side, BufferedImage.TYPE_INT_ARGB_PRE)
-    val g = retImage.getGraphics()
-    g.drawImage(image, 0, 0, Side, Side, center._1 - Side / 2, center._2 - Side / 2, center._1 + Side / 2, center._2 + Side / 2, null)
-    retImage
   }
 }
 
@@ -239,22 +163,17 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
     rule.transform(additives)
   }
 
-  private lazy val neighbourParts: List[Image] = {
-    val neighboursWithDirections = fieldView.neighboursWithDirections(this)
-    neighboursWithDirections.toList.map { case (d, n) => TerrainHexView.terrainTypeImage(n.hex.terrain, Some(d.opposite)) }
-  }
-
-  val image: Image = {
+  val image: MImage = {
     if (hex.terrain == Forest) {
-      TerrainHexView.terrainTypeImage(Grass, None)
+      MImage(Grass.imagePath)
     } else {
-      TerrainHexView.terrainTypeImage(hex.terrain, None)
+      MImage(hex.terrain.imagePath)
     }
   }
 
-  val secondaryImage: Option[Image] = {
+  val secondaryImage: Option[MImage] = {
     if (hex.terrain == Forest) {
-      Some(TerrainHexView.terrainTypeImage(Forest, None))
+      Some(MImage(Forest.imagePath))
     } else {
       None
     }
@@ -272,27 +191,38 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
 
   // TODO cache it based on neighbors, elements, etc
   lazy val hexImage: Image = {
-    drawImage(TerrainHexView.Side, TerrainHexView.Side) { gc =>
-      gc.drawImage(image, 0, 0)
-      elements foreach (_.drawItself(gc, 0, 0))
-      neighbourMapObjects foreach (_.drawImage(gc, 0, 0))
-      secondaryImage.foreach(gc.drawImage(_, 0, 0))
-      mapObject foreach (_.drawImage(gc, 0, 0))
-      neighbourParts.foreach(gc.drawImage(_, 0, 0))
+    val side = TerrainHexView.Side
+    val imageSide = side * 2
+    val offset = side / 2
+    drawImage(2 * side, 2 * side) { gc =>
+      image.drawCenteredImage(gc, 0, 0, imageSide, imageSide)
+      elements foreach (_.drawItself(gc, offset, offset))
+      neighbourMapObjects foreach (_.drawImage(gc, offset, offset))
+      secondaryImage.foreach(_.drawCenteredImage(gc, 0, 0, imageSide, imageSide))
+      mapObject foreach (_.drawImage(gc, offset, offset))
     }
   }
 
-  def drawItself(gc: GraphicsContext) {
-    if (isDirty || isDarkened != currentDarkened) {
-      gc.drawImage(hexImage, x, y)
-      drawHexGrid(gc)
-      drawMovementImpossibleIfNeeded(gc)
-      drawArrowStartIfNeeded(gc)
-      drawArrowEndIfNeeded(gc)
-      drawDefenceIfNeeded(gc)
-      isDirty = false
-    }
+  def shouldBeRedrawn = isDirty || isDarkened != currentDarkened
 
+  def drawItself(gc: GraphicsContext, stage: HexDrawingStage) {
+    if (shouldBeRedrawn) {
+      stage match {
+        case TerrainImageStage =>
+          MImage(hexImage).drawCenteredImage(gc, x, y, TerrainHexView.Side, TerrainHexView.Side)
+        case MovementImpossibleStage =>
+          drawMovementImpossibleIfNeeded(gc)
+        case ArrowStage =>
+          drawArrowStartIfNeeded(gc)
+          drawArrowEndIfNeeded(gc)
+        case DefenceStage =>
+          drawDefenceIfNeeded(gc)
+        case HexGridStage =>
+          drawHexGrid(gc)
+        case EndDrawing =>
+          isDirty = false
+      }
+    }
   }
 
   private def drawMovementImpossibleIfNeeded(gc: GraphicsContext) {
@@ -331,3 +261,11 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
   def center = (x + side / 2, y + side / 2)
   def coords = (x, y)
 }
+
+sealed trait HexDrawingStage
+case object TerrainImageStage extends HexDrawingStage
+case object MovementImpossibleStage extends HexDrawingStage
+case object ArrowStage extends HexDrawingStage
+case object DefenceStage extends HexDrawingStage
+case object HexGridStage extends HexDrawingStage
+case object EndDrawing extends HexDrawingStage

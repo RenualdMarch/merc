@@ -31,7 +31,7 @@ class TerrainHexFieldView(field: TerrainHexField) {
   }
 
   // sorting is make sure that hexes are drawn in correct order, back before first
-  val hexesToDraw = (realHexes ++ blackHexes).toList.sortBy(h => 10000 * h.hex.y + h.hex.x)
+  val hexesToDraw = (realHexes ++ blackHexes).toList.sortBy(h => (h.hex.terrain.layer, h.hex.y, h.hex.x))
   val hexesToDrawMap = hexesToDraw.map(h => ((h.hex.x, h.hex.y), h)).toMap
 
   private var _movementOptions: Option[Set[TerrainHexView]] = None
@@ -102,12 +102,45 @@ class TerrainHexFieldView(field: TerrainHexField) {
 
   def hex(x: Int, y: Int) = realHexesMap(x, y)
 
+  private val correctOrder = List(TerrainImageStage, MovementImpossibleStage, ArrowStage,
+    DefenceStage, HexGridStage, EndDrawing)
+
   def drawItself(gc: GraphicsContext, viewPort: Rectangle2D, soldiersDrawer: SoldiersDrawer) {
+
+    val dirty = hexesToDraw.filter(_.shouldBeRedrawn) toSet
+    val dirtyWithNeigs = hexesToRedrawWithNeighboursOfUpperLayer(dirty)
+    dirtyWithNeigs.foreach(_.isDirty = true)
     val visibleHexes = hexesToDraw filter (isVisible(viewPort))
     val hexesWithSoldiers = visibleHexes.filter(h => h.isDirty && h.soldier.isDefined)
-    visibleHexes foreach (_.drawItself(gc))
+    correctOrder.foreach { stage =>
+      visibleHexes foreach (_.drawItself(gc, stage))
+    }
     soldiersDrawer.drawSoldiers(gc, hexesWithSoldiers)
     soldiersDrawer.drawDrawablesInMovements(gc)
+  }
+
+  def hexesToRedrawWithNeighboursOfUpperLayer(set: Set[TerrainHexView]): Set[TerrainHexView] = {
+    val alreadyCalculated = collection.mutable.Set[TerrainHexView]()
+    var lastStep = set
+    while (lastStep.nonEmpty) {
+      val newSteps = lastStep.flatMap(neighboursToBeRedrawn)
+      alreadyCalculated ++= lastStep
+      lastStep = newSteps -- alreadyCalculated
+    }
+
+    alreadyCalculated.toSet
+  }
+
+  def neighboursToBeRedrawn(view: TerrainHexView): Set[TerrainHexView] = {
+    val neigs = neighbours(view)
+    if (view.hex.terrain.layer == 0) {
+      neigs.filter(_.hex.terrain.layer > 0)
+    } else {
+      val neigsSameLayer = neigs.filter(_.hex.terrain.layer == view.hex.terrain.layer)
+      val neigsSameLayerToBeRepainted = neigsSameLayer.filter(n => n.hex.x > view.hex.x || n.hex.y > view.hex.x)
+      val neigsOfBiggerLayer = neigs.filter(_.hex.terrain.layer < view.hex.terrain.layer)
+      neigsOfBiggerLayer ++ neigsSameLayerToBeRepainted
+    }
   }
 
   def isVisible(viewPort: Rectangle2D)(hex: TerrainHexView): Boolean = {

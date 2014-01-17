@@ -13,21 +13,22 @@ object TerrainType {
   def apply(name: String) = namesMap(name.toLowerCase())
 }
 
-abstract sealed class TerrainType(val name: String) {
+abstract sealed class TerrainType(val name: String, val layer: Int) {
   def imagePath = "/images/terrain/" + name + ".png"
+
 }
 
-case object Grass extends TerrainType("grass")
-case object Water extends TerrainType("water")
-case object Sand extends TerrainType("sand")
-case object Hill extends TerrainType("hill")
-case object BankInside extends TerrainType("bankInside")
-case object BankOutside extends TerrainType("bankOutside")
-case object Swamp extends TerrainType("swamp")
-case object Mountain extends TerrainType("mountain")
-case object Road extends TerrainType("road")
-case object Forest extends TerrainType("forest")
+case object Grass extends TerrainType("grass", 0)
+case object Water extends TerrainType("water", 0)
+case object Sand extends TerrainType("sand", 0)
+case object Hill extends TerrainType("hill", 1)
+case object BankInside extends TerrainType("bankInside", 0)
+case object BankOutside extends TerrainType("bankOutside", 0)
+case object Swamp extends TerrainType("swamp", 0)
+case object Mountain extends TerrainType("mountain", 2)
+case object Road extends TerrainType("road", 0)
+case object Forest extends TerrainType("forest", 1)
 
 // THIS TYPES ARE FORBIDDEN TO USE ON MAP
-case object Village extends TerrainType("village")
-case object Empty extends TerrainType("void")
+case object Village extends TerrainType("village", 0)
+case object Empty extends TerrainType("void", 0)
