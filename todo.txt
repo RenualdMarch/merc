@@ -19,15 +19,13 @@ For M4, these things should be completed and tested
 +Draw trees above bridges
 +when draw terrain additives, guarantee that same additives are drawn in same situations.
 +When movement is over, still need to redraw all its hexes
-Fix issues with knight movement
-Lazy redraw - test and fix everything
++Fix issues with knight movement
++Lazy redraw - test and fix everything
+All human soldiers of 0 and 1 level are present
 Hills and mountains borders
 AI - different implementations
-All human soldiers of 0 and 1 level are present
 AI - tournament mode to test AI
-Logging support
-Investigate bug with arrow flickering when moving mouse but dont change target
-During attack for some reason oval under soldier color is more intensive
+Log more
 long play testing, bug fixing
 
 

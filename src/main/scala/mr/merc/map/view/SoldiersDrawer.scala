@@ -28,7 +28,9 @@ class SoldiersDrawer {
 
   private var momentaryAndPreviousDirtyHexes: List[TerrainHexView] = Nil
   private def drawablesInMovements = currentMovement.map(_.drawables).getOrElse(Nil)
-  def dirtyHexesInMovements = momentaryAndPreviousDirtyHexes ++ currentMovement.map(_.dirtyHexes).getOrElse(Nil)
+  def dirtyHexesInMovements = {
+    momentaryAndPreviousDirtyHexes ++ currentMovement.map(_.dirtyHexes).getOrElse(Nil)
+  }
   private def soldiersInMovements = drawablesInMovements flatMap (d => d match {
     case soldier: SoldierView => Some(soldier)
     case _ => None

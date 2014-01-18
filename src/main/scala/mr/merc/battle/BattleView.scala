@@ -102,11 +102,6 @@ class BattleView(model: BattleModel, _soldierDrawer: SoldiersDrawer = new Soldie
       new MomentaryMovement(battleOverActions(defender)))
     val move = new MovementList(attacksList ++ refreshList)
     mapView.addMovement(move)
-
-    // FIXME This is hack, and I hope one day it will be removed
-    val dirtyHexes = mapView.terrainView.neighbours(attackerTerrainHex) ++
-      mapView.terrainView.neighbours(defenderTerrainHex)
-    mapView.addMovement(new MomentaryMovement(Unit, dirtyHexes.toList))
   }
 
   private def battleOverActions(soldier: Soldier) {
