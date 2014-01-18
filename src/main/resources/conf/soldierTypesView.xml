@@ -227,5 +227,39 @@
 			<pain sound="humanPain1"/>
 		</sounds>
 	</view>
+	<view name="Human-Bowman">
+		<attack1 imageName="sword-human-short">
+			<all>
+				<succ>
+					<image name="bowman-melee-attack-1"/>
+					<image name="bowman-melee-attack-2"/>
+					<image name="bowman-melee-attack-3"/>
+					<image name="bowman-melee-attack-4"/>
+				</succ>
+			</all>
+		</attack1>
+		<attack2 imageName="bow" projectile="Arrow">
+			<all>
+				<succ>
+					<image name="bowman-bow"/>
+					<image name="bowman-bow-attack-1"/>
+					<image name="bowman-bow-attack-2"/>
+					<image name="bowman-bow-attack-3"/>
+					<image name="bowman-bow-attack-4"/>
+				</succ>
+			</all>
+		</attack2>
+		<defence>
+			<image name="bowman-bow-defend"/>
+		</defence>
+		<stand>
+			<image name="bowman"/>
+		</stand>
+		<sounds>
+			<attack1 succ="sword"/>
+			<attack2 succ="bow" fail="bowFail"/>
+			<pain sound="humanPain1"/>
+		</sounds>
+	</view>
 
 </views>

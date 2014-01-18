@@ -148,5 +148,33 @@
 			<resistance type="Arcane" resistance="20"/>			
 		</resistances>			
 	</soldierType>
-		
+	<soldierType name="Human-Bowman" cost="14" hp="33" movement="5" exp="39" level="1">
+		<attacks>
+			<attack damage="4" count="2" attackType="Blade" ranged="false"/>
+			<attack damage="6" count="3" attackType="Pierce" ranged="true"/>
+		</attacks>
+		<moveCosts>
+			<moveCost type="Water" cost="3"/>
+			<moveCost type="Forest" cost="2"/>
+			<moveCost type="Swamp" cost="3"/>
+			<moveCost type="Hill" cost="2"/>
+			<moveCost type="Mountain" cost="3"/>
+			<moveCost type="Sand" cost="2"/>
+			<moveCost type="Grass" cost="1"/>
+			<moveCost type="Village" cost="1"/>
+		</moveCosts>
+		<defences>
+			<defence type="Water" defence="20"/>
+			<defence type="Forest" defence="50"/>
+			<defence type="Swamp" defence="20"/>
+			<defence type="Hill" defence="50"/>
+			<defence type="Mountain" defence="60"/>
+			<defence type="Sand" defence="30"/>
+			<defence type="Grass" defence="40"/>
+			<defence type="Village" defence="60"/>
+		</defences>
+		<resistances>
+			<resistance type="Arcane" resistance="20"/>			
+		</resistances>	
+	</soldierType>
 </soldierTypes>

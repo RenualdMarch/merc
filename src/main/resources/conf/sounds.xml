@@ -12,6 +12,7 @@
 	<sound name="bowFail" path="bow-miss.ogg"/>
 	<sound name="dagger" path="dagger-swish.wav"/>
 	<sound name="club" path="club.ogg"/>
+	<sound name="sword" path="sword-1.ogg"/>
 		
 	<!-- movements -->
 	<sound name="horseMovement" path="horse-elf-canter.wav"/>
