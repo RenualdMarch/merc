@@ -58,4 +58,44 @@
 			</all>
 		</start>
 	</projectile>
+	<projectile name="Pitchfork-succ">
+		<move>
+			<n>
+				<image name="pitchfork-n"/>
+			</n>
+			<ne>
+				<image name="pitchfork-ne"/>
+			</ne>
+		</move>
+	</projectile>
+	<projectile name="Pitchfork-fail">
+		<move>
+			<n>
+				<image name="pitchfork-n"/>
+			</n>
+			<ne>
+				<image name="pitchfork-ne"/>
+			</ne>
+		</move>
+	</projectile>
+	<projectile name="Arrow-succ">
+		<move>
+			<n>
+				<image name="missile-n"/>
+			</n>
+			<ne>
+				<image name="missile-ne"/>
+			</ne>
+		</move>
+	</projectile>
+	<projectile name="Arrow-fail">
+		<move>
+			<n>
+				<image name="missile-n"/>
+			</n>
+			<ne>
+				<image name="missile-ne"/>
+			</ne>
+		</move>
+	</projectile>
 </projectiles>

@@ -8,6 +8,10 @@
 	<sound name="spear" path="spear.wav"/>
 	<sound name="spearFail" path="spear-miss.ogg"/>
 	<sound name="staff" path="staff.wav"/>
+	<sound name="bow" path="bow.ogg"/>
+	<sound name="bowFail" path="bow-miss.ogg"/>
+	<sound name="dagger" path="dagger-swish.wav"/>
+	<sound name="club" path="club.ogg"/>
 		
 	<!-- movements -->
 	<sound name="horseMovement" path="horse-elf-canter.wav"/>

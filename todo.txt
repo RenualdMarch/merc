@@ -21,13 +21,15 @@ For M4, these things should be completed and tested
 +When movement is over, still need to redraw all its hexes
 +Fix issues with knight movement
 +Lazy redraw - test and fix everything
-All human soldiers of 0 and 1 level are present
++All human soldiers of 0 level are present
+All human soldiers of 1 level are present
+Load soldier types from different sources?
+Healing at villages
 Hills and mountains borders
 AI - different implementations
 AI - tournament mode to test AI
 Log more
 long play testing, bug fixing
-
 
 
 M5 going to be vertical slice of game 

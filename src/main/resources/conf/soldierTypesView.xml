@@ -106,11 +106,126 @@
 		<stand>
 			<image name="mage"/>
 		</stand>
+		<defence>
+			<image name="mage-defend"/>
+		</defence>
 		<sounds>
 			<attack1 succ="staff"/>
 			<attack2 succ="magicAttack1" fail="magicAttack1Fail"/>
 			<pain sound="humanPain1"/>
 		</sounds>
 	</view>
-	
+	<view name="Human-Peasant">
+		<attack1 imageName="pitchfork">
+			<all>
+				<succ>
+					<image name="peasant-attack"/>
+					<image name="peasant-attack2"/>
+				</succ>
+			</all>
+		</attack1>
+		<attack2 imageName="pitchfork" projectile="Pitchfork">
+			<all>
+				<succ>
+					<image name="peasant-ranged"/>
+				</succ>
+			</all>
+		</attack2>
+		<stand>
+			<image name="peasant"/>
+		</stand>
+		<idle>
+			<image name="peasant-idle-1"/>
+			<image name="peasant-idle-2"/>
+			<image name="peasant-idle-3"/>
+			<image name="peasant-idle-4"/>
+			<image name="peasant-idle-5"/>
+			<image name="peasant-idle-6"/>
+			<image name="peasant-idle-7"/>
+		</idle>
+		<defence>
+			<image name="peasant-defend"/>
+		</defence>
+		<sounds>
+			<attack1 succ="spear" fail="spearFail"/>
+			<attack2 succ="spear" fail="spearFail"/>
+			<pain sound="humanPain1"/>
+		</sounds>
+	</view>
+	<view name="Human-Woodsman">
+		<attack1 imageName="dagger-human">
+			<all>
+				<succ>
+					<image name="woodsman-melee-1"/>
+					<image name="woodsman-melee-2"/>
+				</succ>
+			</all>
+		</attack1>
+		<attack2 imageName="bow" projectile="Arrow">
+			<all>
+				<succ>
+					<image name="woodsman-bow"/>
+					<image name="woodsman-bow-attack-1"/>
+					<image name="woodsman-bow-attack-2"/>
+					<image name="woodsman-bow-attack-3"/>
+					<image name="woodsman-bow-attack-4"/>
+				</succ>
+			</all>
+		</attack2>
+		<stand>
+			<image name="woodsman"/>
+		</stand>
+		<idle>
+			<image name="woodsman-idle-1"/>
+			<image name="woodsman-idle-2"/>
+			<image name="woodsman-idle-3"/>
+			<image name="woodsman-idle-4"/>
+			<image name="woodsman-idle-5"/>
+			<image name="woodsman-idle-6"/>
+			<image name="woodsman-idle-7"/>
+			<image name="woodsman-idle-8"/>
+			<image name="woodsman-idle-9"/>
+			<image name="woodsman-idle-10"/>
+			<image name="woodsman-idle-11"/>
+			<image name="woodsman-idle-12"/>
+			<image name="woodsman-idle-13"/>
+			<image name="woodsman-idle-14"/>	
+		</idle>
+		<defence>
+			<image name="woodsman-bow-defend"/>
+		</defence>
+		<sounds>
+			<attack1 succ="dagger"/>
+			<attack2 succ="bow" fail="bowFail"/>
+			<pain sound="humanPain1"/>
+		</sounds>
+	</view>
+	<view name="Human-Ruffian">
+		<attack1 imageName="club">
+			<all>
+				<succ>
+					<image name="ruffian-attack-1"/>
+					<image name="ruffian-attack-2"/>
+					<image name="ruffian-attack-3"/>
+					<image name="ruffian-attack-4"/>
+					<image name="ruffian-attack-5"/>
+					<image name="ruffian-attack-6"/>
+					<image name="ruffian-attack-7"/>
+					<image name="ruffian-attack-8"/>
+					<image name="ruffian-attack-9"/>					
+				</succ>
+			</all>
+		</attack1>
+		<defence>
+			<image name="ruffian-defend-1"/>
+		</defence>
+		<stand>
+			<image name="ruffian"/>
+		</stand>
+		<sounds>
+			<attack1 succ="club"/>
+			<pain sound="humanPain1"/>
+		</sounds>
+	</view>
+
 </views>

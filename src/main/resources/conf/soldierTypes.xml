@@ -10,7 +10,6 @@
 			<moveCost type="Swamp" cost="4"/>
 			<moveCost type="Hill" cost="2"/>
 			<moveCost type="Mountain" cost="1000"/>
-			<moveCost type="Road" cost="1"/>
 			<moveCost type="Sand" cost="2"/>
 			<moveCost type="Grass" cost="1"/>
 			<moveCost type="Village" cost="2"/>
@@ -21,7 +20,6 @@
 			<defence type="Swamp" defence="20"/>
 			<defence type="Hill" defence="40"/>
 			<defence type="Mountain" defence="0"/>
-			<defence type="Road" defence="40"/>
 			<defence type="Sand" defence="30"/>
 			<defence type="Grass" defence="40"/>
 			<defence type="Village" defence="40"/>
@@ -46,7 +44,6 @@
 			<moveCost type="Swamp" cost="3"/>
 			<moveCost type="Hill" cost="2"/>
 			<moveCost type="Mountain" cost="3"/>
-			<moveCost type="Road" cost="1"/>
 			<moveCost type="Sand" cost="2"/>
 			<moveCost type="Grass" cost="1"/>
 			<moveCost type="Village" cost="2"/>
@@ -57,18 +54,99 @@
 			<defence type="Swamp" defence="20"/>
 			<defence type="Hill" defence="50"/>
 			<defence type="Mountain" defence="60"/>
-			<defence type="Road" defence="40"/>
 			<defence type="Sand" defence="30"/>
 			<defence type="Grass" defence="40"/>
 			<defence type="Village" defence="60"/>
 		</defences>
 		<resistances>
-			<resistance type="Blade" resistance="0"/>
-			<resistance type="Impact" resistance="0"/>
-			<resistance type="Cold" resistance="0"/>
-			<resistance type="Pierce" resistance="0"/>
-			<resistance type="Fire" resistance="0"/>
 			<resistance type="Arcane" resistance="20"/>			
 		</resistances>
 	</soldierType>
+	<soldierType name="Human-Peasant" cost="8" hp="18" movement="5" exp="23" level="0">
+		<attacks>
+			<attack damage="5" count="2" attackType="Pierce" ranged="false"/>
+			<attack damage="4" count="1" attackType="Pierce" ranged="true"/>
+		</attacks>
+		<moveCosts>
+			<moveCost type="Water" cost="3"/>
+			<moveCost type="Forest" cost="2"/>
+			<moveCost type="Swamp" cost="3"/>
+			<moveCost type="Hill" cost="2"/>
+			<moveCost type="Mountain" cost="3"/>
+			<moveCost type="Sand" cost="2"/>
+			<moveCost type="Grass" cost="1"/>
+			<moveCost type="Village" cost="1"/>
+		</moveCosts>
+		<defences>
+			<defence type="Water" defence="20"/>
+			<defence type="Forest" defence="50"/>
+			<defence type="Swamp" defence="20"/>
+			<defence type="Hill" defence="50"/>
+			<defence type="Mountain" defence="60"/>
+			<defence type="Sand" defence="30"/>
+			<defence type="Grass" defence="40"/>
+			<defence type="Village" defence="60"/>
+		</defences>
+		<resistances>
+			<resistance type="Arcane" resistance="20"/>			
+		</resistances>		
+	</soldierType>
+	<soldierType name="Human-Woodsman" cost="10" hp="18" movement="5" exp="23" level="0">
+		<attacks>
+			<attack damage="3" count="1" attackType="Blade" ranged="false"/>
+			<attack damage="4" count="3" attackType="Pierce" ranged="true"/>
+		</attacks>
+		<moveCosts>
+			<moveCost type="Water" cost="3"/>
+			<moveCost type="Forest" cost="2"/>
+			<moveCost type="Swamp" cost="3"/>
+			<moveCost type="Hill" cost="2"/>
+			<moveCost type="Mountain" cost="3"/>
+			<moveCost type="Sand" cost="2"/>
+			<moveCost type="Grass" cost="1"/>
+			<moveCost type="Village" cost="1"/>
+		</moveCosts>
+		<defences>
+			<defence type="Water" defence="20"/>
+			<defence type="Forest" defence="50"/>
+			<defence type="Swamp" defence="20"/>
+			<defence type="Hill" defence="50"/>
+			<defence type="Mountain" defence="60"/>
+			<defence type="Sand" defence="30"/>
+			<defence type="Grass" defence="40"/>
+			<defence type="Village" defence="60"/>
+		</defences>
+		<resistances>
+			<resistance type="Arcane" resistance="20"/>			
+		</resistances>		
+	</soldierType>
+	<soldierType name="Human-Ruffian" cost="6" hp="16" movement="5" exp="18" level="0">
+		<attacks>
+			<attack damage="5" count="2" attackType="Impact" ranged="false"/>
+		</attacks>
+		<moveCosts>
+			<moveCost type="Water" cost="3"/>
+			<moveCost type="Forest" cost="2"/>
+			<moveCost type="Swamp" cost="3"/>
+			<moveCost type="Hill" cost="2"/>
+			<moveCost type="Mountain" cost="3"/>
+			<moveCost type="Sand" cost="2"/>
+			<moveCost type="Grass" cost="1"/>
+			<moveCost type="Village" cost="1"/>
+		</moveCosts>
+		<defences>
+			<defence type="Water" defence="20"/>
+			<defence type="Forest" defence="50"/>
+			<defence type="Swamp" defence="20"/>
+			<defence type="Hill" defence="50"/>
+			<defence type="Mountain" defence="60"/>
+			<defence type="Sand" defence="30"/>
+			<defence type="Grass" defence="40"/>
+			<defence type="Village" defence="60"/>
+		</defences>
+		<resistances>
+			<resistance type="Arcane" resistance="20"/>			
+		</resistances>			
+	</soldierType>
+		
 </soldierTypes>
