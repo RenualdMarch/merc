@@ -98,4 +98,24 @@
 			</ne>
 		</move>
 	</projectile>
+	<projectile name="Spear-succ">
+		<move>
+			<n>
+				<image name="spear-n"/>
+			</n>
+			<ne>
+				<image name="spear-ne"/>
+			</ne>
+		</move>
+	</projectile>
+	<projectile name="Spear-fail">
+		<move>
+			<n>
+				<image name="spear-n"/>
+			</n>
+			<ne>
+				<image name="spear-ne"/>
+			</ne>
+		</move>
+	</projectile>
 </projectiles>

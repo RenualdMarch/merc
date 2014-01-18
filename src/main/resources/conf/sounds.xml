@@ -13,6 +13,8 @@
 	<sound name="dagger" path="dagger-swish.wav"/>
 	<sound name="club" path="club.ogg"/>
 	<sound name="sword" path="sword-1.ogg"/>
+	<sound name="miss1" path="miss-1.ogg"/>
+	<sound name="mace" path="mace.wav"/>
 		
 	<!-- movements -->
 	<sound name="horseMovement" path="horse-elf-canter.wav"/>

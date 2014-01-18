@@ -22,8 +22,7 @@ For M4, these things should be completed and tested
 +Fix issues with knight movement
 +Lazy redraw - test and fix everything
 +All human soldiers of 0 level are present
-All human soldiers of 1 level are present
-Load soldier types from different sources?
++All human soldiers of 1 level are present
 Healing at villages
 Hills and mountains borders
 AI - different implementations
@@ -33,6 +32,8 @@ long play testing, bug fixing
 
 
 M5 going to be vertical slice of game 
+Update scalafx version
+Load soldier types from different sources
 Levels of difficulty
 investigate MigLayout - a lot of UI ahead
 global map with several kingdoms and cities
