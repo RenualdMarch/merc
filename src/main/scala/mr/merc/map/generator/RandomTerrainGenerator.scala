@@ -8,7 +8,7 @@ import scala.util.Random
 
 class RandomTerrainGenerator extends MapGenerator {
 
-  val terrainTypes = Vector(Water, Forest, Grass, Sand, Swamp)
+  val terrainTypes = Vector(Water, Forest, Grass, Sand, Swamp, Hill, Mountain)
   val houseChance = 0.1
   val bridgeChance = 0.1
 

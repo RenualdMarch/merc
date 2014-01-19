@@ -24,7 +24,7 @@ For M4, these things should be completed and tested
 +All human soldiers of 0 level are present
 +All human soldiers of 1 level are present
 +Healing at villages
-Hills and mountains borders
++Hills and mountains borders
 Make more grass on generated map - make weights
 Allies test
 Enable hills and mountains on primitive map generation
@@ -32,7 +32,7 @@ Make AI heal in villages
 AI - different implementations
 AI - tournament mode to test AI
 Log more
-Show healing events
+Show healing at village events
 Unit test view more
 Save screen position between human moves
 Show victory or defeat message
@@ -40,7 +40,9 @@ Victory condition - enemy destroyed
 long play testing, bug fixing
 
 
-M5 going to be vertical slice of game 
+M5 going to be vertical slice of game
+terrain additives specifically for given terrain types
+show healer healing events
 Update scalafx version
 After wesnoth release take a look at images
 Load soldier types from different sources

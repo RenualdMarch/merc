@@ -44,9 +44,6 @@ object TerrainHexViewAdditive {
       case (Forest, _) => None
       case (_, Water) => Some(new TerrainHexViewAdditive(add.from, add.to, add.hexTerrainType, BankOutside))
       case (Water, _) => Some(new TerrainHexViewAdditive(add.from, add.to, Water, BankInside))
-      case (Hill, _) => None
-      case (_, Hill) => None
-      case (_, Mountain) => None
       case (Mountain, _) => None
       case (_, Forest) => Some(new TerrainHexViewAdditive(add.from, add.to, add.hexTerrainType, Grass))
       case (_, _) => Some(add)
