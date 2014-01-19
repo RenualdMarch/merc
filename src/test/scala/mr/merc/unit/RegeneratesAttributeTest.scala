@@ -52,12 +52,11 @@ class RegeneratesAttributeTest extends FunSuite with BeforeAndAfter {
   test("regenerates is created when unit is poisoned") {
     soldier.addState(Poisoned)
     val actions = soldier.beforeTurnActions(field, 1, 1)
-    assert(actions.size === 2)
+    assert(actions.size === 1)
     actions.find(_.isInstanceOf[Regeneration]).get match {
       case Regeneration(someone) => assert(someone === soldier)
       case _ => fail
     }
-    actions.find(_.isInstanceOf[PoisoningDamage]).get
   }
 
   test("regenerates is created when units hp is not max") {
@@ -71,14 +70,16 @@ class RegeneratesAttributeTest extends FunSuite with BeforeAndAfter {
   }
 
   test("regenerates is created when unit is poisoned and hp is not max") {
-    soldier.hp -= 1
+    soldier.hp = 10
     soldier.addState(Poisoned)
     val actions = soldier.beforeTurnActions(field, 1, 1)
-    assert(actions.size === 2)
+    assert(actions.size === 1)
     actions.find(_.isInstanceOf[Regeneration]).get match {
       case Regeneration(someone) => assert(someone === soldier)
       case _ => fail
     }
-    actions.find(_.isInstanceOf[PoisoningDamage]).get
+    actions.foreach(_.action())
+    assert(soldier.hp === 10)
+    assert(soldier.state === Set())
   }
 }

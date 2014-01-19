@@ -82,7 +82,13 @@ class Soldier(val name: String, val soldierType: SoldierType, val owner: Player)
       result += Regeneration(this)
     }
 
-    if (state.contains(Poisoned)) {
+    if (field.hex(x, y).mapObj == Some(House) && !attributes.contains(Regenerates)
+      && (needsHealing || state.contains(Poisoned))) {
+      result += Regeneration(this)
+    }
+
+    if (state.contains(Poisoned) && !attributes.contains(Regenerates)
+      && field.hex(x, y).mapObj != Some(House)) {
       result += PoisoningDamage(this)
     }
 

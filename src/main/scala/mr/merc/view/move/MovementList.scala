@@ -5,6 +5,8 @@ import mr.merc.map.hex.view.TerrainHexView
 class MovementList(val list: List[Movement]) extends Movement {
   private val moves = list.toVector
   private var current = 0
+
+  // TODO add test to prevDirtyHexes
   private var prevDirtyHexes: List[TerrainHexView] = Nil
   private def incrementCurrent() {
     prevDirtyHexes :::= currentMovement.dirtyHexes
