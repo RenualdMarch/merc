@@ -25,14 +25,16 @@ For M4, these things should be completed and tested
 +All human soldiers of 1 level are present
 +Healing at villages
 +Hills and mountains borders
++Enable hills and mountains on primitive map generation
++Allies test
 Make more grass on generated map - make weights
-Allies test
-Enable hills and mountains on primitive map generation
-Make AI heal in villages
+Make quick battle initial disposition
+Make AI make moves
+Show healing at village events
 AI - different implementations
 AI - tournament mode to test AI
+Make AI heal in villages
 Log more
-Show healing at village events
 Unit test view more
 Save screen position between human moves
 Show victory or defeat message
