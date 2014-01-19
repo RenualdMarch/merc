@@ -27,7 +27,7 @@ For M4, these things should be completed and tested
 +Hills and mountains borders
 +Enable hills and mountains on primitive map generation
 +Allies test
-Make more grass on generated map - make weights
++Make more grass on generated map - make weights
 Make quick battle initial disposition
 Make AI make moves
 Show healing at village events
