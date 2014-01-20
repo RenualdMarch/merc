@@ -30,12 +30,10 @@ For M4, these things should be completed and tested
 +Make more grass on generated map - make weights
 Make quick battle initial disposition
 Make AI make moves
-Show healing at village events
 AI - different implementations
 AI - tournament mode to test AI
-Make AI heal in villages
 Log more
-Unit test view more
+MovementList test
 Save screen position between human moves
 Show victory or defeat message
 Victory condition - enemy destroyed
@@ -43,9 +41,12 @@ long play testing, bug fixing
 
 
 M5 going to be vertical slice of game
+Show healing at village events
 terrain additives specifically for given terrain types
+Make AI heal in villages
 show healer healing events
 Update scalafx version
+Scalatest version 2
 After wesnoth release take a look at images
 Load soldier types from different sources
 Levels of difficulty
