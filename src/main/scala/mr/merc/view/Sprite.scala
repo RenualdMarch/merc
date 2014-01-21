@@ -16,7 +16,7 @@ object Sprite {
 class Sprite[T <: SpriteState](val images: Map[T, List[MImage]], private var _state: T,
   var mirroringEnabled: Boolean = true, var animationEnabled: Boolean = true) extends Drawable {
   require(images.keys.exists(_ == _state), "Initial state isn't present in map!")
-  require(!images.values.exists(_.size == 0), "There are states with zero images")
+  require(!images.values.exists(_.size == 0), s"State ${images.find(_._2.size == 0).get._1} with zero images")
 
   private var _time = 0
   private var _index = 0

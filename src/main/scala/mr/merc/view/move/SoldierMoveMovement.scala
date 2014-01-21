@@ -8,7 +8,7 @@ import mr.merc.sound.Sound
 import mr.merc.map.hex.view.TerrainHexFieldView
 
 class SoldierMoveMovement(val from: TerrainHexView, val to: TerrainHexView, val soldier: SoldierView, fieldView: TerrainHexFieldView) extends Movement {
-  private val movementSpeed = 100
+  private val movementSpeed = 200
   private val linearMovement = new LinearMovement(from.x, from.y, to.x, to.y, movementSpeed)
 
   override def start() {

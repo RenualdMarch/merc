@@ -40,6 +40,7 @@ import mr.merc.map.generator.RandomTerrainGenerator
 import mr.merc.log.Logging
 import scalafx.scene.CacheHint
 import scalafx.geometry.Rectangle2D
+import mr.merc.game.QuickGameGenerator
 
 // TODO move all styling to css
 class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleControllerParent with Logging {
@@ -60,17 +61,8 @@ class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleCont
   }
 
   import scalafx.Includes._
-  val pulse = 25 ms
-  val generator = new RandomTerrainGenerator
-  val field = generator.generateMap(30, 20, 0)
-  val player1 = Player("1", Color.BLUE)
-  val player2 = Player("2", Color.YELLOW)
-  val soldier = new Soldier("1", SoldierType("Human-Horseman"), player2)
-  soldier.exp = 10
-  val enemy = new Soldier("2", SoldierType("Human-Mage"), player1)
-  field.hex(4, 0).soldier = Some(soldier)
-  field.hex(4, 2).soldier = Some(enemy)
-  val gameField = new GameField(field, List(player1, player2))
+  val pulse = 20 ms
+  val gameField = new QuickGameGenerator().generateGame
 
   val controller = new BattleController(gameField, this)
 
@@ -81,7 +73,7 @@ class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleCont
     content = battleCanvas
     style = "-fx-background-color:BLACK;"
   }
-  private val minimap = new Minimap(field, battleCanvasScrollPane)
+  private val minimap = new Minimap(gameField.hexField, battleCanvasScrollPane)
   private val soldierName = new Text()
   private val soldierLevel = new Text()
   private val soldierHP = new Text()

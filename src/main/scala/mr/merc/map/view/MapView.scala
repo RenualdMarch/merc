@@ -13,9 +13,10 @@ import scalafx.scene.image.ImageView
 import scalafx.scene.SnapshotParameters
 import scalafx.scene.paint.Color
 import scalafx.geometry.Rectangle2D
+import mr.merc.log.Logging
 
 // TODO add update method which handles case when soldiers changed
-class MapView(field: TerrainHexField, val soldiersDrawer: SoldiersDrawer = new SoldiersDrawer()) {
+class MapView(field: TerrainHexField, val soldiersDrawer: SoldiersDrawer = new SoldiersDrawer()) extends Logging {
   val terrainView = new TerrainHexFieldView(field)
 
   createSoldiers foreach (soldiersDrawer.addSoldier)
@@ -29,6 +30,7 @@ class MapView(field: TerrainHexField, val soldiersDrawer: SoldiersDrawer = new S
       val soldierOption = h.hex.soldier
       soldierOption match {
         case Some(soldier) => {
+          debug(s"Creating soldier view for soldier type ${soldier.soldierType.name}")
           val view = new SoldierView(soldier)
           view.x = h.x
           view.y = h.y

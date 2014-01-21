@@ -418,7 +418,9 @@
 		</attack1>
 		<attack2 imageName="javelin-human" projectile="Spear">
 			<all>
-				<image name="spearman-attack-ranged"/>
+				<succ>
+				   <image name="spearman-attack-ranged"/>
+				</succ>
 			</all>
 		</attack2>
 		<stand>

@@ -28,7 +28,10 @@ For M4, these things should be completed and tested
 +Enable hills and mountains on primitive map generation
 +Allies test
 +Make more grass on generated map - make weights
-Make quick battle initial disposition
++Make quick battle initial disposition
+Check on Java 8
+Fix performance issue with not needed redrawing of soldiers
+Make movement more smooth
 Make AI make moves
 AI - different implementations
 AI - tournament mode to test AI

@@ -111,6 +111,8 @@ class TerrainHexFieldView(field: TerrainHexField) {
     val dirtyWithNeigs = hexesToRedrawWithNeighboursOfUpperLayer(dirty)
     dirtyWithNeigs.foreach(_.isDirty = true)
     val visibleHexes = hexesToDraw filter (isVisible(viewPort))
+
+    // TODO why should we constantly redraw soldiers?
     val hexesWithSoldiers = visibleHexes.filter(h => h.isDirty && h.soldier.isDefined)
     correctOrder.foreach { stage =>
       visibleHexes foreach (_.drawItself(gc, stage))
