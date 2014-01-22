@@ -29,8 +29,7 @@ For M4, these things should be completed and tested
 +Allies test
 +Make more grass on generated map - make weights
 +Make quick battle initial disposition
-Check on Java 8
-Fix performance issue with not needed redrawing of soldiers
++Fix performance issue with not needed redrawing of soldiers
 Make movement more smooth
 Make AI make moves
 AI - different implementations

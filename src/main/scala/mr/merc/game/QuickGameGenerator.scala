@@ -19,7 +19,7 @@ class QuickGameGenerator extends GameGenerator {
   private val cutTypes = List("Human-Bowman", "Human-Cavalryman")
 
   private def soldiersList(player: Player): List[Soldier] = {
-    val shuffled = Random.shuffle(cutTypes)
+    val shuffled = Random.shuffle(types)
     shuffled.zipWithIndex.map { case (s, i) => new Soldier(i.toString, SoldierType(s), player) }
   }
 

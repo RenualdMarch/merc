@@ -27,7 +27,7 @@ case object BankOutside extends TerrainType("bankOutside", 0)
 case object Swamp extends TerrainType("swamp", 0)
 case object Mountain extends TerrainType("mountain", 2)
 case object Road extends TerrainType("road", 0)
-case object Forest extends TerrainType("forest", 1)
+case object Forest extends TerrainType("forest", 3)
 
 // THIS TYPES ARE FORBIDDEN TO USE ON MAP
 case object Village extends TerrainType("village", 0)

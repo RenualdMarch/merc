@@ -106,19 +106,26 @@ class TerrainHexFieldView(field: TerrainHexField) {
     DefenceStage, HexGridStage, EndDrawing)
 
   def drawItself(gc: GraphicsContext, viewPort: Rectangle2D, soldiersDrawer: SoldiersDrawer) {
-
-    val dirty = hexesToDraw.filter(_.shouldBeRedrawn) toSet
-    val dirtyWithNeigs = hexesToRedrawWithNeighboursOfUpperLayer(dirty)
-    dirtyWithNeigs.foreach(_.isDirty = true)
     val visibleHexes = hexesToDraw filter (isVisible(viewPort))
-
-    // TODO why should we constantly redraw soldiers?
-    val hexesWithSoldiers = visibleHexes.filter(h => h.isDirty && h.soldier.isDefined)
+    val dirty = visibleHexes.filter(_.shouldBeRedrawn) toSet;
+    val dirtyWithNeigs = neigsToRedrawFromCache(dirty)
+    dirtyWithNeigs.foreach(_.isDirty = true)
+    val hexesWithSoldiers = visibleHexes.filter(h => h.shouldBeRedrawn && h.soldier.isDefined)
     correctOrder.foreach { stage =>
       visibleHexes foreach (_.drawItself(gc, stage))
     }
     soldiersDrawer.drawSoldiers(gc, hexesWithSoldiers)
     soldiersDrawer.drawDrawablesInMovements(gc)
+  }
+
+  def neigsToRedrawFromCache(set: Set[TerrainHexView]): Set[TerrainHexView] = {
+    set flatMap redrawNeigsCache
+  }
+
+  val redrawNeigsCache: Map[TerrainHexView, Set[TerrainHexView]] = {
+    hexesToDraw.map { h =>
+      (h -> hexesToRedrawWithNeighboursOfUpperLayer(Set(h)))
+    } toMap
   }
 
   def hexesToRedrawWithNeighboursOfUpperLayer(set: Set[TerrainHexView]): Set[TerrainHexView] = {
