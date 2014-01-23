@@ -16,15 +16,13 @@ class QuickGameGenerator extends GameGenerator {
     "Human-Fencer", "Human-HeavyInfantryman", "Human-Horseman", "Human-Mage",
     "Human-Spearman")
 
-  private val cutTypes = List("Human-Bowman", "Human-Cavalryman")
-
   private def soldiersList(player: Player): List[Soldier] = {
     val shuffled = Random.shuffle(types)
     shuffled.zipWithIndex.map { case (s, i) => new Soldier(i.toString, SoldierType(s), player) }
   }
 
   override def generateGame: GameField = {
-    val field = new RandomTerrainGenerator(0, 0.05).generateMap(30, 20, 0)
+    val field = new RandomTerrainGenerator(0, 0.05).generateMap(20, 20, 0)
     val humanPlayer = new Player("Human", Color.YELLOW)
     val aiPlayer = new Player("AI", Color.CYAN)
     val humans = soldiersList(humanPlayer)
@@ -37,7 +35,7 @@ class QuickGameGenerator extends GameGenerator {
 
     indices zip ais foreach {
       case (i, s) =>
-        field.hex(29, i).soldier = Some(s)
+        field.hex(19, i).soldier = Some(s)
     }
 
     new GameField(field, List(humanPlayer, aiPlayer))
