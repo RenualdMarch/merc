@@ -22,6 +22,7 @@ import mr.merc.view.move.MomentaryMovement
 import mr.merc.unit.view._
 import mr.merc.log.Logging
 import scalafx.geometry.Rectangle2D
+import mr.merc.view.move.SmoothMovement
 
 // injecting soldier drawer for test purposes only
 class BattleView(model: BattleModel, _soldierDrawer: SoldiersDrawer = new SoldiersDrawer) extends Logging {
@@ -113,11 +114,16 @@ class BattleView(model: BattleModel, _soldierDrawer: SoldiersDrawer = new Soldie
   }
 
   private def handleMovementEvent(soldier: SoldierView, path: List[TerrainHexView]) {
-    val destination = path.tail
-    val departure = path.init
-    val allMovements = for ((a, b) <- departure zip destination) yield new SoldierMoveMovement(a, b, soldier, mapView.terrainView)
+    // THIS IS OLD VERSION OF SOLDIER MOVEMENT
+    // IT MAY BE UNCOMMENTED IF SOMETHING GOES WRONG WITH MOVEMENT
+    // OR REMOVED IF THERE ARE NO BUGS
+    //val destination = path.tail
+    //val departure = path.init
+    //val allMovements = for ((a, b) <- departure zip destination) yield new SoldierMoveMovement(a, b, soldier, mapView.terrainView)
     val standAfterMove = MomentaryMovement(soldier.state = StandState)
-    mapView.addMovement(new MovementList(allMovements :+ standAfterMove))
+    //mapView.addMovement(new MovementList(allMovements :+ standAfterMove))
+    mapView.addMovement(new SmoothMovement(path, soldier, mapView.terrainView))
+    mapView.addMovement(standAfterMove)
   }
 
   private def handleEndMoveEvent(player: Player) {
