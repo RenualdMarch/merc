@@ -7,7 +7,7 @@ import mr.merc.unit.view.SoldierView
 import mr.merc.unit.view.MoveState
 import mr.merc.unit.sound.MovementSound
 
-class SmoothMovement(list: List[TerrainHexView], soldier: SoldierView, fieldView: TerrainHexFieldView, movementSpeed: Int = 200) extends Movement {
+class SmoothMovement(val list: List[TerrainHexView], val soldier: SoldierView, fieldView: TerrainHexFieldView, movementSpeed: Int = 200) extends Movement {
 
   override def start() {
     super.start()

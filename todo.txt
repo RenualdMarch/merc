@@ -32,15 +32,18 @@ For M4, these things should be completed and tested
 +Fix performance issue with not needed redrawing of soldiers
 +Make movement more smooth
 +Make AI make moves
-AI - different implementations
-AI - tournament mode to test AI
++AI - different implementations
++AI - tournament mode to test AI
++Block end turn button until ai is moving
 Log more
 MovementList test
+BattleModel test together with battle model helpers
 SmoothMovement test
+end turn button test
 Save screen position between human moves
 Some lazy images eager loading
 Show victory or defeat message
-Victory condition - enemy destroyed
+Bug with selection after mouse leaving canvas
 long play testing, bug fixing
 
 

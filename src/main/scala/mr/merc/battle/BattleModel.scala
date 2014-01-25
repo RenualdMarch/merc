@@ -23,6 +23,7 @@ import mr.merc.map.terrain.Grass
 import mr.merc.map.terrain.Road
 import mr.merc.unit.SoldierDefence
 import mr.merc.log.Logging
+import mr.merc.players.Player
 
 class BattleModel(val map: GameField) extends BattleModelEventHandler with Logging {
   private var currentPlayerIndex = 0
@@ -230,6 +231,12 @@ class BattleModel(val map: GameField) extends BattleModelEventHandler with Loggi
     } else {
       HaventMoved
     }
+  }
+
+  def isOver: Boolean = soldiersByAlliance.size == 1
+
+  def soldiersByAlliance: Map[Set[Player], List[Soldier]] = {
+    allSoldiers.groupBy(s => s.owner.allies.toSet + s.owner)
   }
 
   def defenceForSoldier(soldier: Soldier, hex: TerrainHex) = Attack.calculateSoldierDefence(soldier, hex)

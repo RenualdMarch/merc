@@ -12,6 +12,7 @@ import mr.merc.unit.Attack
 import mr.merc.unit.Impact
 import mr.merc.unit.Soldier
 import mr.merc.map.hex.view.TerrainHexFieldView
+import scalafx.beans.property.BooleanProperty
 
 class BattleControllerTest extends FunSuite with BeforeAndAfter {
   var controller: BattleController = _
@@ -36,6 +37,7 @@ class BattleControllerTest extends FunSuite with BeforeAndAfter {
     controller = new BattleController(gameField, new BattleControllerParent() {
       def window = ???
       def onMinimapChange() {}
+      val disableEndTurn = new BooleanProperty()
     }) {
       override def selectAttack(attacker: Soldier, defender: Soldier,
         attackerHex: TerrainHex, defenderHex: TerrainHex) = Some(attacker.soldierType.attacks(0))

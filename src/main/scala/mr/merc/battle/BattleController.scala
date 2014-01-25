@@ -186,7 +186,7 @@ class BattleController(gameField: GameField, parent: BattleControllerParent) ext
 
   def endTurnButton() {
     debug(s"End turn button clicked")
-    if (battleModel.validateEndTurn) {
+    if (battleModel.validateEndTurn && battleModel.currentPlayer.ai.isEmpty) {
       val result = battleModel.handleEvent(EndMoveModelEvent)
       battleView.handleEvent(result.buildBattleViewEvent)
       removeArrow()
@@ -293,13 +293,17 @@ class BattleController(gameField: GameField, parent: BattleControllerParent) ext
 
   def update(time: Int) {
     battleView.update(time)
-    battleModel.currentPlayer.ai.foreach { ai =>
-      if (!battleView.areMovementsGoing) {
-        val event = ai.nextTurn(battleModel)
-        val result = battleModel.handleEvent(event)
-        battleView.handleEvent(result.buildBattleViewEvent)
+    if (!battleModel.isOver) {
+      battleModel.currentPlayer.ai.foreach { ai =>
+        if (!battleView.areMovementsGoing) {
+          val event = ai.nextTurn(battleModel)
+          val result = battleModel.handleEvent(event)
+          battleView.handleEvent(result.buildBattleViewEvent)
+        }
       }
     }
+
+    parent.disableEndTurn.value = !(battleModel.validateEndTurn && battleModel.currentPlayer.ai.isEmpty)
   }
 
   def drawBattleCanvas(gc: GraphicsContext, viewPort: Rectangle2D) {

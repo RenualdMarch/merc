@@ -52,4 +52,234 @@
 			<attack imageName="attack2" damage="2" count="3" attackType="Fire" ranged="true"/>
 		</attacks>
 	</soldierType>	
+		
+	
+	<soldierType name="Human-Horseman" cost="23" hp="48" movement="8" exp="44" level="1">
+		<attacks>
+			<attack damage="9" count="2" attackType="Pierce" ranged="false" attributes="Charge"/>
+		</attacks>
+		<moveCosts>
+			<moveCost type="Water" cost="3"/>
+			<moveCost type="Forest" cost="3"/>
+			<moveCost type="Swamp" cost="4"/>
+			<moveCost type="Hill" cost="2"/>
+			<moveCost type="Mountain" cost="8"/>
+			<moveCost type="Sand" cost="2"/>
+			<moveCost type="Grass" cost="1"/>
+			<moveCost type="Village" cost="2"/>
+		</moveCosts>
+		<defences>
+			<defence type="Water" defence="30"/>
+			<defence type="Forest" defence="30"/>
+			<defence type="Swamp" defence="20"/>
+			<defence type="Hill" defence="40"/>
+			<defence type="Mountain" defence="20"/>
+			<defence type="Sand" defence="30"/>
+			<defence type="Grass" defence="40"/>
+			<defence type="Village" defence="40"/>
+		</defences>
+		<resistances>
+			<resistance type="Blade" resistance="20"/>
+			<resistance type="Impact" resistance="30"/>
+			<resistance type="Cold" resistance="0"/>
+			<resistance type="Pierce" resistance="-20"/>
+			<resistance type="Fire" resistance="0"/>
+			<resistance type="Arcane" resistance="20"/>			
+		</resistances>
+	</soldierType>
+	<soldierType name="Human-Mage" cost="20" hp="24" movement="5" exp="54" level="1">
+		<attacks>
+			<attack damage="5" count="1" attackType="Impact" ranged="false"/>
+			<attack damage="7" count="3" attackType="Fire" ranged="true" attributes="Magical"/>
+		</attacks>
+		<moveCosts>
+			<moveCost type="Water" cost="3"/>
+			<moveCost type="Forest" cost="2"/>
+			<moveCost type="Swamp" cost="3"/>
+			<moveCost type="Hill" cost="2"/>
+			<moveCost type="Mountain" cost="3"/>
+			<moveCost type="Sand" cost="2"/>
+			<moveCost type="Grass" cost="1"/>
+			<moveCost type="Village" cost="2"/>
+		</moveCosts>
+		<defences>
+			<defence type="Water" defence="20"/>
+			<defence type="Forest" defence="50"/>
+			<defence type="Swamp" defence="20"/>
+			<defence type="Hill" defence="50"/>
+			<defence type="Mountain" defence="60"/>
+			<defence type="Sand" defence="30"/>
+			<defence type="Grass" defence="40"/>
+			<defence type="Village" defence="60"/>
+		</defences>
+		<resistances>
+			<resistance type="Arcane" resistance="20"/>			
+		</resistances>
+	</soldierType>
+	<soldierType name="Human-Bowman" cost="14" hp="33" movement="5" exp="39" level="1">
+		<attacks>
+			<attack damage="4" count="2" attackType="Blade" ranged="false"/>
+			<attack damage="6" count="3" attackType="Pierce" ranged="true"/>
+		</attacks>
+		<moveCosts>
+			<moveCost type="Water" cost="3"/>
+			<moveCost type="Forest" cost="2"/>
+			<moveCost type="Swamp" cost="3"/>
+			<moveCost type="Hill" cost="2"/>
+			<moveCost type="Mountain" cost="3"/>
+			<moveCost type="Sand" cost="2"/>
+			<moveCost type="Grass" cost="1"/>
+			<moveCost type="Village" cost="1"/>
+		</moveCosts>
+		<defences>
+			<defence type="Water" defence="20"/>
+			<defence type="Forest" defence="50"/>
+			<defence type="Swamp" defence="20"/>
+			<defence type="Hill" defence="50"/>
+			<defence type="Mountain" defence="60"/>
+			<defence type="Sand" defence="30"/>
+			<defence type="Grass" defence="40"/>
+			<defence type="Village" defence="60"/>
+		</defences>
+		<resistances>
+			<resistance type="Arcane" resistance="20"/>			
+		</resistances>	
+	</soldierType>
+	<soldierType name="Human-Cavalryman" cost="17" hp="34" movement="8" exp="40" level="1">
+		<attacks>
+			<attack damage="6" count="3" attackType="Blade" ranged="false"/>
+		</attacks>
+		<moveCosts>
+			<moveCost type="Water" cost="4"/>
+			<moveCost type="Forest" cost="3"/>
+			<moveCost type="Swamp" cost="4"/>
+			<moveCost type="Hill" cost="2"/>
+			<moveCost type="Mountain" cost="8"/>
+			<moveCost type="Sand" cost="2"/>
+			<moveCost type="Grass" cost="1"/>
+			<moveCost type="Village" cost="1"/>
+		</moveCosts>
+		<defences>
+			<defence type="Water" defence="20"/>
+			<defence type="Forest" defence="30"/>
+			<defence type="Swamp" defence="20"/>
+			<defence type="Hill" defence="40"/>
+			<defence type="Mountain" defence="20"/>
+			<defence type="Sand" defence="30"/>
+			<defence type="Grass" defence="40"/>
+			<defence type="Village" defence="40"/>
+		</defences>
+		<resistances>
+			<resistance type="Blade" resistance="30"/>
+			<resistance type="Impact" resistance="40"/>
+			<resistance type="Cold" resistance="20"/>
+			<resistance type="Pierce" resistance="-20"/>
+			<resistance type="Fire" resistance="0"/>
+			<resistance type="Arcane" resistance="20"/>		
+		</resistances>	
+	</soldierType>
+	<soldierType name="Human-Fencer" cost="16" hp="28" movement="6" exp="42" level="1" attributes="Skirmisher">
+		<attacks>
+			<attack damage="4" count="4" attackType="Blade" ranged="false"/>
+		</attacks>
+		<moveCosts>
+			<moveCost type="Water" cost="2"/>
+			<moveCost type="Forest" cost="2"/>
+			<moveCost type="Swamp" cost="2"/>
+			<moveCost type="Hill" cost="2"/>
+			<moveCost type="Mountain" cost="3"/>
+			<moveCost type="Sand" cost="2"/>
+			<moveCost type="Grass" cost="1"/>
+			<moveCost type="Village" cost="1"/>
+		</moveCosts>
+		<defences>
+			<defence type="Water" defence="40"/>
+			<defence type="Forest" defence="70"/>
+			<defence type="Swamp" defence="40"/>
+			<defence type="Hill" defence="70"/>
+			<defence type="Mountain" defence="70"/>
+			<defence type="Sand" defence="40"/>
+			<defence type="Grass" defence="60"/>
+			<defence type="Village" defence="70"/>
+		</defences>
+		<resistances>
+			<resistance type="Blade" resistance="-30"/>
+			<resistance type="Impact" resistance="-20"/>
+			<resistance type="Cold" resistance="10"/>
+			<resistance type="Pierce" resistance="-20"/>
+			<resistance type="Fire" resistance="0"/>
+			<resistance type="Arcane" resistance="20"/>		
+		</resistances>			
+	</soldierType>
+	<soldierType name="Human-HeavyInfantryman" cost="19" hp="38" movement="4" exp="40" level="1">
+		<attacks>
+			<attack damage="11" count="2" attackType="Impact" ranged="false"/>
+		</attacks>
+		<moveCosts>
+			<moveCost type="Water" cost="4"/>
+			<moveCost type="Forest" cost="2"/>
+			<moveCost type="Swamp" cost="4"/>
+			<moveCost type="Hill" cost="3"/>
+			<moveCost type="Mountain" cost="4"/>
+			<moveCost type="Sand" cost="2"/>
+			<moveCost type="Grass" cost="1"/>
+			<moveCost type="Village" cost="1"/>
+		</moveCosts>
+		<defences>
+			<defence type="Water" defence="10"/>
+			<defence type="Forest" defence="40"/>
+			<defence type="Swamp" defence="10"/>
+			<defence type="Hill" defence="40"/>
+			<defence type="Mountain" defence="10"/>
+			<defence type="Sand" defence="20"/>
+			<defence type="Grass" defence="30"/>
+			<defence type="Village" defence="40"/>
+		</defences>
+		<resistances>
+			<resistance type="Blade" resistance="50"/>
+			<resistance type="Impact" resistance="10"/>
+			<resistance type="Cold" resistance="-10"/>
+			<resistance type="Pierce" resistance="40"/>
+			<resistance type="Fire" resistance="-10"/>
+			<resistance type="Arcane" resistance="20"/>		
+		</resistances>			
+	</soldierType>
+	<soldierType name="Human-Spearman" cost="14" hp="36" movement="5" exp="42" level="1">
+		<attacks>
+			<attack damage="7" count="3" attackType="Pierce" ranged="false" attributes="Firststrike"/>
+			<attack damage="6" count="1" attackType="Pierce" ranged="true"/>
+		</attacks>
+		<moveCosts>
+			<moveCost type="Water" cost="3"/>
+			<moveCost type="Forest" cost="2"/>
+			<moveCost type="Swamp" cost="3"/>
+			<moveCost type="Hill" cost="2"/>
+			<moveCost type="Mountain" cost="3"/>
+			<moveCost type="Sand" cost="2"/>
+			<moveCost type="Grass" cost="1"/>
+			<moveCost type="Village" cost="1"/>
+		</moveCosts>
+		<defences>
+			<defence type="Water" defence="20"/>
+			<defence type="Forest" defence="50"/>
+			<defence type="Swamp" defence="20"/>
+			<defence type="Hill" defence="50"/>
+			<defence type="Mountain" defence="60"/>
+			<defence type="Sand" defence="30"/>
+			<defence type="Grass" defence="40"/>
+			<defence type="Village" defence="60"/>
+		</defences>
+		<resistances>
+			<resistance type="Blade" resistance="0"/>
+			<resistance type="Impact" resistance="0"/>
+			<resistance type="Cold" resistance="0"/>
+			<resistance type="Pierce" resistance="0"/>
+			<resistance type="Fire" resistance="0"/>
+			<resistance type="Arcane" resistance="20"/>		
+		</resistances>	
+	</soldierType>
+	
+	
+	
+	
 </soldierTypes>

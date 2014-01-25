@@ -28,6 +28,7 @@ import mr.merc.map.hex.SE
 import mr.merc.view.move.SoldierAttackMovement
 import mr.merc.map.hex.NW
 import mr.merc.view.move.MomentaryMovement
+import mr.merc.view.move.SmoothMovement
 
 class BattleViewTest extends FunSuite with BeforeAndAfter with MockitoSugar {
   val field = new TerrainHexField(10, 10, (x, y) => new TerrainHex(x, y, Grass))
@@ -72,17 +73,9 @@ class BattleViewTest extends FunSuite with BeforeAndAfter with MockitoSugar {
     verify(soldierDrawer).addMovement(org.mockito.Matchers.argThat(new ArgumentMatcher {
       def matches(argument: Any): Boolean = {
         argument match {
-          case moves: MovementList => {
+          case moves: SmoothMovement => {
             assert(moves.list.size === 3)
-            val first = moves.list(0).asInstanceOf[SoldierMoveMovement]
-            assert(first.from.hex === field.hex(0, 0))
-            assert(first.to.hex === field.hex(1, 0))
-            assert(first.soldier.soldier === soldier)
-            val second = moves.list(1).asInstanceOf[SoldierMoveMovement]
-            assert(second.from.hex === field.hex(1, 0))
-            assert(second.to.hex === field.hex(2, 0))
-            assert(second.soldier.soldier === soldier)
-            val third = moves.list(2).asInstanceOf[MomentaryMovement]
+            assert(moves.soldier.soldier === soldier)
             true
           }
           case _ => false

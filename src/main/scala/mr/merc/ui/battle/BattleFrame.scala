@@ -81,6 +81,7 @@ class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleCont
   private val endTurnButton = new Button() {
     text = Localization("turn.end")
   }
+  override val disableEndTurn = endTurnButton.disable
 
   private val soldierWrapper = controller.soldierToShow
   private val soldierViewControl = new SoldierViewControl(soldierWrapper)
