@@ -31,7 +31,7 @@ For M4, these things should be completed and tested
 +Make quick battle initial disposition
 +Fix performance issue with not needed redrawing of soldiers
 +Make movement more smooth
-Make AI make moves
++Make AI make moves
 AI - different implementations
 AI - tournament mode to test AI
 Log more
@@ -41,7 +41,6 @@ Save screen position between human moves
 Some lazy images eager loading
 Show victory or defeat message
 Victory condition - enemy destroyed
-
 long play testing, bug fixing
 
 

@@ -51,9 +51,9 @@ case class AIAgent(soldier: Soldier, hex: TerrainHex, conf: AIConfiguration) {
   private def targetToEvent(target: TargetInfo): List[BattleModelEvent] = {
     if (target.hexFromWhichAttack != hex) {
       List(MovementModelEvent(soldier, hex, target.hexFromWhichAttack),
-        AttackModelEvent(soldier, target.hexFromWhichAttack, target.hexFromWhichAttack, target.attack.index))
+        AttackModelEvent(soldier, target.hexFromWhichAttack, target.hexWhichAttack, target.attack.index))
     } else {
-      List(AttackModelEvent(soldier, target.hexFromWhichAttack, target.hexFromWhichAttack, target.attack.index))
+      List(AttackModelEvent(soldier, target.hexFromWhichAttack, target.hexWhichAttack, target.attack.index))
     }
   }
 
@@ -92,6 +92,7 @@ case class AIAgent(soldier: Soldier, hex: TerrainHex, conf: AIConfiguration) {
         val attackersAttackIndex = AttackSelectionHelper.selectBestAttack(attacker, defender, bestHexForAttack, enemyHex)
         val attackersAttack = attacker.soldierType.attacks(attackersAttackIndex)
         val prediction = AttackResultPredictor.predictResult(soldier, enemyHex.soldier.get, bestHexForAttack, enemyHex, attackersAttack, Attack.selectBestAttackForDefender(soldier, enemyHex.soldier.get, attackersAttack))
+        require(bestHexForAttack != enemyHex, "Same hexes, attack is invalid")
         TargetInfo(bestHexForAttack, enemyHex, attackersAttack, prediction)
     }
 

@@ -29,10 +29,13 @@ import mr.merc.map.hex._
 import javax.imageio.ImageIO
 import java.io.File
 import java.util.UUID
+import mr.merc.map.objects.MapObject
 
 object TerrainHexView {
   val Side = 72
   val textLength = 36
+
+  var imageCache = collection.mutable.HashMap[(TerrainType, Option[MapObject], Map[Direction, TerrainType], Map[Direction, MapObject]), Image]()
 
   lazy val hexGridImage: Image = {
     drawImage(Side, Side) { gc =>
@@ -189,18 +192,25 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
     neigMapObj.flatMap(p => p.mapObj.get.images(hex, field)).toList
   }
 
-  // TODO cache it based on neighbors, elements, etc
   lazy val hexImage: Image = {
-    val side = TerrainHexView.Side
-    val imageSide = side * 2
-    val offset = side / 2
-    drawImage(2 * side, 2 * side) { gc =>
-      image.drawCenteredImage(gc, 0, 0, imageSide, imageSide)
-      elements foreach (_.drawItself(gc, offset, offset))
-      neighbourMapObjects foreach (_.drawImage(gc, offset, offset))
-      secondaryImage.foreach(_.drawCenteredImage(gc, 0, 0, imageSide, imageSide))
-      mapObject foreach (_.drawImage(gc, offset, offset))
+    TerrainHexView.imageCache.get(buildKey) match {
+      case Some(image) => image
+      case None => {
+        val side = TerrainHexView.Side
+        val imageSide = side * 2
+        val offset = side / 2
+        val newImage = drawImage(2 * side, 2 * side) { gc =>
+          image.drawCenteredImage(gc, 0, 0, imageSide, imageSide)
+          elements foreach (_.drawItself(gc, offset, offset))
+          neighbourMapObjects foreach (_.drawImage(gc, offset, offset))
+          secondaryImage.foreach(_.drawCenteredImage(gc, 0, 0, imageSide, imageSide))
+          mapObject foreach (_.drawImage(gc, offset, offset))
+        }
+        TerrainHexView.imageCache.put(buildKey, newImage)
+        newImage
+      }
     }
+
   }
 
   def shouldBeRedrawn = isDirty || isDarkened != currentDarkened
@@ -252,6 +262,14 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
         val image = TerrainHexView.defenceImages(d.defence, drawPolygon)
         gc.drawImage(image, x, y)
     }
+  }
+
+  private def buildKey: (TerrainType, Option[MapObject], Map[Direction, TerrainType], Map[Direction, MapObject]) = {
+    val neigTypes = fieldView.neighboursWithDirections(this).mapValues(_.hex.terrain).view.force
+    val neigObjects = fieldView.neighboursWithDirections(this).
+      mapValues(_.hex.mapObj).filterNot(_._2.isEmpty).mapValues(_.get).view.force
+
+    (hex.terrain, hex.mapObj, neigTypes, neigObjects)
   }
 
   private def drawHexGrid(gc: GraphicsContext) {

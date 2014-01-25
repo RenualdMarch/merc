@@ -52,7 +52,7 @@ class BattleModel(val map: GameField) extends BattleModelEventHandler with Loggi
   }
 
   private[battle] def handleMovementEvent(soldier: Soldier, from: TerrainHex, to: TerrainHex): MovementModelEventResult = {
-    require(validateMovementEvent(soldier, from, to))
+    require(validateMovementEvent(soldier, from, to), s"movement from $from to $to is invalid")
     require(to.soldier == None)
     val path = PathFinder.findPath(map.gridForSoldier(soldier), from, to, soldier.movePointsRemain, soldier.movedThisTurn)
     val movePrice = pathPrice(soldier.movementCostFunction, path.get)
@@ -84,7 +84,7 @@ class BattleModel(val map: GameField) extends BattleModelEventHandler with Loggi
   }
 
   private[battle] def handleAttackEvent(soldier: Soldier, from: TerrainHex, target: TerrainHex, attackNumber: Int): AttackModelEventResult = {
-    require(validateAttackEvent(soldier, from, target, attackNumber))
+    require(validateAttackEvent(soldier, from, target, attackNumber), s"invalid attack attempt from $from to $target with attack $attackNumber")
     val defender = target.soldier.get
 
     val attackerAttack = soldier.soldierType.attacks(attackNumber)
@@ -152,7 +152,7 @@ class BattleModel(val map: GameField) extends BattleModelEventHandler with Loggi
     }
 
     PossibleMovesFinder.findPossibleMoves(map.gridForSoldier(soldier), currentHex,
-      movePoints, movedThisTurn).filterNot(_ == currentHex)
+      movePoints, movedThisTurn).filterNot(h => h == currentHex || h.soldier.nonEmpty)
   }
 
   def possibleAttacksWhenThereAreNoMoves(soldier: Soldier, currentHex: TerrainHex): Set[TerrainHex] = {

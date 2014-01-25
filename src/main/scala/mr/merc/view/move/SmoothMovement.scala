@@ -33,9 +33,14 @@ class SmoothMovement(list: List[TerrainHexView], soldier: SoldierView, fieldView
   override def update(time: Int) {
     super.update(time)
     currentTime += time
-    updateSoldierCoords()
+
     if (isOver) {
-      list.last.soldier = Some(soldier)
+      val last = list.last
+      soldier.x = last.x
+      soldier.y = last.y
+      last.soldier = Some(soldier)
+    } else {
+      updateSoldierCoords()
     }
   }
 

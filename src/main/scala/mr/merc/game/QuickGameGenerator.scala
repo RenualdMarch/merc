@@ -9,6 +9,7 @@ import mr.merc.players.Player
 import mr.merc.map.GameField
 import scalafx.scene.paint.Color
 import scala.util.Random
+import mr.merc.ai.BattleAI
 
 class QuickGameGenerator extends GameGenerator {
 
@@ -24,7 +25,7 @@ class QuickGameGenerator extends GameGenerator {
   override def generateGame: GameField = {
     val field = new RandomTerrainGenerator(0, 0.05).generateMap(20, 20, 0)
     val humanPlayer = new Player("Human", Color.YELLOW)
-    val aiPlayer = new Player("AI", Color.CYAN)
+    val aiPlayer = new Player("AI", Color.CYAN, Some(BattleAI()))
     val humans = soldiersList(humanPlayer)
     val ais = soldiersList(aiPlayer)
     val indices = List(4, 6, 8, 10, 12, 14, 16)

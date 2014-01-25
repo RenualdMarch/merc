@@ -45,6 +45,8 @@ class BattleView(model: BattleModel, _soldierDrawer: SoldiersDrawer = new Soldie
 
   def wrap(t: TerrainHex) = hexesViewMap(t)
 
+  def areMovementsGoing = mapView.soldiersDrawer.movements.nonEmpty
+
   def handleEvent(event: BattleViewEvent) {
     info(s"Battle view received event $event")
     event match {

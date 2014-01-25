@@ -293,6 +293,13 @@ class BattleController(gameField: GameField, parent: BattleControllerParent) ext
 
   def update(time: Int) {
     battleView.update(time)
+    battleModel.currentPlayer.ai.foreach { ai =>
+      if (!battleView.areMovementsGoing) {
+        val event = ai.nextTurn(battleModel)
+        val result = battleModel.handleEvent(event)
+        battleView.handleEvent(result.buildBattleViewEvent)
+      }
+    }
   }
 
   def drawBattleCanvas(gc: GraphicsContext, viewPort: Rectangle2D) {

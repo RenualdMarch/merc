@@ -6,23 +6,38 @@ import mr.merc.battle.BattleModel
 import mr.merc.ai.conditional.BattleModelHelper._
 import mr.merc.battle.event.EndMoveModelEvent
 import mr.merc.ai.AIQueueAdapter
+import mr.merc.unit.Soldier
 
 // TODO test me
 class ConditionalAI(config: AIConfiguration) extends BattleAI with AIQueueAdapter {
+  var soldierStates: Map[Soldier, SoldierAiState] = Map()
+
   def nextTurns(model: BattleModel): List[BattleModelEvent] = {
+    if (soldierStates.isEmpty) { // means that this is first call during this turn
+      soldierStates ++= model.currentSoldiers.map(s => (s._1, HaventMoved)).toMap
+    }
+
     val command = new GlobalStrategy(config).decideGlobalCommand(model)
-    val soldiersAndHexes = model.currentSoldiers.sortBy(_._1.movePointsRemain)
+    val soldiersAndHexes = model.currentSoldiers.filter(s => soldierStates(s._1) == HaventMoved) sortBy (_._1.movePointsRemain)
+
     val stream = soldiersAndHexes.toStream.map {
       case (s, h) =>
         val agent = new AIAgent(s, h, config)
+        soldierStates += s -> Moved
         agent.makeMove(command, model)
     }
 
     stream.dropWhile(_.isEmpty)
     if (stream.isEmpty) {
+      soldierStates = Map()
       List(EndMoveModelEvent)
     } else {
       stream.head.get
     }
   }
+
+  sealed trait SoldierAiState
+  case object HaventMoved extends SoldierAiState
+  case object Moved extends SoldierAiState
+
 }
