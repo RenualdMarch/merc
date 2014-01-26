@@ -179,7 +179,7 @@ class BattleModel(val map: GameField) extends BattleModelEventHandler with Loggi
     }
   }
 
-  // TODO allies
+  // TODO allies test
   def validateAttackEvent(soldier: Soldier, from: TerrainHex, target: TerrainHex, attackNumber: Int): Boolean = {
     if (!soldier.owner.isSamePlayer(currentPlayer)) {
       return false
@@ -199,8 +199,7 @@ class BattleModel(val map: GameField) extends BattleModelEventHandler with Loggi
     }
   }
 
-  // TODO no reason to end turn when game is over
-  def validateEndTurn = true
+  def validateEndTurn = !isOver
 
   private def nextPlayer() {
     currentPlayerIndex += 1
@@ -241,3 +240,5 @@ class BattleModel(val map: GameField) extends BattleModelEventHandler with Loggi
 
   def defenceForSoldier(soldier: Soldier, hex: TerrainHex) = Attack.calculateSoldierDefence(soldier, hex)
 }
+
+case class BattleResult(winningAlliance: List[Player])

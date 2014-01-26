@@ -240,4 +240,11 @@ case class SoldierTypeViewInfo(name: String, images: Map[SoldierViewState, List[
     val newImages = images.mapValues(_.map(_.changeSoldierColor(color))).toSeq.toMap
     SoldierTypeViewInfo(name, newImages, sounds, attacks)
   }
+
+  def eagerLoad() {
+    images.flatMap(_._2) foreach { im =>
+      im.loadLazyImage()
+      im.mirrorVertically.loadLazyImage()
+    }
+  }
 }

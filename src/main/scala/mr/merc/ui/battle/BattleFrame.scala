@@ -41,6 +41,9 @@ import mr.merc.log.Logging
 import scalafx.scene.CacheHint
 import scalafx.geometry.Rectangle2D
 import mr.merc.game.QuickGameGenerator
+import mr.merc.battle.BattleResult
+import mr.merc.unit.Attack
+import scalafx.stage.Modality
 
 // TODO move all styling to css
 class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleControllerParent with Logging {
@@ -65,8 +68,6 @@ class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleCont
   val gameField = new QuickGameGenerator().generateGame
 
   val controller = new BattleController(gameField, this)
-
-  override def window = sceneManager.stage
 
   private val battleCanvas = new Canvas()
   private val battleCanvasScrollPane = new ScrollPane {
@@ -132,6 +133,10 @@ class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleCont
   soldierHP.text <== soldierWrapper.hp
   soldierType.text <== soldierWrapper.soldierType
 
+  private def canvasMouseLeft(event: jfxin.MouseEvent) {
+    controller.mouseLeftCanvas()
+  }
+
   private def canvasMouseClicked(event: jfxin.MouseEvent) {
     val x = event.getX().toInt
     val y = event.getY().toInt
@@ -144,6 +149,15 @@ class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleCont
   }
 
   battleCanvas.delegate.addEventHandler(jfxin.MouseEvent.MOUSE_CLICKED, canvasMouseClicked _)
+  battleCanvas.delegate.addEventHandler(jfxin.MouseEvent.MOUSE_EXITED, canvasMouseLeft _)
+
+  sceneManager.stage.width.onChange {
+    onMinimapChange()
+  }
+
+  sceneManager.stage.height.onChange {
+    onMinimapChange()
+  }
 
   battleCanvas.onMouseMoved = { event: jfxin.MouseEvent =>
     val x = event.getX().toInt
@@ -158,16 +172,40 @@ class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleCont
   timeline.play()
 
   var lastUpdateTime = System.currentTimeMillis()
+  var battleIsOverDialogShown = false
   def gameLoop() {
     val currentTime = System.currentTimeMillis
     val timePassed = currentTime - lastUpdateTime
     lastUpdateTime = currentTime
     debug(s"in game loop $timePassed ms passed since previous call")
-    controller.update(timePassed.toInt)
-    controller.drawBattleCanvas(gc, battleCanvasScrollPane.viewport)
+    if (!battleIsOverDialogShown) {
+      controller.update(timePassed.toInt)
+      controller.drawBattleCanvas(gc, battleCanvasScrollPane.viewport)
+    }
   }
 
   def onMinimapChange() {
     minimap.redraw()
+  }
+
+  def showBattleOverDialog(result: BattleResult) {
+    battleIsOverDialogShown = true
+    val dialog = new BattleResultDialog(result, sceneManager)
+    dialog.initModality(Modality.WINDOW_MODAL)
+    dialog.initOwner(sceneManager.stage)
+    dialog.centerOnScreen()
+    dialog.showAndWait()
+  }
+
+  def showAttackSelectionDialog(attacker: Soldier, defender: Soldier, attackerHex: TerrainHex,
+    defenderHex: TerrainHex): Option[Attack] = {
+
+    val dialog = new AttackSelectionDialog(attacker, defender, attackerHex, defenderHex)
+    dialog.initModality(Modality.WINDOW_MODAL)
+    dialog.initOwner(sceneManager.stage)
+    dialog.centerOnScreen()
+    dialog.showAndWait()
+
+    dialog.selectedAttack
   }
 }

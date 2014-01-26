@@ -73,6 +73,11 @@ class BattleController(gameField: GameField, parent: BattleControllerParent) ext
     }
   }
 
+  def mouseLeftCanvas() {
+    removeArrow()
+    removeDefence()
+  }
+
   private def removeArrow() {
     if (arrowIsShown) {
       arrowIsShown = false
@@ -173,16 +178,7 @@ class BattleController(gameField: GameField, parent: BattleControllerParent) ext
   })
 
   def selectAttack(attacker: Soldier, defender: Soldier, attackerHex: TerrainHex,
-    defenderHex: TerrainHex): Option[Attack] = {
-
-    val dialog = new AttackSelectionDialog(attacker, defender, attackerHex, defenderHex)
-    dialog.initModality(Modality.WINDOW_MODAL)
-    dialog.initOwner(parent.window)
-    dialog.centerOnScreen()
-    dialog.showAndWait()
-
-    dialog.selectedAttack
-  }
+    defenderHex: TerrainHex): Option[Attack] = parent.showAttackSelectionDialog(attacker, defender, attackerHex, defenderHex)
 
   def endTurnButton() {
     debug(s"End turn button clicked")
@@ -291,6 +287,7 @@ class BattleController(gameField: GameField, parent: BattleControllerParent) ext
     }
   }
 
+  private var battleIsOverDialogShown = false
   def update(time: Int) {
     battleView.update(time)
     if (!battleModel.isOver) {
@@ -301,6 +298,9 @@ class BattleController(gameField: GameField, parent: BattleControllerParent) ext
           battleView.handleEvent(result.buildBattleViewEvent)
         }
       }
+    } else if (!battleIsOverDialogShown && !battleView.areMovementsGoing) {
+      battleIsOverDialogShown = true
+      parent.showBattleOverDialog(buildBattleResult)
     }
 
     parent.disableEndTurn.value = !(battleModel.validateEndTurn && battleModel.currentPlayer.ai.isEmpty)
@@ -309,6 +309,8 @@ class BattleController(gameField: GameField, parent: BattleControllerParent) ext
   def drawBattleCanvas(gc: GraphicsContext, viewPort: Rectangle2D) {
     battleView.drawItself(gc, viewPort)
   }
+
+  def buildBattleResult = new BattleResult(gameField.players)
 }
 
 private[battle] class VisitedHexesList {

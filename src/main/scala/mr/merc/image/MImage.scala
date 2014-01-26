@@ -4,6 +4,8 @@ import scalafx.scene.image.Image
 import scalafx.scene.canvas.GraphicsContext
 import scalafx.scene.image.ImageView
 import scalafx.scene.paint.Color
+import scala.util.Try
+import mr.merc.log.Logging
 
 object MImage {
   def apply(path: String, xOffset: Int, yOffset: Int, alpha: Float): MImage =
@@ -22,7 +24,7 @@ object MImage {
   val emptyImage = apply(ImageUtil.emptyImage)
 }
 
-abstract class MImage private[image] (val xOffset: Int, val yOffset: Int, val alpha: Float) {
+abstract class MImage private[image] (val xOffset: Int, val yOffset: Int, val alpha: Float) extends Logging {
 
   val defaultAlpha = 1f
   def imagePath: Option[String]
@@ -52,4 +54,15 @@ abstract class MImage private[image] (val xOffset: Int, val yOffset: Int, val al
   lazy val mirrorVertically = new LazyMirroredVerticallyImage(this, -xOffset, yOffset, alpha)
 
   lazy val mirrorHorizontally = new LazyMirroredHorizontallyImage(this, xOffset, -yOffset, alpha)
+
+  def loadLazyImage() {
+    try {
+      image.width
+    } catch {
+      case e: Exception => {
+        // since this may happen during tests execution, it may be alright to fail
+        debug("Failed eagerly load image", e)
+      }
+    }
+  }
 }

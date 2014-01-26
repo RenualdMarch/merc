@@ -41,6 +41,8 @@ object SoldierView {
 }
 
 class SoldierView(val soldier: Soldier) extends Sprite[SoldierViewState](SoldierTypeViewInfo(soldier.soldierType.name, soldier.owner.color).images, StandState) {
+  SoldierTypeViewInfo(soldier.soldierType.name, soldier.owner.color).eagerLoad()
+
   private val maxHp = 100
   private val healthBarHeight = Math.min(soldier.soldierType.hp, maxHp) * 2 * TerrainHexView.Side / 3 / maxHp
   private val healthBarWidth = 4

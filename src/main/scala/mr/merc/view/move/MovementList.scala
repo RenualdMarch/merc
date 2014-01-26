@@ -51,7 +51,7 @@ class MovementList(val list: List[Movement]) extends Movement {
   override def dirtyHexes = if (isOver) {
     prevDirtyHexes
   } else {
-    currentMovement.dirtyHexes
+    prevDirtyHexes ++ currentMovement.dirtyHexes
   }
 
   override def update(time: Int) {

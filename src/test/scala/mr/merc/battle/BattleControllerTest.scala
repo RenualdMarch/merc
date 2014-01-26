@@ -35,9 +35,11 @@ class BattleControllerTest extends FunSuite with BeforeAndAfter {
     val gameField = new GameField(hexField, List(Player("1"), Player("2")))
 
     controller = new BattleController(gameField, new BattleControllerParent() {
-      def window = ???
       def onMinimapChange() {}
       val disableEndTurn = new BooleanProperty()
+      def showBattleOverDialog(result: BattleResult) = ???
+      def showAttackSelectionDialog(attacker: Soldier, defender: Soldier, attackerHex: TerrainHex,
+        defenderHex: TerrainHex) = ???
     }) {
       override def selectAttack(attacker: Soldier, defender: Soldier,
         attackerHex: TerrainHex, defenderHex: TerrainHex) = Some(attacker.soldierType.attacks(0))
@@ -321,4 +323,16 @@ class BattleControllerTest extends FunSuite with BeforeAndAfter {
     assert(controller.soldierToShow.soldier.get.name === "3")
   }
 
+  test("when mouse left canvas, defence and arrow are hidden") {
+    leftClick(0, 0)
+    moveMouse(0, 2)
+    assert(controller.defenceIsShown === true)
+    controller.mouseLeftCanvas()
+    assert(controller.defenceIsShown === false)
+    moveMouse(0, 3)
+    moveMouse(0, 4)
+    assert(controller.arrowIsShown === true)
+    controller.mouseLeftCanvas()
+    assert(controller.arrowIsShown === false)
+  }
 }
