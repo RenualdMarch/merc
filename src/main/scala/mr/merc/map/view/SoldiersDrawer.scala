@@ -5,8 +5,9 @@ import mr.merc.view.move.Movement
 import scalafx.scene.canvas.GraphicsContext
 import scala.collection.mutable.Queue
 import mr.merc.map.hex.view.TerrainHexView
+import mr.merc.log.Logging
 
-class SoldiersDrawer {
+class SoldiersDrawer extends Logging {
   private var _soldiers = Set[SoldierView]()
   private val _movements = Queue[Movement]()
   private def currentMovement = _movements.headOption
@@ -20,6 +21,7 @@ class SoldiersDrawer {
   }
 
   def addMovement(movement: Movement) {
+    info(s"added movement $movement")
     _movements enqueue movement
   }
 
@@ -42,6 +44,7 @@ class SoldiersDrawer {
 
     currentMovement match {
       case Some(move) => if (move.isOver) {
+        info(s"Movement $move is over")
         executeAllMomentaryMovesAndStartFirstNonMomentary()
       } else {
         executeAllMomentaryMovesAndStartFirstNonMomentary()

@@ -15,9 +15,7 @@ object SoundPlayer {
 
   private def renderer(path: String, s: Status => Unit): BaseAudioRenderer = {
     val lowercase = path.toLowerCase
-    if (lowercase.endsWith("wav")) {
-      new WavRenderer(s)
-    } else if (lowercase.endsWith("ogg")) {
+    if (lowercase.endsWith("ogg")) {
       new JOrbisOggRenderer(s)
     } else if (lowercase.endsWith("mp3")) {
       new JavaLayerMp3Renderer(s)

@@ -1,23 +1,23 @@
 <sounds>
 	<!-- effects -->
-	<sound name="fireExplosion" path="fire.wav"/>
+	<sound name="fireExplosion" path="fire.ogg"/>
 	
 	<!-- attacks -->
 	<sound name="magicAttack1" path="magic-missile-1.ogg"/>
 	<sound name="magicAttack1Fail" path="magic-missile-1-miss.ogg"/>
-	<sound name="spear" path="spear.wav"/>
+	<sound name="spear" path="spear.ogg"/>
 	<sound name="spearFail" path="spear-miss.ogg"/>
-	<sound name="staff" path="staff.wav"/>
+	<sound name="staff" path="staff.ogg"/>
 	<sound name="bow" path="bow.ogg"/>
 	<sound name="bowFail" path="bow-miss.ogg"/>
-	<sound name="dagger" path="dagger-swish.wav"/>
+	<sound name="dagger" path="dagger-swish.ogg"/>
 	<sound name="club" path="club.ogg"/>
 	<sound name="sword" path="sword-1.ogg"/>
 	<sound name="miss1" path="miss-1.ogg"/>
-	<sound name="mace" path="mace.wav"/>
+	<sound name="mace" path="mace.ogg"/>
 		
 	<!-- movements -->
-	<sound name="horseMovement" path="horse-elf-canter.wav"/>
+	<sound name="horseMovement" path="horse-elf-canter.ogg"/>
 	
 	<!-- pain -->
 	<sound name="horsePain" path="horse-die.ogg"/>

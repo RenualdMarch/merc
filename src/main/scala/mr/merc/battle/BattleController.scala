@@ -290,14 +290,8 @@ class BattleController(gameField: GameField, parent: BattleControllerParent) ext
   }
 
   private var battleIsOverDialogShown = false
-  var totalTime = 0
   def update(time: Int) {
     battleView.update(time)
-    totalTime += time
-    if (totalTime > 10000) {
-      //parent.showAttackSelectionDialog(null, null, null, null)
-      totalTime = 0
-    }
     if (!battleModel.isOver) {
       battleModel.currentPlayer.ai.foreach { ai =>
         if (!battleView.areMovementsGoing) {

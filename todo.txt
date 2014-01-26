@@ -45,7 +45,9 @@ For M4, these things should be completed and tested
 +long play testing, bug fixing
 +screen is to high and wide
 +soldiers are not visibly dead, and victory dialog appears
-Log more
++Log more
++Wav is not playing in distribution
++Make distribution and test it
 
 
 

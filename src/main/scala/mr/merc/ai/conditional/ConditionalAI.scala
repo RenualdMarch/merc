@@ -7,9 +7,10 @@ import mr.merc.ai.conditional.BattleModelHelper._
 import mr.merc.battle.event.EndMoveModelEvent
 import mr.merc.ai.AIQueueAdapter
 import mr.merc.unit.Soldier
+import mr.merc.log.Logging
 
 // TODO test me
-class ConditionalAI(config: AIConfiguration) extends BattleAI with AIQueueAdapter {
+class ConditionalAI(config: AIConfiguration) extends BattleAI with AIQueueAdapter with Logging {
   var soldierStates: Map[Soldier, SoldierAiState] = Map()
 
   def nextTurns(model: BattleModel): List[BattleModelEvent] = {
@@ -32,6 +33,7 @@ class ConditionalAI(config: AIConfiguration) extends BattleAI with AIQueueAdapte
       soldierStates = Map()
       List(EndMoveModelEvent)
     } else {
+      debug(s"AI decided to do ${stream.head.get}")
       stream.head.get
     }
   }

@@ -55,7 +55,7 @@ object Main extends JFXApp {
   val screenRect = Screen.primary.visualBounds
 
   stage = new PrimaryStage {
-    title = "Mercenary"
+    title = "Mercenary 0.1 (M4)"
     scene = new Scene(screenRect.width - 100, screenRect.height - 100) // to make it fit on the screen
     // TODO check on java 8
     // fullScreen = true
