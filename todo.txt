@@ -1,78 +1,31 @@
-For M4, these things should be completed and tested
+For M5, (0.2) these things should be completed and tested
 
-+Create assembly for different platforms
-+Use Grass movement and defence for Road and Bridges
-+Make default resistance zero
-+Move attack view configures to attack view
-+Show defence when select where to move - in color
-+Logging
-+Game menu
-+Game options
-+AI - battle chances
-+Changing position on minimap
-+Shown map of any size
-+Primitive map generation
-+Forest borders bug
-+Borders fix
-+Allies
-+Neighbours redraw when moving
-+Draw trees above bridges
-+when draw terrain additives, guarantee that same additives are drawn in same situations.
-+When movement is over, still need to redraw all its hexes
-+Fix issues with knight movement
-+Lazy redraw - test and fix everything
-+All human soldiers of 0 level are present
-+All human soldiers of 1 level are present
-+Healing at villages
-+Hills and mountains borders
-+Enable hills and mountains on primitive map generation
-+Allies test
-+Make more grass on generated map - make weights
-+Make quick battle initial disposition
-+Fix performance issue with not needed redrawing of soldiers
-+Make movement more smooth
-+Make AI make moves
-+AI - different implementations
-+AI - tournament mode to test AI
-+Block end turn button until ai is moving
-+MovementList test
-+BattleModel test together with battle model helpers
-+Bug with selection after mouse leaving canvas
-+resize minimap on window resize
-+Some lazy images eager loading
-+Show victory or defeat message
-+Make arrows and fireballs fly faster
-+long play testing, bug fixing
-+screen is to high and wide
-+soldiers are not visibly dead, and victory dialog appears
-+Log more
-+Wav is not playing in distribution
-+Make distribution and test it
-
-
-
-M5 going to be vertical slice of game
-Show healing at village events
-Show healing events
-Save screen position between human moves
-Soldier view clean up
-maximized screen with java 8
-SmoothMovementTest
-terrain additives specifically for given terrain types
-Make AI heal in villages
-show healer healing events
-Update scalafx version
-Scalatest version 2
-After wesnoth release take a look at images
-Load soldier types from different sources
-Levels of difficulty
 investigate MigLayout - a lot of UI ahead
+Update libraries - Update scalafx version, Scalatest version 2, other libraries
+Load soldier types from different sources
+human units level 2 and 3
+Show healing at village events
+Show healing by healer events
+Save screen position between human moves and center on movements if not visible
+Soldier view clean up
+Additional terrain types
+terrain additives specifically for given terrain types
+add winter weather on maps
 global map with several kingdoms and cities
 ability to travel among cities and 4 seasons
 diplomacy among kingdoms - war, peace, alliance, cold war?
 soldiers expirience and change soldier types when level-up
-units hiring
-human units level 2 and 3
+units hiring and levelup
+Make AI heal in villages
+Make AI move in groups
 mission "Destroy all enemies", with place for different victory conditions
 enhanced soldier type for army leader
-add winter weather on maps
+
+
+
+Consider following:
+
+Different images for same terrain type
+maximized screen with java 8
+After wesnoth release take a look at images
+Levels of difficulty
