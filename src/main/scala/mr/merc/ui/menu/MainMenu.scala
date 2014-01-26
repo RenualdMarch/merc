@@ -18,7 +18,7 @@ class MainMenu(sceneManager: SceneManager) extends BorderPane {
   stylesheets.add("/css/mainMenu.css")
 
   val newBattleButton = new Button {
-    text = Localization("menu.newBattle")
+    text = Localization("menu.quickBattle")
     onAction = { e: ActionEvent =>
       sceneManager.startNewBattle()
     }

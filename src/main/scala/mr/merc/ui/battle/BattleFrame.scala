@@ -194,15 +194,16 @@ class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleCont
     dialog.initModality(Modality.WINDOW_MODAL)
     dialog.initOwner(sceneManager.stage)
     dialog.centerOnScreen()
-    dialog.showAndWait()
+    dialog.show()
   }
 
   def showAttackSelectionDialog(attacker: Soldier, defender: Soldier, attackerHex: TerrainHex,
     defenderHex: TerrainHex): Option[Attack] = {
 
     val dialog = new AttackSelectionDialog(attacker, defender, attackerHex, defenderHex)
+
     dialog.initModality(Modality.WINDOW_MODAL)
-    dialog.initOwner(sceneManager.stage)
+    dialog.initOwner(sceneManager.stage.delegate)
     dialog.centerOnScreen()
     dialog.showAndWait()
 

@@ -40,10 +40,13 @@ For M4, these things should be completed and tested
 +Bug with selection after mouse leaving canvas
 +resize minimap on window resize
 +Some lazy images eager loading
-Show victory or defeat message
-Make arrows and fireballs fly faster
++Show victory or defeat message
++Make arrows and fireballs fly faster
++long play testing, bug fixing
++screen is to high and wide
++soldiers are not visibly dead, and victory dialog appears
 Log more
-long play testing, bug fixing
+
 
 
 M5 going to be vertical slice of game
@@ -51,6 +54,7 @@ Show healing at village events
 Show healing events
 Save screen position between human moves
 Soldier view clean up
+maximized screen with java 8
 SmoothMovementTest
 terrain additives specifically for given terrain types
 Make AI heal in villages

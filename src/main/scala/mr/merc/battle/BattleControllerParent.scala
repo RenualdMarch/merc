@@ -8,7 +8,7 @@ import mr.merc.unit.Attack
 
 trait BattleControllerParent {
   def onMinimapChange(): Unit
-  val disableEndTurn: BooleanProperty
+  def disableEndTurn: BooleanProperty
   def showBattleOverDialog(result: BattleResult): Unit
   def showAttackSelectionDialog(attacker: Soldier, defender: Soldier, attackerHex: TerrainHex,
     defenderHex: TerrainHex): Option[Attack]

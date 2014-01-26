@@ -9,27 +9,26 @@ import mr.merc.battle.BattleResult
 import scalafx.scene.text.Text
 import scalafx.scene.control.Button
 import scalafx.scene.Scene
+import scalafx.event.ActionEvent
 
 class BattleResultDialog(result: BattleResult, sceneManager: SceneManager) extends Stage {
   title = Localization("attack.battleResult.title")
 
+  val line = result.winningAlliance.map(_.name).mkString(", ")
   val label = new Text {
-    text = Localization("attack.battleResult.message", result.winningAlliance.mkString(", "))
+    text = Localization("attack.battleResult.message", line)
   }
 
   val okButton = new Button {
     text = Localization("common.ok")
-    onAction = {
+    onAction = { e: ActionEvent =>
       BattleResultDialog.this.close()
       sceneManager.showMainMenu
     }
   }
-
-  val vbox = new VBox {
-    content = List(label, okButton)
-  }
-
   this.scene = new Scene {
-    content = vbox
+    content = new VBox {
+      content = List(label, okButton)
+    }
   }
 }

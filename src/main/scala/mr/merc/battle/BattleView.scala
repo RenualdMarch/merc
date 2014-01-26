@@ -25,8 +25,8 @@ import scalafx.geometry.Rectangle2D
 import mr.merc.view.move.SmoothMovement
 
 // injecting soldier drawer for test purposes only
-class BattleView(model: BattleModel, _soldierDrawer: SoldiersDrawer = new SoldiersDrawer) extends Logging {
-  val mapView = new MapView(model.map.hexField, _soldierDrawer)
+class BattleView(model: BattleModel, soldierDrawer: SoldiersDrawer = new SoldiersDrawer) extends Logging {
+  val mapView = new MapView(model.map.hexField, soldierDrawer)
 
   private val hexesViewMap = mapView.terrainView.realHexes.map(v => (v.hex -> v)) toMap
   private val soldiersMap = mapView.soldiers.map(s => (s.soldier -> s)) toMap
@@ -45,7 +45,11 @@ class BattleView(model: BattleModel, _soldierDrawer: SoldiersDrawer = new Soldie
 
   def wrap(t: TerrainHex) = hexesViewMap(t)
 
-  def areMovementsGoing = mapView.soldiersDrawer.movements.nonEmpty
+  def areMovementsGoing = soldierDrawer.movements.nonEmpty
+
+  def areAllDeadSoldiersNotRendered = soldierDrawer.soldiers.forall { s =>
+    s.soldier.hp != 0 || (s.soldier.hp == 0 && s.state == NoState)
+  }
 
   def handleEvent(event: BattleViewEvent) {
     info(s"Battle view received event $event")
@@ -116,14 +120,7 @@ class BattleView(model: BattleModel, _soldierDrawer: SoldiersDrawer = new Soldie
   }
 
   private def handleMovementEvent(soldier: SoldierView, path: List[TerrainHexView]) {
-    // THIS IS OLD VERSION OF SOLDIER MOVEMENT
-    // IT MAY BE UNCOMMENTED IF SOMETHING GOES WRONG WITH MOVEMENT
-    // OR REMOVED IF THERE ARE NO BUGS
-    //val destination = path.tail
-    //val departure = path.init
-    //val allMovements = for ((a, b) <- departure zip destination) yield new SoldierMoveMovement(a, b, soldier, mapView.terrainView)
     val standAfterMove = MomentaryMovement(soldier.state = StandState)
-    //mapView.addMovement(new MovementList(allMovements :+ standAfterMove))
     mapView.addMovement(new SmoothMovement(path, soldier, mapView.terrainView))
     mapView.addMovement(standAfterMove)
   }

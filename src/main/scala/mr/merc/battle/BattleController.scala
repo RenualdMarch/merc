@@ -125,7 +125,7 @@ class BattleController(gameField: GameField, parent: BattleControllerParent) ext
             } else {
               visitedHexesList.prev.get
             }
-            // TODO think we should remove selected soldier
+            // TODO think if we should remove selected soldier
             selectedSoldier = None
 
             removeArrow()
@@ -224,6 +224,8 @@ class BattleController(gameField: GameField, parent: BattleControllerParent) ext
     }
   }
 
+  def endGame = parent.showBattleOverDialog(buildBattleResult)
+
   private[battle] def canBeCurrentHexAttackedFromPrevious: Boolean = {
     val canSoldierAttack = selectedSoldier.map(!_.attackedThisTurn).getOrElse(false)
     if (!canSoldierAttack) {
@@ -288,8 +290,14 @@ class BattleController(gameField: GameField, parent: BattleControllerParent) ext
   }
 
   private var battleIsOverDialogShown = false
+  var totalTime = 0
   def update(time: Int) {
     battleView.update(time)
+    totalTime += time
+    if (totalTime > 10000) {
+      //parent.showAttackSelectionDialog(null, null, null, null)
+      totalTime = 0
+    }
     if (!battleModel.isOver) {
       battleModel.currentPlayer.ai.foreach { ai =>
         if (!battleView.areMovementsGoing) {
@@ -298,7 +306,8 @@ class BattleController(gameField: GameField, parent: BattleControllerParent) ext
           battleView.handleEvent(result.buildBattleViewEvent)
         }
       }
-    } else if (!battleIsOverDialogShown && !battleView.areMovementsGoing) {
+    } else if (!battleIsOverDialogShown && !battleView.areMovementsGoing
+      && battleView.areAllDeadSoldiersNotRendered) {
       battleIsOverDialogShown = true
       parent.showBattleOverDialog(buildBattleResult)
     }
@@ -310,7 +319,10 @@ class BattleController(gameField: GameField, parent: BattleControllerParent) ext
     battleView.drawItself(gc, viewPort)
   }
 
-  def buildBattleResult = new BattleResult(gameField.players)
+  def buildBattleResult: BattleResult = {
+    val players = battleModel.soldiersByAlliance.toList(0)._1
+    new BattleResult(players.toList)
+  }
 }
 
 private[battle] class VisitedHexesList {

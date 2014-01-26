@@ -35,7 +35,7 @@ class QuickGameGenerator(player1: Player = new Player("Human", Color.YELLOW),
 
     indices zip ais foreach {
       case (i, s) =>
-        field.hex(19, i).soldier = Some(s)
+        field.hex(field.width - 1, i).soldier = Some(s)
     }
 
     new GameField(field, List(player1, player2))
