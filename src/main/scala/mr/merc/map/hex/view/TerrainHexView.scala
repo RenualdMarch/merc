@@ -91,7 +91,7 @@ object TerrainHexView {
 
   lazy val movementImpossibleImage: Image = {
     drawImage(Side, Side) { gc =>
-      gc.globalAlpha = 0.3
+      gc.globalAlpha = 0.6
       gc.fill = Color.BLACK
       gc.fillPolygon(angles())
     }
