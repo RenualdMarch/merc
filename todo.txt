@@ -1,19 +1,17 @@
 For M5, (0.2) these things should be completed and tested
-
-investigate MigLayout - a lot of UI ahead
++integration with wesnoth editor
+two canvas prototype with custom scrolling logic
+Additional terrain types - gravel
+global map with several kingdoms and cities
+ability to travel among cities
+diplomacy among kingdoms - war, peace, alliance, cold war?
 Update libraries - Update scalafx version, Scalatest version 2, other libraries
-Load soldier types from different sources
+Load soldier types from many sources
 human units level 2 and 3
 Show healing at village events
 Show healing by healer events
 Save screen position between human moves and center on movements if not visible
 Soldier view clean up
-Additional terrain types
-terrain additives specifically for given terrain types
-add winter weather on maps
-global map with several kingdoms and cities
-ability to travel among cities and 4 seasons
-diplomacy among kingdoms - war, peace, alliance, cold war?
 soldiers expirience and change soldier types when level-up
 units hiring and levelup
 Make AI heal in villages
@@ -24,7 +22,8 @@ enhanced soldier type for army leader
 
 
 Consider following:
-
+terrain additives specifically for given terrain types
+add winter weather on maps
 Different images for same terrain type
 maximized screen with java 8
 After wesnoth release take a look at images
