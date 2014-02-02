@@ -36,63 +36,7 @@ class SoldierDrawerTest extends FunSuite with MockitoSugar with BeforeAndAfter {
     verify(soldier3, times(1)).updateTime(50)
   }
 
-  test("dirty hexes are saved when movement is over") {
-    val hexField = new TerrainHexField(5, 5, TerrainHex.grassInit)
-    val hexFieldView = new TerrainHexFieldView(hexField)
-    val hex1 = hexFieldView.hex(1, 1)
-    val hex2 = hexFieldView.hex(2, 2)
-    val movement1 = new ExampleMovement(Nil, List(hex1))
-    val movement2 = new ExampleMovement(Nil, List(hex2))
-    val soldiersDrawer = new SoldiersDrawer
-    soldiersDrawer.addMovement(movement1)
-    soldiersDrawer.addMovement(movement2)
-
-    assert(soldiersDrawer.dirtyHexesInMovements === List(hex1))
-    soldiersDrawer.update(10)
-    assert(soldiersDrawer.dirtyHexesInMovements === List(hex1))
-    soldiersDrawer.update(10)
-    assert(soldiersDrawer.dirtyHexesInMovements === List(hex1, hex2))
-    soldiersDrawer.update(10)
-    assert(soldiersDrawer.dirtyHexesInMovements === List(hex2))
-    soldiersDrawer.update(10)
-    assert(soldiersDrawer.dirtyHexesInMovements === List(hex2))
-    soldiersDrawer.update(10)
-    assert(soldiersDrawer.dirtyHexesInMovements === Nil)
-  }
-
-  test("dirty hexes are saved when movement is momentary") {
-    val hexField = new TerrainHexField(5, 5, TerrainHex.grassInit)
-    val hexFieldView = new TerrainHexFieldView(hexField)
-    val hex1 = hexFieldView.hex(1, 1)
-    val hex2 = hexFieldView.hex(2, 2)
-    val movement1 = new ExampleMomentaryMovement(List(hex1))
-    val movement2 = new ExampleMovement(Nil, List(hex2))
-    val soldiersDrawer = new SoldiersDrawer
-    soldiersDrawer.addMovement(movement1)
-    soldiersDrawer.addMovement(movement2)
-    assert(soldiersDrawer.dirtyHexesInMovements === List(hex1))
-    soldiersDrawer.update(10)
-    assert(soldiersDrawer.dirtyHexesInMovements === List(hex1, hex2))
-    soldiersDrawer.update(10)
-    assert(soldiersDrawer.dirtyHexesInMovements === List(hex2))
-  }
-
   after {
     reset(soldier1, soldier2, soldier3, gc)
   }
-}
-
-class ExampleMovement(override val drawables: List[SoldierView], override val dirtyHexes: List[TerrainHexView] = Nil) extends Movement {
-  private var updatedCount = 0
-
-  override def update(time: Int) {
-    super.update(time)
-    updatedCount += 1
-  }
-
-  def isOver = updatedCount == 2
-}
-
-class ExampleMomentaryMovement(override val dirtyHexes: List[TerrainHexView] = Nil) extends MomentaryMovement(Unit, dirtyHexes) {
-
 }

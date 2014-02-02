@@ -86,6 +86,4 @@ class SoldierRangedAttackMovement(val fromHex: TerrainHexView, val toHex: Terrai
     drainNumberMovement.map(_.isOver).getOrElse(true)
 
   override def drawables = List(defender, attacker, projectileView) ++ numberMovements
-
-  override def dirtyHexes = field.neighbours(fromHex) ++ field.neighbours(toHex) toList
 }

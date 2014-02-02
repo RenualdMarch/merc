@@ -41,14 +41,20 @@ class Sprite[T <: SpriteState](val images: Map[T, List[MImage]], private var _st
   }
 
   def y = _y
-  def y_=(i: Int) {
-    markAsDirty()
+  private def y_=(i: Int) {
     _y = i
   }
 
-  def x = _x
-  def x_=(i: Int) {
+  def coords = (x, y)
+
+  def coords_=(c: (Int, Int)) {
     markAsDirty()
+    x = c._1
+    y = c._2
+  }
+
+  def x = _x
+  private def x_=(i: Int) {
     if (mirroringEnabled) {
       val oldX = _x
       _x = i

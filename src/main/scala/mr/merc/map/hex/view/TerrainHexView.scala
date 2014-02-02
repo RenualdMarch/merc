@@ -182,25 +182,13 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
     neigMapObj.flatMap(p => p.mapObj.get.images(hex, field)).toList
   }
 
-  lazy val hexImage: Image = {
-    TerrainHexView.imageCache.get(buildKey) match {
-      case Some(image) => image
-      case None => {
-        val side = TerrainHexView.Side
-        val imageSide = side * 2
-        val offset = side / 2
-        val newImage = drawImage(2 * side, 2 * side) { gc =>
-          image.drawCenteredImage(gc, 0, 0, imageSide, imageSide)
-          elements foreach (_.drawItself(gc, offset, offset))
-          neighbourMapObjects foreach (_.drawImage(gc, offset, offset))
-          secondaryImage.foreach(_.drawCenteredImage(gc, 0, 0, imageSide, imageSide))
-          mapObject foreach (_.drawImage(gc, offset, offset))
-        }
-        TerrainHexView.imageCache.put(buildKey, newImage)
-        newImage
-      }
-    }
-
+  def drawTerrainImage(gc: GraphicsContext) {
+    val side = TerrainHexView.Side
+    image.drawCenteredImage(gc, x, y, side, side)
+    elements foreach (_.drawItself(gc, x, y))
+    neighbourMapObjects foreach (_.drawImage(gc, x, y))
+    secondaryImage.foreach(_.drawCenteredImage(gc, x, y, side, side))
+    mapObject foreach (_.drawImage(gc, x, y))
   }
 
   def darkeningShouldBeRedrawn = isDarkened != currentDarkened
@@ -208,7 +196,7 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
   def drawItself(gc: GraphicsContext, stage: HexDrawingStage) {
     stage match {
       case TerrainImageStage =>
-        MImage(hexImage).drawCenteredImage(gc, x, y, TerrainHexView.Side, TerrainHexView.Side)
+        drawTerrainImage(gc)
       case MovementImpossibleStage =>
         drawMovementImpossibleIfNeeded(gc)
       case ArrowStage =>

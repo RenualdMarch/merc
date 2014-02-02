@@ -35,8 +35,7 @@ class SmoothMovement(val list: List[TerrainHexView], val soldier: SoldierView, f
 
     if (isOver) {
       val last = list.last
-      soldier.x = last.x
-      soldier.y = last.y
+      soldier.coords = (last.x, last.y)
     } else {
       updateSoldierCoords()
     }
@@ -47,8 +46,7 @@ class SmoothMovement(val list: List[TerrainHexView], val soldier: SoldierView, f
     func match {
       case Some(f) => {
         val coords = f(currentTime)
-        soldier.x = coords._1
-        soldier.y = coords._2
+        soldier.coords = coords
       }
       case None => // do nothing, movement is over
     }
@@ -57,15 +55,6 @@ class SmoothMovement(val list: List[TerrainHexView], val soldier: SoldierView, f
   def isOver = !movementFunctionByTime(currentTime, timeFunctions).isDefined
 
   override def drawables = List(soldier)
-
-  override def dirtyHexes: List[TerrainHexView] = {
-    val stage = movementFunctionByTime(currentTime, timeFunctions) match {
-      case Some(f) => f
-      case None => timeFunctions.last
-    }
-
-    fieldView.neighbours(stage.startHex) | fieldView.neighbours(stage.endHex) | Set(stage.startHex, stage.endHex) toList
-  }
 }
 
 class MovementFunction(startT: Int, endT: Int, val startHex: TerrainHexView, val endHex: TerrainHexView) extends PartialFunction[Int, (Int, Int)] {

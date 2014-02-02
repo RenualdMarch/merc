@@ -32,8 +32,7 @@ class MapView(field: TerrainHexField, val soldiersDrawer: SoldiersDrawer = new S
         case Some(soldier) => {
           debug(s"Creating soldier view for soldier type ${soldier.soldierType.name}")
           val view = new SoldierView(soldier)
-          view.x = h.x
-          view.y = h.y
+          view.coords = (h.x, h.y)
           Some(view)
         }
         case None => None

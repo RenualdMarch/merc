@@ -29,9 +29,11 @@ class CanvasLayer(val layersCount: Int, fullMapSize: Rectangle2D, cleanRedraw: (
   private def redraw() {
     0 until layersCount foreach { i =>
       val canvas = canvasArray(i)
-      val gc = canvas.graphicsContext2D
-      gc.clearRect(0, 0, canvas.width.value, canvas.height.value)
-      cleanRedraw(i, viewRect, canvasArray(i).graphicsContext2D)
+      if (canvas.width.value >= 0 && canvas.height.value >= 0) {
+        val gc = canvas.graphicsContext2D
+        gc.clearRect(0, 0, canvas.width.value, canvas.height.value)
+        cleanRedraw(i, viewRect, canvasArray(i).graphicsContext2D)
+      }
     }
   }
 
@@ -50,8 +52,13 @@ class CanvasLayer(val layersCount: Int, fullMapSize: Rectangle2D, cleanRedraw: (
     f(gc, viewRect)
   }
 
+  verBar.prefWidth.value = 20
+  horBar.prefHeight.value = 20
+
   private val canvasAreaWidth = this.width - verBar.prefWidth
   private val canvasAreaHeight = this.height - horBar.prefHeight
+  verBar.prefHeight <== canvasAreaHeight
+  horBar.prefWidth <== canvasAreaWidth
 
   def positionComponents() {
     canvasArray.foreach { c =>

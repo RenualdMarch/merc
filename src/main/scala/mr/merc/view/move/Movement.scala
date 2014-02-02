@@ -17,7 +17,4 @@ trait Movement {
   def isOver: Boolean
   // who is first should be rendered first
   def drawables: List[Drawable] = Nil
-
-  // hexes that must be rewritten during this move execution
-  def dirtyHexes: List[TerrainHexView] = Nil
 }

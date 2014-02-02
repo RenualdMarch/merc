@@ -19,8 +19,7 @@ class ProjectileView(start: Option[List[MImage]], move: Option[List[MImage]], en
 
   val movement = new LinearMovement(from._1, from._2, to._1, to._2, speed)
   movement.start()
-  x = from._1
-  y = from._2
+  coords = (from._1, from._2);
   centered = Some(TerrainHexView.Side)
 
   override def state_=(st: ProjectileState) {
@@ -40,8 +39,7 @@ class ProjectileView(start: Option[List[MImage]], move: Option[List[MImage]], en
 
     if (state == ProjectileMovement) {
       movement.update(time)
-      x = movement.x
-      y = movement.y
+      coords = (movement.x, movement.y)
     }
 
     if (result != 0 && index == 0 || movement.isOver && this.state == ProjectileMovement) {
@@ -51,8 +49,7 @@ class ProjectileView(start: Option[List[MImage]], move: Option[List[MImage]], en
             this.state = ProjectileMovement
           } else if (end.isDefined) {
             this.state = ProjectileEnd
-            x = to._1
-            y = to._2
+            coords = to
           } else {
             this.state = ProjectileNotRender
           }
