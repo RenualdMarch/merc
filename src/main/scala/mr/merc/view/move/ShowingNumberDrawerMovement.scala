@@ -5,6 +5,7 @@ import mr.merc.view.Drawable
 import scalafx.scene.canvas.GraphicsContext
 import scalafx.scene.text.Font
 import scalafx.scene.text.FontWeight
+import scalafx.geometry.Rectangle2D
 
 object ShowingNumberDrawerMovement {
   private val speed = 125
@@ -27,6 +28,8 @@ class ShowingNumberDrawerMovement(target: (Int, Int), speed: Int, height: Int, f
 
   private val movement = new LinearMovement(target._1, target._2, target._1, target._2 - height, speed)
 
+  var dirtyRect: Option[Rectangle2D] = None
+
   override def start() {
     super.start()
     movement.start()
@@ -34,6 +37,7 @@ class ShowingNumberDrawerMovement(target: (Int, Int), speed: Int, height: Int, f
 
   override def update(time: Int) {
     super.update(time)
+    dirtyRect = Some(new Rectangle2D(movement.x + textLength / 2, movement.y, textLength, 30))
     movement.update(time)
   }
 

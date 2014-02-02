@@ -11,7 +11,6 @@ class SmoothMovement(val list: List[TerrainHexView], val soldier: SoldierView, f
 
   override def start() {
     super.start()
-    list.head.soldier = None
     updateSoldierCoords()
     soldier.state = MoveState
     soldier.sounds.get(MovementSound).foreach(_.play)
@@ -38,7 +37,6 @@ class SmoothMovement(val list: List[TerrainHexView], val soldier: SoldierView, f
       val last = list.last
       soldier.x = last.x
       soldier.y = last.y
-      last.soldier = Some(soldier)
     } else {
       updateSoldierCoords()
     }

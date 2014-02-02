@@ -6,6 +6,7 @@ import scalafx.scene.image.ImageView
 import scalafx.scene.paint.Color
 import scala.util.Try
 import mr.merc.log.Logging
+import scalafx.geometry.Rectangle2D
 
 object MImage {
   def apply(path: String, xOffset: Int, yOffset: Int, alpha: Float): MImage =
@@ -38,10 +39,15 @@ abstract class MImage private[image] (val xOffset: Int, val yOffset: Int, val al
     gc.restore()
   }
 
-  def drawCenteredImage(gc: GraphicsContext, x: Int, y: Int, width: Int, height: Int) {
+  def centeredRect(x: Double, y: Double, width: Double, height: Double): Rectangle2D = {
     val actualX = x + (width - this.width) / 2
     val actualY = y + (height - this.height) / 2
-    gc.drawImage(image, actualX, actualY)
+    new Rectangle2D(actualX, actualY, image.width.value, image.height.value)
+  }
+
+  def drawCenteredImage(gc: GraphicsContext, x: Int, y: Int, width: Int, height: Int) {
+    val rect = centeredRect(x, y, width, height)
+    gc.drawImage(image, rect.minX, rect.minY)
   }
 
   def changeSoldierColor(color: Color) = new LazyChangedColorMImage(color, this, xOffset, yOffset, alpha)

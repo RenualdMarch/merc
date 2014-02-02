@@ -30,6 +30,7 @@ import javax.imageio.ImageIO
 import java.io.File
 import java.util.UUID
 import mr.merc.map.objects.MapObject
+import scalafx.scene.effect.BlendMode
 
 object TerrainHexView {
   val Side = 72
@@ -106,7 +107,7 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
   val side = TerrainHexView.Side
   val x = findX
   val y = findY
-  var isDirty = true
+  var isInterfaceDirty = true
   var isDarkened = false
   private var currentDarkened = false
   private var _arrowStart: Option[Direction] = None
@@ -114,7 +115,7 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
   def arrowStart_=(as: Option[Direction]) {
     if (as != _arrowStart) {
       _arrowStart = as
-      isDirty = true
+      isInterfaceDirty = true
     }
   }
   private var _arrowEnd: Option[Direction] = None
@@ -122,7 +123,7 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
   def arrowEnd_=(ae: Option[Direction]) {
     if (ae != _arrowEnd) {
       _arrowEnd = ae
-      isDirty = true
+      isInterfaceDirty = true
     }
   }
 
@@ -131,18 +132,7 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
   def defence_=(d: Option[(SoldierDefence, Boolean)]) {
     if (_defence != d) {
       _defence = d
-      isDirty = true
-    }
-  }
-
-  private var _soldier: Option[SoldierView] = None
-  def soldier = _soldier
-  def soldier_=(s: Option[SoldierView]) {
-    if (_soldier != s) {
-      _soldier.foreach(_.hexView = None)
-      _soldier = s
-      _soldier.foreach(_.hexView = Some(this))
-      isDirty = true
+      isInterfaceDirty = true
     }
   }
 
@@ -213,26 +203,30 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
 
   }
 
-  def shouldBeRedrawn = isDirty || isDarkened != currentDarkened
+  def darkeningShouldBeRedrawn = isDarkened != currentDarkened
 
   def drawItself(gc: GraphicsContext, stage: HexDrawingStage) {
-    if (shouldBeRedrawn) {
-      stage match {
-        case TerrainImageStage =>
-          MImage(hexImage).drawCenteredImage(gc, x, y, TerrainHexView.Side, TerrainHexView.Side)
-        case MovementImpossibleStage =>
-          drawMovementImpossibleIfNeeded(gc)
-        case ArrowStage =>
-          drawArrowStartIfNeeded(gc)
-          drawArrowEndIfNeeded(gc)
-        case DefenceStage =>
-          drawDefenceIfNeeded(gc)
-        case HexGridStage =>
-          drawHexGrid(gc)
-        case EndDrawing =>
-          isDirty = false
-      }
+    stage match {
+      case TerrainImageStage =>
+        MImage(hexImage).drawCenteredImage(gc, x, y, TerrainHexView.Side, TerrainHexView.Side)
+      case MovementImpossibleStage =>
+        drawMovementImpossibleIfNeeded(gc)
+      case ArrowStage =>
+        drawArrowStartIfNeeded(gc)
+        drawArrowEndIfNeeded(gc)
+      case DefenceStage =>
+        drawDefenceIfNeeded(gc)
+      case HexGridStage =>
+        drawHexGrid(gc)
+      case EndInterfaceDrawing =>
+        isInterfaceDirty = false
+      case ClearStage =>
+        drawClearStage(gc)
     }
+  }
+
+  private def drawClearStage(gc: GraphicsContext) {
+    gc.clearRect(x, y, TerrainHexView.Side, TerrainHexView.Side)
   }
 
   private def drawMovementImpossibleIfNeeded(gc: GraphicsContext) {
@@ -281,9 +275,10 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
 }
 
 sealed trait HexDrawingStage
+case object ClearStage extends HexDrawingStage
 case object TerrainImageStage extends HexDrawingStage
 case object MovementImpossibleStage extends HexDrawingStage
 case object ArrowStage extends HexDrawingStage
 case object DefenceStage extends HexDrawingStage
 case object HexGridStage extends HexDrawingStage
-case object EndDrawing extends HexDrawingStage
+case object EndInterfaceDrawing extends HexDrawingStage

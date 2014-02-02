@@ -9,7 +9,7 @@ import scalafx.geometry.Orientation
 import scalafx.geometry.Rectangle2D
 
 // TODO handle case when CanvasLayer is resized - image shouldn't change position
-class CanvasLayer(layersCount: Int, fullMapSize: Rectangle2D, cleanRedraw: (Int, Rectangle2D, GraphicsContext) => Unit) extends Pane {
+class CanvasLayer(val layersCount: Int, fullMapSize: Rectangle2D, cleanRedraw: (Int, Rectangle2D, GraphicsContext) => Unit) extends Pane with ScrollPaneLike {
   val canvasArray = 0 until layersCount map (i => new Canvas()) toVector
   val horBar = new ScrollBar
   horBar.orientation.value = Orientation.HORIZONTAL
@@ -75,4 +75,7 @@ class CanvasLayer(layersCount: Int, fullMapSize: Rectangle2D, cleanRedraw: (Int,
     positionComponents()
     redraw()
   }
+
+  val vvalue = verBar.value
+  val hvalue = horBar.value
 }

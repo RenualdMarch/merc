@@ -64,8 +64,6 @@ class SoldierAttackMovement(val fromHex: TerrainHexView, val toHex: TerrainHexVi
     super.start()
     attacker.animationEnabled = false
     attacker.mirroringEnabled = false
-    fromHex.soldier = None
-    toHex.soldier = None
 
     if (dir == SE || dir == NE) {
       attacker.rightDirection = true
@@ -113,8 +111,6 @@ class SoldierAttackMovement(val fromHex: TerrainHexView, val toHex: TerrainHexVi
     attacker.animationEnabled = true
     attacker.mirroringEnabled = true
     attacker.state = StandState
-    fromHex.soldier = Some(attacker)
-    toHex.soldier = Some(defender)
   }
 
   private def handleMoveToEnemy(time: Int) {

@@ -13,8 +13,9 @@ import mr.merc.map.view.MapView
 import scalafx.beans.binding.Bindings._
 import javafx.scene.{ input => jfxin }
 import mr.merc.ui.common.ConversionUtils._
+import mr.merc.ui.common.ScrollPaneLike
 
-class Minimap(field: TerrainHexField, pane: ScrollPane) extends VBox {
+class Minimap(field: TerrainHexField, pane: ScrollPaneLike) extends VBox {
   private val canvas = new Canvas()
   content = canvas
   private val mapView = new MapView(field)

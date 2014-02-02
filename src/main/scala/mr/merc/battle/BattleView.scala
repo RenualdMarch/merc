@@ -35,8 +35,12 @@ class BattleView(model: BattleModel, soldierDrawer: SoldiersDrawer = new Soldier
     mapView.update(time)
   }
 
-  def drawItself(gc: GraphicsContext, viewPort: Rectangle2D) {
-    mapView.drawItself(gc, viewPort)
+  def drawItself(layer: Int, viewPort: Rectangle2D, gc: GraphicsContext) {
+    mapView.drawFromScratch(layer, gc, viewPort)
+  }
+
+  def drawChanges(layer: Int, gc: GraphicsContext, viewPort: Rectangle2D) {
+    mapView.drawChanges(layer, gc, viewPort)
   }
 
   def hexByPixel(x: Int, y: Int) = mapView.hexByPixel(x, y)

@@ -6,6 +6,8 @@ import scalafx.scene.canvas.GraphicsContext
 import scala.collection.mutable.Queue
 import mr.merc.map.hex.view.TerrainHexView
 import mr.merc.log.Logging
+import scalafx.geometry.Rectangle2D
+import mr.merc.view.Drawable
 
 class SoldiersDrawer extends Logging {
   private var _soldiers = Set[SoldierView]()
@@ -78,11 +80,25 @@ class SoldiersDrawer extends Logging {
     }
   }
 
-  def drawDrawablesInMovements(gc: GraphicsContext) {
-    drawablesInMovements foreach (_.drawItself(gc))
-  }
+  def drawSoldiers(gc: GraphicsContext, viewRect: Rectangle2D) {
+    val visibleSoldiers = soldiers.filter(_.viewRect.intersects(viewRect))
+    val dirtySoldiers = visibleSoldiers.filter(_.dirtyRect.isDefined)
+    val dirtyDrawables = drawablesInMovements.filter(_.dirtyRect.isDefined)
+    val soldiersNotTakingPartInMovements = dirtySoldiers --
+      dirtyDrawables.collect { case x: SoldierView => x }
 
-  def drawSoldiers(gc: GraphicsContext, hexes: List[TerrainHexView]) {
-    hexes.flatMap(_.soldier).foreach(_.drawItself(gc))
+    val drawablesToRedraw: List[Drawable] = soldiersNotTakingPartInMovements.toList ::: dirtyDrawables
+
+    drawablesToRedraw.foreach {
+      case d =>
+        val rect = d.dirtyRect.get
+        gc.clearRect(rect.minX, rect.minY, rect.width, rect.height)
+        d.dirtyRect = None
+    }
+
+    drawablesToRedraw.foreach {
+      case d =>
+        d.drawItself(gc)
+    }
   }
 }

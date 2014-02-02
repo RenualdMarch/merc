@@ -7,6 +7,7 @@ import mr.merc.view.Sprite
 import mr.merc.view.SpriteState
 import scalafx.scene.canvas.GraphicsContext
 import mr.merc.sound.Sound
+import mr.merc.map.hex.view.TerrainHexView
 
 class ProjectileView(start: Option[List[MImage]], move: Option[List[MImage]], end: Option[List[MImage]],
   from: (Int, Int), to: (Int, Int), speed: Int, sounds: Map[ProjectileSoundState, Sound]) extends Sprite[ProjectileState](
@@ -20,6 +21,7 @@ class ProjectileView(start: Option[List[MImage]], move: Option[List[MImage]], en
   movement.start()
   x = from._1
   y = from._2
+  centered = Some(TerrainHexView.Side)
 
   override def state_=(st: ProjectileState) {
     super.state = st
@@ -71,10 +73,6 @@ class ProjectileView(start: Option[List[MImage]], move: Option[List[MImage]], en
     }
 
     result
-  }
-
-  override def drawItself(gc: GraphicsContext) {
-    imageToDraw.drawCenteredImage(gc, x, y, 72, 72)
   }
 }
 

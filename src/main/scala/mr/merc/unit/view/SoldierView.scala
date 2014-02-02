@@ -23,6 +23,7 @@ import scalafx.scene.shape.Ellipse
 import mr.merc.unit._
 import mr.merc.map.hex.view.TerrainHexFieldView
 import mr.merc.map.hex._
+import scalafx.geometry.Rectangle2D
 
 object SoldierView {
   private[view] val attackDistancePercentage = 0.6
@@ -56,8 +57,6 @@ class SoldierView(val soldier: Soldier) extends Sprite[SoldierViewState](Soldier
   val healthBar = new VerticalBarView(healthBarWidth, healthBarHeight, Color.WHITE, Color.RED, hpPercent)
   val xpBar = new VerticalBarView(xpBarWidth, xpBarHeight, Color.WHITE, Color.WHITE, xpPercent)
 
-  var hexView: Option[TerrainHexView] = None
-
   def hpPercent = soldier.hp.toDouble / soldier.soldierType.hp
   def xpPercent = soldier.exp.toDouble / soldier.soldierType.exp
 
@@ -83,7 +82,7 @@ class SoldierView(val soldier: Soldier) extends Sprite[SoldierViewState](Soldier
 
     if (result > 0) {
       // TODO optimize it in case of 1-frame 
-      markHexAsDirty()
+      markAsDirty()
     }
 
     if (result > 0 && index == 0) {
@@ -94,15 +93,6 @@ class SoldierView(val soldier: Soldier) extends Sprite[SoldierViewState](Soldier
       }
     }
     result
-  }
-
-  override def state_=(st: SoldierViewState) {
-    super.state = st
-    markHexAsDirty()
-  }
-
-  def markHexAsDirty() {
-    hexView.foreach(_.isDirty = true)
   }
 
   def lookAtDirection(direction: Direction) {
@@ -146,7 +136,7 @@ class SoldierView(val soldier: Soldier) extends Sprite[SoldierViewState](Soldier
   def refreshBars() {
     healthBar.fillPercentage = hpPercent
     xpBar.fillPercentage = xpPercent
-    markHexAsDirty()
+    markAsDirty()
   }
 }
 

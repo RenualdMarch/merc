@@ -36,57 +36,6 @@ class SoldierDrawerTest extends FunSuite with MockitoSugar with BeforeAndAfter {
     verify(soldier3, times(1)).updateTime(50)
   }
 
-  test("movement with one soldier") {
-    val soldiersDrawer = new SoldiersDrawer
-    addSoldiers(soldiersDrawer)
-
-    val move = new ExampleMovement(List(soldier2))
-    soldiersDrawer.addMovement(move)
-
-    assert(soldiersDrawer.movements === List(move))
-    soldiersDrawer.drawDrawablesInMovements(gc)
-    soldiersDrawer.update(50)
-    assert(soldiersDrawer.movements === List(move))
-
-    soldiersDrawer.update(50)
-    assert(soldiersDrawer.movements === Nil)
-    soldiersDrawer.drawDrawablesInMovements(gc)
-    verify(soldier2, times(1)).drawItself(gc)
-    verify(soldier1, never()).drawItself(gc)
-    verify(soldier3, never()).drawItself(gc)
-  }
-
-  test("movement with two soldiers") {
-    val soldiersDrawer = new SoldiersDrawer
-    addSoldiers(soldiersDrawer)
-
-    val move = new ExampleMovement(List(soldier1, soldier2))
-    soldiersDrawer.addMovement(move)
-    soldiersDrawer.drawDrawablesInMovements(gc)
-    val inOrder = org.mockito.Mockito.inOrder(soldier1, soldier2);
-    inOrder.verify(soldier1).drawItself(gc)
-    inOrder.verify(soldier2).drawItself(gc)
-    verify(soldier3, never()).drawItself(gc)
-  }
-
-  test("two separate movements with 1 soldier each") {
-    val soldiersDrawer = new SoldiersDrawer
-    addSoldiers(soldiersDrawer)
-
-    val move1 = new ExampleMovement(List(soldier1, soldier2))
-    val move2 = new ExampleMovement(List(soldier3))
-    soldiersDrawer.addMovement(move1)
-    soldiersDrawer.addMovement(move2)
-
-    assert(soldiersDrawer.movements.toList === List(move1, move2))
-
-    soldiersDrawer.drawDrawablesInMovements(gc)
-    val inOrder = org.mockito.Mockito.inOrder(soldier1, soldier2, soldier3);
-    inOrder.verify(soldier1).drawItself(gc)
-    inOrder.verify(soldier2).drawItself(gc)
-    verify(soldier3, never()).drawItself(gc)
-  }
-
   test("dirty hexes are saved when movement is over") {
     val hexField = new TerrainHexField(5, 5, TerrainHex.grassInit)
     val hexFieldView = new TerrainHexFieldView(hexField)

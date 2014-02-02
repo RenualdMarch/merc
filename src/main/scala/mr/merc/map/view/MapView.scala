@@ -34,7 +34,6 @@ class MapView(field: TerrainHexField, val soldiersDrawer: SoldiersDrawer = new S
           val view = new SoldierView(soldier)
           view.x = h.x
           view.y = h.y
-          h.soldier = Some(view)
           Some(view)
         }
         case None => None
@@ -49,9 +48,12 @@ class MapView(field: TerrainHexField, val soldiersDrawer: SoldiersDrawer = new S
     soldiersDrawer.update(time)
   }
 
-  def drawItself(gc: GraphicsContext, viewPort: Rectangle2D) {
-    soldiersDrawer.dirtyHexesInMovements.foreach(_.isDirty = true)
-    terrainView.drawItself(gc, viewPort, soldiersDrawer)
+  def drawChanges(layer: Int, gc: GraphicsContext, viewPort: Rectangle2D) {
+    terrainView.drawChanges(layer, gc, viewPort, soldiersDrawer)
+  }
+
+  def drawFromScratch(layer: Int, gc: GraphicsContext, viewPort: Rectangle2D) {
+    terrainView.drawFromScratch(layer, gc, viewPort, soldiersDrawer)
   }
 
   def addMovement(movement: Movement) {
