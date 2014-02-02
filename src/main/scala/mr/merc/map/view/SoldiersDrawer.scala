@@ -13,13 +13,16 @@ class SoldiersDrawer extends Logging {
   private var _soldiers = Set[SoldierView]()
   private val _movements = Queue[Movement]()
   private def currentMovement = _movements.headOption
+  private val rectIntersectionHelper = new RectIntersectionHelper[SoldierView]
 
   def addSoldier(s: SoldierView) {
     _soldiers += s
+    rectIntersectionHelper.addRect(s, s.viewRect)
   }
 
   def removeSoldier(s: SoldierView) {
     _soldiers = soldiers filterNot (_ == s)
+    rectIntersectionHelper.removeRect(s)
   }
 
   def addMovement(movement: Movement) {
@@ -75,25 +78,45 @@ class SoldiersDrawer extends Logging {
     }
   }
 
+  private def calculateTouchedSoldiers(dirtySoldiers: Set[SoldierView]): Set[SoldierView] = {
+    var alreadyTouched = Set[SoldierView]()
+    var touchedLastTime = Set[SoldierView]()
+
+    touchedLastTime ++= dirtySoldiers
+
+    do {
+      val touchedThisIteration = touchedLastTime.flatMap(rectIntersectionHelper.intersections)
+      alreadyTouched ++= touchedLastTime
+      touchedLastTime = touchedThisIteration -- alreadyTouched
+    } while (touchedLastTime.nonEmpty)
+
+    alreadyTouched -- dirtySoldiers
+  }
+
   def drawSoldiers(gc: GraphicsContext, viewRect: Rectangle2D) {
     val visibleSoldiers = soldiers.filter(_.viewRect.intersects(viewRect))
     val dirtySoldiers = visibleSoldiers.filter(_.dirtyRect.isDefined)
     val dirtyDrawables = drawablesInMovements.filter(_.dirtyRect.isDefined)
-    val soldiersNotTakingPartInMovements = dirtySoldiers --
-      dirtyDrawables.collect { case x: SoldierView => x }
+    val soldiersDrawables = dirtyDrawables.collect { case x: SoldierView => x }
+    val allDirtySoldiers = dirtySoldiers ++ soldiersDrawables
 
-    val drawablesToRedraw: List[Drawable] = soldiersNotTakingPartInMovements.toList ::: dirtyDrawables
+    allDirtySoldiers foreach { ds =>
+      rectIntersectionHelper.addRect(ds, ds.viewRect)
+    }
+    val touchedSoldiers = calculateTouchedSoldiers(allDirtySoldiers)
+    touchedSoldiers foreach (t => t.dirtyRect = Some(t.viewRect))
+    val dirtySoldiersNotTakingPartInMovements = dirtySoldiers -- soldiersDrawables
+    val dirtyAndTouched = (dirtySoldiersNotTakingPartInMovements ++ touchedSoldiers).toList.sortBy(_.y)
+    val drawablesToRedraw: List[Drawable] = dirtyAndTouched ::: dirtyDrawables
 
-    drawablesToRedraw.foreach {
-      case d =>
-        val rect = d.dirtyRect.get
-        gc.clearRect(rect.minX, rect.minY, rect.width, rect.height)
-        d.dirtyRect = None
+    drawablesToRedraw.foreach { d =>
+      val rect = d.dirtyRect.get
+      gc.clearRect(rect.minX, rect.minY, rect.width, rect.height)
+      d.dirtyRect = None
     }
 
-    drawablesToRedraw.foreach {
-      case d =>
-        d.drawItself(gc)
+    drawablesToRedraw.foreach { d =>
+      d.drawItself(gc)
     }
   }
 }
