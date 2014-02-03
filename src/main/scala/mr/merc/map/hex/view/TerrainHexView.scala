@@ -182,8 +182,11 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
     neigMapObj.flatMap(p => p.mapObj.get.images(hex, field)).toList
   }
 
-  def drawTerrainImage(gc: GraphicsContext) {
+  def drawTerrainImage(gc: GraphicsContext)(implicit offset: (Int, Int)) {
     val side = TerrainHexView.Side
+    val x = this.x + offset._1
+    val y = this.y + offset._2
+
     image.drawCenteredImage(gc, x, y, side, side)
     elements foreach (_.drawItself(gc, x, y))
     neighbourMapObjects foreach (_.drawImage(gc, x, y))
@@ -193,7 +196,8 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
 
   def darkeningShouldBeRedrawn = isDarkened != currentDarkened
 
-  def drawItself(gc: GraphicsContext, stage: HexDrawingStage) {
+  def drawItself(gc: GraphicsContext, stage: HexDrawingStage, xOffset: Int, yOffset: Int) {
+    implicit val offset = (xOffset, yOffset)
     stage match {
       case TerrainImageStage =>
         drawTerrainImage(gc)
@@ -217,45 +221,37 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
     gc.clearRect(x, y, TerrainHexView.Side, TerrainHexView.Side)
   }
 
-  private def drawMovementImpossibleIfNeeded(gc: GraphicsContext) {
+  private def drawMovementImpossibleIfNeeded(gc: GraphicsContext)(implicit offset: (Int, Int)) {
     if (isDarkened && !arrowEnd.isDefined) {
-      gc.drawImage(TerrainHexView.movementImpossibleImage, x, y)
+      gc.drawImage(TerrainHexView.movementImpossibleImage, x + offset._1, y + offset._2)
     }
     currentDarkened = isDarkened
   }
 
-  private def drawArrowStartIfNeeded(gc: GraphicsContext) {
+  private def drawArrowStartIfNeeded(gc: GraphicsContext)(implicit offset: (Int, Int)) {
     arrowStart foreach { dir =>
       val path = arrowPath + "attack-indicator-src-" + dir.toString.toLowerCase() + ".png"
-      MImage(path).drawImage(gc, x, y)
+      MImage(path).drawImage(gc, x + offset._1, y + offset._2)
     }
   }
 
-  private def drawArrowEndIfNeeded(gc: GraphicsContext) {
+  private def drawArrowEndIfNeeded(gc: GraphicsContext)(implicit offset: (Int, Int)) {
     arrowEnd foreach { dir =>
       val path = arrowPath + "attack-indicator-dst-" + dir.toString.toLowerCase() + ".png"
-      MImage(path).drawImage(gc, x, y)
+      MImage(path).drawImage(gc, x + offset._1, y + offset._2)
     }
   }
 
-  private def drawDefenceIfNeeded(gc: GraphicsContext) {
+  private def drawDefenceIfNeeded(gc: GraphicsContext)(implicit offset: (Int, Int)) {
     defence foreach {
       case (d, drawPolygon) =>
         val image = TerrainHexView.defenceImages(d.defence, drawPolygon)
-        gc.drawImage(image, x, y)
+        gc.drawImage(image, x + offset._1, y + offset._2)
     }
   }
 
-  private def buildKey: (TerrainType, Option[MapObject], Map[Direction, TerrainType], Map[Direction, MapObject]) = {
-    val neigTypes = fieldView.neighboursWithDirections(this).mapValues(_.hex.terrain).view.force
-    val neigObjects = fieldView.neighboursWithDirections(this).
-      mapValues(_.hex.mapObj).filterNot(_._2.isEmpty).mapValues(_.get).view.force
-
-    (hex.terrain, hex.mapObj, neigTypes, neigObjects)
-  }
-
-  private def drawHexGrid(gc: GraphicsContext) {
-    gc.drawImage(TerrainHexView.hexGridImage, x, y)
+  private def drawHexGrid(gc: GraphicsContext)(implicit offset: (Int, Int)) {
+    gc.drawImage(TerrainHexView.hexGridImage, x + offset._1, y + offset._2)
   }
 
   def center = (x + side / 2, y + side / 2)

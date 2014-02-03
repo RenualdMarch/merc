@@ -43,25 +43,25 @@ class ShowingNumberDrawerMovement(target: (Int, Int), speed: Int, height: Int, f
 
   def isOver = movement.coveredPart == 1
 
-  def drawItself(gc: GraphicsContext) {
+  def drawItself(gc: GraphicsContext, xOffset: Int, yOffset: Int) {
     if (movement.coveredPart > fadingStart) {
       gc.save()
       val fadingPart = 1 - fadingStart
       val fadingAlready = movement.coveredPart - fadingStart
       val alpha = 1 - fadingAlready / fadingPart
       gc.globalAlpha = alpha
-      drawText(gc)
+      drawText(gc, xOffset, yOffset)
       gc.restore
     } else {
-      drawText(gc)
+      drawText(gc, xOffset, yOffset)
     }
   }
 
-  def drawText(gc: GraphicsContext) {
+  def drawText(gc: GraphicsContext, xOffset: Int, yOffset: Int) {
     gc.save()
     gc.font = Font.font(Font.default.getFamily, FontWeight.BOLD, 20)
     gc.fill = color
-    gc.fillText(text, movement.x + textLength / 2, movement.y, textLength)
+    gc.fillText(text, movement.x + textLength / 2 + xOffset, movement.y + yOffset, textLength)
     gc.restore()
   }
 }

@@ -115,14 +115,14 @@ class TerrainHexFieldView(field: TerrainHexField) {
     if (layer == interfaceLayer) {
       val dirty = visibleHexes.filter(_.isInterfaceDirty)
       List(ClearStage, ArrowStage, DefenceStage, EndInterfaceDrawing).foreach { stage =>
-        dirty foreach (_.drawItself(gc, stage))
+        dirty foreach (_.drawItself(gc, stage, -viewPort.minX.toInt, -viewPort.minY.toInt))
       }
     } else if (layer == soldierLayer) {
       soldiersDrawer.drawSoldiers(gc, viewPort)
     } else if (layer == darkeningLayer) {
       val hexes = visibleHexes.filter(_.darkeningShouldBeRedrawn)
       List(ClearStage, MovementImpossibleStage).foreach { stage =>
-        hexes foreach (_.drawItself(gc, stage))
+        hexes foreach (_.drawItself(gc, stage, -viewPort.minX.toInt, -viewPort.minY.toInt))
       }
     }
   }
@@ -132,17 +132,17 @@ class TerrainHexFieldView(field: TerrainHexField) {
 
     if (layer == interfaceLayer) {
       List(ClearStage, ArrowStage, DefenceStage, EndInterfaceDrawing).foreach { stage =>
-        visibleHexes foreach (_.drawItself(gc, stage))
+        visibleHexes foreach (_.drawItself(gc, stage, -viewPort.minX.toInt, -viewPort.minY.toInt))
       }
     } else if (layer == terrainLayer) {
-      List(TerrainImageStage).foreach { stage =>
-        visibleHexes foreach (_.drawItself(gc, stage))
+      List(TerrainImageStage, HexGridStage).foreach { stage =>
+        visibleHexes foreach (_.drawItself(gc, stage, -viewPort.minX.toInt, -viewPort.minY.toInt))
       }
     } else if (layer == soldierLayer) {
       soldiersDrawer.drawSoldiers(gc, viewPort)
     } else if (layer == darkeningLayer) {
       List(ClearStage, MovementImpossibleStage).foreach { stage =>
-        visibleHexes foreach (_.drawItself(gc, stage))
+        visibleHexes foreach (_.drawItself(gc, stage, -viewPort.minX.toInt, -viewPort.minY.toInt))
       }
     }
   }

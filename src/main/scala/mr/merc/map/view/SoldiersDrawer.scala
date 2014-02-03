@@ -116,7 +116,7 @@ class SoldiersDrawer extends Logging {
     }
 
     drawablesToRedraw.foreach { d =>
-      d.drawItself(gc)
+      d.drawItself(gc, -viewRect.minX.toInt, -viewRect.minY.toInt)
     }
   }
 }

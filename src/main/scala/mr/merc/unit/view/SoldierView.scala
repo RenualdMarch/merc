@@ -60,19 +60,19 @@ class SoldierView(val soldier: Soldier) extends Sprite[SoldierViewState](Soldier
   def hpPercent = soldier.hp.toDouble / soldier.soldierType.hp
   def xpPercent = soldier.exp.toDouble / soldier.soldierType.exp
 
-  override def drawItself(gc: GraphicsContext) {
+  override def drawItself(gc: GraphicsContext, xOffset: Int, yOffset: Int) {
     if (state != DeathState && state != NoState && !state.isInstanceOf[SoldierViewAttackState]) {
-      drawOvalUnderSoldier(gc)
+      drawOvalUnderSoldier(gc, xOffset: Int, yOffset: Int)
     }
 
     if (state != DeathState && state != NoState) {
-      drawAttackStatusCircleNearSoldier(gc)
+      drawAttackStatusCircleNearSoldier(gc, xOffset, yOffset)
     }
 
-    super.drawItself(gc)
+    super.drawItself(gc, xOffset, yOffset)
 
     if (state != DeathState && state != NoState) {
-      healthBar.draw(x + 12, y + 15, gc)
+      healthBar.draw(x + xOffset + 12, y + yOffset + 15, gc)
       //xpBar.draw(x + 6, y + TerrainHexView.Side - xpBarHeight, gc)
     }
   }
@@ -103,18 +103,18 @@ class SoldierView(val soldier: Soldier) extends Sprite[SoldierViewState](Soldier
     }
   }
 
-  private def drawOvalUnderSoldier(gc: GraphicsContext) {
+  private def drawOvalUnderSoldier(gc: GraphicsContext, xOffset: Int, yOffset: Int) {
     gc.save()
     gc.fill = soldier.owner.color
     gc.globalAlpha = 0.2
-    gc.fillOval(x + 12, y + 44, 48, 24)
+    gc.fillOval(x + xOffset + 12, y + yOffset + 44, 48, 24)
     gc.globalAlpha = 1
     gc.stroke = soldier.owner.color
-    gc.strokeOval(x + 12, y + 44, 48, 24)
+    gc.strokeOval(x + xOffset + 12, y + yOffset + 44, 48, 24)
     gc.restore()
   }
 
-  private def drawAttackStatusCircleNearSoldier(gc: GraphicsContext) {
+  private def drawAttackStatusCircleNearSoldier(gc: GraphicsContext, xOffset: Int, yOffset: Int) {
     gc.save()
     val color = soldier.turnState match {
       case NotHisTurn => Color.GRAY
@@ -124,7 +124,7 @@ class SoldierView(val soldier: Soldier) extends Sprite[SoldierViewState](Soldier
     }
 
     gc.fill = color
-    gc.fillOval(x + 18, y, 8, 8)
+    gc.fillOval(x + xOffset + 18, y + yOffset, 8, 8)
     gc.restore()
   }
 

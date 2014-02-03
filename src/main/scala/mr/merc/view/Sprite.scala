@@ -94,10 +94,10 @@ class Sprite[T <: SpriteState](val images: Map[T, List[MImage]], private var _st
   private def currentImage = images(state)(index)
 
   var centered: Option[Int] = None
-  def drawItself(gc: GraphicsContext) {
+  def drawItself(gc: GraphicsContext, xOffset: Int, yOffset: Int) {
     centered match {
-      case Some(side) => imageToDraw.drawCenteredImage(gc, x, y, side, side)
-      case None => imageToDraw.drawImage(gc, x, y)
+      case Some(side) => imageToDraw.drawCenteredImage(gc, x + xOffset, y + yOffset, side, side)
+      case None => imageToDraw.drawImage(gc, x + xOffset, y + yOffset)
     }
   }
 

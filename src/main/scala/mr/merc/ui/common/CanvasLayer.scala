@@ -84,5 +84,11 @@ class CanvasLayer(val layersCount: Int, fullMapSize: Rectangle2D, cleanRedraw: (
   }
 
   val vvalue = verBar.value
+  vvalue.onChange {
+    redraw()
+  }
   val hvalue = horBar.value
+  hvalue.onChange {
+    redraw()
+  }
 }
