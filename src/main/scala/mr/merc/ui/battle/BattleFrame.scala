@@ -119,7 +119,7 @@ class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleCont
   private def canvasMouseClicked(event: jfxin.MouseEvent) {
     val x = event.getX().toInt
     val y = event.getY().toInt
-    controller.moveMouse(x, y)
+    controller.moveMouse(x, y, battleCanvas.viewRect)
     if (event.getButton() == jfxin.MouseButton.PRIMARY) {
       controller.leftClickMouse()
     } else if (event.getButton() == jfxin.MouseButton.SECONDARY) {
@@ -141,7 +141,7 @@ class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleCont
   battleCanvas.onMouseMoved = { event: jfxin.MouseEvent =>
     val x = event.getX().toInt
     val y = event.getY().toInt
-    controller.moveMouse(x, y)
+    controller.moveMouse(x, y, battleCanvas.viewRect)
   }
 
   endTurnButton.onAction = { e: ActionEvent => controller.endTurnButton() }

@@ -13,10 +13,12 @@ import mr.merc.unit.Impact
 import mr.merc.unit.Soldier
 import mr.merc.map.hex.view.TerrainHexFieldView
 import scalafx.beans.property.BooleanProperty
+import scalafx.geometry.Rectangle2D
 
 class BattleControllerTest extends FunSuite with BeforeAndAfter {
   var controller: BattleController = _
   val fieldView = new TerrainHexFieldView(new TerrainHexField(10, 10, (x, y) => new TerrainHex(x, y, Grass)))
+  val viewRect = new Rectangle2D(0, 0, 100, 100)
 
   before {
     val hexField = new TerrainHexField(10, 10, (x, y) => new TerrainHex(x, y, Grass))
@@ -46,7 +48,12 @@ class BattleControllerTest extends FunSuite with BeforeAndAfter {
     }
   }
 
-  def moveMouse(hexX: Int, hexY: Int) = controller.moveMouse _ tupled fieldView.hex(hexX, hexY).center
+  def moveMouse(hexX: Int, hexY: Int) = {
+    val center = fieldView.hex(hexX, hexY).center
+    val x = center._1
+    val y = center._2
+    controller.moveMouse(x, y, viewRect)
+  }
   def rightClick(hexX: Int, hexY: Int) = {
     moveMouse(hexX, hexY)
     controller.rightClickMouse()

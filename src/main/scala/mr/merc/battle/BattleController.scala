@@ -41,9 +41,9 @@ class BattleController(gameField: GameField, parent: BattleControllerParent) ext
   private[battle] var movementOptionsAreShown = false
   private[battle] val visitedHexesList = new VisitedHexesList()
 
-  def moveMouse(x: Int, y: Int) {
+  def moveMouse(x: Int, y: Int, viewRect: Rectangle2D) {
     debug(s"Mouse moved to ($x, $y)")
-    val hexOpt = battleView.hexByPixel(x, y)
+    val hexOpt = battleView.hexByPixel(x, y, viewRect)
     hexOpt match {
       case Some(hexView) => {
         visitedHexesList.visitHex(hexView.hex)

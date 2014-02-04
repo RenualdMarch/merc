@@ -117,12 +117,17 @@ class TerrainHexFieldView(field: TerrainHexField) {
       List(ClearStage, ArrowStage, DefenceStage, EndInterfaceDrawing).foreach { stage =>
         dirty foreach (_.drawItself(gc, stage, -viewPort.minX.toInt, -viewPort.minY.toInt))
       }
+
     } else if (layer == soldierLayer) {
       soldiersDrawer.drawSoldiers(gc, viewPort)
     } else if (layer == darkeningLayer) {
-      val hexes = visibleHexes.filter(_.darkeningShouldBeRedrawn)
+      val set = if (visibleHexes.exists(_.darkeningShouldBeRedrawn)) {
+        visibleHexes
+      } else {
+        Nil
+      }
       List(ClearStage, MovementImpossibleStage).foreach { stage =>
-        hexes foreach (_.drawItself(gc, stage, -viewPort.minX.toInt, -viewPort.minY.toInt))
+        set foreach (_.drawItself(gc, stage, -viewPort.minX.toInt, -viewPort.minY.toInt))
       }
     }
   }
@@ -139,7 +144,7 @@ class TerrainHexFieldView(field: TerrainHexField) {
         visibleHexes foreach (_.drawItself(gc, stage, -viewPort.minX.toInt, -viewPort.minY.toInt))
       }
     } else if (layer == soldierLayer) {
-      soldiersDrawer.drawSoldiers(gc, viewPort)
+      soldiersDrawer.drawSoldiersFromScratch(gc, viewPort)
     } else if (layer == darkeningLayer) {
       List(ClearStage, MovementImpossibleStage).foreach { stage =>
         visibleHexes foreach (_.drawItself(gc, stage, -viewPort.minX.toInt, -viewPort.minY.toInt))

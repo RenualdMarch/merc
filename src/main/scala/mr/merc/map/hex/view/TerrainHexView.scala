@@ -182,10 +182,10 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
     neigMapObj.flatMap(p => p.mapObj.get.images(hex, field)).toList
   }
 
-  def drawTerrainImage(gc: GraphicsContext)(implicit offset: (Int, Int)) {
+  def drawTerrainImage(gc: GraphicsContext, xOffset: Int, yOffset: Int) {
     val side = TerrainHexView.Side
-    val x = this.x + offset._1
-    val y = this.y + offset._2
+    val x = this.x + xOffset
+    val y = this.y + yOffset
 
     image.drawCenteredImage(gc, x, y, side, side)
     elements foreach (_.drawItself(gc, x, y))
@@ -197,61 +197,60 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
   def darkeningShouldBeRedrawn = isDarkened != currentDarkened
 
   def drawItself(gc: GraphicsContext, stage: HexDrawingStage, xOffset: Int, yOffset: Int) {
-    implicit val offset = (xOffset, yOffset)
     stage match {
       case TerrainImageStage =>
-        drawTerrainImage(gc)
+        drawTerrainImage(gc, xOffset, yOffset)
       case MovementImpossibleStage =>
-        drawMovementImpossibleIfNeeded(gc)
+        drawMovementImpossibleIfNeeded(gc, xOffset, yOffset)
       case ArrowStage =>
-        drawArrowStartIfNeeded(gc)
-        drawArrowEndIfNeeded(gc)
+        drawArrowStartIfNeeded(gc, xOffset, yOffset)
+        drawArrowEndIfNeeded(gc, xOffset, yOffset)
       case DefenceStage =>
-        drawDefenceIfNeeded(gc)
+        drawDefenceIfNeeded(gc, xOffset, yOffset)
       case HexGridStage =>
-        drawHexGrid(gc)
+        drawHexGrid(gc, xOffset, yOffset)
       case EndInterfaceDrawing =>
         isInterfaceDirty = false
       case ClearStage =>
-        drawClearStage(gc)
+        drawClearStage(gc, xOffset, yOffset)
     }
   }
 
-  private def drawClearStage(gc: GraphicsContext) {
-    gc.clearRect(x, y, TerrainHexView.Side, TerrainHexView.Side)
+  private def drawClearStage(gc: GraphicsContext, xOffset: Int, yOffset: Int) {
+    gc.clearRect(x + xOffset, y + yOffset, TerrainHexView.Side, TerrainHexView.Side)
   }
 
-  private def drawMovementImpossibleIfNeeded(gc: GraphicsContext)(implicit offset: (Int, Int)) {
+  private def drawMovementImpossibleIfNeeded(gc: GraphicsContext, xOffset: Int, yOffset: Int) {
     if (isDarkened && !arrowEnd.isDefined) {
-      gc.drawImage(TerrainHexView.movementImpossibleImage, x + offset._1, y + offset._2)
+      gc.drawImage(TerrainHexView.movementImpossibleImage, x + xOffset, y + yOffset)
     }
     currentDarkened = isDarkened
   }
 
-  private def drawArrowStartIfNeeded(gc: GraphicsContext)(implicit offset: (Int, Int)) {
+  private def drawArrowStartIfNeeded(gc: GraphicsContext, xOffset: Int, yOffset: Int) {
     arrowStart foreach { dir =>
       val path = arrowPath + "attack-indicator-src-" + dir.toString.toLowerCase() + ".png"
-      MImage(path).drawImage(gc, x + offset._1, y + offset._2)
+      MImage(path).drawImage(gc, x + xOffset, y + yOffset)
     }
   }
 
-  private def drawArrowEndIfNeeded(gc: GraphicsContext)(implicit offset: (Int, Int)) {
+  private def drawArrowEndIfNeeded(gc: GraphicsContext, xOffset: Int, yOffset: Int) {
     arrowEnd foreach { dir =>
       val path = arrowPath + "attack-indicator-dst-" + dir.toString.toLowerCase() + ".png"
-      MImage(path).drawImage(gc, x + offset._1, y + offset._2)
+      MImage(path).drawImage(gc, x + xOffset, y + yOffset)
     }
   }
 
-  private def drawDefenceIfNeeded(gc: GraphicsContext)(implicit offset: (Int, Int)) {
+  private def drawDefenceIfNeeded(gc: GraphicsContext, xOffset: Int, yOffset: Int) {
     defence foreach {
       case (d, drawPolygon) =>
         val image = TerrainHexView.defenceImages(d.defence, drawPolygon)
-        gc.drawImage(image, x + offset._1, y + offset._2)
+        gc.drawImage(image, x + xOffset, y + yOffset)
     }
   }
 
-  private def drawHexGrid(gc: GraphicsContext)(implicit offset: (Int, Int)) {
-    gc.drawImage(TerrainHexView.hexGridImage, x + offset._1, y + offset._2)
+  private def drawHexGrid(gc: GraphicsContext, xOffset: Int, yOffset: Int) {
+    gc.drawImage(TerrainHexView.hexGridImage, x + xOffset, y + yOffset)
   }
 
   def center = (x + side / 2, y + side / 2)

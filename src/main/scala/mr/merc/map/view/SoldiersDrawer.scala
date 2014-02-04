@@ -93,6 +93,11 @@ class SoldiersDrawer extends Logging {
     alreadyTouched -- dirtySoldiers
   }
 
+  def drawSoldiersFromScratch(gc: GraphicsContext, viewRect: Rectangle2D) {
+    soldiers.foreach(s => s.dirtyRect = Some(s.viewRect))
+    drawSoldiers(gc, viewRect)
+  }
+
   def drawSoldiers(gc: GraphicsContext, viewRect: Rectangle2D) {
     val visibleSoldiers = soldiers.filter(_.viewRect.intersects(viewRect))
     val dirtySoldiers = visibleSoldiers.filter(_.dirtyRect.isDefined)
@@ -111,7 +116,7 @@ class SoldiersDrawer extends Logging {
 
     drawablesToRedraw.foreach { d =>
       val rect = d.dirtyRect.get
-      gc.clearRect(rect.minX, rect.minY, rect.width, rect.height)
+      gc.clearRect(rect.minX - viewRect.minX, rect.minY - viewRect.minY, rect.width, rect.height)
       d.dirtyRect = None
     }
 

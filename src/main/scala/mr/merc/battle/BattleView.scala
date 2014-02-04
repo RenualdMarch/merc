@@ -43,7 +43,7 @@ class BattleView(model: BattleModel, soldierDrawer: SoldiersDrawer = new Soldier
     mapView.drawChanges(layer, gc, viewPort)
   }
 
-  def hexByPixel(x: Int, y: Int) = mapView.hexByPixel(x, y)
+  def hexByPixel(x: Int, y: Int, viewport: Rectangle2D) = mapView.hexByPixel(x + viewport.minX.toInt, y + viewport.minY.toInt)
 
   def wrap(s: Soldier) = soldiersMap(s)
 
