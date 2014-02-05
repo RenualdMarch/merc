@@ -10,17 +10,16 @@ import scalafx.geometry.Rectangle2D
 
 // TODO handle case when CanvasLayer is resized - image shouldn't change position
 class CanvasLayer(val layersCount: Int, fullMapSize: Rectangle2D, cleanRedraw: (Int, Rectangle2D, GraphicsContext) => Unit) extends Pane with ScrollPaneLike {
+  style = "-fx-background-color: black"
   val canvasArray = 0 until layersCount map (i => new Canvas()) toVector
   val horBar = new ScrollBar
   horBar.orientation.value = Orientation.HORIZONTAL
   horBar.max = 1
   horBar.min = 0
-  horBar.blockIncrement = 0.1
   val verBar = new ScrollBar
   verBar.orientation.value = Orientation.VERTICAL
   verBar.max = 1
   verBar.min = 0
-  verBar.blockIncrement = 0.1
 
   children.add(horBar)
   children.add(verBar)
@@ -59,6 +58,10 @@ class CanvasLayer(val layersCount: Int, fullMapSize: Rectangle2D, cleanRedraw: (
   private val canvasAreaHeight = this.height - horBar.prefHeight
   verBar.prefHeight <== canvasAreaHeight
   horBar.prefWidth <== canvasAreaWidth
+  verBar.visibleAmount <== canvasAreaHeight / fullMapSize.height
+  horBar.visibleAmount <== canvasAreaWidth / fullMapSize.width
+  verBar.unitIncrement = 0.1
+  horBar.unitIncrement = 0.1
 
   def positionComponents() {
     canvasArray.foreach { c =>
