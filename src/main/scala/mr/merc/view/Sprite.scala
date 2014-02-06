@@ -5,6 +5,7 @@ import mr.merc.image.MImage
 import scalafx.geometry.Rectangle2D
 
 object Sprite {
+
   def apply(images: Map[SpriteState, List[MImage]], initialState: SpriteState): Sprite[SpriteState] = {
     new Sprite[SpriteState](images, initialState)
   }

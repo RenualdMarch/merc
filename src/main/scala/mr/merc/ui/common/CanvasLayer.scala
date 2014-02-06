@@ -43,6 +43,7 @@ class CanvasLayer(val layersCount: Int, fullMapSize: Rectangle2D, cleanRedraw: (
     val verDiff = fullMapSize.height - canvasAreaHeight.value.doubleValue
     val x = hor * horDiff
     val y = ver * verDiff
+    //println(s"x=$x,y=$y,hor=$hor,ver=$ver,horDiff=$horDiff,verDiff=$verDiff")
     new Rectangle2D(x, y, canvasAreaWidth.value.doubleValue, canvasAreaHeight.value.doubleValue)
   }
 

@@ -12,6 +12,7 @@ import mr.merc.map.hex.TerrainHexField
 import mr.merc.map.hex.TerrainHex
 import mr.merc.map.hex.view.TerrainHexFieldView
 import mr.merc.view.move.MomentaryMovement
+import mr.merc.view.Sprite
 
 class SoldierDrawerTest extends FunSuite with MockitoSugar with BeforeAndAfter {
   val soldier1 = mock[SoldierView]

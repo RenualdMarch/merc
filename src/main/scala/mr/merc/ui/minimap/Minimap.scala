@@ -147,8 +147,18 @@ class Minimap(field: TerrainHexField, pane: ScrollPaneLike) extends VBox {
   }
 
   private def positionOnMinimapToMap(x: Double, y: Double): (Double, Double) = {
-    val w = rectPosX.toDouble / scrollableWidth
-    val h = rectPosY.toDouble / scrollableHeight
+    val w = if (scrollableWidth == 0) {
+      0
+    } else {
+      rectPosX.toDouble / scrollableWidth
+    }
+
+    val h = if (scrollableHeight == 0) {
+      0
+    } else {
+      rectPosY.toDouble / scrollableHeight
+    }
+
     (w, h)
   }
 

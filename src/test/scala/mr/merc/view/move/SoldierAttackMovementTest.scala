@@ -13,8 +13,11 @@ import mr.merc.map.hex.view.TerrainHexView
 import mr.merc.map.hex.TerrainHexField
 import mr.merc.map.hex.TerrainHex
 import mr.merc.map.hex.view.TerrainHexFieldView
+import org.scalatest.BeforeAndAfter
+import mr.merc.view.Sprite
 
-class SoldierAttackMovementTest extends FunSuite {
+class SoldierAttackMovementTest extends FunSuite with BeforeAndAfter {
+
   test("imagesList") {
     assert(SoldierAttackMovement.imagesList(5) === List(0, 0, 0, 0, 1, 1, 1, 1,
       2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4))
