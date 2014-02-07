@@ -7,10 +7,10 @@ import org.scalatest.BeforeAndAfter
 class SpriteStateTest extends FunSuite with BeforeAndAfter {
   object TestState1 extends SpriteState
   object TestState2 extends SpriteState
-  val image1 = MImage("image1")
-  val image2 = MImage("image2")
-  val image3 = MImage("image3")
-  val image4 = MImage("image4")
+  val image1 = MImage("/testImages/image1.png")
+  val image2 = MImage("/testImages/image2.png")
+  val image3 = MImage("/testImages/image3.png")
+  val image4 = MImage("/testImages/image4.png")
   val images = Map((TestState1 -> List(image1)), (TestState2 -> List(image2, image3, image4)))
   var sprite: Sprite[SpriteState] = _
 

@@ -13,6 +13,7 @@ import mr.merc.map.hex.TerrainHex
 import mr.merc.map.hex.view.TerrainHexFieldView
 import mr.merc.view.move.MomentaryMovement
 import mr.merc.view.Sprite
+import scalafx.geometry.Rectangle2D
 
 class SoldierDrawerTest extends FunSuite with MockitoSugar with BeforeAndAfter {
   val soldier1 = mock[SoldierView]
@@ -24,6 +25,12 @@ class SoldierDrawerTest extends FunSuite with MockitoSugar with BeforeAndAfter {
     sd.addSoldier(soldier1)
     sd.addSoldier(soldier2)
     sd.addSoldier(soldier3)
+  }
+
+  before {
+    when(soldier1.viewRect).thenReturn(new Rectangle2D(0, 0, 10, 10))
+    when(soldier2.viewRect).thenReturn(new Rectangle2D(0, 0, 10, 10))
+    when(soldier3.viewRect).thenReturn(new Rectangle2D(0, 0, 10, 10))
   }
 
   test("simple updating without movements") {
