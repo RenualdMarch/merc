@@ -2,10 +2,8 @@ package mr.merc.image
 
 import org.scalatest.FunSuite
 import org.scalatest.BeforeAndAfter
-import org.scalamock.scalatest.MockFactory
-import org.scalamock.MockFactoryBase
 
-class MImageCacheTest extends FunSuite with BeforeAndAfter with MockFactory {
+class MImageCacheTest extends FunSuite with BeforeAndAfter {
 
   before {
     MImageCache.clear();

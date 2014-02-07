@@ -6,13 +6,11 @@ scalaVersion := "2.10.2"
 
 libraryDependencies += "org.scala-lang" % "scala-reflect" % "2.10.2"
 
-libraryDependencies += "org.scalatest" % "scalatest_2.10" % "1.9.1" % "test"
+libraryDependencies += "org.scalatest" % "scalatest_2.10" % "2.0" % "test"
 
 libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.3"
 
-libraryDependencies += "org.scalafx" % "scalafx_2.10" % "1.0.0-M6"
-
-libraryDependencies += "org.scalamock" %% "scalamock-scalatest-support" % "3.0.1" % "test"
+libraryDependencies += "org.scalafx" % "scalafx_2.10" % "1.0.0-M7"
 
 libraryDependencies += "org.mockito" % "mockito-core" % "1.9.5" % "test"
 

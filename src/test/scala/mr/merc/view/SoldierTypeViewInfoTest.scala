@@ -1,7 +1,6 @@
 package mr.merc.view
 
 import org.scalatest.FunSuite
-import org.scalatest.matchers.ShouldMatchers
 import mr.merc.unit.view.SoldierViewAttackState
 import mr.merc.map.hex._
 import mr.merc.unit.view.DeathState
@@ -12,8 +11,9 @@ import mr.merc.unit.view.StandState
 import mr.merc.image.LazyMirroredVerticallyImage
 import mr.merc.unit.view.SoldierTypeViewInfo
 import mr.merc.unit.sound._
+import org.scalatest.Matchers
 
-class SoldierTypeViewInfoTest extends FunSuite with ShouldMatchers {
+class SoldierTypeViewInfoTest extends FunSuite with Matchers {
 
   test("loading without optional parameters") {
     val vt = SoldierTypeViewInfo("testType1")
@@ -105,9 +105,9 @@ class SoldierTypeViewInfoTest extends FunSuite with ShouldMatchers {
     val death = vt.images(DeathState)
     assert(death.size === 2)
     assert(death(0).imagePath.get === "/images/units/testType1/im10.png")
-    death(0).alpha should be(0.7f plusOrMinus 0.01f)
+    death(0).alpha should be(0.7f +- 0.01f)
     assert(death(1).imagePath.get === "/images/units/testType1/im11.png")
-    death(1).alpha should be(0.3f plusOrMinus 0.01f)
+    death(1).alpha should be(0.3f +- 0.01f)
 
     val move = vt.images(MoveState)
     assert(move.size === 1)
@@ -155,15 +155,15 @@ class SoldierTypeViewInfoTest extends FunSuite with ShouldMatchers {
     val death = vt.images(DeathState)
     assert(death.size === 5)
     assert(death(0).imagePath.get === "/images/units/testType2/im15.png")
-    death(0).alpha should be(1f plusOrMinus 0.01f)
+    death(0).alpha should be(1f +- 0.01f)
     assert(death(1).imagePath.get === "/images/units/testType2/im15.png")
-    death(1).alpha should be(0.8f plusOrMinus 0.01f)
+    death(1).alpha should be(0.8f +- 0.01f)
     assert(death(2).imagePath.get === "/images/units/testType2/im15.png")
-    death(2).alpha should be(0.6f plusOrMinus 0.01f)
+    death(2).alpha should be(0.6f +- 0.01f)
     assert(death(3).imagePath.get === "/images/units/testType2/im15.png")
-    death(3).alpha should be(0.4f plusOrMinus 0.01f)
+    death(3).alpha should be(0.4f +- 0.01f)
     assert(death(4).imagePath.get === "/images/units/testType2/im15.png")
-    death(4).alpha should be(0.2f plusOrMinus 0.01f)
+    death(4).alpha should be(0.2f +- 0.01f)
   }
 
   test("sounds") {

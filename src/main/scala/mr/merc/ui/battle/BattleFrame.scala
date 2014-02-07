@@ -24,7 +24,7 @@ import mr.merc.map.hex.TerrainHex
 import mr.merc.map.objects._
 import mr.merc.map.terrain._
 import scalafx.scene.control.Button
-import javafx.event.ActionEvent
+import scalafx.event.ActionEvent
 import scalafx.scene.Node
 import scalafx.stage.Window
 import mr.merc.ui.minimap.Minimap
@@ -146,7 +146,7 @@ class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleCont
 
   endTurnButton.onAction = { e: ActionEvent => controller.endTurnButton() }
 
-  val timeline = Timeline(KeyFrame(pulse, onFinished = gameLoop))
+  val timeline = Timeline(KeyFrame(pulse, onFinished = { ev: ActionEvent => gameLoop() }))
   timeline.cycleCount = Animation.INDEFINITE
   timeline.play()
 

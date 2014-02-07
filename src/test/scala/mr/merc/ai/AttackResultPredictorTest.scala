@@ -11,7 +11,7 @@ import mr.merc.unit.Firststrike
 import mr.merc.unit.Berserk
 import mr.merc.unit.Drain
 
-class AttackResultPredictorTest extends FunSuite with ShouldMatchers {
+class AttackResultPredictorTest extends FunSuite with Matchers {
 
   import mr.merc.unit.Util._
 
@@ -36,8 +36,8 @@ class AttackResultPredictorTest extends FunSuite with ShouldMatchers {
     val pred = AttackResultPredictor.predictResult(attacker, defender, attackerHex, defenderHex, attacker.soldierType.attacks(0), Some(defender.soldierType.attacks(0)))
     assert(pred.defenderDies === 0.6 * 0.6)
     assert(pred.attackerDies === 0.4 * 0.4 * (1 - 0.6 * 0.6))
-    pred.expectedDamageToAttacker should be(((1 - 0.6 * 0.6) * 10 * 0.4 + 0.6 * 0.6 * 5 * 0.4) plusOrMinus 0.01)
-    pred.expectedDamageToDefender should be(6d plusOrMinus 0.01)
+    pred.expectedDamageToAttacker should be(((1 - 0.6 * 0.6) * 10 * 0.4 + 0.6 * 0.6 * 5 * 0.4) +- 0.01)
+    pred.expectedDamageToDefender should be(6d +- 0.01)
   }
 
   test("prediction with defender without attack") {
