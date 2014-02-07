@@ -44,24 +44,10 @@ import mr.merc.game.QuickGameGenerator
 import mr.merc.battle.BattleResult
 import mr.merc.unit.Attack
 import scalafx.stage.Modality
+import mr.merc.ui.common.CanvasLayer
 
 // TODO move all styling to css
 class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleControllerParent with Logging {
-  implicit class ScrollPaneViewport(scrollPane: ScrollPane) {
-    def viewport: Rectangle2D = {
-      val vPercent = scrollPane.vvalue.value
-      val hPercent = scrollPane.hvalue.value
-      val contentWidth = scrollPane.width.value
-      val contentHeight = scrollPane.height.value
-      val canvasHeight = battleCanvas.height.value
-      val canvasWidth = battleCanvas.width.value
-      val invisibleWidth = canvasWidth - contentWidth
-      val invisibleHeight = canvasHeight - contentHeight
-      val x = invisibleWidth * hPercent
-      val y = invisibleHeight * vPercent
-      new Rectangle2D(x, y, canvasWidth, canvasHeight)
-    }
-  }
 
   import scalafx.Includes._
   val pulse = 20 ms
@@ -69,12 +55,9 @@ class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleCont
 
   val controller = new BattleController(gameField, this)
 
-  private val battleCanvas = new Canvas()
-  private val battleCanvasScrollPane = new ScrollPane {
-    content = battleCanvas
-    style = "-fx-background-color:BLACK;"
-  }
-  private val minimap = new Minimap(gameField.hexField, battleCanvasScrollPane)
+  val mapView = controller.battleView.mapView
+  private val battleCanvas = new CanvasLayer(4, new Rectangle2D(0, 0, mapView.pixelWidth, mapView.pixelHeight), controller.cleanRedraw)
+  private val minimap = new Minimap(gameField.hexField, battleCanvas)
   private val soldierName = new Text()
   private val soldierLevel = new Text()
   private val soldierHP = new Text()
@@ -86,8 +69,6 @@ class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleCont
 
   private val soldierWrapper = controller.soldierToShow
   private val soldierViewControl = new SoldierViewControl(soldierWrapper)
-
-  private def gc = battleCanvas.graphicsContext2D
 
   private val rightPanel = new VBox() {
     prefWidth = 400
@@ -119,13 +100,11 @@ class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleCont
   }
 
   // Initialization
-  center = battleCanvasScrollPane
+  center = battleCanvas
   right = rightPanel
 
-  battleCanvasScrollPane.prefWidth <== this.width - rightPanel.width
-  battleCanvasScrollPane.prefHeight <== this.height
-  battleCanvas.width.value = controller.battleView.mapView.pixelWidth
-  battleCanvas.height.value = controller.battleView.mapView.pixelHeight
+  battleCanvas.prefWidth <== this.width - rightPanel.width
+  battleCanvas.prefHeight <== this.height
   minimap.prefWidth <== rightPanel.width / 2
   minimap.prefHeight <== rightPanel.width / 2
   soldierName.text <== soldierWrapper.name
@@ -140,7 +119,7 @@ class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleCont
   private def canvasMouseClicked(event: jfxin.MouseEvent) {
     val x = event.getX().toInt
     val y = event.getY().toInt
-    controller.moveMouse(x, y)
+    controller.moveMouse(x, y, battleCanvas.viewRect)
     if (event.getButton() == jfxin.MouseButton.PRIMARY) {
       controller.leftClickMouse()
     } else if (event.getButton() == jfxin.MouseButton.SECONDARY) {
@@ -162,7 +141,7 @@ class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleCont
   battleCanvas.onMouseMoved = { event: jfxin.MouseEvent =>
     val x = event.getX().toInt
     val y = event.getY().toInt
-    controller.moveMouse(x, y)
+    controller.moveMouse(x, y, battleCanvas.viewRect)
   }
 
   endTurnButton.onAction = { e: ActionEvent => controller.endTurnButton() }
@@ -180,7 +159,7 @@ class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleCont
     debug(s"in game loop $timePassed ms passed since previous call")
     if (!battleIsOverDialogShown) {
       controller.update(timePassed.toInt)
-      controller.drawBattleCanvas(gc, battleCanvasScrollPane.viewport)
+      controller.updateBattleCanvas(battleCanvas)
     }
   }
 

@@ -64,8 +64,6 @@ class SoldierAttackMovement(val fromHex: TerrainHexView, val toHex: TerrainHexVi
     super.start()
     attacker.animationEnabled = false
     attacker.mirroringEnabled = false
-    fromHex.soldier = None
-    toHex.soldier = None
 
     if (dir == SE || dir == NE) {
       attacker.rightDirection = true
@@ -73,8 +71,7 @@ class SoldierAttackMovement(val fromHex: TerrainHexView, val toHex: TerrainHexVi
       attacker.rightDirection = false
     }
 
-    attacker.x = fromX
-    attacker.y = fromY
+    attacker.coords = (fromX, fromY)
 
     attacker.state = state
     attacker.index = 0
@@ -113,22 +110,18 @@ class SoldierAttackMovement(val fromHex: TerrainHexView, val toHex: TerrainHexVi
     attacker.animationEnabled = true
     attacker.mirroringEnabled = true
     attacker.state = StandState
-    fromHex.soldier = Some(attacker)
-    toHex.soldier = Some(defender)
   }
 
   private def handleMoveToEnemy(time: Int) {
     linearMovementToEnemy.update(time)
-    attacker.x = linearMovementToEnemy.x
-    attacker.y = linearMovementToEnemy.y
+    attacker.coords = (linearMovementToEnemy.x, linearMovementToEnemy.y)
     attacker.index = frames(frameListIndex)
   }
 
   private def handleMoveFromEnemy(time: Int) {
     if (!linearMovementFromEnemy.isOver) {
       linearMovementFromEnemy.update(time)
-      attacker.x = linearMovementFromEnemy.x
-      attacker.y = linearMovementFromEnemy.y
+      attacker.coords = (linearMovementFromEnemy.x, linearMovementFromEnemy.y)
       attacker.index = attackImagesSize - 1
     }
 
@@ -147,8 +140,6 @@ class SoldierAttackMovement(val fromHex: TerrainHexView, val toHex: TerrainHexVi
     drainNumberMovement.map(_.isOver).getOrElse(true)
 
   override def drawables = List(defender, attacker) ++ numberMovements
-
-  override def dirtyHexes = field.neighbours(fromHex) ++ field.neighbours(toHex) toList
 
   def isOver = linearMovementToEnemy.isOver && linearMovementFromEnemy.isOver && numbersAreOver
 }

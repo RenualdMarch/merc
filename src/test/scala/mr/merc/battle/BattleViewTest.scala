@@ -29,6 +29,7 @@ import mr.merc.view.move.SoldierAttackMovement
 import mr.merc.map.hex.NW
 import mr.merc.view.move.MomentaryMovement
 import mr.merc.view.move.SmoothMovement
+import mr.merc.view.Sprite
 
 class BattleViewTest extends FunSuite with BeforeAndAfter with MockitoSugar {
   val field = new TerrainHexField(10, 10, (x, y) => new TerrainHex(x, y, Grass))

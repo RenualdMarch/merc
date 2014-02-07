@@ -45,7 +45,6 @@ class TerrainHexFieldView(field: TerrainHexField) {
       case Some(views) => darkHexes(views).foreach(_.isDarkened = true)
       case None => // do nothing
     }
-    realHexes.filter(_.soldier.isDefined).foreach(_.isDirty = true)
     _movementOptions = viewsOpt
   }
 
@@ -103,19 +102,54 @@ class TerrainHexFieldView(field: TerrainHexField) {
   def hex(x: Int, y: Int) = realHexesMap(x, y)
 
   private val correctOrder = List(TerrainImageStage, MovementImpossibleStage, ArrowStage,
-    DefenceStage, HexGridStage, EndDrawing)
+    DefenceStage, HexGridStage, EndInterfaceDrawing)
 
-  def drawItself(gc: GraphicsContext, viewPort: Rectangle2D, soldiersDrawer: SoldiersDrawer) {
+  val soldierLayer = 1
+  val terrainLayer = 0
+  val interfaceLayer = 3
+  val darkeningLayer = 2
+
+  def drawChanges(layer: Int, gc: GraphicsContext, viewPort: Rectangle2D, soldiersDrawer: SoldiersDrawer) {
     val visibleHexes = hexesToDraw filter (isVisible(viewPort))
-    val dirty = visibleHexes.filter(_.shouldBeRedrawn) toSet;
-    val dirtyWithNeigs = neigsToRedrawFromCache(dirty)
-    dirtyWithNeigs.foreach(_.isDirty = true)
-    val hexesWithSoldiers = visibleHexes.filter(h => h.shouldBeRedrawn && h.soldier.isDefined)
-    correctOrder.foreach { stage =>
-      visibleHexes foreach (_.drawItself(gc, stage))
+
+    if (layer == interfaceLayer) {
+      val dirty = visibleHexes.filter(_.isInterfaceDirty)
+      List(ClearStage, ArrowStage, DefenceStage, EndInterfaceDrawing).foreach { stage =>
+        dirty foreach (_.drawItself(gc, stage, -viewPort.minX.toInt, -viewPort.minY.toInt))
+      }
+
+    } else if (layer == soldierLayer) {
+      soldiersDrawer.drawSoldiers(gc, viewPort)
+    } else if (layer == darkeningLayer) {
+      val set = if (visibleHexes.exists(_.darkeningShouldBeRedrawn)) {
+        visibleHexes
+      } else {
+        Nil
+      }
+      List(ClearStage, MovementImpossibleStage).foreach { stage =>
+        set foreach (_.drawItself(gc, stage, -viewPort.minX.toInt, -viewPort.minY.toInt))
+      }
     }
-    soldiersDrawer.drawSoldiers(gc, hexesWithSoldiers)
-    soldiersDrawer.drawDrawablesInMovements(gc)
+  }
+
+  def drawFromScratch(layer: Int, gc: GraphicsContext, viewPort: Rectangle2D, soldiersDrawer: SoldiersDrawer) {
+    val visibleHexes = hexesToDraw filter (isVisible(viewPort))
+
+    if (layer == interfaceLayer) {
+      List(ClearStage, ArrowStage, DefenceStage, EndInterfaceDrawing).foreach { stage =>
+        visibleHexes foreach (_.drawItself(gc, stage, -viewPort.minX.toInt, -viewPort.minY.toInt))
+      }
+    } else if (layer == terrainLayer) {
+      List(TerrainImageStage, HexGridStage).foreach { stage =>
+        visibleHexes foreach (_.drawItself(gc, stage, -viewPort.minX.toInt, -viewPort.minY.toInt))
+      }
+    } else if (layer == soldierLayer) {
+      soldiersDrawer.drawSoldiersFromScratch(gc, viewPort)
+    } else if (layer == darkeningLayer) {
+      List(ClearStage, MovementImpossibleStage).foreach { stage =>
+        visibleHexes foreach (_.drawItself(gc, stage, -viewPort.minX.toInt, -viewPort.minY.toInt))
+      }
+    }
   }
 
   def neigsToRedrawFromCache(set: Set[TerrainHexView]): Set[TerrainHexView] = {

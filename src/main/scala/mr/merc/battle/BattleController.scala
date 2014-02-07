@@ -27,6 +27,7 @@ import mr.merc.battle.event.HideDefence
 import mr.merc.battle.event.ShowDefence
 import mr.merc.log.Logging
 import scalafx.geometry.Rectangle2D
+import mr.merc.ui.common.CanvasLayer
 
 class BattleController(gameField: GameField, parent: BattleControllerParent) extends Logging {
   val battleModel = new BattleModel(gameField)
@@ -40,9 +41,9 @@ class BattleController(gameField: GameField, parent: BattleControllerParent) ext
   private[battle] var movementOptionsAreShown = false
   private[battle] val visitedHexesList = new VisitedHexesList()
 
-  def moveMouse(x: Int, y: Int) {
+  def moveMouse(x: Int, y: Int, viewRect: Rectangle2D) {
     debug(s"Mouse moved to ($x, $y)")
-    val hexOpt = battleView.hexByPixel(x, y)
+    val hexOpt = battleView.hexByPixel(x, y, viewRect)
     hexOpt match {
       case Some(hexView) => {
         visitedHexesList.visitHex(hexView.hex)
@@ -309,8 +310,14 @@ class BattleController(gameField: GameField, parent: BattleControllerParent) ext
     parent.disableEndTurn.value = !(battleModel.validateEndTurn && battleModel.currentPlayer.ai.isEmpty)
   }
 
-  def drawBattleCanvas(gc: GraphicsContext, viewPort: Rectangle2D) {
-    battleView.drawItself(gc, viewPort)
+  def updateBattleCanvas(layer: CanvasLayer) {
+    0 until layer.layersCount foreach { i =>
+      layer.updateCanvas(i)((gc, viewPort) => battleView.drawChanges(i, gc, viewPort))
+    }
+  }
+
+  def cleanRedraw(layer: Int, viewRect: Rectangle2D, gc: GraphicsContext) {
+    battleView.drawItself(layer, viewRect, gc)
   }
 
   def buildBattleResult: BattleResult = {

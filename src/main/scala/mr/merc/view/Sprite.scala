@@ -2,8 +2,10 @@ package mr.merc.view
 
 import scalafx.scene.canvas.GraphicsContext
 import mr.merc.image.MImage
+import scalafx.geometry.Rectangle2D
 
 object Sprite {
+
   def apply(images: Map[SpriteState, List[MImage]], initialState: SpriteState): Sprite[SpriteState] = {
     new Sprite[SpriteState](images, initialState)
   }
@@ -22,12 +24,38 @@ class Sprite[T <: SpriteState](val images: Map[T, List[MImage]], private var _st
   private var _index = 0
   var duration = 100
   private var _x = 0
-  var y = 0
+  private var _y = 0
+
   var rightDirection = true
 
-  def x = _x
+  var dirtyRect: Option[Rectangle2D] = None
 
-  def x_=(i: Int) {
+  def calculateDirtyRect = centered match {
+    case Some(size) => currentImage.centeredRect(x, y, size, size)
+    case None => new Rectangle2D(x, y, currentImage.width, currentImage.height)
+  }
+
+  def viewRect = calculateDirtyRect
+
+  def markAsDirty() {
+    dirtyRect = Some(calculateDirtyRect)
+  }
+
+  def y = _y
+  private def y_=(i: Int) {
+    _y = i
+  }
+
+  def coords = (x, y)
+
+  def coords_=(c: (Int, Int)) {
+    markAsDirty()
+    x = c._1
+    y = c._2
+  }
+
+  def x = _x
+  private def x_=(i: Int) {
     if (mirroringEnabled) {
       val oldX = _x
       _x = i
@@ -57,6 +85,7 @@ class Sprite[T <: SpriteState](val images: Map[T, List[MImage]], private var _st
   def state_=(st: T) {
     require(images.keys.exists(_ == st), s"State $st isn't present in map!")
     if (st != state) {
+      markAsDirty()
       _state = st
       _time = 0
       _index = 0
@@ -65,8 +94,12 @@ class Sprite[T <: SpriteState](val images: Map[T, List[MImage]], private var _st
 
   private def currentImage = images(state)(index)
 
-  def drawItself(gc: GraphicsContext) {
-    imageToDraw.drawImage(gc, x, y)
+  var centered: Option[Int] = None
+  def drawItself(gc: GraphicsContext, xOffset: Int, yOffset: Int) {
+    centered match {
+      case Some(side) => imageToDraw.drawCenteredImage(gc, x + xOffset, y + yOffset, side, side)
+      case None => imageToDraw.drawImage(gc, x + xOffset, y + yOffset)
+    }
   }
 
   def imageToDraw = if (rightDirection) {
@@ -89,6 +122,9 @@ class Sprite[T <: SpriteState](val images: Map[T, List[MImage]], private var _st
 
   private def increaseIndex(increase: Int) {
     val frames = images(state).size
+    if (frames != 1) {
+      markAsDirty()
+    }
     _index = (index + increase) % frames
   }
 }

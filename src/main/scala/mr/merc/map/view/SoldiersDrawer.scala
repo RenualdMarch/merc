@@ -6,18 +6,23 @@ import scalafx.scene.canvas.GraphicsContext
 import scala.collection.mutable.Queue
 import mr.merc.map.hex.view.TerrainHexView
 import mr.merc.log.Logging
+import scalafx.geometry.Rectangle2D
+import mr.merc.view.Drawable
 
 class SoldiersDrawer extends Logging {
   private var _soldiers = Set[SoldierView]()
   private val _movements = Queue[Movement]()
   private def currentMovement = _movements.headOption
+  private val rectIntersectionHelper = new RectIntersectionHelper[SoldierView]
 
   def addSoldier(s: SoldierView) {
     _soldiers += s
+    rectIntersectionHelper.addRect(s, s.viewRect)
   }
 
   def removeSoldier(s: SoldierView) {
     _soldiers = soldiers filterNot (_ == s)
+    rectIntersectionHelper.removeRect(s)
   }
 
   def addMovement(movement: Movement) {
@@ -28,18 +33,14 @@ class SoldiersDrawer extends Logging {
   def soldiers = _soldiers
   def movements = _movements
 
-  private var momentaryAndPreviousDirtyHexes: List[TerrainHexView] = Nil
   private def drawablesInMovements = currentMovement.map(_.drawables).getOrElse(Nil)
-  def dirtyHexesInMovements = {
-    momentaryAndPreviousDirtyHexes ++ currentMovement.map(_.dirtyHexes).getOrElse(Nil)
-  }
+
   private def soldiersInMovements = drawablesInMovements flatMap (d => d match {
     case soldier: SoldierView => Some(soldier)
     case _ => None
   })
 
   def update(time: Int) {
-    momentaryAndPreviousDirtyHexes = Nil
     updateAllSoldiersExceptForInMovement(time)
 
     currentMovement match {
@@ -72,17 +73,55 @@ class SoldiersDrawer extends Logging {
     }
 
     while (currentMovement.map(_.isOver).getOrElse(false)) {
-      momentaryAndPreviousDirtyHexes ++= currentMovement.get.dirtyHexes
       _movements.dequeue()
       currentMovement.map(_.start())
     }
   }
 
-  def drawDrawablesInMovements(gc: GraphicsContext) {
-    drawablesInMovements foreach (_.drawItself(gc))
+  private def calculateTouchedSoldiers(dirtySoldiers: Set[SoldierView]): Set[SoldierView] = {
+    var alreadyTouched = Set[SoldierView]()
+    var touchedLastTime = Set[SoldierView]()
+
+    touchedLastTime ++= dirtySoldiers
+
+    do {
+      val touchedThisIteration = touchedLastTime.flatMap(rectIntersectionHelper.intersections)
+      alreadyTouched ++= touchedLastTime
+      touchedLastTime = touchedThisIteration -- alreadyTouched
+    } while (touchedLastTime.nonEmpty)
+
+    alreadyTouched -- dirtySoldiers
   }
 
-  def drawSoldiers(gc: GraphicsContext, hexes: List[TerrainHexView]) {
-    hexes.flatMap(_.soldier).foreach(_.drawItself(gc))
+  def drawSoldiersFromScratch(gc: GraphicsContext, viewRect: Rectangle2D) {
+    soldiers.foreach(s => s.dirtyRect = Some(s.viewRect))
+    drawSoldiers(gc, viewRect)
+  }
+
+  def drawSoldiers(gc: GraphicsContext, viewRect: Rectangle2D) {
+    val visibleSoldiers = soldiers.filter(_.viewRect.intersects(viewRect))
+    val dirtySoldiers = visibleSoldiers.filter(_.dirtyRect.isDefined)
+    val dirtyDrawables = drawablesInMovements.filter(_.dirtyRect.isDefined)
+    val soldiersDrawables = dirtyDrawables.collect { case x: SoldierView => x }
+    val allDirtySoldiers = dirtySoldiers ++ soldiersDrawables
+
+    allDirtySoldiers foreach { ds =>
+      rectIntersectionHelper.addRect(ds, ds.viewRect)
+    }
+    val touchedSoldiers = calculateTouchedSoldiers(allDirtySoldiers)
+    touchedSoldiers foreach (t => t.dirtyRect = Some(t.viewRect))
+    val dirtySoldiersNotTakingPartInMovements = dirtySoldiers -- soldiersDrawables
+    val dirtyAndTouched = (dirtySoldiersNotTakingPartInMovements ++ touchedSoldiers).toList.sortBy(_.y)
+    val drawablesToRedraw: List[Drawable] = dirtyAndTouched ::: dirtyDrawables
+
+    drawablesToRedraw.foreach { d =>
+      val rect = d.dirtyRect.get
+      gc.clearRect(rect.minX - viewRect.minX, rect.minY - viewRect.minY, rect.width, rect.height)
+      d.dirtyRect = None
+    }
+
+    drawablesToRedraw.foreach { d =>
+      d.drawItself(gc, -viewRect.minX.toInt, -viewRect.minY.toInt)
+    }
   }
 }

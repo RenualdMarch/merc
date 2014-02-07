@@ -30,6 +30,7 @@ import javax.imageio.ImageIO
 import java.io.File
 import java.util.UUID
 import mr.merc.map.objects.MapObject
+import scalafx.scene.effect.BlendMode
 
 object TerrainHexView {
   val Side = 72
@@ -106,7 +107,7 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
   val side = TerrainHexView.Side
   val x = findX
   val y = findY
-  var isDirty = true
+  var isInterfaceDirty = true
   var isDarkened = false
   private var currentDarkened = false
   private var _arrowStart: Option[Direction] = None
@@ -114,7 +115,7 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
   def arrowStart_=(as: Option[Direction]) {
     if (as != _arrowStart) {
       _arrowStart = as
-      isDirty = true
+      isInterfaceDirty = true
     }
   }
   private var _arrowEnd: Option[Direction] = None
@@ -122,7 +123,7 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
   def arrowEnd_=(ae: Option[Direction]) {
     if (ae != _arrowEnd) {
       _arrowEnd = ae
-      isDirty = true
+      isInterfaceDirty = true
     }
   }
 
@@ -131,18 +132,7 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
   def defence_=(d: Option[(SoldierDefence, Boolean)]) {
     if (_defence != d) {
       _defence = d
-      isDirty = true
-    }
-  }
-
-  private var _soldier: Option[SoldierView] = None
-  def soldier = _soldier
-  def soldier_=(s: Option[SoldierView]) {
-    if (_soldier != s) {
-      _soldier.foreach(_.hexView = None)
-      _soldier = s
-      _soldier.foreach(_.hexView = Some(this))
-      isDirty = true
+      isInterfaceDirty = true
     }
   }
 
@@ -192,88 +182,75 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
     neigMapObj.flatMap(p => p.mapObj.get.images(hex, field)).toList
   }
 
-  lazy val hexImage: Image = {
-    TerrainHexView.imageCache.get(buildKey) match {
-      case Some(image) => image
-      case None => {
-        val side = TerrainHexView.Side
-        val imageSide = side * 2
-        val offset = side / 2
-        val newImage = drawImage(2 * side, 2 * side) { gc =>
-          image.drawCenteredImage(gc, 0, 0, imageSide, imageSide)
-          elements foreach (_.drawItself(gc, offset, offset))
-          neighbourMapObjects foreach (_.drawImage(gc, offset, offset))
-          secondaryImage.foreach(_.drawCenteredImage(gc, 0, 0, imageSide, imageSide))
-          mapObject foreach (_.drawImage(gc, offset, offset))
-        }
-        TerrainHexView.imageCache.put(buildKey, newImage)
-        newImage
-      }
-    }
+  def drawTerrainImage(gc: GraphicsContext, xOffset: Int, yOffset: Int) {
+    val side = TerrainHexView.Side
+    val x = this.x + xOffset
+    val y = this.y + yOffset
 
+    image.drawCenteredImage(gc, x, y, side, side)
+    elements foreach (_.drawItself(gc, x, y))
+    neighbourMapObjects foreach (_.drawImage(gc, x, y))
+    secondaryImage.foreach(_.drawCenteredImage(gc, x, y, side, side))
+    mapObject foreach (_.drawImage(gc, x, y))
   }
 
-  def shouldBeRedrawn = isDirty || isDarkened != currentDarkened
+  def darkeningShouldBeRedrawn = isDarkened != currentDarkened
 
-  def drawItself(gc: GraphicsContext, stage: HexDrawingStage) {
-    if (shouldBeRedrawn) {
-      stage match {
-        case TerrainImageStage =>
-          MImage(hexImage).drawCenteredImage(gc, x, y, TerrainHexView.Side, TerrainHexView.Side)
-        case MovementImpossibleStage =>
-          drawMovementImpossibleIfNeeded(gc)
-        case ArrowStage =>
-          drawArrowStartIfNeeded(gc)
-          drawArrowEndIfNeeded(gc)
-        case DefenceStage =>
-          drawDefenceIfNeeded(gc)
-        case HexGridStage =>
-          drawHexGrid(gc)
-        case EndDrawing =>
-          isDirty = false
-      }
+  def drawItself(gc: GraphicsContext, stage: HexDrawingStage, xOffset: Int, yOffset: Int) {
+    stage match {
+      case TerrainImageStage =>
+        drawTerrainImage(gc, xOffset, yOffset)
+      case MovementImpossibleStage =>
+        drawMovementImpossibleIfNeeded(gc, xOffset, yOffset)
+      case ArrowStage =>
+        drawArrowStartIfNeeded(gc, xOffset, yOffset)
+        drawArrowEndIfNeeded(gc, xOffset, yOffset)
+      case DefenceStage =>
+        drawDefenceIfNeeded(gc, xOffset, yOffset)
+      case HexGridStage =>
+        drawHexGrid(gc, xOffset, yOffset)
+      case EndInterfaceDrawing =>
+        isInterfaceDirty = false
+      case ClearStage =>
+        drawClearStage(gc, xOffset, yOffset)
     }
   }
 
-  private def drawMovementImpossibleIfNeeded(gc: GraphicsContext) {
+  private def drawClearStage(gc: GraphicsContext, xOffset: Int, yOffset: Int) {
+    gc.clearRect(x + xOffset, y + yOffset, TerrainHexView.Side, TerrainHexView.Side)
+  }
+
+  private def drawMovementImpossibleIfNeeded(gc: GraphicsContext, xOffset: Int, yOffset: Int) {
     if (isDarkened && !arrowEnd.isDefined) {
-      gc.drawImage(TerrainHexView.movementImpossibleImage, x, y)
+      gc.drawImage(TerrainHexView.movementImpossibleImage, x + xOffset, y + yOffset)
     }
     currentDarkened = isDarkened
   }
 
-  private def drawArrowStartIfNeeded(gc: GraphicsContext) {
+  private def drawArrowStartIfNeeded(gc: GraphicsContext, xOffset: Int, yOffset: Int) {
     arrowStart foreach { dir =>
       val path = arrowPath + "attack-indicator-src-" + dir.toString.toLowerCase() + ".png"
-      MImage(path).drawImage(gc, x, y)
+      MImage(path).drawImage(gc, x + xOffset, y + yOffset)
     }
   }
 
-  private def drawArrowEndIfNeeded(gc: GraphicsContext) {
+  private def drawArrowEndIfNeeded(gc: GraphicsContext, xOffset: Int, yOffset: Int) {
     arrowEnd foreach { dir =>
       val path = arrowPath + "attack-indicator-dst-" + dir.toString.toLowerCase() + ".png"
-      MImage(path).drawImage(gc, x, y)
+      MImage(path).drawImage(gc, x + xOffset, y + yOffset)
     }
   }
 
-  private def drawDefenceIfNeeded(gc: GraphicsContext) {
+  private def drawDefenceIfNeeded(gc: GraphicsContext, xOffset: Int, yOffset: Int) {
     defence foreach {
       case (d, drawPolygon) =>
         val image = TerrainHexView.defenceImages(d.defence, drawPolygon)
-        gc.drawImage(image, x, y)
+        gc.drawImage(image, x + xOffset, y + yOffset)
     }
   }
 
-  private def buildKey: (TerrainType, Option[MapObject], Map[Direction, TerrainType], Map[Direction, MapObject]) = {
-    val neigTypes = fieldView.neighboursWithDirections(this).mapValues(_.hex.terrain).view.force
-    val neigObjects = fieldView.neighboursWithDirections(this).
-      mapValues(_.hex.mapObj).filterNot(_._2.isEmpty).mapValues(_.get).view.force
-
-    (hex.terrain, hex.mapObj, neigTypes, neigObjects)
-  }
-
-  private def drawHexGrid(gc: GraphicsContext) {
-    gc.drawImage(TerrainHexView.hexGridImage, x, y)
+  private def drawHexGrid(gc: GraphicsContext, xOffset: Int, yOffset: Int) {
+    gc.drawImage(TerrainHexView.hexGridImage, x + xOffset, y + yOffset)
   }
 
   def center = (x + side / 2, y + side / 2)
@@ -281,9 +258,10 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
 }
 
 sealed trait HexDrawingStage
+case object ClearStage extends HexDrawingStage
 case object TerrainImageStage extends HexDrawingStage
 case object MovementImpossibleStage extends HexDrawingStage
 case object ArrowStage extends HexDrawingStage
 case object DefenceStage extends HexDrawingStage
 case object HexGridStage extends HexDrawingStage
-case object EndDrawing extends HexDrawingStage
+case object EndInterfaceDrawing extends HexDrawingStage

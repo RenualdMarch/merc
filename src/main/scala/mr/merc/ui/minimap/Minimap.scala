@@ -13,8 +13,9 @@ import mr.merc.map.view.MapView
 import scalafx.beans.binding.Bindings._
 import javafx.scene.{ input => jfxin }
 import mr.merc.ui.common.ConversionUtils._
+import mr.merc.ui.common.ScrollPaneLike
 
-class Minimap(field: TerrainHexField, pane: ScrollPane) extends VBox {
+class Minimap(field: TerrainHexField, pane: ScrollPaneLike) extends VBox {
   private val canvas = new Canvas()
   content = canvas
   private val mapView = new MapView(field)
@@ -146,8 +147,18 @@ class Minimap(field: TerrainHexField, pane: ScrollPane) extends VBox {
   }
 
   private def positionOnMinimapToMap(x: Double, y: Double): (Double, Double) = {
-    val w = rectPosX.toDouble / scrollableWidth
-    val h = rectPosY.toDouble / scrollableHeight
+    val w = if (scrollableWidth == 0) {
+      0
+    } else {
+      rectPosX.toDouble / scrollableWidth
+    }
+
+    val h = if (scrollableHeight == 0) {
+      0
+    } else {
+      rectPosY.toDouble / scrollableHeight
+    }
+
     (w, h)
   }
 

@@ -48,8 +48,6 @@ class SoldierRangedAttackMovement(val fromHex: TerrainHexView, val toHex: Terrai
     (damageNumberMovement ++ drainNumberMovement).foreach(_.start())
     attacker.state = SoldierViewAttackState(result.success, dir, result.attackIndex)
     attacker.sounds.get(AttackSound(result.attackIndex, result.success)).foreach(_.play)
-    fromHex.soldier = None
-    toHex.soldier = None
   }
 
   override def update(time: Int) = {
@@ -74,11 +72,6 @@ class SoldierRangedAttackMovement(val fromHex: TerrainHexView, val toHex: Terrai
     if (!numbersAreOver) {
       numberMovements.foreach(_.update(time))
     }
-
-    if (isOver) {
-      fromHex.soldier = Some(attacker)
-      toHex.soldier = Some(defender)
-    }
   }
 
   def isOver = projectileView.state == ProjectileNotRender && attackerFinishedHisThrowingMove && numbersAreOver
@@ -93,6 +86,4 @@ class SoldierRangedAttackMovement(val fromHex: TerrainHexView, val toHex: Terrai
     drainNumberMovement.map(_.isOver).getOrElse(true)
 
   override def drawables = List(defender, attacker, projectileView) ++ numberMovements
-
-  override def dirtyHexes = field.neighbours(fromHex) ++ field.neighbours(toHex) toList
 }
