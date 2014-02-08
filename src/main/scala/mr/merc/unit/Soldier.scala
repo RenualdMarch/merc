@@ -8,6 +8,7 @@ import mr.merc.map.objects.WoodenBridge
 import mr.merc.map.terrain.Village
 import mr.merc.map.terrain.Road
 import mr.merc.map.terrain.Grass
+import mr.merc.map.terrain.Dirt
 
 class Soldier(val name: String, val soldierType: SoldierType, val owner: Player) {
   private var _hp = soldierType.hp
@@ -98,7 +99,7 @@ class Soldier(val name: String, val soldierType: SoldierType, val owner: Player)
   def movementCostFunction(hex: TerrainHex): Int = {
     if (hex.mapObj == Some(House)) {
       soldierType.moveCost(Village)
-    } else if (hex.mapObj == Some(WoodenBridge) || hex.terrain == Road) {
+    } else if (hex.mapObj == Some(WoodenBridge) || hex.terrain == Road || hex.terrain == Dirt) {
       soldierType.moveCost(Grass)
     } else {
       soldierType.moveCost(hex.terrain)

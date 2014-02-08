@@ -164,19 +164,9 @@ class Minimap(field: TerrainHexField, pane: ScrollPaneLike) extends VBox {
 
   private def color(hex: TerrainHex): Color = {
     if (hex.soldier.nonEmpty) {
-      return hex.soldier.get.owner.color
-    }
-
-    hex.terrain match {
-      case Water => Color.BLUE
-      case Forest => Color.GREEN
-      case Grass => Color.LIGHTGREEN
-      case Sand => Color.YELLOW
-      case Swamp => Color.BROWN
-      case Hill => Color.LIGHTGRAY
-      case Mountain => Color.GRAY
-      case Road => Color.ORANGE
-      case a: Any => throw new IllegalArgumentException(s"Unknown color $a")
+      hex.soldier.get.owner.color
+    } else {
+      Color.BLACK
     }
   }
 }

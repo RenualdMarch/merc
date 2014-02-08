@@ -1,20 +1,12 @@
 package mr.merc.map.hex.view
 
-import mr.merc.map.terrain.Grass
-import mr.merc.map.terrain.Sand
-import mr.merc.map.terrain.Hill
-import mr.merc.map.terrain.TerrainType
-import mr.merc.map.terrain.Swamp
-import mr.merc.map.terrain.Water
-import mr.merc.map.terrain.Mountain
-import mr.merc.map.terrain.Road
-import mr.merc.map.terrain.Forest
+import mr.merc.map.terrain._
 import mr.merc.map.hex.Direction
 import mr.merc.log.Logging
 
 object TerrainHexViewAdditiveRule {
   // first is drawn first
-  private val orderOfTypes = List(Hill, Mountain, Water, Forest, Swamp, Grass, Sand, Road)
+  private val orderOfTypes = List(Hill, Mountain, Water, Forest, Swamp, Dirt, Grass, Sand, Road)
 }
 
 /**

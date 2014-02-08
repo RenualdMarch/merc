@@ -6,7 +6,7 @@ import mr.merc.image.MImage
 import javafx.embed.swing.SwingFXUtils
 
 object TerrainType {
-  val list = List[TerrainType](Water, Forest, Grass, Sand, Swamp, Hill, Mountain, Road)
+  val list = List[TerrainType](Water, Forest, Grass, Sand, Swamp, Hill, Mountain, Dirt, Road)
   val helperTypesList = List[TerrainType](BankInside, BankOutside)
   private val namesMap = (Village :: list ::: helperTypesList).map(t => (t.name.toLowerCase(), t)).toMap
 
@@ -28,6 +28,7 @@ case object Swamp extends TerrainType("swamp", 0)
 case object Mountain extends TerrainType("mountain", 2)
 case object Road extends TerrainType("road", 0)
 case object Forest extends TerrainType("forest", 3)
+case object Dirt extends TerrainType("dirt", 0)
 
 // THIS TYPES ARE FORBIDDEN TO USE ON MAP
 case object Village extends TerrainType("village", 0)

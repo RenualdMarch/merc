@@ -98,4 +98,17 @@
 	<element type="Mountain" from="S" to="S" />
 	<element type="Mountain" from="SE" to="SE" />
 	<element type="Mountain" from="SW" to="SW" />
+	
+	<element type="Dirt" from="N" to="N"/>
+	<element type="Dirt" from="NE" to="NE"/>
+	<element type="Dirt" from="NW" to="NW"/>
+	<element type="Dirt" from="S" to="S"/>
+	<element type="Dirt" from="SE" to="SE"/>
+	<element type="Dirt" from="SW" to="SW"/>
+	<element type="Dirt" from="NE" to="SE"/>
+	<element type="Dirt" from="N" to="NE"/>
+	<element type="Dirt" from="NW" to="N"/>
+	<element type="Dirt" from="SE" to="S"/>
+	<element type="Dirt" from="S" to="SW"/>
+	<element type="Dirt" from="SW" to="NW"/>
 </elements>

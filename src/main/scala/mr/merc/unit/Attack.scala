@@ -8,6 +8,7 @@ import mr.merc.map.terrain.Village
 import mr.merc.map.objects.WoodenBridge
 import mr.merc.map.terrain.Road
 import mr.merc.map.terrain.Grass
+import mr.merc.map.terrain.Dirt
 
 object Attack {
   private val maxChance = 100
@@ -71,7 +72,7 @@ object Attack {
   def calculateSoldierDefence(soldier: Soldier, hex: TerrainHex): SoldierDefence = {
     if (hex.mapObj == Some(House)) {
       SoldierDefence(soldier.soldierType.defence(Village))
-    } else if (hex.mapObj == Some(WoodenBridge) || hex.terrain == Road) {
+    } else if (hex.mapObj == Some(WoodenBridge) || hex.terrain == Road || hex.terrain == Dirt) {
       SoldierDefence(soldier.soldierType.defence(Grass))
     } else {
       SoldierDefence(soldier.soldierType.defence(hex.terrain))
