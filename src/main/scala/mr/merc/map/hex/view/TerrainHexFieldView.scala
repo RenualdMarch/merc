@@ -16,8 +16,9 @@ import scalafx.scene.paint.Color
 import scalafx.geometry.Rectangle2D
 import mr.merc.map.hex.Direction
 import mr.merc.map.view.SoldiersDrawer
+import mr.merc.ui.common.CanvasLayer
 
-class TerrainHexFieldView(field: TerrainHexField) {
+class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer) {
   private val infiniteField = new InfiniteHexField((x, y) => new TerrainHex(x, y, Empty))
 
   val realHexes = field.hexes.map(new TerrainHexView(_, field, this))
@@ -101,56 +102,69 @@ class TerrainHexFieldView(field: TerrainHexField) {
 
   def hex(x: Int, y: Int) = realHexesMap(x, y)
 
-  private val correctOrder = List(TerrainImageStage, MovementImpossibleStage, ArrowStage,
-    DefenceStage, HexGridStage, EndInterfaceDrawing)
+  def calculateVisibleHexes(viewRect: Rectangle2D) = hexesToDraw filter (isVisible(viewRect))
 
-  val soldierLayer = 1
-  val terrainLayer = 0
-  val interfaceLayer = 3
-  val darkeningLayer = 2
+  private val soldierBattleLayer = new CanvasLayer {
+    def updateLayer(gc: GraphicsContext, viewRect: Rectangle2D) {
+      soldiersDrawer.drawSoldiers(gc, viewRect)
+    }
 
-  def drawChanges(layer: Int, gc: GraphicsContext, viewPort: Rectangle2D, soldiersDrawer: SoldiersDrawer) {
-    val visibleHexes = hexesToDraw filter (isVisible(viewPort))
+    def drawLayer(gc: GraphicsContext, viewRect: Rectangle2D) {
+      soldiersDrawer.drawSoldiersFromScratch(gc, viewRect)
+    }
+  }
 
-    if (layer == interfaceLayer) {
-      val dirty = visibleHexes.filter(_.isInterfaceDirty)
-      List(ClearStage, ArrowStage, DefenceStage, EndInterfaceDrawing).foreach { stage =>
-        dirty foreach (_.drawItself(gc, stage, -viewPort.minX.toInt, -viewPort.minY.toInt))
+  private val terrainBattleLayer = new CanvasLayer {
+    def updateLayer(gc: GraphicsContext, viewRect: Rectangle2D) {
+      // No changes possible
+    }
+
+    def drawLayer(gc: GraphicsContext, viewRect: Rectangle2D) {
+      val visibleHexes = calculateVisibleHexes(viewRect)
+      List(TerrainImageStage, HexGridStage).foreach { stage =>
+        visibleHexes foreach (_.drawItself(gc, stage, -viewRect.minX.toInt, -viewRect.minY.toInt))
       }
+    }
+  }
 
-    } else if (layer == soldierLayer) {
-      soldiersDrawer.drawSoldiers(gc, viewPort)
-    } else if (layer == darkeningLayer) {
+  private val interfaceBattleLayer = new CanvasLayer {
+    def updateLayer(gc: GraphicsContext, viewRect: Rectangle2D) {
+      val dirty = calculateVisibleHexes(viewRect).filter(_.isInterfaceDirty)
+      List(ClearStage, ArrowStage, DefenceStage, EndInterfaceDrawing).foreach { stage =>
+        dirty foreach (_.drawItself(gc, stage, -viewRect.minX.toInt, -viewRect.minY.toInt))
+      }
+    }
+
+    def drawLayer(gc: GraphicsContext, viewRect: Rectangle2D) {
+      val visibleHexes = calculateVisibleHexes(viewRect)
+      List(ClearStage, ArrowStage, DefenceStage, EndInterfaceDrawing).foreach { stage =>
+        visibleHexes foreach (_.drawItself(gc, stage, -viewRect.minX.toInt, -viewRect.minY.toInt))
+      }
+    }
+  }
+
+  private val darkeningBattleLayer = new CanvasLayer {
+    def updateLayer(gc: GraphicsContext, viewRect: Rectangle2D) {
+      val visibleHexes = calculateVisibleHexes(viewRect)
       val set = if (visibleHexes.exists(_.darkeningShouldBeRedrawn)) {
         visibleHexes
       } else {
         Nil
       }
       List(ClearStage, MovementImpossibleStage).foreach { stage =>
-        set foreach (_.drawItself(gc, stage, -viewPort.minX.toInt, -viewPort.minY.toInt))
+        set foreach (_.drawItself(gc, stage, -viewRect.minX.toInt, -viewRect.minY.toInt))
       }
     }
-  }
 
-  def drawFromScratch(layer: Int, gc: GraphicsContext, viewPort: Rectangle2D, soldiersDrawer: SoldiersDrawer) {
-    val visibleHexes = hexesToDraw filter (isVisible(viewPort))
-
-    if (layer == interfaceLayer) {
-      List(ClearStage, ArrowStage, DefenceStage, EndInterfaceDrawing).foreach { stage =>
-        visibleHexes foreach (_.drawItself(gc, stage, -viewPort.minX.toInt, -viewPort.minY.toInt))
-      }
-    } else if (layer == terrainLayer) {
-      List(TerrainImageStage, HexGridStage).foreach { stage =>
-        visibleHexes foreach (_.drawItself(gc, stage, -viewPort.minX.toInt, -viewPort.minY.toInt))
-      }
-    } else if (layer == soldierLayer) {
-      soldiersDrawer.drawSoldiersFromScratch(gc, viewPort)
-    } else if (layer == darkeningLayer) {
+    def drawLayer(gc: GraphicsContext, viewRect: Rectangle2D) {
+      val visibleHexes = calculateVisibleHexes(viewRect)
       List(ClearStage, MovementImpossibleStage).foreach { stage =>
-        visibleHexes foreach (_.drawItself(gc, stage, -viewPort.minX.toInt, -viewPort.minY.toInt))
+        visibleHexes foreach (_.drawItself(gc, stage, -viewRect.minX.toInt, -viewRect.minY.toInt))
       }
     }
   }
+
+  def canvasBattleLayers = List(terrainBattleLayer, soldierBattleLayer, darkeningBattleLayer, interfaceBattleLayer)
 
   def neigsToRedrawFromCache(set: Set[TerrainHexView]): Set[TerrainHexView] = {
     set flatMap redrawNeigsCache

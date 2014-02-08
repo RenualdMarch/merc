@@ -15,6 +15,7 @@ import mr.merc.map.hex.TerrainHex
 import mr.merc.map.hex.view.TerrainHexFieldView
 import org.scalatest.BeforeAndAfter
 import mr.merc.view.Sprite
+import mr.merc.map.view.SoldiersDrawer
 
 class SoldierAttackMovementTest extends FunSuite with BeforeAndAfter {
 
@@ -33,7 +34,7 @@ class SoldierAttackMovementTest extends FunSuite with BeforeAndAfter {
     val direction = NE
 
     val field = new TerrainHexField(10, 10, TerrainHex.grassInit)
-    val fieldView = new TerrainHexFieldView(field)
+    val fieldView = new TerrainHexFieldView(field, new SoldiersDrawer())
     val from = new TerrainHexView(field.hex(0, 0), field, fieldView) {
       override def coords = (0, 10)
     }

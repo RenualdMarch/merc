@@ -14,10 +14,11 @@ import mr.merc.unit.Soldier
 import mr.merc.map.hex.view.TerrainHexFieldView
 import scalafx.beans.property.BooleanProperty
 import scalafx.geometry.Rectangle2D
+import mr.merc.map.view.SoldiersDrawer
 
 class BattleControllerTest extends FunSuite with BeforeAndAfter {
   var controller: BattleController = _
-  val fieldView = new TerrainHexFieldView(new TerrainHexField(10, 10, (x, y) => new TerrainHex(x, y, Grass)))
+  val fieldView = new TerrainHexFieldView(new TerrainHexField(10, 10, (x, y) => new TerrainHex(x, y, Grass)), new SoldiersDrawer())
   val viewRect = new Rectangle2D(0, 0, 100, 100)
 
   before {

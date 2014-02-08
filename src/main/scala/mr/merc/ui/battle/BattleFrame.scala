@@ -44,7 +44,7 @@ import mr.merc.game.QuickGameGenerator
 import mr.merc.battle.BattleResult
 import mr.merc.unit.Attack
 import scalafx.stage.Modality
-import mr.merc.ui.common.CanvasLayer
+import mr.merc.ui.common.CanvasLayers
 
 // TODO move all styling to css
 class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleControllerParent with Logging {
@@ -56,7 +56,7 @@ class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleCont
   val controller = new BattleController(gameField, this)
 
   val mapView = controller.battleView.mapView
-  private val battleCanvas = new CanvasLayer(4, new Rectangle2D(0, 0, mapView.pixelWidth, mapView.pixelHeight), controller.cleanRedraw)
+  private val battleCanvas = new CanvasLayers(mapView.canvasBattleLayers, new Rectangle2D(0, 0, mapView.pixelWidth, mapView.pixelHeight))
   private val minimap = new Minimap(gameField.hexField, battleCanvas)
   private val soldierName = new Text()
   private val soldierLevel = new Text()
@@ -159,7 +159,7 @@ class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleCont
     debug(s"in game loop $timePassed ms passed since previous call")
     if (!battleIsOverDialogShown) {
       controller.update(timePassed.toInt)
-      controller.updateBattleCanvas(battleCanvas)
+      battleCanvas.updateCanvas()
     }
   }
 

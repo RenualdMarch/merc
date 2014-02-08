@@ -9,9 +9,9 @@ import scalafx.geometry.Orientation
 import scalafx.geometry.Rectangle2D
 
 // TODO handle case when CanvasLayer is resized - image shouldn't change position
-class CanvasLayer(val layersCount: Int, fullMapSize: Rectangle2D, cleanRedraw: (Int, Rectangle2D, GraphicsContext) => Unit) extends Pane with ScrollPaneLike {
+class CanvasLayers(layers: List[CanvasLayer], fullMapSize: Rectangle2D) extends Pane with ScrollPaneLike {
   style = "-fx-background-color: black"
-  val canvasArray = 0 until layersCount map (i => new Canvas()) toVector
+  val canvasList = layers map (l => (l, new Canvas()))
   val horBar = new ScrollBar
   horBar.orientation.value = Orientation.HORIZONTAL
   horBar.max = 1
@@ -23,16 +23,15 @@ class CanvasLayer(val layersCount: Int, fullMapSize: Rectangle2D, cleanRedraw: (
 
   children.add(horBar)
   children.add(verBar)
-  canvasArray foreach (children.add(_))
+  canvasList foreach (c => children.add(c._2))
 
   private def redraw() {
-    0 until layersCount foreach { i =>
-      val canvas = canvasArray(i)
-      if (canvas.width.value >= 0 && canvas.height.value >= 0) {
-        val gc = canvas.graphicsContext2D
-        gc.clearRect(0, 0, canvas.width.value, canvas.height.value)
-        cleanRedraw(i, viewRect, canvasArray(i).graphicsContext2D)
-      }
+    canvasList foreach {
+      case (layer, canvas) =>
+        if (canvas.width.value >= 0 && canvas.height.value >= 0) {
+          val gc = canvas.graphicsContext2D
+          layer.drawLayer(gc, viewRect)
+        }
     }
   }
 
@@ -43,13 +42,17 @@ class CanvasLayer(val layersCount: Int, fullMapSize: Rectangle2D, cleanRedraw: (
     val verDiff = fullMapSize.height - canvasAreaHeight.value.doubleValue
     val x = hor * horDiff
     val y = ver * verDiff
-    //println(s"x=$x,y=$y,hor=$hor,ver=$ver,horDiff=$horDiff,verDiff=$verDiff")
     new Rectangle2D(x, y, canvasAreaWidth.value.doubleValue, canvasAreaHeight.value.doubleValue)
   }
 
-  def updateCanvas(layer: Int)(f: (GraphicsContext, Rectangle2D) => Unit) {
-    val gc = canvasArray(layer).graphicsContext2D
-    f(gc, viewRect)
+  def updateCanvas() {
+    canvasList.foreach {
+      case (layer, canvas) =>
+        if (canvas.width.value >= 0 && canvas.height.value >= 0) {
+          val gc = canvas.graphicsContext2D
+          layer.updateLayer(gc, viewRect)
+        }
+    }
   }
 
   verBar.prefWidth.value = 20
@@ -65,7 +68,7 @@ class CanvasLayer(val layersCount: Int, fullMapSize: Rectangle2D, cleanRedraw: (
   horBar.unitIncrement = 0.1
 
   def positionComponents() {
-    canvasArray.foreach { c =>
+    canvasList.map(_._2).foreach { c =>
       c.layoutX = 0
       c.layoutY = 0
       c.width = canvasAreaWidth.value.doubleValue
@@ -95,4 +98,9 @@ class CanvasLayer(val layersCount: Int, fullMapSize: Rectangle2D, cleanRedraw: (
   hvalue.onChange {
     redraw()
   }
+}
+
+trait CanvasLayer {
+  def updateLayer(gc: GraphicsContext, viewRect: Rectangle2D)
+  def drawLayer(gc: GraphicsContext, viewRect: Rectangle2D)
 }

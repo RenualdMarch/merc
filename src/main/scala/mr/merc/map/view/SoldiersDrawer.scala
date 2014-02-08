@@ -94,6 +94,7 @@ class SoldiersDrawer extends Logging {
   }
 
   def drawSoldiersFromScratch(gc: GraphicsContext, viewRect: Rectangle2D) {
+    gc.clearRect(0, 0, viewRect.width, viewRect.height)
     soldiers.foreach(s => s.dirtyRect = Some(s.viewRect))
     drawSoldiers(gc, viewRect)
   }

@@ -24,13 +24,14 @@ import mr.merc.unit._
 import mr.merc.map.hex.view.TerrainHexFieldView
 import mr.merc.map.hex._
 import scalafx.geometry.Rectangle2D
+import mr.merc.map.view.SoldiersDrawer
 
 object SoldierView {
   private[view] val attackDistancePercentage = 0.6
 
   private[view] def coordsCorrection(dir: Direction): (Int, Int) = {
     val hexField = new TerrainHexField(4, 4, (x, y) => new TerrainHex(x, y, Grass))
-    val hexFieldView = new TerrainHexFieldView(hexField)
+    val hexFieldView = new TerrainHexFieldView(hexField, new SoldiersDrawer)
     val center = hexField.hex(1, 1)
     val centerView = new TerrainHexView(center, hexField, hexFieldView)
     val neig = hexField.neighboursWithDirections(1, 1)(dir)

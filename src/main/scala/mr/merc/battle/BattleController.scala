@@ -27,7 +27,7 @@ import mr.merc.battle.event.HideDefence
 import mr.merc.battle.event.ShowDefence
 import mr.merc.log.Logging
 import scalafx.geometry.Rectangle2D
-import mr.merc.ui.common.CanvasLayer
+import mr.merc.ui.common.CanvasLayers
 
 class BattleController(gameField: GameField, parent: BattleControllerParent) extends Logging {
   val battleModel = new BattleModel(gameField)
@@ -308,16 +308,6 @@ class BattleController(gameField: GameField, parent: BattleControllerParent) ext
     }
 
     parent.disableEndTurn.value = !(battleModel.validateEndTurn && battleModel.currentPlayer.ai.isEmpty)
-  }
-
-  def updateBattleCanvas(layer: CanvasLayer) {
-    0 until layer.layersCount foreach { i =>
-      layer.updateCanvas(i)((gc, viewPort) => battleView.drawChanges(i, gc, viewPort))
-    }
-  }
-
-  def cleanRedraw(layer: Int, viewRect: Rectangle2D, gc: GraphicsContext) {
-    battleView.drawItself(layer, viewRect, gc)
   }
 
   def buildBattleResult: BattleResult = {

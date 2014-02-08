@@ -2,7 +2,7 @@ For M5, (0.2) these things should be completed and tested
 +integration with wesnoth editor
 +two canvas prototype with custom scrolling logic
 +Update libraries - Update scalafx version, Scalatest version 2, other libraries
-Additional terrain types - gravel
++Additional terrain types - gravel
 global map with several kingdoms and cities
 ability to travel among cities
 diplomacy among kingdoms - war, peace, alliance, cold war?

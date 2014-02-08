@@ -3,10 +3,11 @@ package mr.merc.map.hex.view
 import org.scalatest.FunSuite
 import mr.merc.map.hex.TerrainHex
 import mr.merc.map.hex.TerrainHexField
+import mr.merc.map.view.SoldiersDrawer
 
 class TerrainHexViewTest extends FunSuite {
   val field = new TerrainHexField(5, 5, TerrainHex.grassInit)
-  val fieldView = new TerrainHexFieldView(field)
+  val fieldView = new TerrainHexFieldView(field, new SoldiersDrawer())
 
   test("pixel coords") {
     val view1 = new TerrainHexView(field.hex(0, 0), field, fieldView)

@@ -17,7 +17,7 @@ import mr.merc.log.Logging
 
 // TODO add update method which handles case when soldiers changed
 class MapView(field: TerrainHexField, val soldiersDrawer: SoldiersDrawer = new SoldiersDrawer()) extends Logging {
-  val terrainView = new TerrainHexFieldView(field)
+  val terrainView = new TerrainHexFieldView(field, soldiersDrawer)
 
   createSoldiers foreach (soldiersDrawer.addSoldier)
 
@@ -47,13 +47,7 @@ class MapView(field: TerrainHexField, val soldiersDrawer: SoldiersDrawer = new S
     soldiersDrawer.update(time)
   }
 
-  def drawChanges(layer: Int, gc: GraphicsContext, viewPort: Rectangle2D) {
-    terrainView.drawChanges(layer, gc, viewPort, soldiersDrawer)
-  }
-
-  def drawFromScratch(layer: Int, gc: GraphicsContext, viewPort: Rectangle2D) {
-    terrainView.drawFromScratch(layer, gc, viewPort, soldiersDrawer)
-  }
+  def canvasBattleLayers = terrainView.canvasBattleLayers
 
   def addMovement(movement: Movement) {
     soldiersDrawer.addMovement(movement)
