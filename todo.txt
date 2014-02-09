@@ -20,6 +20,7 @@ mission "Destroy all enemies", with place for different victory conditions
 enhanced soldier type for army leader
 maximized screen with java 8
 JAVA 8
+Bridges directions on wesnoth map and on actual map
 
 Consider following:
 

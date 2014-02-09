@@ -46,6 +46,7 @@ class WesnothMapReader {
       case "Mm" => Mountain
       case "Wo" => Water
       case "Hh" => Hill
+      case "Re" => Dirt
       case "Gg" | "Gs" => Grass
     }
 

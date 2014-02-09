@@ -99,7 +99,6 @@ class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleCont
     }, endTurnButton)
   }
 
-  // Initialization
   center = battleCanvas
   right = rightPanel
 

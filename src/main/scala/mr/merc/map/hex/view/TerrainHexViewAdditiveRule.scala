@@ -6,7 +6,7 @@ import mr.merc.log.Logging
 
 object TerrainHexViewAdditiveRule {
   // first is drawn first
-  private val orderOfTypes = List(Hill, Mountain, Water, Forest, Swamp, Dirt, Grass, Sand, Road)
+  private val orderOfTypes = List(Hill, Mountain, Water, Forest, Swamp, Grass, Sand, Road, Dirt)
 }
 
 /**

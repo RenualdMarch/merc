@@ -17,6 +17,13 @@ class MainMenu(sceneManager: SceneManager) extends BorderPane {
   styleClass.add("mainMenuContainer")
   stylesheets.add("/css/mainMenu.css")
 
+  val newGameButton = new Button {
+    text = Localization("menu.newGame")
+    onAction = { e: ActionEvent =>
+      sceneManager.startNewGame()
+    }
+  }
+
   val newBattleButton = new Button {
     text = Localization("menu.quickBattle")
     onAction = { e: ActionEvent =>
@@ -39,7 +46,7 @@ class MainMenu(sceneManager: SceneManager) extends BorderPane {
   }
 
   val menuPane = new VBox {
-    content = List(newBattleButton, optionsButton, exitButton)
+    content = List(newGameButton, newBattleButton, optionsButton, exitButton)
   }
 
   menuPane.styleClass.add("menuPane")

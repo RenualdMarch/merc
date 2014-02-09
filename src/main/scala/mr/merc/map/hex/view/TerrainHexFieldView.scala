@@ -127,6 +127,20 @@ class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer
     }
   }
 
+  private val terrainWorldLayer = new CanvasLayer {
+    def updateLayer(gc: GraphicsContext, viewRect: Rectangle2D) {
+      // No changes possible
+    }
+
+    def drawLayer(gc: GraphicsContext, viewRect: Rectangle2D) {
+      val visibleHexes = calculateVisibleHexes(viewRect)
+      // TODO add borders
+      List(TerrainImageStage).foreach { stage =>
+        visibleHexes foreach (_.drawItself(gc, stage, -viewRect.minX.toInt, -viewRect.minY.toInt))
+      }
+    }
+  }
+
   private val interfaceBattleLayer = new CanvasLayer {
     def updateLayer(gc: GraphicsContext, viewRect: Rectangle2D) {
       val dirty = calculateVisibleHexes(viewRect).filter(_.isInterfaceDirty)
@@ -165,6 +179,7 @@ class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer
   }
 
   def canvasBattleLayers = List(terrainBattleLayer, soldierBattleLayer, darkeningBattleLayer, interfaceBattleLayer)
+  def canvasWorldLayers = List(terrainWorldLayer)
 
   def neigsToRedrawFromCache(set: Set[TerrainHexView]): Set[TerrainHexView] = {
     set flatMap redrawNeigsCache

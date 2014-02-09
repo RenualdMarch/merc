@@ -20,6 +20,7 @@ attackAttribute.magical=Magical
 attackAttribute.marksman=Marksman
 attackAttribute.poison=Poison
 attackAttribute.slow=Slow
+menu.newGame=New game
 menu.quickBattle=Quick battle
 menu.options=Options
 menu.exit=Exit
