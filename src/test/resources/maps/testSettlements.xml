@@ -1,4 +1,5 @@
 <settlements>
 	<settlement x="1" y="2" nameKey="name" cultureName="culture" population="199"/>
 	<settlement x="3" y="1" nameKey="name2" cultureName="culture2" population="200"/>
+	
 </settlements>
