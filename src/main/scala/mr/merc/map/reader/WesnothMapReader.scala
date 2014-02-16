@@ -31,7 +31,7 @@ class WesnothMapReader {
     val splittedLines = cell.split("\\^")
     val mapObj = if (splittedLines.size == 2) {
       splittedLines(1) match {
-        case "Bw\\" => Some(WoodenBridge)
+        case "Bw\\" | "Bw/" => Some(WoodenBridge)
         case "Vh" => Some(House)
         case x => throw new IllegalArgumentException(s"Unkown map object: $x")
       }
