@@ -12,20 +12,7 @@ import scala.beans.BeanProperty
 import scala.xml.XML
 
 object Settlement {
-  def loadSettlements(fileName: String): Map[(Int, Int), Settlement] = {
-    val xml = XML.load(getClass.getResourceAsStream("/maps/" + fileName + ".xml"))
 
-    val settlements = for (node <- xml \ "settlement") yield {
-      val x = (node \ "@x").toString().toInt
-      val y = (node \ "@y").toString().toInt
-      val nameKey = (node \ "@nameKey").toString()
-      val cultureName = (node \ "@cultureName").toString()
-      val population = (node \ "@population").toString().toInt
-
-      ((x, y), Settlement(nameKey, cultureName, population))
-    }
-    settlements toMap
-  }
 }
 
 case class Settlement(nameKey: String, cultureName: String, population: Int) {
