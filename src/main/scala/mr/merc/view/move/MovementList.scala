@@ -15,7 +15,6 @@ class MovementList(val list: List[Movement]) extends Movement {
       moves(current)
     } catch {
       case ex: Exception => {
-        println(this.isOver)
         throw ex
       }
     }

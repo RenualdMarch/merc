@@ -1,7 +1,7 @@
 <settlements>
-	<settlement x="1" y="2" nameKey="name" cultureName="culture" population="199"/>
-	<settlement x="3" y="1" nameKey="name2" cultureName="culture2" population="200"/>
-	<settlement x="3" y="4" nameKey="name3" cultureName="culture2" population="201"/>
+	<settlement x="0" y="0" nameKey="name" cultureName="culture" population="199"/>
+	<settlement x="0" y="3" nameKey="name2" cultureName="culture2" population="200"/>
+	<settlement x="3" y="2" nameKey="name3" cultureName="culture2" population="201"/>
 	<country nameKey="country1" cultureName="culture2" settlements="name2,name3"/>
 	<country nameKey="country2" cultureName="culture" settlements="name"/>
 	

@@ -17,9 +17,9 @@ object WorldMap {
   def load(hexField: TerrainHexField, mapName: String): WorldMap = {
     val xml = XML.load(getClass.getResourceAsStream("/maps/" + mapName + ".xml"))
     val settlements = loadSettlements(xml)
-
     val provinces = calculateProvinces(hexField, settlements)
     val provincesMap = provinces map (p => (p.settlement.nameKey, p)) toMap
+
     val countries = loadCountries(xml, provincesMap)
     new WorldMap(hexField, provinces, countries)
   }
@@ -41,7 +41,8 @@ object WorldMap {
     val centers = hexField.hexes.filter(_.mapObj == Some(House))
     val result = hexField.hexes.groupBy { h =>
       val centersAndDistances = centers.map(c => (c, h.distance(c), settlements(c.x, c.y).population))
-      centersAndDistances.minBy(c => (c._2, c._3))._1
+      val closest = centersAndDistances.minBy(c => (c._2))._1
+      closest
     }
 
     result map (r => new Province(settlements(r._1.x, r._1.y), r._2.toSet)) toSet

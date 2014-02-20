@@ -6,6 +6,7 @@ import mr.merc.map.objects.House
 import mr.merc.map.terrain.Grass
 import mr.merc.map.hex.TerrainHexField
 import scala.xml.XML
+import mr.merc.world.Culture
 
 class WorldMapTest extends FunSuite {
   test("province division") {
@@ -42,8 +43,8 @@ class WorldMapTest extends FunSuite {
     assert(secondProvince.containsHex(hex(3, 3)) === true)
   }
 
-  ignore("countries creation") {
-    val cities = Set((0, 0), (0, 3), (3, 4))
+  test("countries creation") {
+    val cities = Set((0, 0), (0, 3), (3, 2))
 
     def mapFunction(x: Int, y: Int): TerrainHex = {
       if (cities.contains(x, y)) {
@@ -54,7 +55,16 @@ class WorldMapTest extends FunSuite {
     }
 
     val field = new TerrainHexField(5, 5, mapFunction)
-    //import field._
-    //val world = new WorldMap(field, "provinceTest2")
+    import field._
+    val world = WorldMap.load(field, "testSettlements2")
+    assert(world.countries.size === 2)
+    val countries = world.countries.sortBy(_.nameKey)
+    assert(countries(0).nameKey === "country1")
+    assert(countries(0).culture === Culture("culture2"))
+    assert(countries(0).provinces.map(_.settlement.nameKey) === Set("name2", "name3"))
+    assert(countries(1).nameKey === "country2")
+    assert(countries(1).culture === Culture("culture"))
+    assert(countries(1).provinces.map(_.settlement.nameKey) === Set("name"))
+
   }
 }
