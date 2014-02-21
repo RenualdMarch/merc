@@ -1,0 +1,7 @@
+<settlements>
+	<settlement x="0" y="0" nameKey="name" cultureName="culture" population="199"/>
+	<settlement x="7" y="7" nameKey="name2" cultureName="culture2" population="200"/>
+	<country nameKey="country1" cultureName="culture2" settlements="name2"/>
+	<country nameKey="country2" cultureName="culture" settlements="name"/>
+	
+</settlements>
