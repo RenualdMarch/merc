@@ -67,4 +67,11 @@ class WorldMapTest extends FunSuite {
     assert(countries(1).provinces.map(_.settlement.nameKey) === Set("name"))
 
   }
+
+  // 1 should be subtracted from each coordinate
+  test("from editor to map test") {
+    val world = WorldMap.load("citiesTest")
+    assert(world.provinces.size === 2)
+    assert(world.countries.size === 2)
+  }
 }
