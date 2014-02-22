@@ -67,5 +67,5 @@ object WorldMap {
 class WorldMap(val hexField: TerrainHexField, val provinces: Set[Province], val countries: List[Country]) {
 
   val provinceByHex = provinces.flatMap(p => p.hexes.map(h => (h, p))) toMap
-
+  def countryByProvince(p: Province) = countries find (_.provinces.contains(p)) get
 }

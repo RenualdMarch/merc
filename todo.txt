@@ -3,7 +3,10 @@ For M5, (0.2) these things should be completed and tested
 +two canvas prototype with custom scrolling logic
 +Update libraries - Update scalafx version, Scalatest version 2, other libraries
 +Additional terrain types - gravel
-global map with several kingdoms and cities
++global map with several kingdoms and cities
+mountain water border bug
+cities names below
+cities flags above
 ability to travel among cities
 diplomacy among kingdoms - war, peace, alliance, cold war?
 Load soldier types from many sources

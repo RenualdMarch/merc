@@ -17,11 +17,12 @@ import scalafx.geometry.Rectangle2D
 import mr.merc.map.hex.Direction
 import mr.merc.map.view.SoldiersDrawer
 import mr.merc.ui.common.CanvasLayer
+import mr.merc.map.world.WorldMap
 
-class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer) {
+class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer, worldMap: Option[WorldMap] = None) {
   private val infiniteField = new InfiniteHexField((x, y) => new TerrainHex(x, y, Empty))
 
-  val realHexes = field.hexes.map(new TerrainHexView(_, field, this))
+  val realHexes = field.hexes.map(new TerrainHexView(_, field, this, worldMap))
   def blackHexes: Set[TerrainHexView] = {
     val hexSet = field.hexes.toSet
     val blackHexes = hexSet.flatMap(h => infiniteField.neighbours(h.x, h.y)) -- hexSet
@@ -134,8 +135,7 @@ class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer
 
     def drawLayer(gc: GraphicsContext, viewRect: Rectangle2D) {
       val visibleHexes = calculateVisibleHexes(viewRect)
-      // TODO add borders
-      List(TerrainImageStage).foreach { stage =>
+      List(TerrainImageStage, CityDrawingStage, BordersGridStage).foreach { stage =>
         visibleHexes foreach (_.drawItself(gc, stage, -viewRect.minX.toInt, -viewRect.minY.toInt))
       }
     }

@@ -1,0 +1,33 @@
+<settlements>
+	<!-- france -->
+	<settlement x="6" y="1" nameKey="paris" cultureName="europe" population="7000"/>
+	<settlement x="13" y="0" nameKey="lyon" cultureName="europe" population="3000"/>
+	<settlement x="19" y="1" nameKey="marseille" cultureName="europe" population="1000"/>
+	<settlement x="2" y="3" nameKey="toulouse" cultureName="europe" population="200"/>
+	<settlement x="11" y="4" nameKey="lille" cultureName="europe" population="50"/>
+	
+	<!-- spain -->
+	<settlement x="6" y="8" nameKey="madrid" cultureName="europe" population="7000"/>
+	<settlement x="8" y="12" nameKey="barcelona" cultureName="europe" population="3000"/>
+	<settlement x="2" y="13" nameKey="valencia" cultureName="europe" population="1000"/>
+	<settlement x="3" y="16" nameKey="seville" cultureName="europe" population="200"/>
+	
+	<!-- england -->
+	<settlement x="21" y="6" nameKey="london" cultureName="europe" population="7000"/>
+	<settlement x="11" y="8" nameKey="manchester" cultureName="europe" population="3000"/>
+	<settlement x="17" y="9" nameKey="liverpool" cultureName="europe" population="1000"/>
+	<settlement x="16" y="14" nameKey="birmingham" cultureName="europe" population="200"/>
+	<settlement x="22" y="17" nameKey="leeds" cultureName="europe" population="50"/>
+	
+	<!-- germany -->
+	<settlement x="12" y="18" nameKey="berlin" cultureName="europe" population="7000"/>
+	<settlement x="16" y="20" nameKey="hamburg" cultureName="europe" population="3000"/>
+	<settlement x="9" y="22" nameKey="munich" cultureName="europe" population="1000"/>
+	<settlement x="20" y="23" nameKey="cologne" cultureName="europe" population="200"/>
+	
+	<country nameKey="france" cultureName="europe" settlements="paris,lyon,marseille,toulouse,lille"/>
+	<country nameKey="spain" cultureName="europe" settlements="madrid,barcelona,valencia,seville"/>
+	<country nameKey="germany" cultureName="europe" settlements="berlin,hamburg,munich,cologne"/>
+	<country nameKey="england" cultureName="europe" settlements="london,manchester,liverpool,birmingham,leeds"/>
+	
+</settlements>

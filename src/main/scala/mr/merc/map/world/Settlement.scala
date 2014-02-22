@@ -16,7 +16,7 @@ object Settlement {
 }
 
 case class Settlement(nameKey: String, cultureName: String, population: Int) {
-  def picturePath {
+  def picturePath: String = {
     val prefix = "/images/cities/" + cultureName + "/"
 
     val name = population match {

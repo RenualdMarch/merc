@@ -31,6 +31,8 @@ import java.io.File
 import java.util.UUID
 import mr.merc.map.objects.MapObject
 import scalafx.scene.effect.BlendMode
+import mr.merc.map.world.WorldMap
+import mr.merc.map.objects.House
 
 object TerrainHexView {
   val Side = 72
@@ -50,6 +52,14 @@ object TerrainHexView {
     val coef = Seq((1, 0), (3, 0), (4, 2), (3, 4), (1, 4), (0, 2))
     val pixelCorrection = Seq((1, 1), (-1, 1), (-1, 0), (-1, -1), (1, -1), (1, 0))
     (coef zip pixelCorrection).map { case ((x, y), (px, py)) => (x * a + px * pix, y * a + py * pix) }
+  }
+
+  private def borderByDirection: Map[Direction, ((Double, Double), (Double, Double))] = {
+    val firstAnglesList = angles()
+    val secondAnglesList = firstAnglesList.tail :+ firstAnglesList.head
+    val lines = firstAnglesList zip secondAnglesList
+
+    List(N, NE, SE, S, SW, NW) zip lines toMap
   }
 
   private def anglesWithCorrection(xCorr: Int, yCorr: Int, pix: Int = 0): Seq[(Double, Double)] = {
@@ -99,7 +109,7 @@ object TerrainHexView {
   }
 }
 
-class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: TerrainHexFieldView) {
+class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: TerrainHexFieldView, worldMapOpt: Option[WorldMap] = None) {
   private val arrowPath = "/images/arrows/"
 
   val neighbours = field.neighboursWithDirections(hex.x, hex.y)
@@ -191,7 +201,55 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
     elements foreach (_.drawItself(gc, x, y))
     neighbourMapObjects foreach (_.drawImage(gc, x, y))
     secondaryImage.foreach(_.drawCenteredImage(gc, x, y, side, side))
-    mapObject foreach (_.drawImage(gc, x, y))
+
+    if (worldMapOpt.isEmpty || hex.mapObj != Some(House)) {
+      mapObject foreach (_.drawImage(gc, x, y))
+    }
+  }
+
+  def drawCityImage(gc: GraphicsContext, xOffset: Int, yOffset: Int) {
+    worldMapOpt match {
+      case Some(worldMap) => if (hex.mapObj == Some(House)) {
+        val path = worldMap.provinceByHex(hex).settlement.picturePath
+        MImage(path).drawCenteredImage(gc, this.x + xOffset, this.y + yOffset, TerrainHexView.Side, TerrainHexView.Side)
+      }
+      case None => // do nothing
+    }
+  }
+
+  def drawProvinceAndCountryBorders(gc: GraphicsContext, xOffset: Int, yOffset: Int, worldMap: WorldMap) {
+    gc.save()
+    field.neighboursWithDirections(hex) foreach {
+      case (dir, neig) =>
+        import scala.math.Ordering.Implicits._
+        if ((neig.x, neig.y) > (hex.x, hex.y)) {
+
+          val currentProvince = worldMap.provinceByHex(hex)
+          val neigProvince = worldMap.provinceByHex(neig)
+
+          if (currentProvince != neigProvince) {
+            val currentCountry = worldMap.countryByProvince(currentProvince)
+            val neigCountry = worldMap.countryByProvince(neigProvince)
+            val color = if (currentCountry == neigCountry) {
+              Color.PINK
+            } else {
+              Color.RED
+            }
+
+            val line = TerrainHexView.borderByDirection(dir)
+            val start = line._1
+            val finish = line._2
+
+            val x = this.x + xOffset
+            val y = this.y + yOffset
+            gc.stroke = color
+            gc.strokeLine(start._1 + x, start._2 + y, finish._1 + x, finish._2 + y)
+
+          }
+        }
+
+    }
+    gc.restore()
   }
 
   def darkeningShouldBeRedrawn = isDarkened != currentDarkened
@@ -213,6 +271,13 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
         isInterfaceDirty = false
       case ClearStage =>
         drawClearStage(gc, xOffset, yOffset)
+      case BordersGridStage =>
+        worldMapOpt match {
+          case Some(worldMap) => drawProvinceAndCountryBorders(gc, xOffset, yOffset, worldMap)
+          case None => // do nothing, this is possible case for empty hexes
+        }
+      case CityDrawingStage =>
+        drawCityImage(gc, xOffset, yOffset)
     }
   }
 
@@ -264,4 +329,6 @@ case object MovementImpossibleStage extends HexDrawingStage
 case object ArrowStage extends HexDrawingStage
 case object DefenceStage extends HexDrawingStage
 case object HexGridStage extends HexDrawingStage
+case object BordersGridStage extends HexDrawingStage
+case object CityDrawingStage extends HexDrawingStage
 case object EndInterfaceDrawing extends HexDrawingStage

@@ -47,7 +47,7 @@ abstract class MImage private[image] (val xOffset: Int, val yOffset: Int, val al
 
   def drawCenteredImage(gc: GraphicsContext, x: Int, y: Int, width: Int, height: Int) {
     val rect = centeredRect(x, y, width, height)
-    gc.drawImage(image, rect.minX, rect.minY)
+    gc.drawImage(image, rect.minX toInt, rect.minY toInt)
   }
 
   def changeSoldierColor(color: Color) = new LazyChangedColorMImage(color, this, xOffset, yOffset, alpha)
