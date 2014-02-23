@@ -6,23 +6,28 @@ For M5, (0.2) these things should be completed and tested
 +global map with several kingdoms and cities
 +mountain water border bug
 +cities names below
-ability to travel among cities - divide in into tasks
-diplomacy among kingdoms - war, peace, alliance, cold war?
+build graph of provinces connections, with distances
+draw arrows from one city to another
+create world calendar
 Load soldier types from many sources
 human units level 2 and 3
+enhanced soldier type for army leader
+ability to travel among cities
+diplomacy among kingdoms - war, peace, alliance, cold war?
+create missions
+move kingdoms characters and another mercenaries
+battles from world frame
+soldiers expirience and change soldier types when level-up
+units hiring and levelup
 Show healing at village events
 Show healing by healer events
 Make AI heal in villages
 Make AI move in groups
 Save screen position between human moves and center on movements if not visible
 Soldier view clean up
-soldiers expirience and change soldier types when level-up
-units hiring and levelup
 mission "Destroy all enemies", with place for different victory conditions
-enhanced soldier type for army leader
 maximized screen with java 8
 JAVA 8
-Bridges directions on wesnoth map and on actual map
 
 Consider following:
 
