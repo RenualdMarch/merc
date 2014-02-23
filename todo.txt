@@ -6,7 +6,7 @@ For M5, (0.2) these things should be completed and tested
 +global map with several kingdoms and cities
 +mountain water border bug
 +cities names below
-build graph of provinces connections, with distances
++build graph of provinces connections, with distances
 draw arrows from one city to another
 create world calendar
 Load soldier types from many sources

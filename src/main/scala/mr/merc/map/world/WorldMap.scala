@@ -68,4 +68,13 @@ class WorldMap(val hexField: TerrainHexField, val provinces: Set[Province], val 
 
   val provinceByHex = provinces.flatMap(p => p.hexes.map(h => (h, p))) toMap
   def countryByProvince(p: Province) = countries find (_.provinces.contains(p)) get
+
+  // TODO add test for this
+  val provinceConnections: Map[Province, List[(Province, Int)]] = {
+    provinces map { p =>
+      val neigProvinces = p.hexes.flatMap(hexField.neighbours).map(provinceByHex) - p
+      val list = neigProvinces.toList.map(np => (np, np.settlementHex.distance(p.settlementHex)))
+      (p, list)
+    } toMap
+  }
 }

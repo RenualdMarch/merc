@@ -28,7 +28,7 @@ class WorldMapTest extends FunSuite {
     assert(provinces.size === 2)
     val firstProvince = provinces(0)
     assert(firstProvince.settlement === Settlement("name", "culture", 199))
-    assert(firstProvince.hexes.size === 7)
+    assert(firstProvince.hexes.size === 11)
     assert(firstProvince.containsHex(hex(0, 0)) === true)
     assert(firstProvince.containsHex(hex(0, 1)) === true)
     assert(firstProvince.containsHex(hex(0, 2)) === false)
@@ -36,7 +36,7 @@ class WorldMapTest extends FunSuite {
 
     val secondProvince = provinces(1)
     assert(secondProvince.settlement === Settlement("name2", "culture2", 200))
-    assert(secondProvince.hexes.size === 16)
+    assert(secondProvince.hexes.size === 12)
     assert(secondProvince.containsHex(hex(0, 2)) === true)
     assert(secondProvince.containsHex(hex(0, 3)) === true)
     assert(secondProvince.containsHex(hex(0, 1)) === false)
@@ -69,9 +69,32 @@ class WorldMapTest extends FunSuite {
   }
 
   // 1 should be subtracted from each coordinate
-  test("from editor to map test") {
+  test("from editor to map") {
     val world = WorldMap.load("citiesTest")
     assert(world.provinces.size === 2)
     assert(world.countries.size === 2)
+  }
+
+  test("province connections") {
+    val cities = Set((0, 0), (0, 4), (4, 4), (4, 0), (2, 2))
+
+    def mapFunction(x: Int, y: Int): TerrainHex = {
+      if (cities.contains(x, y)) {
+        new TerrainHex(x, y, Grass, Some(House))
+      } else {
+        new TerrainHex(x, y, Grass)
+      }
+    }
+
+    val field = new TerrainHexField(6, 6, mapFunction)
+    import field._
+    val world = WorldMap.load(field, "provinceConnections")
+    val province00 = world.provinceByHex(hex(0, 0))
+    val province04 = world.provinceByHex(hex(0, 4))
+    val province44 = world.provinceByHex(hex(4, 4))
+    val province40 = world.provinceByHex(hex(4, 0))
+    val province22 = world.provinceByHex(hex(2, 2))
+
+    assert(world.provinceConnections(province00).toSet === Set((province04, 4), (province22, 3), (province40, 4)))
   }
 }

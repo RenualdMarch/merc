@@ -12,7 +12,7 @@ class Hex(val x: Int, val y: Int) {
 
   private[hex] def toCubeHex: CubeHex = {
     val cubeX = x
-    val cubeZ = y - (x - x & 1) / 2
+    val cubeZ = y - (x - (x & 1)) / 2
     val cubeY = -cubeX - cubeZ
     new CubeHex(cubeX, cubeY, cubeZ)
   }
