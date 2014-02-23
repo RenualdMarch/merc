@@ -33,6 +33,7 @@ import mr.merc.map.objects.MapObject
 import scalafx.scene.effect.BlendMode
 import mr.merc.map.world.WorldMap
 import mr.merc.map.objects.House
+import mr.merc.map.terrain.Mountain
 
 object TerrainHexView {
   val Side = 72
@@ -197,8 +198,13 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
     val x = this.x + xOffset
     val y = this.y + yOffset
 
-    image.drawCenteredImage(gc, x, y, side, side)
-    elements foreach (_.drawItself(gc, x, y))
+    if (hex.terrain == Mountain) {
+      elements foreach (_.drawItself(gc, x, y))
+      image.drawCenteredImage(gc, x, y, side, side)
+    } else {
+      image.drawCenteredImage(gc, x, y, side, side)
+      elements foreach (_.drawItself(gc, x, y))
+    }
     neighbourMapObjects foreach (_.drawImage(gc, x, y))
     secondaryImage.foreach(_.drawCenteredImage(gc, x, y, side, side))
 
