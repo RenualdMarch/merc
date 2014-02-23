@@ -34,6 +34,9 @@ import scalafx.scene.effect.BlendMode
 import mr.merc.map.world.WorldMap
 import mr.merc.map.objects.House
 import mr.merc.map.terrain.Mountain
+import mr.merc.local.Localization
+import scalafx.scene.text.TextAlignment
+import scalafx.geometry.VPos
 
 object TerrainHexView {
   val Side = 72
@@ -213,14 +216,26 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
     }
   }
 
-  def drawCityImage(gc: GraphicsContext, xOffset: Int, yOffset: Int) {
+  def drawCity(gc: GraphicsContext, xOffset: Int, yOffset: Int) {
     worldMapOpt match {
       case Some(worldMap) => if (hex.mapObj == Some(House)) {
-        val path = worldMap.provinceByHex(hex).settlement.picturePath
+        val settlement = worldMap.provinceByHex(hex).settlement
+        val path = settlement.picturePath
         MImage(path).drawCenteredImage(gc, this.x + xOffset, this.y + yOffset, TerrainHexView.Side, TerrainHexView.Side)
+        drawCityName(gc, xOffset, yOffset, Localization(settlement.nameKey))
       }
       case None => // do nothing
     }
+  }
+
+  def drawCityName(gc: GraphicsContext, xOffset: Int, yOffset: Int, text: String) {
+    gc.save()
+    gc.textAlign = TextAlignment.CENTER
+    gc.textBaseline = VPos.CENTER
+    gc.font = Font.font(Font.default.getFamily, FontWeight.BOLD, 20)
+    gc.fill = Color.WHITE
+    gc.fillText(text, this.x + xOffset + TerrainHexView.Side / 2, this.y + yOffset + TerrainHexView.Side + 10, 144)
+    gc.restore()
   }
 
   def drawProvinceAndCountryBorders(gc: GraphicsContext, xOffset: Int, yOffset: Int, worldMap: WorldMap) {
@@ -283,7 +298,7 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
           case None => // do nothing, this is possible case for empty hexes
         }
       case CityDrawingStage =>
-        drawCityImage(gc, xOffset, yOffset)
+        drawCity(gc, xOffset, yOffset)
     }
   }
 

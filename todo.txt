@@ -5,9 +5,8 @@ For M5, (0.2) these things should be completed and tested
 +Additional terrain types - gravel
 +global map with several kingdoms and cities
 +mountain water border bug
-cities names below
-cities flags above
-ability to travel among cities
++cities names below
+ability to travel among cities - divide in into tasks
 diplomacy among kingdoms - war, peace, alliance, cold war?
 Load soldier types from many sources
 human units level 2 and 3
@@ -32,3 +31,4 @@ add winter weather on maps
 Different images for same terrain type
 After wesnoth release take a look at images
 Levels of difficulty
+cities flags above
