@@ -99,6 +99,8 @@ class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer
     }
   }
 
+  var worldMapArrows: Option[List[(TerrainHexView, TerrainHexView)]] = None
+
   private val realHexesMap = realHexes map (h => ((h.hex.x, h.hex.y), h)) toMap
 
   def hex(x: Int, y: Int) = realHexesMap(x, y)
@@ -137,6 +139,34 @@ class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer
       val visibleHexes = calculateVisibleHexes(viewRect)
       List(TerrainImageStage, CityDrawingStage, BordersGridStage).foreach { stage =>
         visibleHexes foreach (_.drawItself(gc, stage, -viewRect.minX.toInt, -viewRect.minY.toInt))
+      }
+    }
+  }
+
+  private val worldArrowsLayer = new CanvasLayer {
+    val arrowPixelHeight = 40
+    private var currentlyDrawed: Option[List[(TerrainHexView, TerrainHexView)]] = None
+    def updateLayer(gc: GraphicsContext, viewRect: Rectangle2D) {
+      if (currentlyDrawed != worldMapArrows) {
+        drawLayer(gc, viewRect)
+      }
+    }
+
+    def drawLayer(gc: GraphicsContext, viewRect: Rectangle2D) {
+      if (currentlyDrawed.nonEmpty) {
+        gc.clearRect(viewRect.minX, viewRect.minY, viewRect.width, viewRect.height)
+      }
+
+      currentlyDrawed = worldMapArrows
+      currentlyDrawed foreach drawArrows
+    }
+
+    def drawArrows(arrows: List[(TerrainHexView, TerrainHexView)]) {
+      arrows foreach {
+        case (start, finish) =>
+        // TODO draw line
+
+        // TODO draw triangle 
       }
     }
   }
