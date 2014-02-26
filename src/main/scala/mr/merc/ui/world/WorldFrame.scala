@@ -14,6 +14,7 @@ import mr.merc.map.world.WorldMap
 class WorldFrame(sceneManager: SceneManager) extends BorderPane {
   val worldMap = WorldMap.load("worldMap1")
   val mapView = new TerrainHexFieldView(worldMap.hexField, new SoldiersDrawer, Some(worldMap))
+  mapView.worldMapArrows = Some(List((mapView.hex(11, 4), mapView.hex(6, 1))))
   val canvasLayers = new CanvasLayers(mapView.canvasWorldLayers, new Rectangle2D(0, 0, mapView.pixelWidth, mapView.pixelHeight))
 
   private val rightPanel = new VBox() {

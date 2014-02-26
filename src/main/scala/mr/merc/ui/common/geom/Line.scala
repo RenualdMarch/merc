@@ -16,4 +16,5 @@ case class Line(beginX: Double, beginY: Double, endX: Double, endY: Double) {
   }
 
   def toMVector = MVector(endX - beginX, endY - beginY)
+  val length = toMVector.length
 }

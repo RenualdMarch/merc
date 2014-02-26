@@ -18,6 +18,7 @@ import mr.merc.map.hex.Direction
 import mr.merc.map.view.SoldiersDrawer
 import mr.merc.ui.common.CanvasLayer
 import mr.merc.map.world.WorldMap
+import mr.merc.ui.common.geom.Line
 
 class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer, worldMap: Option[WorldMap] = None) {
   private val infiniteField = new InfiniteHexField((x, y) => new TerrainHex(x, y, Empty))
@@ -144,7 +145,11 @@ class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer
   }
 
   private val worldArrowsLayer = new CanvasLayer {
-    val arrowPixelHeight = 40
+    val hexOffset = 60
+    val arrowLength = 60
+    val arrowLineWidth = 20
+    val arrowWidth = 60
+    val arrowColor = Color.RED
     private var currentlyDrawed: Option[List[(TerrainHexView, TerrainHexView)]] = None
     def updateLayer(gc: GraphicsContext, viewRect: Rectangle2D) {
       if (currentlyDrawed != worldMapArrows) {
@@ -158,15 +163,30 @@ class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer
       }
 
       currentlyDrawed = worldMapArrows
-      currentlyDrawed foreach drawArrows
+      currentlyDrawed foreach (drawArrows(gc, _))
     }
 
-    def drawArrows(arrows: List[(TerrainHexView, TerrainHexView)]) {
+    def drawArrows(gc: GraphicsContext, arrows: List[(TerrainHexView, TerrainHexView)]) {
       arrows foreach {
         case (start, finish) =>
-        // TODO draw line
+          val line = new Line(start.center._1, start.center._2, finish.center._1, finish.center._2)
+          val cutLine = line.cutFromTheBeginning(hexOffset).cutFromTheEnd(hexOffset)
+          val cutFromArrow = cutLine.cutFromTheBeginning(cutLine.length - arrowLength)
+          val cutWithoutArrow = cutLine.cutFromTheEnd(arrowLength)
+          gc.save()
+          gc.lineWidth = arrowLineWidth
+          gc.stroke = arrowColor
+          gc.strokeLine(cutWithoutArrow.beginX, cutWithoutArrow.beginY, cutWithoutArrow.endX, cutWithoutArrow.endY)
 
-        // TODO draw triangle 
+          val vector = cutFromArrow.toMVector
+          val orth = vector.ortho
+          val firstSide = orth * (arrowWidth / 2)
+          val firstLine = firstSide.toLine(cutFromArrow.beginX, cutFromArrow.beginY)
+          val secondSide = orth * (-arrowWidth / 2)
+          val secondLine = secondSide.toLine(cutFromArrow.beginX, cutFromArrow.beginY)
+          gc.fill = arrowColor
+          gc.fillPolygon(Seq((cutFromArrow.endX, cutFromArrow.endY), (firstLine.endX, firstLine.endY), (secondLine.endX, secondLine.endY)))
+          gc.restore()
       }
     }
   }
@@ -209,7 +229,7 @@ class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer
   }
 
   def canvasBattleLayers = List(terrainBattleLayer, soldierBattleLayer, darkeningBattleLayer, interfaceBattleLayer)
-  def canvasWorldLayers = List(terrainWorldLayer)
+  def canvasWorldLayers = List(terrainWorldLayer, worldArrowsLayer)
 
   def neigsToRedrawFromCache(set: Set[TerrainHexView]): Set[TerrainHexView] = {
     set flatMap redrawNeigsCache

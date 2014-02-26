@@ -7,11 +7,13 @@ For M5, (0.2) these things should be completed and tested
 +mountain water border bug
 +cities names below
 +build graph of provinces connections, with distances
-draw arrows from one city to another
-create world calendar
++draw arrows from one city to another
+make arrows clickable and able to change color when they are selected
 Load soldier types from many sources
 human units level 2 and 3
 enhanced soldier type for army leader
+game map character
+create world calendar
 ability to travel among cities
 diplomacy among kingdoms - war, peace, alliance, cold war?
 create missions
