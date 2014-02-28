@@ -159,17 +159,19 @@ class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer
 
     def drawLayer(gc: GraphicsContext, viewRect: Rectangle2D) {
       if (currentlyDrawed.nonEmpty) {
-        gc.clearRect(viewRect.minX, viewRect.minY, viewRect.width, viewRect.height)
+        gc.clearRect(0, 0, viewRect.width, viewRect.height)
       }
 
       currentlyDrawed = worldMapArrows
-      currentlyDrawed foreach (drawArrows(gc, _))
+      currentlyDrawed foreach (drawArrows(gc, _, viewRect))
     }
 
-    def drawArrows(gc: GraphicsContext, arrows: List[(TerrainHexView, TerrainHexView)]) {
+    def drawArrows(gc: GraphicsContext, arrows: List[(TerrainHexView, TerrainHexView)], viewRect: Rectangle2D) {
       arrows foreach {
         case (start, finish) =>
-          val line = new Line(start.center._1, start.center._2, finish.center._1, finish.center._2)
+          val xOffset = -viewRect.minX.toInt
+          val yOffset = -viewRect.minY.toInt
+          val line = new Line(start.center._1 + xOffset, start.center._2 + yOffset, finish.center._1 + xOffset, finish.center._2 + yOffset)
           val cutLine = line.cutFromTheBeginning(hexOffset).cutFromTheEnd(hexOffset)
           val cutFromArrow = cutLine.cutFromTheBeginning(cutLine.length - arrowLength)
           val cutWithoutArrow = cutLine.cutFromTheEnd(arrowLength)
