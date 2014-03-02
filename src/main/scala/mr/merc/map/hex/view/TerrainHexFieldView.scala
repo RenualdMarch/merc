@@ -19,6 +19,8 @@ import mr.merc.map.view.SoldiersDrawer
 import mr.merc.ui.common.CanvasLayer
 import mr.merc.map.world.WorldMap
 import mr.merc.ui.common.geom.Line
+import mr.merc.ui.common.geom.Polygon
+import mr.merc.ui.common.geom.PolygonSet
 
 class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer, worldMap: Option[WorldMap] = None) {
   private val infiniteField = new InfiniteHexField((x, y) => new TerrainHex(x, y, Empty))
@@ -150,7 +152,9 @@ class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer
     val arrowLineWidth = 20
     val arrowWidth = 60
     val arrowColor = Color.RED
+
     private var currentlyDrawed: Option[List[(TerrainHexView, TerrainHexView)]] = None
+
     def updateLayer(gc: GraphicsContext, viewRect: Rectangle2D) {
       if (currentlyDrawed != worldMapArrows) {
         drawLayer(gc, viewRect)
@@ -171,25 +175,44 @@ class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer
         case (start, finish) =>
           val xOffset = -viewRect.minX.toInt
           val yOffset = -viewRect.minY.toInt
-          val line = new Line(start.center._1 + xOffset, start.center._2 + yOffset, finish.center._1 + xOffset, finish.center._2 + yOffset)
-          val cutLine = line.cutFromTheBeginning(hexOffset).cutFromTheEnd(hexOffset)
-          val cutFromArrow = cutLine.cutFromTheBeginning(cutLine.length - arrowLength)
-          val cutWithoutArrow = cutLine.cutFromTheEnd(arrowLength)
-          gc.save()
-          gc.lineWidth = arrowLineWidth
-          gc.stroke = arrowColor
-          gc.strokeLine(cutWithoutArrow.beginX, cutWithoutArrow.beginY, cutWithoutArrow.endX, cutWithoutArrow.endY)
 
-          val vector = cutFromArrow.toMVector
-          val orth = vector.ortho
-          val firstSide = orth * (arrowWidth / 2)
-          val firstLine = firstSide.toLine(cutFromArrow.beginX, cutFromArrow.beginY)
-          val secondSide = orth * (-arrowWidth / 2)
-          val secondLine = secondSide.toLine(cutFromArrow.beginX, cutFromArrow.beginY)
-          gc.fill = arrowColor
-          gc.fillPolygon(Seq((cutFromArrow.endX, cutFromArrow.endY), (firstLine.endX, firstLine.endY), (secondLine.endX, secondLine.endY)))
-          gc.restore()
+          val head = arrowHead(start, finish)
+          val body = arrowLine(start, finish)
+          val set = new PolygonSet(head, body)
+          set.drawPolygons(xOffset, yOffset, gc, Color.RED)
       }
+    }
+
+    def arrowHead(start: TerrainHexView, finish: TerrainHexView): Polygon = {
+      val line = new Line(start.center._1, start.center._2, finish.center._1, finish.center._2)
+      val cutLine = line.cutFromTheBeginning(hexOffset).cutFromTheEnd(hexOffset)
+      val cutFromArrow = cutLine.cutFromTheBeginning(cutLine.length - arrowLength)
+
+      val vector = cutFromArrow.toMVector
+      val orth = vector.ortho
+      val firstSide = orth * (arrowWidth / 2)
+      val firstLine = firstSide.toLine(cutFromArrow.beginX, cutFromArrow.beginY)
+      val secondSide = orth * (-arrowWidth / 2)
+      val secondLine = secondSide.toLine(cutFromArrow.beginX, cutFromArrow.beginY)
+
+      new Polygon((cutFromArrow.endX, cutFromArrow.endY), (firstLine.endX, firstLine.endY), (secondLine.endX, secondLine.endY))
+    }
+
+    def arrowLine(start: TerrainHexView, finish: TerrainHexView): Polygon = {
+      val line = new Line(start.center._1, start.center._2, finish.center._1, finish.center._2)
+      val cutLine = line.cutFromTheBeginning(hexOffset).cutFromTheEnd(hexOffset)
+      val cutWithoutArrow = cutLine.cutFromTheEnd(arrowLength)
+
+      val vector = cutWithoutArrow.toMVector
+      val orthoNorm = vector.ortho
+      val ortho1 = orthoNorm * (arrowLineWidth / 2)
+      val ortho2 = ortho1 * (-1)
+      val begin1 = (cutWithoutArrow.beginX + ortho1.x, cutWithoutArrow.beginY + ortho1.y)
+      val begin2 = (cutWithoutArrow.beginX + ortho2.x, cutWithoutArrow.beginY + ortho2.y)
+      val end1 = (cutWithoutArrow.endX + ortho1.x, cutWithoutArrow.endY + ortho1.y)
+      val end2 = (cutWithoutArrow.endX + ortho2.x, cutWithoutArrow.endY + ortho2.y)
+
+      new Polygon(begin1, begin2, end2, end1)
     }
   }
 

@@ -49,6 +49,7 @@ import mr.merc.ui.battle.BattleFrame
 import mr.merc.music.MusicPlayer
 import mr.merc.ui.menu.MainMenu
 import mr.merc.ui.common.SceneManager
+import scalafx.scene.shape.Polygon
 
 object Main extends JFXApp {
 
