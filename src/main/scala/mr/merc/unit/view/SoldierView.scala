@@ -42,8 +42,7 @@ object SoldierView {
 
 }
 
-class SoldierView(val soldier: Soldier) extends Sprite[SoldierViewState](SoldierTypeViewInfo(soldier.soldierType.name, soldier.owner.color).images, StandState) {
-  SoldierTypeViewInfo(soldier.soldierType.name, soldier.owner.color).eagerLoad()
+class SoldierView(val soldier: Soldier) extends AbstractSoldierView(SoldierTypeViewInfo(soldier.soldierType.name, soldier.owner.color)) {
 
   private val maxHp = 100
   private val healthBarHeight = Math.min(soldier.soldierType.hp, maxHp) * 2 * TerrainHexView.Side / 3 / maxHp
@@ -76,24 +75,6 @@ class SoldierView(val soldier: Soldier) extends Sprite[SoldierViewState](Soldier
       healthBar.draw(x + xOffset + 12, y + yOffset + 15, gc)
       //xpBar.draw(x + 6, y + TerrainHexView.Side - xpBarHeight, gc)
     }
-  }
-
-  override def updateTime(delta: Int): Int = {
-    val result = super.updateTime(delta)
-
-    if (result > 0) {
-      // TODO optimize it in case of 1-frame 
-      markAsDirty()
-    }
-
-    if (result > 0 && index == 0) {
-      if (state == DeathState) {
-        state = NoState
-      } else if (state == IdleState) {
-        state = StandState
-      }
-    }
-    result
   }
 
   def lookAtDirection(direction: Direction) {

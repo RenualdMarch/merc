@@ -21,7 +21,7 @@ class SoldierDrawerTest extends FunSuite with MockitoSugar with BeforeAndAfter {
   val soldier3 = mock[SoldierView]
   val gc = mock[GraphicsContext]
 
-  def addSoldiers(sd: SoldiersDrawer) {
+  def addSoldiers(sd: SoldiersDrawer[SoldierView]) {
     sd.addSoldier(soldier1)
     sd.addSoldier(soldier2)
     sd.addSoldier(soldier3)
@@ -34,7 +34,7 @@ class SoldierDrawerTest extends FunSuite with MockitoSugar with BeforeAndAfter {
   }
 
   test("simple updating without movements") {
-    val soldiersDrawer = new SoldiersDrawer
+    val soldiersDrawer = new SoldiersDrawer[SoldierView]
     addSoldiers(soldiersDrawer)
 
     soldiersDrawer.update(50)

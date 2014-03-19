@@ -41,7 +41,7 @@ class BattleViewTest extends FunSuite with BeforeAndAfter with MockitoSugar {
   val closedSoldierType = new SoldierType("testType1", 1, 20, 10, 5, 1,
     List(Attack(0, 1, 2, Impact, false)), Map(), Map(), Map())
 
-  val soldierDrawer = mock[SoldiersDrawer]
+  val soldierDrawer = mock[SoldiersDrawer[SoldierView]]
 
   var view: BattleView = _
 
@@ -95,7 +95,7 @@ class BattleViewTest extends FunSuite with BeforeAndAfter with MockitoSugar {
     from.soldier = Some(attacker)
     val to = field.hex(1, 0)
     to.soldier = Some(defender)
-    val soldierDrawer = new SoldiersDrawer
+    val soldierDrawer = new SoldiersDrawer[SoldierView]
     view = new BattleView(model, soldierDrawer)
     val event = new AttackBattleViewEvent(from, to, attacker, defender, result)
     view.handleEvent(event)
@@ -129,7 +129,7 @@ class BattleViewTest extends FunSuite with BeforeAndAfter with MockitoSugar {
     from.soldier = Some(attacker)
     val to = field.hex(1, 0)
     to.soldier = Some(defender)
-    val soldierDrawer = new SoldiersDrawer
+    val soldierDrawer = new SoldiersDrawer[SoldierView]
     view = new BattleView(model, soldierDrawer)
 
     val event = new AttackBattleViewEvent(from, to, attacker, defender, result)

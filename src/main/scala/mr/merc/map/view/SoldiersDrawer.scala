@@ -1,6 +1,5 @@
 package mr.merc.map.view
 
-import mr.merc.unit.view.SoldierView
 import mr.merc.view.move.Movement
 import scalafx.scene.canvas.GraphicsContext
 import scala.collection.mutable.Queue
@@ -8,19 +7,21 @@ import mr.merc.map.hex.view.TerrainHexView
 import mr.merc.log.Logging
 import scalafx.geometry.Rectangle2D
 import mr.merc.view.Drawable
+import mr.merc.unit.view.AbstractSoldierView
+import scala.reflect.ClassTag
 
-class SoldiersDrawer extends Logging {
-  private var _soldiers = Set[SoldierView]()
+class SoldiersDrawer[T <: AbstractSoldierView: ClassTag] extends Logging {
+  private var _soldiers = Set[T]()
   private val _movements = Queue[Movement]()
   private def currentMovement = _movements.headOption
-  private val rectIntersectionHelper = new RectIntersectionHelper[SoldierView]
+  private val rectIntersectionHelper = new RectIntersectionHelper[T]
 
-  def addSoldier(s: SoldierView) {
+  def addSoldier(s: T) {
     _soldiers += s
     rectIntersectionHelper.addRect(s, s.viewRect)
   }
 
-  def removeSoldier(s: SoldierView) {
+  def removeSoldier(s: T) {
     _soldiers = soldiers filterNot (_ == s)
     rectIntersectionHelper.removeRect(s)
   }
@@ -36,7 +37,7 @@ class SoldiersDrawer extends Logging {
   private def drawablesInMovements = currentMovement.map(_.drawables).getOrElse(Nil)
 
   private def soldiersInMovements = drawablesInMovements flatMap (d => d match {
-    case soldier: SoldierView => Some(soldier)
+    case soldier: T => Some(soldier)
     case _ => None
   })
 
@@ -78,9 +79,9 @@ class SoldiersDrawer extends Logging {
     }
   }
 
-  private def calculateTouchedSoldiers(dirtySoldiers: Set[SoldierView]): Set[SoldierView] = {
-    var alreadyTouched = Set[SoldierView]()
-    var touchedLastTime = Set[SoldierView]()
+  private def calculateTouchedSoldiers(dirtySoldiers: Set[T]): Set[T] = {
+    var alreadyTouched = Set[T]()
+    var touchedLastTime = Set[T]()
 
     touchedLastTime ++= dirtySoldiers
 
@@ -103,7 +104,7 @@ class SoldiersDrawer extends Logging {
     val visibleSoldiers = soldiers.filter(_.viewRect.intersects(viewRect))
     val dirtySoldiers = visibleSoldiers.filter(_.dirtyRect.isDefined)
     val dirtyDrawables = drawablesInMovements.filter(_.dirtyRect.isDefined)
-    val soldiersDrawables = dirtyDrawables.collect { case x: SoldierView => x }
+    val soldiersDrawables = dirtyDrawables.collect { case x: T => x }
     val allDirtySoldiers = dirtySoldiers ++ soldiersDrawables
 
     allDirtySoldiers foreach { ds =>

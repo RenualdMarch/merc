@@ -6,4 +6,5 @@ sealed trait WorldModelEvent {
 
 }
 
-case class MoveToAnotherCityWorldModelEvent(province: Province) extends WorldModelEvent
+case class MoveCharacter(character: Character, province: Province) extends WorldModelEvent
+case class MoveCharacterToBorders(character: Character) extends WorldModelEvent
