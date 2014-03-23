@@ -17,6 +17,7 @@ import mr.merc.map.terrain.TerrainType
 import scala.collection.mutable.ArrayBuffer
 import mr.merc.world.character.HumanCharacter
 import mr.merc.world.character.Character
+import mr.merc.map.hex.TerrainHex
 
 class WorldView(worldMap: WorldMap) {
   val soldierDrawer = new SoldiersDrawer[CharacterView]
@@ -28,7 +29,13 @@ class WorldView(worldMap: WorldMap) {
       val mutableMap = collection.mutable.Map[Option[Province], ArrayBuffer[(TerrainHexView, Option[CharacterView])]]()
       val buffer = ArrayBuffer[(TerrainHexView, Option[CharacterView])]() ++ characterPlacesInProvinceCenter(p).map((_, None))
       mutableMap += (None -> buffer)
-      // TODO add to province movements
+
+      worldMap.provinceConnections(p).foreach {
+        case (n, i) =>
+          val buffer = ArrayBuffer[(TerrainHexView, Option[CharacterView])]() ++ characterPlacesMovingToProvince(p, n).map((_, None))
+          mutableMap += (Some(n) -> buffer)
+      }
+
       (p -> mutableMap)
     } toMap
   }
@@ -59,8 +66,24 @@ class WorldView(worldMap: WorldMap) {
           }
         }
         soldierDrawer.addSoldier(view)
-
-        // TODO insert character in province borders
+      }
+      p.characters.charactersInMovement.foreach {
+        case (target, list) =>
+          list foreach { c =>
+            val view = new CharacterView(c)
+            c match {
+              case human: HumanCharacter => {
+                humanCharacterPosition = p
+                view.coords = hexFieldView.hex(p.settlementHex.x, p.settlementHex.y).coords
+              }
+              case computer: Character => {
+                val buffer = mapPositions(p)(Some(target))
+                val hexView = insertCharacterView(buffer, view, s"Not found free " +
+                  "place in province ${p.settlement.nameKey} when moving to ${target.settlement.nameKey}")
+                view.coords = hexView.coords
+              }
+            }
+          }
       }
     }
   }
@@ -85,12 +108,19 @@ class WorldView(worldMap: WorldMap) {
     hexFieldView.arrowPolygon(startView, finishView)
   }
 
+  def validHexesTypes(hex: TerrainHex) = !Set[TerrainType](Water, Mountain).contains(hex.terrain)
   def characterPlacesInProvinceCenter(province: Province): List[TerrainHexView] = {
-    val invalidHexesTypes = Set[TerrainType](Water, Mountain)
     val center = province.settlementHex
-    val hexes = (province.hexes - center).toList.filter(h => !invalidHexesTypes.contains(h.terrain))
+    val hexes = (province.hexes - center).toList.filter(validHexesTypes)
 
     hexes.sortBy(center.distance) map { h => hexFieldView.hex(h.x, h.y) }
+  }
+
+  def characterPlacesMovingToProvince(placement: Province, target: Province): List[TerrainHexView] = {
+    val center = placement.settlementHex
+    val targetCenter = target.settlementHex
+    val hexes = (placement.hexes - center).toList.filter(validHexesTypes)
+    hexes.sortBy(targetCenter.distance) map { h => hexFieldView.hex(h.x, h.y) }
   }
 
   def pixelHeight = hexFieldView.pixelHeight
