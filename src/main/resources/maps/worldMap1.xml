@@ -25,9 +25,9 @@
 	<settlement x="9" y="22" nameKey="munich" cultureName="europe" population="1000"/>
 	<settlement x="20" y="23" nameKey="cologne" cultureName="europe" population="200"/>
 	
-	<country nameKey="france" cultureName="europe" settlements="paris,lyon,marseille,toulouse,lille"/>
-	<country nameKey="spain" cultureName="europe" settlements="madrid,barcelona,valencia,seville"/>
-	<country nameKey="germany" cultureName="europe" settlements="berlin,hamburg,munich,cologne"/>
-	<country nameKey="england" cultureName="europe" settlements="london,manchester,liverpool,birmingham,leeds"/>
+	<country nameKey="france" cultureName="europe" color="blue" settlements="paris,lyon,marseille,toulouse,lille"/>
+	<country nameKey="spain" cultureName="europe" color="yellow" settlements="madrid,barcelona,valencia,seville"/>
+	<country nameKey="germany" cultureName="europe" color="black" settlements="berlin,hamburg,munich,cologne"/>
+	<country nameKey="england" cultureName="europe" color="white" settlements="london,manchester,liverpool,birmingham,leeds"/>
 	
 </settlements>

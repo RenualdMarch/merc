@@ -5,7 +5,7 @@
 	<settlement x="0" y="4" nameKey="name4" cultureName="culture2" population="201"/>
 	<settlement x="2" y="2" nameKey="name5" cultureName="culture2" population="201"/>
 	
-	<country nameKey="country1" cultureName="culture2" settlements="name2,name3,name4,name5"/>
-	<country nameKey="country2" cultureName="culture" settlements="name"/>
+	<country nameKey="country1" color="green" cultureName="culture2" settlements="name2,name3,name4,name5"/>
+	<country nameKey="country2" color="blue" cultureName="culture" settlements="name"/>
 	
 </settlements>

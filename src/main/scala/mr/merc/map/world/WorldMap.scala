@@ -7,6 +7,8 @@ import scala.xml.XML
 import scala.xml.Elem
 import mr.merc.map.reader.WesnothMapReader
 import mr.merc.world.Culture
+import scalafx.scene.paint.Color
+import mr.merc.world.character.CharacterGenerator
 
 object WorldMap {
   def load(mapName: String): WorldMap = {
@@ -53,8 +55,9 @@ object WorldMap {
       val nameKey = (node \ "@nameKey").toString()
       val cultureName = (node \ "@cultureName").toString()
       val settlements = (node \ "@settlements").toString().split(",").toSet
+      val color = (node \ "@color").toString()
       val provincesSet = settlements map provinces
-      val c = new Country(nameKey, Culture(cultureName))
+      val c = new Country(nameKey, Culture(cultureName), Color.web(color))
       c.provinces = provincesSet
       c
     }
@@ -76,5 +79,15 @@ class WorldMap(val hexField: TerrainHexField, val provinces: Set[Province], val 
       val list = neigProvinces.toList.map(np => (np, np.settlementHex.distance(p.settlementHex)))
       (p, list)
     } toMap
+  }
+
+  private val characterGenerator = new CharacterGenerator()
+  def initCharacters() {
+    countries.foreach(characterGenerator.fillCountryWithComputerCharacters)
+  }
+
+  def initHumanCharacter() {
+    val human = characterGenerator.generateHumanCharacter
+    provinces.toList(0).characters.charactersInProvinceCenter += human
   }
 }

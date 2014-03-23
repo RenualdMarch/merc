@@ -1,8 +1,9 @@
 package mr.merc.world.character
 
 import mr.merc.map.world.Province
+import scala.collection.mutable.ArrayBuffer
 
 class CharactersInProvince {
-  var charactersInProvinceCenter: List[Character] = Nil
-  var charactersInMovement: Map[Province, List[Character]] = Map()
+  val charactersInProvinceCenter: ArrayBuffer[Character] = ArrayBuffer()
+  val charactersInMovement: Map[Province, ArrayBuffer[Character]] = Map()
 }
