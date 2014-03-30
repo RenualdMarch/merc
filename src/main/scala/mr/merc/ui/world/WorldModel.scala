@@ -1,5 +1,7 @@
 package mr.merc.ui.world
 
-class WorldModel {
+import mr.merc.map.world.WorldMap
+
+class WorldModel(val worldMap: WorldMap) {
 
 }

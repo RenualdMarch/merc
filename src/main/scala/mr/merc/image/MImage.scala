@@ -42,7 +42,7 @@ abstract class MImage private[image] (val xOffset: Int, val yOffset: Int, val al
   def centeredRect(x: Double, y: Double, width: Double, height: Double): Rectangle2D = {
     val actualX = x + (width - this.width) / 2
     val actualY = y + (height - this.height) / 2
-    new Rectangle2D(actualX, actualY, image.width.value, image.height.value)
+    new Rectangle2D(actualX.toInt, actualY.toInt, image.width.value, image.height.value)
   }
 
   def drawCenteredImage(gc: GraphicsContext, x: Int, y: Int, width: Int, height: Int) {

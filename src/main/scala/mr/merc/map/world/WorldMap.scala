@@ -81,13 +81,22 @@ class WorldMap(val hexField: TerrainHexField, val provinces: Set[Province], val 
     } toMap
   }
 
+  private var computerCharactersGenerated = false
+  private var humanCharacterGenerated = false
+
+  def charactersGenerated = computerCharactersGenerated && humanCharacterGenerated
+
   private val characterGenerator = new CharacterGenerator()
   def initCharacters() {
+    require(!computerCharactersGenerated)
     countries.foreach(characterGenerator.fillCountryWithComputerCharacters)
+    computerCharactersGenerated = true
   }
 
   def initHumanCharacter() {
+    require(!humanCharacterGenerated)
     val human = characterGenerator.generateHumanCharacter
     provinces.toList(0).characters.charactersInProvinceCenter += human
+    humanCharacterGenerated = true
   }
 }

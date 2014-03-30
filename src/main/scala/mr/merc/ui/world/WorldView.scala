@@ -23,6 +23,21 @@ class WorldView(worldMap: WorldMap) {
   val soldierDrawer = new SoldiersDrawer[CharacterView]
   val hexFieldView = new TerrainHexFieldView(worldMap.hexField, soldierDrawer, Some(worldMap))
 
+  private var characterHexes = Map[(Int, Int), CharacterView]()
+
+  def characterOnHex(x: Int, y: Int) = characterHexes.get(x, y)
+
+  def cityOnHex(x: Int, y: Int): Option[Province] = {
+    val hex = worldMap.hexField.hex(x, y)
+    val province = worldMap.provinceByHex(hex)
+    val center = province.settlementHex
+    if (center == hex) {
+      Some(province)
+    } else {
+      None
+    }
+  }
+
   var humanCharacterPosition: Province = _
   val mapPositions: Map[Province, collection.mutable.Map[Option[Province], ArrayBuffer[(TerrainHexView, Option[CharacterView])]]] = {
     worldMap.countries.flatMap(_.provinces).map { p =>
@@ -47,6 +62,7 @@ class WorldView(worldMap: WorldMap) {
       getOrElse(sys.error(errorText))
     val (hexView, _) = buffer(freeIndex)
     buffer.update(freeIndex, (hexView, Some(view)))
+    characterHexes += ((hexView.hex.x, hexView.hex.y) -> view)
     hexView
   }
 
@@ -58,6 +74,7 @@ class WorldView(worldMap: WorldMap) {
           case human: HumanCharacter => {
             humanCharacterPosition = p
             view.coords = hexFieldView.hex(p.settlementHex.x, p.settlementHex.y).coords
+            characterHexes += ((p.settlementHex.x, p.settlementHex.y) -> view)
           }
           case computer: Character => {
             val buffer = mapPositions(p)(None)
@@ -75,6 +92,7 @@ class WorldView(worldMap: WorldMap) {
               case human: HumanCharacter => {
                 humanCharacterPosition = p
                 view.coords = hexFieldView.hex(p.settlementHex.x, p.settlementHex.y).coords
+                characterHexes += ((p.settlementHex.x, p.settlementHex.y) -> view)
               }
               case computer: Character => {
                 val buffer = mapPositions(p)(Some(target))

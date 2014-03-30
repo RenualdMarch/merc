@@ -8,11 +8,22 @@ import mr.merc.unit.SoldierType
 class Character(nameKey: String, _color: Color, val characterType: CharacterType, val culture: Culture, val soldierType: SoldierType) {
 
   def color = _color
-  def name = Localization(nameKey)
+  val name = Localization(nameKey)
 }
 
-sealed trait CharacterType
-case object General extends CharacterType
-case object Governor extends CharacterType
-case object MercenaryGeneral extends CharacterType
-case object SoldierCharacter extends CharacterType
+sealed trait CharacterType {
+  val nameKey: String
+  val name = Localization(nameKey)
+}
+
+case object General extends CharacterType {
+  val nameKey = "character.general"
+}
+
+case object Governor extends CharacterType {
+  val nameKey = "character.governor"
+}
+
+case object MercenaryGeneral extends CharacterType {
+  val nameKey = "character.mercenary"
+}
