@@ -8,11 +8,13 @@ For M5, (0.2) these things should be completed and tested
 +cities names below
 +build graph of provinces connections, with distances
 +draw arrows from one city to another
++game map character
 make arrows clickable and able to change color when they are selected
+JAVA 8
+add circles below characters
 Load soldier types from many sources
 human units level 2 and 3
 enhanced soldier type for army leader
-game map character
 create world calendar
 ability to travel among cities
 diplomacy among kingdoms - war, peace, alliance, cold war?
@@ -29,7 +31,7 @@ Save screen position between human moves and center on movements if not visible
 Soldier view clean up
 mission "Destroy all enemies", with place for different victory conditions
 maximized screen with java 8
-JAVA 8
+
 
 Consider following:
 
@@ -38,4 +40,3 @@ add winter weather on maps
 Different images for same terrain type
 After wesnoth release take a look at images
 Levels of difficulty
-cities flags above

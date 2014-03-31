@@ -106,6 +106,7 @@ class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer
 
   private val realHexesMap = realHexes map (h => ((h.hex.x, h.hex.y), h)) toMap
 
+  def hex(hex: Hex): TerrainHexView = this.hex(hex.x, hex.y)
   def hex(x: Int, y: Int) = realHexesMap(x, y)
 
   def calculateVisibleHexes(viewRect: Rectangle2D) = hexesToDraw filter (isVisible(viewRect))

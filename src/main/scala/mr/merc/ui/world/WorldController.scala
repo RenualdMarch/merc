@@ -9,20 +9,43 @@ import scalafx.geometry.Rectangle2D
 import mr.merc.map.world.WorldMap
 import mr.merc.world.character.Character
 import scalafx.beans.property.ObjectProperty
+import mr.merc.world.character.HumanCharacter
 
 class WorldController {
   val worldMap = WorldMap.load("worldMap1")
   worldMap.initCharacters()
   worldMap.initHumanCharacter()
   val worldView = new WorldView(worldMap)
+  var shownArrows: List[(Province, Province)] = Nil
 
   val selected: ObjectProperty[Option[Either[Character, Province]]] = new ObjectProperty()
   selected.value = None
 
+  def update(time: Int) {
+
+  }
+
   def onMouseLeftClick(x: Int, y: Int, viewRect: Rectangle2D) {
     val selectedCharacter = selectCharacter(x, y, viewRect)
     selectedCharacter match {
-      case Some(c) => this.selected.value = Some(Left(c))
+      case Some(c) => {
+        this.selected.value = Some(Left(c))
+        c match {
+          case human: HumanCharacter => {
+            // TODO remove this hack and save player position somewhere!
+            val selectedProvince = selectCity(x, y, viewRect).get
+            val neigs = worldMap.provinceConnections(selectedProvince)
+            val pairs = neigs.map(n => (selectedProvince, n._1))
+            shownArrows = pairs
+
+            worldView.handleEvent(ShowCityArrowsWorldViewEvent(pairs))
+          }
+          case char: Character => {
+            shownArrows = Nil
+            worldView.handleEvent(ShowCityArrowsWorldViewEvent(Nil))
+          }
+        }
+      }
       case None => {
         val selectedCity = selectCity(x, y, viewRect)
         selectedCity match {

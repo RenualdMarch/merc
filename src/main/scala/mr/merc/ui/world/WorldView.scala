@@ -143,4 +143,18 @@ class WorldView(worldMap: WorldMap) {
 
   def pixelHeight = hexFieldView.pixelHeight
   def pixelWidth = hexFieldView.pixelWidth
+
+  def handleEvent(event: WorldViewEvent) {
+    event match {
+      case ShowCityArrowsWorldViewEvent(list) => {
+        val views = list.map {
+          case (fromProvince, toProvince) =>
+            val from = hexFieldView.hex(fromProvince.settlementHex)
+            val to = hexFieldView.hex(toProvince.settlementHex)
+            (from, to)
+        }
+        hexFieldView.worldMapArrows = views
+      }
+    }
+  }
 }

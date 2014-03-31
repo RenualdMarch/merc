@@ -16,6 +16,7 @@ class CitySelectedPanel(province: Province) extends VBox {
   val canvas = CanvasFactory(new Rectangle2D(0, 0, side, side), image)
   val settlement = province.settlement
 
+  // TODO move this to parent class
   prefWidth = 400
   style = "-fx-background-color: cyan"
   spacing = 20

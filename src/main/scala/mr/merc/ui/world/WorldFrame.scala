@@ -15,8 +15,15 @@ import mr.merc.ui.world.selection.CharacterSelectedPanel
 import mr.merc.ui.world.selection.CitySelectedPanel
 import scalafx.scene.input.MouseEvent
 import scalafx.scene.input.MouseButton
+import scalafx.animation.Timeline
+import scalafx.animation.KeyFrame
+import scalafx.event.ActionEvent
+import mr.merc.log.Logging
+import scalafx.animation.Animation
 
-class WorldFrame(sceneManager: SceneManager) extends BorderPane {
+class WorldFrame(sceneManager: SceneManager) extends BorderPane with Logging {
+  val pulse = 20 ms
+
   val controller = new WorldController()
 
   val worldView = controller.worldView
@@ -63,5 +70,19 @@ class WorldFrame(sceneManager: SceneManager) extends BorderPane {
   }
 
   controller.selected.onChange(onSelectionChange)
+
+  val timeline = Timeline(KeyFrame(pulse, onFinished = { ev: ActionEvent => gameLoop() }))
+  timeline.cycleCount = Animation.INDEFINITE
+  timeline.play()
+
+  var lastUpdateTime = System.currentTimeMillis()
+  def gameLoop() {
+    val currentTime = System.currentTimeMillis
+    val timePassed = currentTime - lastUpdateTime
+    lastUpdateTime = currentTime
+    debug(s"in game loop $timePassed ms passed since previous call")
+    controller.update(timePassed.toInt)
+    canvasLayers.updateCanvas()
+  }
 
 }
