@@ -9,8 +9,9 @@ For M5, (0.2) these things should be completed and tested
 +build graph of provinces connections, with distances
 +draw arrows from one city to another
 +game map character
++JAVA 8
 make arrows clickable and able to change color when they are selected
-JAVA 8
+
 add circles below characters
 Load soldier types from many sources
 human units level 2 and 3

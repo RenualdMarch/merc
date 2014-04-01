@@ -1,6 +1,6 @@
 name:= "Merc"
 
-version := "0.1"
+version := "0.2"
 
 scalaVersion := "2.10.2"
 
@@ -10,7 +10,7 @@ libraryDependencies += "org.scalatest" % "scalatest_2.10" % "2.0" % "test"
 
 libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.3"
 
-libraryDependencies += "org.scalafx" % "scalafx_2.10" % "1.0.0-M7"
+libraryDependencies += "org.scalafx" % "scalafx_2.10" % "8.0.0-R4"
 
 libraryDependencies += "org.mockito" % "mockito-core" % "1.9.5" % "test"
 
@@ -20,8 +20,6 @@ libraryDependencies += "de.huxhorn.sulky" % "de.huxhorn.sulky.3rdparty.jlayer" %
 
 libraryDependencies += "com.miglayout" % "miglayout-javafx" % "4.2"
 
-unmanagedJars in Test += Attributed.blank(file(System.getenv("JAVA_HOME") + "/jre/lib/jfxrt.jar"))
-
 scalacOptions ++= Seq("-feature", "-deprecation", "-language:postfixOps", "-language:implicitConversions")
 
 jfxSettings
@@ -30,6 +28,6 @@ JFX.mainClass := Some("mr.merc.main.Main")
 
 JFX.devKit := JFX.jdk(System.getenv("JAVA_HOME"))
 
-JFX.addJfxrtToClasspath := true
+JFX.addJfxrtToClasspath := false
 
 JFX.nativeBundles := "image"
