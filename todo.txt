@@ -12,7 +12,6 @@ For M5, (0.2) these things should be completed and tested
 +JAVA 8
 +make arrows clickable and able to change color when they are selected
 +add circles below characters
-Load soldier types from many sources
 human units level 2 and 3
 create world calendar
 ability to travel among cities
