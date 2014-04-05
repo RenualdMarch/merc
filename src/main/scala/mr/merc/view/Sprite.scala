@@ -3,6 +3,7 @@ package mr.merc.view
 import scalafx.scene.canvas.GraphicsContext
 import mr.merc.image.MImage
 import scalafx.geometry.Rectangle2D
+import mr.merc.map.hex._
 
 object Sprite {
 
@@ -29,6 +30,14 @@ class Sprite[T <: SpriteState](val images: Map[T, List[MImage]], private var _st
   var rightDirection = true
 
   var dirtyRect: Option[Rectangle2D] = None
+
+  def lookAtDirection(direction: Direction) {
+    if (direction == NE || direction == SE) {
+      rightDirection = true
+    } else if (direction == NW || direction == SW) {
+      rightDirection = false
+    }
+  }
 
   def calculateDirtyRect = centered match {
     case Some(size) => currentImage.centeredRect(x, y, size, size)

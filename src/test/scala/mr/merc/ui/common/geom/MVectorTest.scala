@@ -1,9 +1,9 @@
 package mr.merc.ui.common.geom
 
 import org.scalatest.FunSuite
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 
-class MVectorTest extends FunSuite with ShouldMatchers {
+class MVectorTest extends FunSuite with Matchers {
   test("scalar product") {
     val result = MVector(1, 2) * MVector(3, 2)
     assert(result === 7)

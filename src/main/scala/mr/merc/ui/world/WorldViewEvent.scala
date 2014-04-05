@@ -7,4 +7,7 @@ sealed trait WorldViewEvent {
 
 }
 
+// TODO replace province with TerrainHexView
 case class ShowCityArrowsWorldViewEvent(arrows: List[(Province, Province)]) extends WorldViewEvent
+case class SelectCityArrow(from: TerrainHexView, to: TerrainHexView) extends WorldViewEvent
+case object DeselectCityArrow extends WorldViewEvent

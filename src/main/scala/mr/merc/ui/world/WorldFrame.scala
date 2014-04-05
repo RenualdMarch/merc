@@ -80,7 +80,7 @@ class WorldFrame(sceneManager: SceneManager) extends BorderPane with Logging {
     val currentTime = System.currentTimeMillis
     val timePassed = currentTime - lastUpdateTime
     lastUpdateTime = currentTime
-    debug(s"in game loop $timePassed ms passed since previous call")
+    //debug(s"in game loop $timePassed ms passed since previous call")
     controller.update(timePassed.toInt)
     canvasLayers.updateCanvas()
   }

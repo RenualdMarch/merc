@@ -18,8 +18,9 @@ import scala.collection.mutable.ArrayBuffer
 import mr.merc.world.character.HumanCharacter
 import mr.merc.world.character.Character
 import mr.merc.map.hex.TerrainHex
+import mr.merc.log.Logging
 
-class WorldView(worldMap: WorldMap) {
+class WorldView(worldMap: WorldMap) extends Logging {
   val soldierDrawer = new SoldiersDrawer[CharacterView]
   val hexFieldView = new TerrainHexFieldView(worldMap.hexField, soldierDrawer, Some(worldMap))
 
@@ -145,6 +146,7 @@ class WorldView(worldMap: WorldMap) {
   def pixelWidth = hexFieldView.pixelWidth
 
   def handleEvent(event: WorldViewEvent) {
+    info(s"Event arrived: $event")
     event match {
       case ShowCityArrowsWorldViewEvent(list) => {
         val views = list.map {
@@ -153,8 +155,11 @@ class WorldView(worldMap: WorldMap) {
             val to = hexFieldView.hex(toProvince.settlementHex)
             (from, to)
         }
-        hexFieldView.worldMapArrows = views
+        hexFieldView.worldMapArrows = views toSet
       }
+
+      case DeselectCityArrow => hexFieldView.selectedWorldMapArrow = None
+      case SelectCityArrow(from, to) => hexFieldView.selectedWorldMapArrow = Some(from, to)
     }
   }
 }

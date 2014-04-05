@@ -62,7 +62,7 @@ class SoldierView(val soldier: Soldier) extends AbstractSoldierView(SoldierTypeV
 
   override def drawItself(gc: GraphicsContext, xOffset: Int, yOffset: Int) {
     if (state != DeathState && state != NoState && !state.isInstanceOf[SoldierViewAttackState]) {
-      drawOvalUnderSoldier(gc, xOffset: Int, yOffset: Int)
+      drawOvalUnderSoldier(gc, xOffset: Int, yOffset: Int, soldier.owner.color)
     }
 
     if (state != DeathState && state != NoState) {
@@ -75,25 +75,6 @@ class SoldierView(val soldier: Soldier) extends AbstractSoldierView(SoldierTypeV
       healthBar.draw(x + xOffset + 12, y + yOffset + 15, gc)
       //xpBar.draw(x + 6, y + TerrainHexView.Side - xpBarHeight, gc)
     }
-  }
-
-  def lookAtDirection(direction: Direction) {
-    if (direction == NE || direction == SE) {
-      rightDirection = true
-    } else if (direction == NW || direction == SW) {
-      rightDirection = false
-    }
-  }
-
-  private def drawOvalUnderSoldier(gc: GraphicsContext, xOffset: Int, yOffset: Int) {
-    gc.save()
-    gc.fill = soldier.owner.color
-    gc.globalAlpha = 0.2
-    gc.fillOval(x + xOffset + 12, y + yOffset + 44, 48, 24)
-    gc.globalAlpha = 1
-    gc.stroke = soldier.owner.color
-    gc.strokeOval(x + xOffset + 12, y + yOffset + 44, 48, 24)
-    gc.restore()
   }
 
   private def drawAttackStatusCircleNearSoldier(gc: GraphicsContext, xOffset: Int, yOffset: Int) {

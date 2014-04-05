@@ -17,6 +17,7 @@ class WorldController {
   worldMap.initHumanCharacter()
   val worldView = new WorldView(worldMap)
   var shownArrows: List[(Province, Province)] = Nil
+  var selectedShownArrow: Option[Province] = None
 
   val selected: ObjectProperty[Option[Either[Character, Province]]] = new ObjectProperty()
   selected.value = None
@@ -61,7 +62,17 @@ class WorldController {
   }
 
   def onMouseMove(x: Int, y: Int, viewRect: Rectangle2D) {
-
+    val arrow = worldView.selectedArrow(x + viewRect.minX.toInt, y + viewRect.minY.toInt)
+    arrow match {
+      case Some(selectedArrow) =>
+        worldView.handleEvent(SelectCityArrow(selectedArrow._1, selectedArrow._2))
+        selectedShownArrow = Some(worldMap.provinceByHex(selectedArrow._2.hex))
+      case None =>
+        if (selectedShownArrow.nonEmpty) {
+          selectedShownArrow = None
+          worldView.handleEvent(DeselectCityArrow)
+        }
+    }
   }
 
   def selectCharacter(x: Int, y: Int, viewRect: Rectangle2D): Option[Character] = {

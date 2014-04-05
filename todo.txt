@@ -10,15 +10,14 @@ For M5, (0.2) these things should be completed and tested
 +draw arrows from one city to another
 +game map character
 +JAVA 8
-make arrows clickable and able to change color when they are selected
-
-add circles below characters
++make arrows clickable and able to change color when they are selected
++add circles below characters
 Load soldier types from many sources
 human units level 2 and 3
-enhanced soldier type for army leader
 create world calendar
 ability to travel among cities
 diplomacy among kingdoms - war, peace, alliance, cold war?
+enhanced soldier type for army leader
 create missions
 move kingdoms characters and another mercenaries
 battles from world frame

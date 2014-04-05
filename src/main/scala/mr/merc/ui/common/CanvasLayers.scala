@@ -55,8 +55,8 @@ class CanvasLayers(layers: List[CanvasLayer], fullMapSize: Rectangle2D) extends 
     }
   }
 
-  verBar.prefWidth.value = 20
-  horBar.prefHeight.value = 20
+  verBar.prefWidth.value = 25
+  horBar.prefHeight.value = 25
 
   private val canvasAreaWidth = this.width - verBar.prefWidth
   private val canvasAreaHeight = this.height - horBar.prefHeight
