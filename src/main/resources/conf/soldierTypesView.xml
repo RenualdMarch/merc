@@ -452,5 +452,89 @@
 			<pain sound="humanPain1"/>
 		</sounds>
 	</view>
+	<view name="Human-Longbowman">
+		<attack1 imageName="sword-human-short">
+			<all>
+				<succ>
+					<image name="longbowman-melee-attack-1"/>
+					<image name="longbowman-melee-attack-2"/>
+					<image name="longbowman-melee-attack-3"/>
+					<image name="longbowman-melee-attack-4"/>
+				</succ>
+			</all>
+		</attack1>
+		<attack2 imageName="bow" projectile="Arrow">
+			<all>
+				<succ>
+					<image name="longbowman-bow"/>
+					<image name="longbowman-bow-attack-1"/>
+					<image name="longbowman-bow-attack-2"/>
+					<image name="longbowman-bow-attack-3"/>
+					<image name="longbowman-bow-attack-4"/>
+				</succ>
+			</all>
+		</attack2>
+		<defence>
+			<image name="longbowman-bow-defend"/>
+		</defence>
+		<stand>
+			<image name="longbowman"/>
+		</stand>
+		<idle>
+			<image name="longbowman-idle-1"/>
+			<image name="longbowman-idle-2"/>
+			<image name="longbowman-idle-3"/>
+			<image name="longbowman-idle-4"/>
+		</idle>
+		<sounds>
+			<attack1 succ="sword" fail="miss1"/>
+			<attack2 succ="bow" fail="bowFail"/>
+			<pain sound="humanPain1"/>
+		</sounds>
+	</view>
+	<view name="Human-Dragoon">
+		<attack1 imageName="sword-human">
+			<all>
+				<succ>
+					<image name="dragoon-attack"/>
+				</succ>
+			</all>
+		</attack1>
+		<attack2 imageName="crossbow-human" projectile="Arrow">
+			<all>
+				<succ>
+					<image name="dragoon-ranged-1"/>
+					<image name="dragoon-ranged-2"/>
+					<image name="dragoon-ranged-3"/>
+					<image name="dragoon-ranged-4"/>
+					<image name="dragoon-ranged-5"/>
+					<image name="dragoon-ranged-6"/>
+					<image name="dragoon-ranged-7"/>
+				</succ>
+			</all>
+		</attack2>
+		<defence>
+			<image name="dragoon-defend"/>
+		</defence>
+		<stand>
+			<image name="dragoon"/>
+		</stand>
+		<move>
+			<image name="dragoon-moving"/>
+		</move>
+		<idle>
+			<image name="dragoon-idle-1"/>
+			<image name="dragoon-idle-2"/>
+			<image name="dragoon-idle-3"/>
+			<image name="dragoon-idle-4"/>
+			<image name="dragoon-idle-5"/>
+			<image name="dragoon-idle-6"/>
+		</idle>
+		<sounds>
+			<attack1 succ="sword" fail="miss1"/>
+			<move sound="horseMovement"/>
+			<pain sound="horsePain"/>
+		</sounds>
+	</view>
 
 </views>

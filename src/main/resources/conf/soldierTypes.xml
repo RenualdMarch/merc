@@ -310,6 +310,70 @@
 			<resistance type="Arcane" resistance="20"/>		
 		</resistances>	
 	</soldierType>
+	<soldierType name="Human-Longbowman" cost="26" hp="51" movement="5" exp="68" level="2">
+		<attacks>
+			<attack damage="8" count="2" attackType="Blade" ranged="false"/>
+			<attack damage="10" count="3" attackType="Pierce" ranged="true"/>
+		</attacks>
+		<moveCosts>
+			<moveCost type="Water" cost="3"/>
+			<moveCost type="Forest" cost="2"/>
+			<moveCost type="Swamp" cost="3"/>
+			<moveCost type="Hill" cost="2"/>
+			<moveCost type="Mountain" cost="3"/>
+			<moveCost type="Sand" cost="2"/>
+			<moveCost type="Grass" cost="1"/>
+			<moveCost type="Village" cost="1"/>
+		</moveCosts>
+		<defences>
+			<defence type="Water" defence="20"/>
+			<defence type="Forest" defence="50"/>
+			<defence type="Swamp" defence="20"/>
+			<defence type="Hill" defence="50"/>
+			<defence type="Mountain" defence="60"/>
+			<defence type="Sand" defence="30"/>
+			<defence type="Grass" defence="40"/>
+			<defence type="Village" defence="60"/>
+		</defences>
+		<resistances>
+			<resistance type="Arcane" resistance="20"/>			
+		</resistances>	
+	</soldierType>
+	<soldierType name="Human-Dragoon" cost="34" hp="49" movement="9" exp="95" level="2">
+		<attacks>
+			<attack damage="6" count="4" attackType="Blade" ranged="false"/>
+			<attack damage="12" count="1" attackType="Pierce" ranged="true"/>
+		</attacks>
+		<moveCosts>
+			<moveCost type="Water" cost="4"/>
+			<moveCost type="Forest" cost="3"/>
+			<moveCost type="Swamp" cost="4"/>
+			<moveCost type="Hill" cost="2"/>
+			<moveCost type="Mountain" cost="8"/>
+			<moveCost type="Sand" cost="2"/>
+			<moveCost type="Grass" cost="1"/>
+			<moveCost type="Village" cost="1"/>
+		</moveCosts>
+		<defences>
+			<defence type="Water" defence="20"/>
+			<defence type="Forest" defence="30"/>
+			<defence type="Swamp" defence="20"/>
+			<defence type="Hill" defence="40"/>
+			<defence type="Mountain" defence="20"/>
+			<defence type="Sand" defence="30"/>
+			<defence type="Grass" defence="40"/>
+			<defence type="Village" defence="40"/>
+		</defences>
+		<resistances>
+			<resistance type="Blade" resistance="30"/>
+			<resistance type="Impact" resistance="40"/>
+			<resistance type="Cold" resistance="20"/>
+			<resistance type="Pierce" resistance="-20"/>
+			<resistance type="Fire" resistance="0"/>
+			<resistance type="Arcane" resistance="20"/>		
+		</resistances>	
+	</soldierType>
+	
 	
 	
 </soldierTypes>
