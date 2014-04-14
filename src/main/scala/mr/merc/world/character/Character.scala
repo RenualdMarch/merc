@@ -5,7 +5,7 @@ import scalafx.scene.paint.Color
 import mr.merc.world.Culture
 import mr.merc.unit.SoldierType
 
-class Character(nameKey: String, _color: Color, val characterType: CharacterType, val culture: Culture, val soldierType: SoldierType) {
+abstract class Character(nameKey: String, _color: Color, val characterType: CharacterType, val culture: Culture, val soldierType: SoldierType) {
 
   def color = _color
   val name = Localization(nameKey)

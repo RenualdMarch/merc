@@ -50,7 +50,7 @@ import mr.merc.ui.common.CanvasLayers
 class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleControllerParent with Logging {
 
   import scalafx.Includes._
-  val pulse = 20 ms
+  val pulse = 30 ms
   val gameField = new QuickGameGenerator().generateGame
 
   val controller = new BattleController(gameField, this)
