@@ -17,9 +17,8 @@ class GameField(val hexField: TerrainHexField, val players: List[Player]) {
       }
 
       override def isBlocked(t: TerrainHex) = isBlockedFor(soldier, t)
-      def distance(from: TerrainHex, to: TerrainHex) = hexField.distance(from, to)
       def neighbours(t: TerrainHex) = hexField.neighbours(t)
-      override def price(t: TerrainHex) = soldier.movementCostFunction(t)
+      override def price(from: TerrainHex, to: TerrainHex) = soldier.movementCostFunction(to)
       override def cellWhereMovementMustBeStopped(t: TerrainHex) = mustStopHere.contains(t)
       override def cellWhereItIsForbiddenToStop(t: TerrainHex) = t.soldier.map(_ != soldier).getOrElse(false)
     }

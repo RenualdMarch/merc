@@ -8,4 +8,5 @@ import mr.merc.world.character.ComputerCharacter
 class Country(val nameKey: String, val culture: Culture, val color: Color) {
   var provinces: Set[Province] = Set()
   var armies: Set[ComputerCharacter] = Set()
+  def activeArmies = armies.filter(_.isActive)
 }

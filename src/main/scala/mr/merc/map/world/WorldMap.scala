@@ -9,6 +9,8 @@ import mr.merc.map.reader.WesnothMapReader
 import mr.merc.world.Culture
 import scalafx.scene.paint.Color
 import mr.merc.world.character.CharacterGenerator
+import mr.merc.world.character.Character
+import mr.merc.map.Grid
 
 object WorldMap {
   def load(mapName: String): WorldMap = {
@@ -67,18 +69,26 @@ object WorldMap {
   }
 }
 
-class WorldMap(val hexField: TerrainHexField, val provinces: Set[Province], val countries: List[Country]) {
+class WorldMap(val hexField: TerrainHexField, val provinces: Set[Province], val countries: List[Country]) extends Grid[Province] {
 
   val provinceByHex = provinces.flatMap(p => p.hexes.map(h => (h, p))) toMap
   def countryByProvince(p: Province) = countries find (_.provinces.contains(p)) get
 
-  // TODO add test for this
   val provinceConnections: Map[Province, List[(Province, Int)]] = {
     provinces map { p =>
       val neigProvinces = p.hexes.flatMap(hexField.neighbours).map(provinceByHex) - p
       val list = neigProvinces.toList.map(np => (np, np.settlementHex.distance(p.settlementHex)))
       (p, list)
     } toMap
+  }
+
+  val provinceDistance: Map[(Province, Province), Int] = {
+    provinceConnections flatMap {
+      case (k, list) =>
+        list.map {
+          case (p, c) => ((k, p), c)
+        }
+    }
   }
 
   private var computerCharactersGenerated = false
@@ -99,4 +109,10 @@ class WorldMap(val hexField: TerrainHexField, val provinces: Set[Province], val 
     provinces.toList(0).characters.charactersInProvinceCenter += human
     humanCharacterGenerated = true
   }
+
+  def neighbours(t: Province): Set[Province] = provinceConnections(t).map(_._1).toSet
+  override def price(from: Province, to: Province) = provinceDistance(from, to)
+
+  // TODO make faster
+  def provinceByCharacter(ch: Character) = provinces.find(p => p.characters.contains(ch))
 }

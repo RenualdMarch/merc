@@ -8,4 +8,5 @@ class Province(val settlement: Settlement, val hexes: Set[TerrainHex]) {
   def containsHex = hexes.contains _
   val settlementHex = hexes.find(_.mapObj == Some(House)) get
   val characters = new CharactersInProvince()
+
 }
