@@ -19,6 +19,10 @@ class War(val firstSide: Country, val secondSide: Country, world: WorldMap) {
     possibleAttacks map (pp => AttackPlan(pp._1, pp._2)) toList
   }
 
+  def containsCountry = Set(firstSide, secondSide).contains _
+  def otherSide(c: Country) = if (firstSide == c) secondSide
+  else if (secondSide == c) firstSide
+  else sys.error(s"$c is not taking part in war beetween $firstSide and $secondSide")
 }
 
 case class AttackPlan(from: Province, to: Province)

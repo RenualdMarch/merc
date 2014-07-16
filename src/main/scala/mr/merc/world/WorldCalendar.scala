@@ -1,8 +1,8 @@
 package mr.merc.world
 
-import java.time.LocalDateTime
+import java.time.LocalDate
 
-class WorldCalendar(private var _today: LocalDateTime = LocalDateTime.now()) {
+class WorldCalendar(private var _today: LocalDate = LocalDate.now()) {
   def nextDay() {
     _today = today.plusDays(1)
   }

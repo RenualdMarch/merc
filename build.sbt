@@ -12,8 +12,6 @@ libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.3"
 
 libraryDependencies += "org.scalafx" % "scalafx_2.10" % "8.0.0-R4"
 
-libraryDependencies += "org.scalaz" %% "scalaz-core" % "7.0.6"
-
 libraryDependencies += "org.mockito" % "mockito-core" % "1.9.5" % "test"
 
 libraryDependencies += "com.projectdarkstar.ext.jorbis" % "jorbis" % "0.0.17"
@@ -22,7 +20,7 @@ libraryDependencies += "de.huxhorn.sulky" % "de.huxhorn.sulky.3rdparty.jlayer" %
 
 libraryDependencies += "com.miglayout" % "miglayout-javafx" % "4.2"
 
-scalacOptions ++= Seq("-feature", "-deprecation", "-language:postfixOps", "-language:implicitConversions")
+scalacOptions ++= Seq("-feature", "-deprecation", "-language:postfixOps", "-language:implicitConversions", "-language:reflectiveCalls")
 
 jfxSettings
 

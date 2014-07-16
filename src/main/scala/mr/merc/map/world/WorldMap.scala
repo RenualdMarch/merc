@@ -111,6 +111,8 @@ class WorldMap(val hexField: TerrainHexField, val provinces: Set[Province], val 
   }
 
   def neighbours(t: Province): Set[Province] = provinceConnections(t).map(_._1).toSet
+  def neighboursByCountry(t: Province, c: Country) = provinceConnections(t).map(_._1).filter(countryByProvince(_) == c).toList
+
   override def price(from: Province, to: Province) = provinceDistance(from, to)
 
   // TODO make faster
