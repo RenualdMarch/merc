@@ -72,6 +72,7 @@ class Soldier(val name: String, val soldierType: SoldierType, val owner: Player)
         val actions = healing match {
           case Heals4 => whoNeedsHealing.map(Heal4Soldier(this, _))
           case Heals8 => whoNeedsHealing.map(Heal8Soldier(this, _))
+          case x => sys.error(s"Impossible case with $x")
         }
         result ++= actions
       }

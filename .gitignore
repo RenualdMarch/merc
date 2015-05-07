@@ -14,5 +14,6 @@ project/project/target
 .project
 .settings
 .cache
+.idea
 .classpath
 /bin

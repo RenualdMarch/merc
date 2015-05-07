@@ -7,14 +7,8 @@ import mr.merc.ui.battle.BattleFrame
 import mr.merc.ui.menu.MainMenu
 import mr.merc.log.Logging
 import mr.merc.ui.menu.OptionsMenu
-import mr.merc.ui.world.WorldFrame
 
 class SceneManager(val stage: Stage) extends Logging {
-
-  def startNewGame() {
-    info("starting new game")
-    sceneRoot = new WorldFrame(this)
-  }
 
   def startNewBattle() {
     info("starting new battle")

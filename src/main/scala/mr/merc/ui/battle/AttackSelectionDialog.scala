@@ -68,9 +68,9 @@ class AttackSelectionDialog(attacker: Soldier, defender: Soldier, attackerHex: T
   this.scene = new Scene {
     stylesheets.add("/css/attackSelectionDialog.css")
     content = new VBox {
-      content = List(table, new HBox() {
-        content = List(okButton, cancelButton)
-        alignment = Pos.CENTER_RIGHT
+      children = List(table, new HBox() {
+        children = List(okButton, cancelButton)
+        alignment = Pos.CenterRight
 
       })
     }
@@ -200,11 +200,11 @@ class AttackSelectionDialog(attacker: Soldier, defender: Soldier, attackerHex: T
       val imageview = new ImageView()
       imageview.fitHeight = 60
       imageview.fitWidth = 60
-      setContentDisplay(ContentDisplay.GRAPHIC_ONLY)
+      setContentDisplay(ContentDisplay.GraphicOnly)
       setGraphic(imageview)
 
       override def updateItem(itemOpt: Option[String], empty: Boolean) {
-        super.updateItem(itemOpt, empty);
+        super.updateItem(itemOpt, empty)
         if (!empty) {
           itemOpt match {
             case Some(item) => imageview.image = MImage(item).image

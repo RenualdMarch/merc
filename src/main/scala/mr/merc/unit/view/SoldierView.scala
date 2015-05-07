@@ -54,8 +54,8 @@ class SoldierView(val soldier: Soldier) extends AbstractSoldierView(SoldierTypeV
 
   lazy val sounds = SoldierTypeViewInfo(soldier.soldierType.name).sounds
 
-  val healthBar = new VerticalBarView(healthBarWidth, healthBarHeight, Color.WHITE, Color.RED, hpPercent)
-  val xpBar = new VerticalBarView(xpBarWidth, xpBarHeight, Color.WHITE, Color.WHITE, xpPercent)
+  val healthBar = new VerticalBarView(healthBarWidth, healthBarHeight, Color.White, Color.Red, hpPercent)
+  val xpBar = new VerticalBarView(xpBarWidth, xpBarHeight, Color.White, Color.White, xpPercent)
 
   def hpPercent = soldier.hp.toDouble / soldier.soldierType.hp
   def xpPercent = soldier.exp.toDouble / soldier.soldierType.exp
@@ -80,10 +80,10 @@ class SoldierView(val soldier: Soldier) extends AbstractSoldierView(SoldierTypeV
   private def drawAttackStatusCircleNearSoldier(gc: GraphicsContext, xOffset: Int, yOffset: Int) {
     gc.save()
     val color = soldier.turnState match {
-      case NotHisTurn => Color.GRAY
-      case HaventMoved | StillCanMove => Color.GREEN
-      case CanntMoveAnyMore => Color.BLUE
-      case HaveAttacked => Color.RED
+      case NotHisTurn => Color.Gray
+      case HaventMoved | StillCanMove => Color.Green
+      case CanntMoveAnyMore => Color.Blue
+      case HaveAttacked => Color.Red
     }
 
     gc.fill = color

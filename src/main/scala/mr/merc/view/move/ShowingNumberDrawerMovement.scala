@@ -13,11 +13,11 @@ object ShowingNumberDrawerMovement {
   private val fadingStart = 0.7
 
   def damage(x: Int, y: Int, number: Int): ShowingNumberDrawerMovement = {
-    new ShowingNumberDrawerMovement((x, y), speed, height, fadingStart, number.toString, Color.RED)
+    new ShowingNumberDrawerMovement((x, y), speed, height, fadingStart, number.toString, Color.Red)
   }
 
   def drain(x: Int, y: Int, number: Int): ShowingNumberDrawerMovement = {
-    new ShowingNumberDrawerMovement((x, y), speed, height, fadingStart, number.toString, Color.GREEN)
+    new ShowingNumberDrawerMovement((x, y), speed, height, fadingStart, number.toString, Color.Green)
   }
 }
 
@@ -59,7 +59,7 @@ class ShowingNumberDrawerMovement(target: (Int, Int), speed: Int, height: Int, f
 
   def drawText(gc: GraphicsContext, xOffset: Int, yOffset: Int) {
     gc.save()
-    gc.font = Font.font(Font.default.getFamily, FontWeight.BOLD, 20)
+    gc.font = Font.font(Font.default.getFamily, FontWeight.Bold, 20)
     gc.fill = color
     gc.fillText(text, movement.x + textLength / 2 + xOffset, movement.y + yOffset, textLength)
     gc.restore()

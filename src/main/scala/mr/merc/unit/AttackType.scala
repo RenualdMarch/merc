@@ -12,7 +12,7 @@ sealed abstract class AttackType {
   val name:String = {
     val rootMirror = runtimeMirror(getClass.getClassLoader)
     val classSymbol = rootMirror.classSymbol(getClass)
-    classSymbol.name.decoded
+    classSymbol.name.toString
   }
 }
 

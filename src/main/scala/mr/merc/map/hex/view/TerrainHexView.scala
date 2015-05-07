@@ -6,37 +6,19 @@ import mr.merc.map.terrain.Grass
 import mr.merc.map.terrain.Forest
 import mr.merc.map.hex.TerrainHex
 import mr.merc.map.hex.TerrainHexField
-import mr.merc.map.hex.CubeHex
 import scalafx.scene.paint.Color
 import mr.merc.map.hex.Direction
-import mr.merc.image.MImageCache
-import mr.merc.unit.SoldierDefence
 import scalafx.scene.text.Font
 import scalafx.scene.text.FontWeight
 import scalafx.scene.image.Image
-import scalafx.scene.canvas.Canvas
-import scalafx.scene.image.WritableImage
-import scalafx.scene.SnapshotParameters
 import mr.merc.ui.common.ImageHelper._
 import mr.merc.unit.SoldierDefence
-import mr.merc.unit.view.SoldierView
 import mr.merc.map.terrain.TerrainType
-import javafx.embed.swing.SwingFXUtils
-import java.awt.image.BufferedImage
-import java.awt.AlphaComposite
-import java.awt.Graphics2D
 import mr.merc.map.hex._
-import javax.imageio.ImageIO
-import java.io.File
-import java.util.UUID
 import mr.merc.map.objects.MapObject
-import scalafx.scene.effect.BlendMode
-import mr.merc.map.world.WorldMap
 import mr.merc.map.objects.House
 import mr.merc.map.terrain.Mountain
-import mr.merc.local.Localization
-import scalafx.scene.text.TextAlignment
-import scalafx.geometry.VPos
+
 
 object TerrainHexView {
   val Side = 72
@@ -46,7 +28,7 @@ object TerrainHexView {
 
   lazy val hexGridImage: Image = {
     drawImage(Side, Side) { gc =>
-      gc.stroke = Color.BLACK
+      gc.stroke = Color.Black
       gc.strokePolygon(angles())
     }
   }
@@ -74,12 +56,12 @@ object TerrainHexView {
     val list = for (d <- 0 to 100 by 10; drawPolygon <- List(true, false)) yield {
       ((d, drawPolygon), drawImage(Side, Side) { gc =>
         if (drawPolygon) {
-          gc.stroke = Color.YELLOW
+          gc.stroke = Color.Yellow
           gc.lineWidth = 2
           gc.strokePolygon(angles(2))
         }
 
-        gc.font = Font.font(Font.default.getFamily, FontWeight.NORMAL, 30)
+        gc.font = Font.font(Font.default.getFamily, FontWeight.Normal, 30)
         gc.fill = defenceColor(d)
         gc.fillText(d.toString, Side / 2 - textLength / 2, Side / 2 + 10, textLength)
       })
@@ -90,30 +72,30 @@ object TerrainHexView {
 
   private def defenceColor(d: Int): Color = {
     if (d <= 20) {
-      Color.DARKRED
+      Color.DarkRed
     } else if (d <= 30) {
-      Color.RED
+      Color.Red
     } else if (d <= 40) {
-      Color.YELLOW
+      Color.Yellow
     } else if (d <= 50) {
-      Color.LIGHTGREEN
+      Color.LightGreen
     } else if (d <= 60) {
-      Color.GREEN
+      Color.Green
     } else {
-      Color.GREEN
+      Color.Green
     }
   }
 
   lazy val movementImpossibleImage: Image = {
     drawImage(Side, Side) { gc =>
       gc.globalAlpha = 0.6
-      gc.fill = Color.BLACK
+      gc.fill = Color.Black
       gc.fillPolygon(angles())
     }
   }
 }
 
-class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: TerrainHexFieldView, worldMapOpt: Option[WorldMap] = None) {
+class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: TerrainHexFieldView) {
   private val arrowPath = "/images/arrows/"
 
   val neighbours = field.neighboursWithDirections(hex.x, hex.y)
@@ -211,66 +193,9 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
     neighbourMapObjects foreach (_.drawImage(gc, x, y))
     secondaryImage.foreach(_.drawCenteredImage(gc, x, y, side, side))
 
-    if (worldMapOpt.isEmpty || hex.mapObj != Some(House)) {
+    if (hex.mapObj != Some(House)) {
       mapObject foreach (_.drawImage(gc, x, y))
     }
-  }
-
-  def drawCity(gc: GraphicsContext, xOffset: Int, yOffset: Int) {
-    worldMapOpt match {
-      case Some(worldMap) => if (hex.mapObj == Some(House)) {
-        val settlement = worldMap.provinceByHex(hex).settlement
-        val path = settlement.picturePath
-        MImage(path).drawCenteredImage(gc, this.x + xOffset, this.y + yOffset, TerrainHexView.Side, TerrainHexView.Side)
-        drawCityName(gc, xOffset, yOffset, Localization(settlement.nameKey))
-      }
-      case None => // do nothing
-    }
-  }
-
-  def drawCityName(gc: GraphicsContext, xOffset: Int, yOffset: Int, text: String) {
-    gc.save()
-    gc.textAlign = TextAlignment.CENTER
-    gc.textBaseline = VPos.CENTER
-    gc.font = Font.font(Font.default.getFamily, FontWeight.BOLD, 20)
-    gc.fill = Color.WHITE
-    gc.fillText(text, this.x + xOffset + TerrainHexView.Side / 2, this.y + yOffset + TerrainHexView.Side + 10, 144)
-    gc.restore()
-  }
-
-  def drawProvinceAndCountryBorders(gc: GraphicsContext, xOffset: Int, yOffset: Int, worldMap: WorldMap) {
-    gc.save()
-    field.neighboursWithDirections(hex) foreach {
-      case (dir, neig) =>
-        import scala.math.Ordering.Implicits._
-        if ((neig.x, neig.y) > (hex.x, hex.y)) {
-
-          val currentProvince = worldMap.provinceByHex(hex)
-          val neigProvince = worldMap.provinceByHex(neig)
-
-          if (currentProvince != neigProvince) {
-            val currentCountry = worldMap.countryByProvince(currentProvince)
-            val neigCountry = worldMap.countryByProvince(neigProvince)
-            val color = if (currentCountry == neigCountry) {
-              Color.PINK
-            } else {
-              Color.RED
-            }
-
-            val line = TerrainHexView.borderByDirection(dir)
-            val start = line._1
-            val finish = line._2
-
-            val x = this.x + xOffset
-            val y = this.y + yOffset
-            gc.stroke = color
-            gc.strokeLine(start._1 + x, start._2 + y, finish._1 + x, finish._2 + y)
-
-          }
-        }
-
-    }
-    gc.restore()
   }
 
   def darkeningShouldBeRedrawn = isDarkened != currentDarkened
@@ -292,13 +217,6 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
         isInterfaceDirty = false
       case ClearStage =>
         drawClearStage(gc, xOffset, yOffset)
-      case BordersGridStage =>
-        worldMapOpt match {
-          case Some(worldMap) => drawProvinceAndCountryBorders(gc, xOffset, yOffset, worldMap)
-          case None => // do nothing, this is possible case for empty hexes
-        }
-      case CityDrawingStage =>
-        drawCity(gc, xOffset, yOffset)
     }
   }
 
@@ -350,6 +268,4 @@ case object MovementImpossibleStage extends HexDrawingStage
 case object ArrowStage extends HexDrawingStage
 case object DefenceStage extends HexDrawingStage
 case object HexGridStage extends HexDrawingStage
-case object BordersGridStage extends HexDrawingStage
-case object CityDrawingStage extends HexDrawingStage
 case object EndInterfaceDrawing extends HexDrawingStage

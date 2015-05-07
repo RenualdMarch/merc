@@ -74,11 +74,11 @@ class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleCont
     prefWidth = 400
     style = "-fx-background-color: cyan"
     spacing = 20
-    alignment = TOP_CENTER
-    content = List[Node](minimap, soldierViewControl, new GridPane {
+    alignment = TopCenter
+    children = List[Node](minimap, soldierViewControl, new GridPane {
       vgap = 20
       hgap = 10
-      alignment = TOP_LEFT
+      alignment = TopLeft
       style = "-fx-padding: 0 0 0 100;"
       add(new Text {
         text = Localization("soldier.type")
@@ -146,7 +146,7 @@ class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleCont
   endTurnButton.onAction = { e: ActionEvent => controller.endTurnButton() }
 
   val timeline = Timeline(KeyFrame(pulse, onFinished = { ev: ActionEvent => gameLoop() }))
-  timeline.cycleCount = Animation.INDEFINITE
+  timeline.cycleCount = Animation.Indefinite
   timeline.play()
 
   var lastUpdateTime = System.currentTimeMillis()

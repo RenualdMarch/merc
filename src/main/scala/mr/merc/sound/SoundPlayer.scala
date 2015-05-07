@@ -7,7 +7,7 @@ import mr.merc.conf.Conf
 object SoundPlayer {
   def playSound(path: String, s: Status => Unit) {
     if (Conf.bool("Sound")) {
-      future {
+      Future {
         renderer(path, s).play(getClass.getResourceAsStream(path))
       }
     }

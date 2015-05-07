@@ -8,25 +8,19 @@ import mr.merc.map.hex.InfiniteHexField
 import mr.merc.map.hex.TerrainHex
 import mr.merc.map.terrain._
 import mr.merc.unit.SoldierDefence
-import scalafx.scene.image.Image
-import scalafx.scene.canvas.Canvas
-import scalafx.scene.image.WritableImage
-import scalafx.scene.SnapshotParameters
-import scalafx.scene.paint.Color
 import scalafx.geometry.Rectangle2D
 import mr.merc.map.hex.Direction
 import mr.merc.map.view.SoldiersDrawer
 import mr.merc.ui.common.CanvasLayer
-import mr.merc.map.world.WorldMap
 import mr.merc.ui.common.geom.Line
 import mr.merc.ui.common.geom.Polygon
 import mr.merc.ui.common.geom.PolygonSet
 import mr.merc.log.Logging
 
-class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer[_], worldMap: Option[WorldMap] = None) extends Logging {
+class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer[_]) extends Logging {
   private val infiniteField = new InfiniteHexField((x, y) => new TerrainHex(x, y, Empty))
 
-  val realHexes = field.hexes.map(new TerrainHexView(_, field, this, worldMap))
+  val realHexes = field.hexes.map(new TerrainHexView(_, field, this))
   def blackHexes: Set[TerrainHexView] = {
     val hexSet = field.hexes.toSet
     val blackHexes = hexSet.flatMap(h => infiniteField.neighbours(h.x, h.y)) -- hexSet
@@ -103,9 +97,6 @@ class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer
     }
   }
 
-  var worldMapArrows: Set[(TerrainHexView, TerrainHexView)] = Set()
-  var selectedWorldMapArrow: Option[(TerrainHexView, TerrainHexView)] = None
-
   private val realHexesMap = realHexes map (h => ((h.hex.x, h.hex.y), h)) toMap
 
   def hex(hex: Hex): TerrainHexView = this.hex(hex.x, hex.y)
@@ -133,100 +124,6 @@ class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer
       List(TerrainImageStage, HexGridStage).foreach { stage =>
         visibleHexes foreach (_.drawItself(gc, stage, -viewRect.minX.toInt, -viewRect.minY.toInt))
       }
-    }
-  }
-
-  private val terrainWorldLayer = new CanvasLayer {
-    def updateLayer(gc: GraphicsContext, viewRect: Rectangle2D) {
-      // No changes possible
-    }
-
-    def drawLayer(gc: GraphicsContext, viewRect: Rectangle2D) {
-      val visibleHexes = calculateVisibleHexes(viewRect)
-      List(TerrainImageStage, CityDrawingStage, BordersGridStage).foreach { stage =>
-        visibleHexes foreach (_.drawItself(gc, stage, -viewRect.minX.toInt, -viewRect.minY.toInt))
-      }
-    }
-  }
-
-  private val worldArrowsLayer = new CanvasLayer {
-    val arrowColor = Color.RED
-    val selectedArrowColor = Color.YELLOW
-
-    private var currentlyNotSelectedDrawed: Set[(TerrainHexView, TerrainHexView)] = Set()
-    private var currentlySelectedDrawed: Option[(TerrainHexView, TerrainHexView)] = None
-
-    def notSelectedArrows = selectedWorldMapArrow match {
-      case Some(selectedArrow) => worldMapArrows.filterNot(_ == selectedArrow)
-      case None => worldMapArrows
-    }
-
-    def updateLayer(gc: GraphicsContext, viewRect: Rectangle2D) {
-      if (currentlyNotSelectedDrawed != notSelectedArrows) {
-        if (currentlyNotSelectedDrawed ++ currentlySelectedDrawed == worldMapArrows) {
-          redrawSelected(gc, viewRect)
-        } else {
-          drawLayer(gc, viewRect)
-        }
-      }
-    }
-
-    def clear(gc: GraphicsContext, viewRect: Rectangle2D) {
-      gc.clearRect(0, 0, viewRect.width, viewRect.height)
-    }
-
-    def drawLayer(gc: GraphicsContext, viewRect: Rectangle2D) {
-      if (currentlyNotSelectedDrawed ++ currentlySelectedDrawed nonEmpty) {
-        clear(gc, viewRect)
-      }
-
-      drawNotSelected(gc, viewRect)
-      drawSelected(gc, viewRect)
-    }
-
-    def drawNotSelected(gc: GraphicsContext, viewRect: Rectangle2D) {
-      notSelectedArrows foreach { a =>
-        drawArrow(gc, a._1, a._2, viewRect, arrowColor)
-      }
-      currentlyNotSelectedDrawed = notSelectedArrows
-    }
-
-    def drawSelected(gc: GraphicsContext, viewRect: Rectangle2D) {
-      selectedWorldMapArrow foreach { a =>
-        drawArrow(gc, a._1, a._2, viewRect, selectedArrowColor)
-      }
-      currentlySelectedDrawed = selectedWorldMapArrow
-    }
-
-    def redrawSelected(gc: GraphicsContext, viewRect: Rectangle2D) {
-      val change = (currentlySelectedDrawed, selectedWorldMapArrow)
-      change match {
-        case (Some(drawn), Some(toBeDrawn)) =>
-          if (drawn != toBeDrawn) {
-            drawArrow(gc, drawn._1, drawn._2, viewRect, arrowColor)
-            drawArrow(gc, toBeDrawn._1, toBeDrawn._2, viewRect, selectedArrowColor)
-          }
-        case (None, Some(toBeDrawn)) => drawArrow(gc, toBeDrawn._1, toBeDrawn._2, viewRect, selectedArrowColor)
-        case (Some(drawn), None) => drawArrow(gc, drawn._1, drawn._2, viewRect, arrowColor)
-        case (None, None) => // do nothing
-      }
-
-      currentlySelectedDrawed = selectedWorldMapArrow
-      currentlyNotSelectedDrawed = notSelectedArrows
-    }
-
-    def drawArrows(gc: GraphicsContext, arrows: List[(TerrainHexView, TerrainHexView)], viewRect: Rectangle2D) {
-      arrows foreach {
-        case (start, finish) =>
-          drawArrow(gc, start, finish, viewRect, arrowColor)
-      }
-    }
-
-    def drawArrow(gc: GraphicsContext, arrowsStart: TerrainHexView, arrowsEnd: TerrainHexView, viewRect: Rectangle2D, color: Color) {
-      val xOffset = -viewRect.minX.toInt
-      val yOffset = -viewRect.minY.toInt
-      arrowPolygon(arrowsStart, arrowsEnd).drawPolygons(xOffset, yOffset, gc, color)
-
     }
   }
 
@@ -268,7 +165,6 @@ class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer
   }
 
   def canvasBattleLayers = List(terrainBattleLayer, soldierBattleLayer, darkeningBattleLayer, interfaceBattleLayer)
-  def canvasWorldLayers = List(terrainWorldLayer, soldierBattleLayer, worldArrowsLayer)
 
   def neigsToRedrawFromCache(set: Set[TerrainHexView]): Set[TerrainHexView] = {
     set flatMap redrawNeigsCache

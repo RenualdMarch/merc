@@ -11,8 +11,8 @@ import scalafx.scene.paint.Color
 import scala.util.Random
 import mr.merc.ai.BattleAI
 
-class QuickGameGenerator(player1: Player = new Player("Human", Color.YELLOW),
-  player2: Player = new Player("AI", Color.CYAN, Some(BattleAI()))) extends GameGenerator {
+class QuickGameGenerator(player1: Player = new Player("Human", Color.Yellow),
+  player2: Player = new Player("AI", Color.Cyan, Some(BattleAI()))) extends GameGenerator {
 
   private val types = List("Human-Bowman", "Human-Cavalryman",
     "Human-Fencer", "Human-HeavyInfantryman", "Human-Horseman", "Human-Mage",

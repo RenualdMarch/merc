@@ -17,7 +17,7 @@ import mr.merc.ui.common.ScrollPaneLike
 
 class Minimap(field: TerrainHexField, pane: ScrollPaneLike) extends VBox {
   private val canvas = new Canvas()
-  content = canvas
+  children = canvas
   private val mapView = new MapView(field)
   private var updateOnPaneChange = true
 
@@ -51,7 +51,7 @@ class Minimap(field: TerrainHexField, pane: ScrollPaneLike) extends VBox {
 
     val gc = canvas.graphicsContext2D
     gc.save()
-    gc.fill = Color.BLACK
+    gc.fill = Color.Black
     gc.fillRect(0, 0, w, h)
 
     val side = minimapSize.cellSide
@@ -63,10 +63,10 @@ class Minimap(field: TerrainHexField, pane: ScrollPaneLike) extends VBox {
       gc.fillRect(x, y, side, side)
     }
 
-    gc.stroke = Color.GRAY
+    gc.stroke = Color.Gray
     gc.strokeRect(xOffset, yOffset, minimapSize.minimapUsefulWidth, minimapSize.minimapUsefulHeight)
 
-    gc.stroke = Color.WHITE
+    gc.stroke = Color.White
     gc.lineWidth = 2
     gc.strokeRect(xOffset + rectPosX, yOffset + rectPosY,
       rectWidth, rectHeight)
@@ -166,7 +166,7 @@ class Minimap(field: TerrainHexField, pane: ScrollPaneLike) extends VBox {
     if (hex.soldier.nonEmpty) {
       hex.soldier.get.owner.color
     } else {
-      Color.BLACK
+      Color.Black
     }
   }
 }

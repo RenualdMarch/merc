@@ -28,7 +28,7 @@ class BattleResultDialog(result: BattleResult, sceneManager: SceneManager) exten
   }
   this.scene = new Scene {
     content = new VBox {
-      content = List(label, okButton)
+      children = List(label, okButton)
     }
   }
 }

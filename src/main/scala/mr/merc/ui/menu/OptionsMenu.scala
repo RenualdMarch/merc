@@ -31,7 +31,7 @@ class OptionsMenu(sceneManager: SceneManager) extends BorderPane {
   val buttonsPanel = createButtonsPanel
   val centerBox = new VBox {
     styleClass.add("optionsPane")
-    content = List(controlsPanel, buttonsPanel)
+    children = List(controlsPanel, buttonsPanel)
     spacing = 20
   }
   centerBox.width.onChange {
@@ -85,7 +85,7 @@ class OptionsMenu(sceneManager: SceneManager) extends BorderPane {
     }
 
     new HBox {
-      content = List(okButton, cancelButton)
+      children = List(okButton, cancelButton)
     }
   }
 

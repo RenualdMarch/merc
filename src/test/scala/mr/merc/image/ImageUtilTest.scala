@@ -9,15 +9,15 @@ class ImageUtilTest extends FunSuite {
 	def createImage3x3:Image = {
 	  val image = new WritableImage(3, 3)
 	  val writer = image.pixelWrit
-	  writer.setColor(0, 0, Color.GREEN)
-	  writer.setColor(1, 0, Color.AQUA)
-	  writer.setColor(2, 0, Color.AZURE)
-	  writer.setColor(0, 1, Color.BLACK)
-	  writer.setColor(1, 1, Color.BLUE)
-	  writer.setColor(2, 1, Color.CORAL)
-	  writer.setColor(0, 2, Color.WHEAT)
-	  writer.setColor(1, 2, Color.WHITE)
-	  writer.setColor(2, 2, Color.WHITESMOKE)
+	  writer.setColor(0, 0, Color.Green)
+	  writer.setColor(1, 0, Color.Aqua)
+	  writer.setColor(2, 0, Color.Azure)
+	  writer.setColor(0, 1, Color.Black)
+	  writer.setColor(1, 1, Color.Blue)
+	  writer.setColor(2, 1, Color.Coral)
+	  writer.setColor(0, 2, Color.Wheat)
+	  writer.setColor(1, 2, Color.White)
+	  writer.setColor(2, 2, Color.WhiteSmoke)
 	  image
 	}
 	
@@ -34,47 +34,47 @@ class ImageUtilTest extends FunSuite {
 	test("mirror horizontally for 2x2 image") {
 	  val image = ImageUtil.mirrorHorizontally(createImage2x2)
 	  val reader = image.pixelReader.get
-	  assert(reader.getColor(0, 0) === Color.OLIVE)
-	  assert(reader.getColor(0, 1) === Color.YELLOW)
-	  assert(reader.getColor(1, 0) === Color.ORANGE)
-	  assert(reader.getColor(1, 1) === Color.YELLOWGREEN)
+	  assert(reader.getColor(0, 0) === Color.Olive)
+	  assert(reader.getColor(0, 1) === Color.Yellow)
+	  assert(reader.getColor(1, 0) === Color.Orange)
+	  assert(reader.getColor(1, 1) === Color.YellowGreen)
 	}
 	
 	test("mirror horizontally for 3x3 image") {
 	  val image = ImageUtil.mirrorHorizontally(createImage3x3)
 	  val reader = image.pixelReader.get
-	  assert(reader.getColor(0, 0) === Color.WHEAT)
-	  assert(reader.getColor(0, 1) === Color.BLACK)
-	  assert(reader.getColor(0, 2) === Color.GREEN)
-	  assert(reader.getColor(1, 0) === Color.WHITE)
-	  assert(reader.getColor(1, 1) === Color.BLUE)
-	  assert(reader.getColor(1, 2) === Color.AQUA)
-	  assert(reader.getColor(2, 0) === Color.WHITESMOKE)
-	  assert(reader.getColor(2, 1) === Color.CORAL)
-	  assert(reader.getColor(2, 2) === Color.AZURE)
+	  assert(reader.getColor(0, 0) === Color.Wheat)
+	  assert(reader.getColor(0, 1) === Color.Black)
+	  assert(reader.getColor(0, 2) === Color.Green)
+	  assert(reader.getColor(1, 0) === Color.White)
+	  assert(reader.getColor(1, 1) === Color.Blue)
+	  assert(reader.getColor(1, 2) === Color.Aqua)
+	  assert(reader.getColor(2, 0) === Color.WhiteSmoke)
+	  assert(reader.getColor(2, 1) === Color.Coral)
+	  assert(reader.getColor(2, 2) === Color.Azure)
 	}
 	
 	test("mirror vertically for 2x2 image") {
 	  val image = ImageUtil.mirrorVertically(createImage2x2)
 	  val reader = image.pixelReader.get
-	  assert(reader.getColor(0, 0) === Color.YELLOWGREEN)
-	  assert(reader.getColor(0, 1) === Color.ORANGE)
-	  assert(reader.getColor(1, 0) === Color.YELLOW)
-	  assert(reader.getColor(1, 1) === Color.OLIVE)
+	  assert(reader.getColor(0, 0) === Color.YellowGreen)
+	  assert(reader.getColor(0, 1) === Color.Orange)
+	  assert(reader.getColor(1, 0) === Color.Yellow)
+	  assert(reader.getColor(1, 1) === Color.Olive)
 	}
 	
 	test("mirror vertically for 3x3 image") {
 	  val image = ImageUtil.mirrorVertically(createImage3x3)
 	  val reader = image.pixelReader.get
-	  assert(reader.getColor(0, 0) === Color.AZURE)
-	  assert(reader.getColor(0, 1) === Color.CORAL)
-	  assert(reader.getColor(0, 2) === Color.WHITESMOKE)
-	  assert(reader.getColor(1, 0) === Color.AQUA)
-	  assert(reader.getColor(1, 1) === Color.BLUE)
-	  assert(reader.getColor(1, 2) === Color.WHITE)
-	  assert(reader.getColor(2, 0) === Color.GREEN)
-	  assert(reader.getColor(2, 1) === Color.BLACK)
-	  assert(reader.getColor(2, 2) === Color.WHEAT)
+	  assert(reader.getColor(0, 0) === Color.Azure)
+	  assert(reader.getColor(0, 1) === Color.Coral)
+	  assert(reader.getColor(0, 2) === Color.WhiteSmoke)
+	  assert(reader.getColor(1, 0) === Color.Aqua)
+	  assert(reader.getColor(1, 1) === Color.Blue)
+	  assert(reader.getColor(1, 2) === Color.White)
+	  assert(reader.getColor(2, 0) === Color.Green)
+	  assert(reader.getColor(2, 1) === Color.Black)
+	  assert(reader.getColor(2, 2) === Color.Wheat)
 
 	}
 }

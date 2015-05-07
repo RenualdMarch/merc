@@ -53,7 +53,7 @@ object Conf {
     }
 
     if (writeToFile) {
-      future {
+      Future {
         conf = new Conf(readProperties.properties ++ changes)
         val props = new Properties
         conf.properties.foreach { case (k, v) => props.put(k, v) }

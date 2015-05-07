@@ -13,13 +13,13 @@ class SoldierViewControl(wrapper: SoldierWrapper) extends VBox {
 
   prefHeight = side
   prefWidth = side
-  alignment = CENTER
+  alignment = Center
   wrapper.image.onChange {
     refreshImage()
   }
 
   val canvas = new Canvas
-  content = canvas
+  children = canvas
   canvas.width <== IntegerProperty(side)
   canvas.height <== IntegerProperty(side)
 
@@ -28,7 +28,7 @@ class SoldierViewControl(wrapper: SoldierWrapper) extends VBox {
   def refreshImage() {
     val gc = canvas.graphicsContext2D
     gc.save()
-    gc.fill = Color.BLACK
+    gc.fill = Color.Black
     gc.fillRect(0, 0, side, side)
     wrapper.image.value.drawImage(gc, 0, 0)
     gc.restore()
