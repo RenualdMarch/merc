@@ -24,10 +24,10 @@ class ImageUtilTest extends FunSuite {
 	def createImage2x2:Image = {
 	  val image = new WritableImage(2, 2)
 	  val writer = image.pixelWrit
-	  writer.setColor(0, 0, Color.YELLOW)
-	  writer.setColor(1, 0, Color.YELLOWGREEN)
-	  writer.setColor(0, 1, Color.OLIVE)
-	  writer.setColor(1, 1, Color.ORANGE)
+	  writer.setColor(0, 0, Color.Yellow)
+	  writer.setColor(1, 0, Color.YellowGreen)
+	  writer.setColor(0, 1, Color.Olive)
+	  writer.setColor(1, 1, Color.Orange)
 	  image
 	}
 	
