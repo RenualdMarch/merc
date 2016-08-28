@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<personSoldierTypes>
+    <personSoldierType name="st">
+        <soldierType name="st1" level="0"/>
+        <soldierType name="st2" level="20"/>
+        <soldierType name="st3" level="40"/>
+    </personSoldierType>
+</personSoldierTypes>

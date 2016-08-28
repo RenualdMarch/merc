@@ -188,9 +188,6 @@ object Attack {
     if (attacker.state.contains(Slowed)) damage / 2 else damage
   }
 
-  def apply(index: Int, damage: Int, count: Int, attackType: AttackType,
-    ranged: Boolean) = new Attack(index, damage, count, attackType, ranged)
-
   def selectBestAttackForDefender(attacker: Soldier, defender: Soldier, attackersAttack: Attack): Option[Attack] = {
     val ranged = attackersAttack.ranged
     val rangedAttacks = defender.soldierType.attacks.filter(_.ranged == ranged)
@@ -205,8 +202,8 @@ object Attack {
   }
 }
 
-class Attack(val index: Int, val damage: Int, val count: Int, val attackType: AttackType,
-  val ranged: Boolean, val attributes: Set[AttackAttribute] = Set()) {
+case class Attack(index: Int, damage: Int, count: Int, attackType: AttackType,
+  ranged: Boolean, attributes: Set[AttackAttribute] = Set()) {
 
   def chanceOfSuccess(enemysDefence: SoldierDefence): ChanceOfSuccess = if (attributes.contains(Magical)) {
     ChanceOfSuccess(70)
