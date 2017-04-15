@@ -91,7 +91,7 @@ class AttackSelectionDialog(attacker: Soldier, defender: Soldier, attackerHex: T
           ObjectProperty(Some(attackImagePath(name)))
         }
       }
-      cellFactory = imageCellFactory
+      cellFactory = imageCellFactory _
       prefWidth = 60
     }
 
@@ -128,7 +128,7 @@ class AttackSelectionDialog(attacker: Soldier, defender: Soldier, attackerHex: T
         val path = c.value._2.map(_.image).map(attackImagePath)
         ObjectProperty(path)
       }
-      cellFactory = imageCellFactory
+      cellFactory = imageCellFactory _
       prefWidth = 60
     }
 

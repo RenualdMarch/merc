@@ -2,15 +2,17 @@ name:= "Merc"
 
 version := "0.2"
 
-scalaVersion := "2.11.5"
+scalaVersion := "2.12.1"
 
-libraryDependencies += "org.scala-lang" % "scala-reflect" % "2.11.5"
+libraryDependencies += "org.scalafx" %% "scalafx" % "8.0.102-R11"
 
-libraryDependencies += "org.scalatest" % "scalatest_2.11" % "2.2.4" % "test"
+libraryDependencies += "org.scala-lang" % "scala-reflect" % "2.12.1"
+
+libraryDependencies += "org.scalactic" %% "scalactic" % "3.0.1"
+
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.1" % "test"
 
 libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.3"
-
-libraryDependencies += "org.scalafx" %% "scalafx" % "8.0.31-R7"
 
 libraryDependencies += "org.mockito" % "mockito-core" % "1.9.5" % "test"
 
@@ -20,7 +22,7 @@ libraryDependencies += "de.huxhorn.sulky" % "de.huxhorn.sulky.3rdparty.jlayer" %
 
 libraryDependencies += "com.miglayout" % "miglayout-javafx" % "4.2"
 
-libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.0.3"
+libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.0.6"
 
 scalacOptions ++= Seq("-feature", "-deprecation", "-language:postfixOps", "-language:implicitConversions", "-language:reflectiveCalls")
 
@@ -33,3 +35,5 @@ JFX.devKit := JFX.jdk(System.getenv("JAVA_HOME"))
 JFX.addJfxrtToClasspath := false
 
 JFX.nativeBundles := "image"
+
+fork := true
