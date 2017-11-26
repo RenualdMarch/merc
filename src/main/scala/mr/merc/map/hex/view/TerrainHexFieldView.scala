@@ -17,17 +17,17 @@ import mr.merc.ui.common.geom.Polygon
 import mr.merc.ui.common.geom.PolygonSet
 import mr.merc.log.Logging
 
-class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer[_]) extends Logging {
+class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer[_], factor: Double) extends Logging {
   private val infiniteField = new InfiniteHexField((x, y) => new TerrainHex(x, y, Empty))
 
-  val realHexes = field.hexes.map(new TerrainHexView(_, field, this))
+  val realHexes = field.hexes.map(new TerrainHexView(_, field, this, factor))
   def blackHexes: Set[TerrainHexView] = {
     val hexSet = field.hexes.toSet
     val blackHexes = hexSet.flatMap(h => infiniteField.neighbours(h.x, h.y)) -- hexSet
     blackHexes.filterNot { h =>
       (h.y == -1 && h.x % 2 == 0) ||
         (h.y == field.height && h.x % 2 == 0)
-    }.map(new TerrainHexView(_, field, this))
+    }.map(new TerrainHexView(_, field, this, factor))
   }
 
   // sorting is make sure that hexes are drawn in correct order, back before first
@@ -201,13 +201,14 @@ class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer
   }
 
   def isVisible(viewPort: Rectangle2D)(hex: TerrainHexView): Boolean = {
-    val hexRect = new Rectangle2D(hex.x, hex.y, TerrainHexView.Side, TerrainHexView.Side)
+    val hexRect = new Rectangle2D(hex.x, hex.y, hex.side, hex.side)
     viewPort.intersects(hexRect) || viewPort.contains(hexRect)
   }
 
+  def side = realHexes.head.side
+
   def hexByPixelCoords(pixelX: Int, pixelY: Int): Option[TerrainHexView] = {
-    val side = TerrainHexView.Side
-    // first part is transform hexes into squares 
+    // first part is transform hexes into squares
     // and decide to what square belongs point
     // odd rows are +36 on y
     // side is 3/4 * hex side
@@ -221,15 +222,15 @@ class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer
 
     val hex = infiniteField.hex(column, row)
     val neighbours = infiniteField.neighbours(hex)
-    val candidates = neighbours + hex map (h => new TerrainHexView(h, field, this))
+    val candidates = neighbours + hex map (h => new TerrainHexView(h, field, this, factor))
     def distanceSquare(x: Int, y: Int) = (x - pixelX) * (x - pixelX) + (y - pixelY) * (y - pixelY)
     val min = candidates.minBy(c => distanceSquare(c.center._1, c.center._2))
 
     realHexesMap.get(min.hex.x, min.hex.y)
   }
 
-  def pixelWidth = hex(field.width - 1, 0).x + TerrainHexView.Side
-  def pixelHeight = hex(0, field.height - 1).y + TerrainHexView.Side
+  def pixelWidth = hex(field.width - 1, 0).x + side
+  def pixelHeight = hex(0, field.height - 1).y + side
 
   private val hexOffset = 60
   private val arrowLength = 60
@@ -243,7 +244,7 @@ class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer
   }
 
   private def arrowHead(start: TerrainHexView, finish: TerrainHexView): Polygon = {
-    val line = new Line(start.center._1, start.center._2, finish.center._1, finish.center._2)
+    val line = Line(start.center._1, start.center._2, finish.center._1, finish.center._2)
     val cutLine = line.cutFromTheBeginning(hexOffset).cutFromTheEnd(hexOffset)
     val cutFromArrow = cutLine.cutFromTheBeginning(cutLine.length - arrowLength)
 
@@ -258,7 +259,7 @@ class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer
   }
 
   private def arrowLine(start: TerrainHexView, finish: TerrainHexView): Polygon = {
-    val line = new Line(start.center._1, start.center._2, finish.center._1, finish.center._2)
+    val line = Line(start.center._1, start.center._2, finish.center._1, finish.center._2)
     val cutLine = line.cutFromTheBeginning(hexOffset).cutFromTheEnd(hexOffset)
     val cutWithoutArrow = cutLine.cutFromTheEnd(arrowLength)
 

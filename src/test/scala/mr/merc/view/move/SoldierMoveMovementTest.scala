@@ -14,10 +14,10 @@ import mr.merc.map.view.SoldiersDrawer
 
 class SoldierMoveMovementTest extends FunSuite with BeforeAndAfter {
   val map = new TerrainHexField(5, 5, (x, y) => new TerrainHex(x, y, Grass))
-  val mapView = new TerrainHexFieldView(map, new SoldiersDrawer())
+  val mapView = new TerrainHexFieldView(map, new SoldiersDrawer(), 1.0)
   val soldier = new Soldier("1", SoldierType("testSoldier"), Player("0"))
   map.hex(0, 1).soldier = Some(soldier)
-  val soldierView = new SoldierView(soldier)
+  val soldierView = new SoldierView(soldier, 1.0)
   test("simple movement") {
     // moving from (0, 1) to (1, 0)
     val from = mapView.hex(0, 1)

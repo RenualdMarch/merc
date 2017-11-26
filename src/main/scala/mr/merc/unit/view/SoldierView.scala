@@ -1,11 +1,6 @@
 package mr.merc.unit.view
 
-import mr.merc.view.SpriteState
-import mr.merc.view.Sprite
-import mr.merc.image.MImage
 import mr.merc.map.hex.Direction
-import mr.merc.map.hex.HexField
-import mr.merc.map.hex.Hex
 import mr.merc.map.hex.view.TerrainHexView
 import mr.merc.map.hex.TerrainHexField
 import mr.merc.map.hex.TerrainHex
@@ -14,42 +9,36 @@ import mr.merc.view.move.Movement
 import mr.merc.unit.Soldier
 import mr.merc.view.move.SoldierMoveMovement
 import mr.merc.view.move.MovementList
-import mr.merc.view.move.SoldierAttackMovement
-import mr.merc.unit.AttackResult
 import scalafx.scene.paint.Color
-import mr.merc.unit.SoldierType
 import scalafx.scene.canvas.GraphicsContext
-import scalafx.scene.shape.Ellipse
 import mr.merc.unit._
 import mr.merc.map.hex.view.TerrainHexFieldView
-import mr.merc.map.hex._
-import scalafx.geometry.Rectangle2D
 import mr.merc.map.view.SoldiersDrawer
 
 object SoldierView {
   private[view] val attackDistancePercentage = 0.6
 
-  private[view] def coordsCorrection(dir: Direction): (Int, Int) = {
+  private[view] def coordsCorrection(dir: Direction, factor: Double): (Int, Int) = {
     val hexField = new TerrainHexField(4, 4, (x, y) => new TerrainHex(x, y, Grass))
-    val hexFieldView = new TerrainHexFieldView(hexField, new SoldiersDrawer)
+    val hexFieldView = new TerrainHexFieldView(hexField, new SoldiersDrawer, factor)
     val center = hexField.hex(1, 1)
-    val centerView = new TerrainHexView(center, hexField, hexFieldView)
+    val centerView = new TerrainHexView(center, hexField, hexFieldView, factor)
     val neig = hexField.neighboursWithDirections(1, 1)(dir)
-    val neigView = new TerrainHexView(neig, hexField, hexFieldView)
+    val neigView = new TerrainHexView(neig, hexField, hexFieldView, factor)
 
     (neigView.x - centerView.x, neigView.y - centerView.y)
   }
 
 }
 
-class SoldierView(val soldier: Soldier) extends AbstractSoldierView(SoldierTypeViewInfo(soldier.soldierType.name, soldier.owner.color)) {
+class SoldierView(val soldier: Soldier, factor: Double) extends AbstractSoldierView(SoldierTypeViewInfo(soldier.soldierType.name, soldier.owner.color), factor) {
 
   private val maxHp = 100
-  private val healthBarHeight = Math.min(soldier.soldierType.hp, maxHp) * 2 * TerrainHexView.Side / 3 / maxHp
+  private val healthBarHeight = Math.min(soldier.soldierType.hp, maxHp) * 2 * TerrainHexView.side(factor) / 3 / maxHp
   private val healthBarWidth = 4
 
   private val maxXp = 200
-  private val xpBarHeight = Math.min(soldier.soldierType.exp, maxXp) * TerrainHexView.Side / maxXp
+  private val xpBarHeight = Math.min(soldier.soldierType.exp, maxXp) * TerrainHexView.side(factor) / maxXp
   private val xpBarWidth = 4
 
   lazy val sounds = SoldierTypeViewInfo(soldier.soldierType.name).sounds

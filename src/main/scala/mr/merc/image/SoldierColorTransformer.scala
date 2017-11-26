@@ -79,7 +79,7 @@ object SoldierColorTransformer {
 	  val height = input.height.value.toInt
 	  
 	  val newImage = new WritableImage(width, height)
-	  val writer = newImage.pixelWrit
+	  val writer = newImage.pixelWriter
 	  val reader = input.pixelReader.get
 	  
 	  for (x <- 0 until width; y <- 0 until height) {

@@ -60,9 +60,9 @@ class SoldierWrapper(private var _soldier: Option[Soldier]) {
   }
 
   private def standImage(soldier: Soldier): MImage = {
-    val view = new SoldierView(soldier)
+    val view = new SoldierView(soldier, 1.0)
     view.state = StandState
-    view.images(StandState)(0)
+    view.images(StandState).head
   }
 
 }

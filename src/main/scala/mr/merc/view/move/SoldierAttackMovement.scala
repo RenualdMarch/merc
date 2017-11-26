@@ -26,7 +26,7 @@ object SoldierAttackMovement {
 
 class SoldierAttackMovement(val fromHex: TerrainHexView, val toHex: TerrainHexView, val dir: Direction,
   val attacker: SoldierView, val defender: SoldierView,
-  val result: AttackResult, field: TerrainHexFieldView, val attackSpeed: Int = 150) extends Movement {
+  val result: AttackResult, field: TerrainHexFieldView, val attackSpeed: Int = 200) extends Movement {
 
   val fromX = fromHex.coords._1
   val fromY = fromHex.coords._2

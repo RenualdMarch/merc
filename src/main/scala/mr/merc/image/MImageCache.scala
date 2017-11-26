@@ -1,8 +1,8 @@
 package mr.merc.image
 
 import scalafx.scene.image.Image
-import java.io.File
 import mr.merc.log.Logging
+import mr.merc.util.CacheFactoryMap
 
 private[image] object MImageCache extends Logging {
   val cache = collection.mutable.Map[String, Image]()
@@ -30,4 +30,12 @@ private[image] object MImageCache extends Logging {
   def clear() {
     cache.clear
   }
+
+  private[image] val scaledCache = new CacheFactoryMap[(Image, Double), Image]({
+    case (image, factor) =>
+      if (factor == 1.0) image
+      else ImageUtil.scale(image, factor)
+  })
+
+  def scale(image: Image, factor: Double): Image = scaledCache(image, factor)
 }

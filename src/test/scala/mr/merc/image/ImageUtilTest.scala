@@ -8,7 +8,7 @@ import scalafx.scene.paint.Color
 class ImageUtilTest extends FunSuite {
 	def createImage3x3:Image = {
 	  val image = new WritableImage(3, 3)
-	  val writer = image.pixelWrit
+	  val writer = image.pixelWriter
 	  writer.setColor(0, 0, Color.Green)
 	  writer.setColor(1, 0, Color.Aqua)
 	  writer.setColor(2, 0, Color.Azure)
@@ -23,7 +23,7 @@ class ImageUtilTest extends FunSuite {
 	
 	def createImage2x2:Image = {
 	  val image = new WritableImage(2, 2)
-	  val writer = image.pixelWrit
+	  val writer = image.pixelWriter
 	  writer.setColor(0, 0, Color.Yellow)
 	  writer.setColor(1, 0, Color.YellowGreen)
 	  writer.setColor(0, 1, Color.Olive)

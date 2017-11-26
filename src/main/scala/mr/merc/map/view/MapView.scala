@@ -16,8 +16,8 @@ import scalafx.geometry.Rectangle2D
 import mr.merc.log.Logging
 
 // TODO add update method which handles case when soldiers changed
-class MapView(field: TerrainHexField, val soldiersDrawer: SoldiersDrawer[SoldierView] = new SoldiersDrawer[SoldierView]()) extends Logging {
-  val terrainView = new TerrainHexFieldView(field, soldiersDrawer)
+class MapView(field: TerrainHexField, factor: Double, val soldiersDrawer: SoldiersDrawer[SoldierView] = new SoldiersDrawer[SoldierView]()) extends Logging {
+  val terrainView = new TerrainHexFieldView(field, soldiersDrawer, factor)
 
   createSoldiers foreach (soldiersDrawer.addSoldier)
 
@@ -29,12 +29,11 @@ class MapView(field: TerrainHexField, val soldiersDrawer: SoldiersDrawer[Soldier
     val soldiers = terrainView.realHexes.flatMap(h => {
       val soldierOption = h.hex.soldier
       soldierOption match {
-        case Some(soldier) => {
+        case Some(soldier) =>
           debug(s"Creating soldier view for soldier type ${soldier.soldierType.name}")
-          val view = new SoldierView(soldier)
+          val view = new SoldierView(soldier, factor)
           view.coords = (h.x, h.y)
           Some(view)
-        }
         case None => None
       }
 

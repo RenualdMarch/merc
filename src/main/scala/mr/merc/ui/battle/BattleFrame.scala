@@ -2,15 +2,18 @@ package mr.merc.ui.battle
 
 import java.net.URL
 import java.util.ResourceBundle
+
 import scalafx.scene.layout.VBox
 import scalafx.scene.canvas.Canvas
 import scalafx.scene.layout.BorderPane
 import scalafx.scene.image.ImageView
 import scalafx.scene.text.Text
 import mr.merc.ui.common.SoldierWrapper
+
 import scalafx.animation.Timeline
 import scalafx.animation.KeyFrame
 import mr.merc.battle.BattleController
+
 import scalafx.scene.paint.Color
 import scalafx.util.Duration
 import scalafx.animation.Animation
@@ -23,41 +26,50 @@ import mr.merc.unit.SoldierType
 import mr.merc.map.hex.TerrainHex
 import mr.merc.map.objects._
 import mr.merc.map.terrain._
+
 import scalafx.scene.control.Button
 import scalafx.event.ActionEvent
 import scalafx.scene.Node
 import scalafx.stage.Window
 import mr.merc.ui.minimap.Minimap
+
 import scalafx.geometry.Pos._
 import scalafx.scene.layout.GridPane
 import mr.merc.local.Localization
-import javafx.{ event => jfxe }
-import javafx.scene.{ input => jfxin }
+import javafx.{event => jfxe}
+import javafx.scene.{input => jfxin}
+
 import mr.merc.ui.common.ConversionUtils._
 import mr.merc.ui.common.SceneManager
+
 import scalafx.scene.control.ScrollPane
 import mr.merc.map.generator.RandomTerrainGenerator
 import mr.merc.log.Logging
+
 import scalafx.scene.CacheHint
 import scalafx.geometry.Rectangle2D
 import mr.merc.game.QuickGameGenerator
 import mr.merc.battle.BattleResult
+import mr.merc.conf.Conf
 import mr.merc.unit.Attack
+
 import scalafx.stage.Modality
 import mr.merc.ui.common.CanvasLayers
 
 // TODO move all styling to css
 class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleControllerParent with Logging {
 
+  val scaling = Conf.double("MapScaling")
+
   import scalafx.Includes._
   val pulse = 30 ms
   val gameField = new QuickGameGenerator().generateGame
 
-  val controller = new BattleController(gameField, this)
+  val controller = new BattleController(gameField, this, scaling)
 
   val mapView = controller.battleView.mapView
   private val battleCanvas = new CanvasLayers(mapView.canvasBattleLayers, new Rectangle2D(0, 0, mapView.pixelWidth, mapView.pixelHeight))
-  private val minimap = new Minimap(gameField.hexField, battleCanvas)
+  private val minimap = new Minimap(gameField.hexField, battleCanvas, scaling)
   private val soldierName = new Text()
   private val soldierLevel = new Text()
   private val soldierHP = new Text()
@@ -169,7 +181,7 @@ class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleCont
   def showBattleOverDialog(result: BattleResult) {
     battleIsOverDialogShown = true
     val dialog = new BattleResultDialog(result, sceneManager)
-    dialog.initModality(Modality.WINDOW_MODAL)
+    dialog.initModality(Modality.WindowModal)
     dialog.initOwner(sceneManager.stage)
     dialog.centerOnScreen()
     dialog.show()
@@ -180,7 +192,7 @@ class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleCont
 
     val dialog = new AttackSelectionDialog(attacker, defender, attackerHex, defenderHex)
 
-    dialog.initModality(Modality.WINDOW_MODAL)
+    dialog.initModality(Modality.WindowModal)
     dialog.initOwner(sceneManager.stage.delegate)
     dialog.centerOnScreen()
     dialog.showAndWait()

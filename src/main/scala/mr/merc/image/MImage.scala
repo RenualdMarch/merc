@@ -51,6 +51,7 @@ abstract class MImage private[image] (val xOffset: Int, val yOffset: Int, val al
   }
 
   def changeSoldierColor(color: Color) = new LazyChangedColorMImage(color, this, xOffset, yOffset, alpha)
+
   def width = image.width.value.toInt
 
   def height = image.height.value.toInt
@@ -71,4 +72,6 @@ abstract class MImage private[image] (val xOffset: Int, val yOffset: Int, val al
       }
     }
   }
+
+  def scaledImage(factor: Double): MImage = new ScaledMImage(image, factor, (xOffset * factor) toInt, (yOffset * factor) toInt, alpha)
 }

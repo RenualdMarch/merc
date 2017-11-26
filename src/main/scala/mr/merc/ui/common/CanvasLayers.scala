@@ -13,11 +13,11 @@ class CanvasLayers(layers: List[CanvasLayer], fullMapSize: Rectangle2D) extends 
   style = "-fx-background-color: black"
   val canvasList = layers map (l => (l, new Canvas()))
   val horBar = new ScrollBar
-  horBar.orientation.value = Orientation.HORIZONTAL
+  horBar.orientation.value = Orientation.Horizontal
   horBar.max = 1
   horBar.min = 0
   val verBar = new ScrollBar
-  verBar.orientation.value = Orientation.VERTICAL
+  verBar.orientation.value = Orientation.Vertical
   verBar.max = 1
   verBar.min = 0
 

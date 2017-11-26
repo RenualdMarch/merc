@@ -10,17 +10,17 @@ import mr.merc.sound.Sound
 import mr.merc.map.hex.view.TerrainHexView
 
 class ProjectileView(start: Option[List[MImage]], move: Option[List[MImage]], end: Option[List[MImage]],
-  from: (Int, Int), to: (Int, Int), speed: Int, sounds: Map[ProjectileSoundState, Sound]) extends Sprite[ProjectileState](
-  Map((ProjectileStart -> start.getOrElse(List(MImage.emptyImage))),
-    (ProjectileMovement -> move.getOrElse(List(MImage.emptyImage))),
-    (ProjectileEnd -> end.getOrElse(List(MImage.emptyImage))),
-    (ProjectileNotRender -> List(MImage.emptyImage))),
-  ProjectileNotRender, mirroringEnabled = false) {
+  from: (Int, Int), to: (Int, Int), speed: Int, factor: Double, sounds: Map[ProjectileSoundState, Sound]) extends Sprite[ProjectileState](
+  Map(ProjectileStart -> start.getOrElse(List(MImage.emptyImage)),
+    ProjectileMovement -> move.getOrElse(List(MImage.emptyImage)),
+    ProjectileEnd -> end.getOrElse(List(MImage.emptyImage)),
+    ProjectileNotRender -> List(MImage.emptyImage)),
+  ProjectileNotRender, factor, mirroringEnabled = false) {
 
   val movement = new LinearMovement(from._1, from._2, to._1, to._2, speed)
   movement.start()
-  coords = (from._1, from._2);
-  centered = Some(TerrainHexView.Side)
+  coords = (from._1, from._2)
+  centered = Some(TerrainHexView.side(factor))
 
   override def state_=(st: ProjectileState) {
     super.state = st

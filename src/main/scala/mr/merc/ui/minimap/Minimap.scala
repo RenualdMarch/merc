@@ -15,10 +15,10 @@ import javafx.scene.{ input => jfxin }
 import mr.merc.ui.common.ConversionUtils._
 import mr.merc.ui.common.ScrollPaneLike
 
-class Minimap(field: TerrainHexField, pane: ScrollPaneLike) extends VBox {
+class Minimap(field: TerrainHexField, pane: ScrollPaneLike, factor: Double) extends VBox {
   private val canvas = new Canvas()
   children = canvas
-  private val mapView = new MapView(field)
+  private val mapView = new MapView(field, factor)
   private var updateOnPaneChange = true
 
   private def xOffset = (width.value - minimapSize.minimapUsefulWidth) / 2

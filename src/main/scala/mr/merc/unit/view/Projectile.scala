@@ -80,26 +80,26 @@ object Projectile {
     val n = parseImagesList(name, node \ "n")
     val ne = parseImagesList(name, node \ "ne")
 
-    if (!all.isEmpty) {
-      Some(Direction.list map ((_ -> all)) toMap)
+    if (all.nonEmpty) {
+      Some(Direction.list map (_ -> all) toMap)
     } else {
       val nw = ne map (_.mirrorVertically)
       val sw = nw map (_.mirrorHorizontally)
       val s = n map (_.mirrorHorizontally)
       val se = ne map (_.mirrorHorizontally)
-      Some(Map((N -> n), (NE -> ne), (NW -> nw), (SW -> sw), (S -> s), (SE -> se)))
+      Some(Map(N -> n, NE -> ne, NW -> nw, SW -> sw, S -> s, SE -> se))
     }
   }
 }
 
 class Projectile(val name: String, val start: Option[Map[Direction, List[MImage]]],
-  val move: Option[Map[Direction, List[MImage]]],
-  val end: Option[Map[Direction, List[MImage]]], val sounds: Map[ProjectileSoundState, Sound]) {
+  val move: Option[Map[Direction, List[MImage]]], val end: Option[Map[Direction, List[MImage]]],
+                 val sounds: Map[ProjectileSoundState, Sound]) {
   private val speed = 200
 
-  def buildView(dir: Direction, from: (Int, Int), to: (Int, Int)) =
+  def buildView(dir: Direction, from: (Int, Int), to: (Int, Int), factor: Double) =
     new ProjectileView(start.map(_(dir)), move.map(_(dir)), end.map(_(dir)),
-      from, to, speed, sounds)
+      from, to, (speed * factor) toInt, factor, sounds)
 }
 
 sealed trait ProjectileSoundState

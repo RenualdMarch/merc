@@ -1,19 +1,18 @@
 package mr.merc.view.move
 
-import mr.merc.view.Drawable
 import mr.merc.map.hex.view.TerrainHexView
 import mr.merc.map.hex.view.TerrainHexFieldView
 import mr.merc.unit.view.SoldierView
 import mr.merc.unit.view.MoveState
 import mr.merc.unit.sound.MovementSound
 
-class SmoothMovement(val list: List[TerrainHexView], val soldier: SoldierView, fieldView: TerrainHexFieldView, movementSpeed: Int = 200) extends Movement {
+class SmoothMovement(val list: List[TerrainHexView], val soldier: SoldierView, fieldView: TerrainHexFieldView, movementSpeed: Int = 600) extends Movement {
 
   override def start() {
     super.start()
     updateSoldierCoords()
     soldier.state = MoveState
-    soldier.sounds.get(MovementSound).foreach(_.play)
+    soldier.sounds.get(MovementSound).foreach(_.play())
   }
 
   private var currentTime = 0
@@ -44,15 +43,14 @@ class SmoothMovement(val list: List[TerrainHexView], val soldier: SoldierView, f
   private def updateSoldierCoords() {
     val func = movementFunctionByTime(currentTime, timeFunctions)
     func match {
-      case Some(f) => {
+      case Some(f) =>
         val coords = f(currentTime)
         soldier.coords = coords
-      }
       case None => // do nothing, movement is over
     }
   }
 
-  def isOver = !movementFunctionByTime(currentTime, timeFunctions).isDefined
+  def isOver: Boolean = movementFunctionByTime(currentTime, timeFunctions).isEmpty
 
   override def drawables = List(soldier)
 }

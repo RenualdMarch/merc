@@ -7,19 +7,19 @@ import mr.merc.map.hex._
 
 object Sprite {
 
-  def apply(images: Map[SpriteState, List[MImage]], initialState: SpriteState): Sprite[SpriteState] = {
-    new Sprite[SpriteState](images, initialState)
+  def apply(images: Map[SpriteState, List[MImage]], initialState: SpriteState, factor: Double): Sprite[SpriteState] = {
+    new Sprite[SpriteState](images, initialState, factor)
   }
 
-  def apply(list: List[MImage]): Sprite[SpriteState] = apply(Map[SpriteState, List[MImage]](DefaultState -> list), DefaultState)
+  def apply(list: List[MImage], factor: Double): Sprite[SpriteState] = apply(Map[SpriteState, List[MImage]](DefaultState -> list), DefaultState, factor)
 
-  def apply(image: MImage): Sprite[SpriteState] = apply(List(image))
+  def apply(image: MImage, factor: Double): Sprite[SpriteState] = apply(List(image), factor)
 }
 
-class Sprite[T <: SpriteState](val images: Map[T, List[MImage]], private var _state: T,
+class Sprite[T <: SpriteState](val images: Map[T, List[MImage]], private var _state: T, factor: Double,
   var mirroringEnabled: Boolean = true, var animationEnabled: Boolean = true) extends Drawable {
   require(images.keys.exists(_ == _state), "Initial state isn't present in map!")
-  require(!images.values.exists(_.size == 0), s"State ${images.find(_._2.size == 0).get._1} with zero images")
+  require(!images.values.exists(_.isEmpty), s"State ${images.find(_._2.isEmpty).get._1} with zero images")
 
   private var _time = 0
   private var _index = 0
@@ -101,9 +101,10 @@ class Sprite[T <: SpriteState](val images: Map[T, List[MImage]], private var _st
     }
   }
 
-  private def currentImage = images(state)(index)
+  private def currentImage = images(state)(index).scaledImage(factor)
 
   var centered: Option[Int] = None
+
   def drawItself(gc: GraphicsContext, xOffset: Int, yOffset: Int) {
     centered match {
       case Some(side) => imageToDraw.drawCenteredImage(gc, x + xOffset, y + yOffset, side, side)
@@ -111,7 +112,7 @@ class Sprite[T <: SpriteState](val images: Map[T, List[MImage]], private var _st
     }
   }
 
-  def imageToDraw = if (rightDirection) {
+  def imageToDraw:MImage = if (rightDirection) {
     currentImage
   } else {
     currentImage.mirrorVertically

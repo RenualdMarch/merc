@@ -17,7 +17,7 @@ class TerrainHexAdditiveTest extends FunSuite {
   test("case with different single terrains") {
     val deter = new TypeDeterminator(Map(((0, 1) -> Sand), ((2, 1) -> Empty), ((0, 2) -> Empty), ((1, 2) -> Sand)))
     val field = new TerrainHexField(5, 5, deter)
-    val view = new TerrainHexFieldView(field, new SoldiersDrawer())
+    val view = new TerrainHexFieldView(field, new SoldiersDrawer(), 1.0)
     val additives = TerrainHexViewAdditive.extractAdditives(view.hex(1, 1))
     assert(additives.size === 2)
     exist(additives, NW, NW, Grass, Sand)
@@ -27,7 +27,7 @@ class TerrainHexAdditiveTest extends FunSuite {
   test("case with single and multiple terrains") {
     val deter = new TypeDeterminator(Map(((0, 1) -> Sand), ((1, 0) -> Sand), ((2, 1) -> Sand), ((1, 2) -> Sand)))
     val field = new TerrainHexField(5, 5, deter)
-    val view = new TerrainHexFieldView(field, new SoldiersDrawer())
+    val view = new TerrainHexFieldView(field, new SoldiersDrawer(), 1.0)
     val additives = TerrainHexViewAdditive.extractAdditives(view.hex(1, 1))
     assert(additives.size === 2)
 
@@ -38,7 +38,7 @@ class TerrainHexAdditiveTest extends FunSuite {
   test("case on the edge") {
     val deter = new TypeDeterminator(Map(((1, 0) -> Sand), ((2, 1) -> Sand)))
     val field = new TerrainHexField(5, 5, deter)
-    val view = new TerrainHexFieldView(field, new SoldiersDrawer())
+    val view = new TerrainHexFieldView(field, new SoldiersDrawer(), 1.0)
     val additives = TerrainHexViewAdditive.extractAdditives(view.hex(2, 0))
     assert(additives.size === 1)
     exist(additives, S, SW, Grass, Sand)
@@ -66,7 +66,7 @@ class TerrainHexAdditiveTest extends FunSuite {
   test("case with water") {
     val deter = new TypeDeterminator(Map(((1, 0) -> Sand), ((2, 1) -> Water), ((2, 2) -> Water)))
     val field = new TerrainHexField(3, 5, deter)
-    val view = new TerrainHexFieldView(field, new SoldiersDrawer())
+    val view = new TerrainHexFieldView(field, new SoldiersDrawer(), 1.0)
 
     val additives = TerrainHexViewAdditive.extractAdditives(view.hex(1, 1))
     assert(additives.size === 2)

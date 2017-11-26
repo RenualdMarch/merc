@@ -4,7 +4,7 @@ import scalafx.scene.paint.Color
 import mr.merc.view.Sprite
 import scalafx.scene.canvas.GraphicsContext
 
-abstract class AbstractSoldierView(viewInfo: SoldierTypeViewInfo) extends Sprite[SoldierViewState](viewInfo.images, StandState) {
+abstract class AbstractSoldierView(viewInfo: SoldierTypeViewInfo, factor: Double) extends Sprite[SoldierViewState](viewInfo.images, StandState, factor) {
   viewInfo.eagerLoad()
 
   override def updateTime(delta: Int): Int = {
@@ -29,10 +29,10 @@ abstract class AbstractSoldierView(viewInfo: SoldierTypeViewInfo) extends Sprite
     gc.save()
     gc.fill = color
     gc.globalAlpha = 0.2
-    gc.fillOval(x + xOffset + 12, y + yOffset + 44, 48, 24)
+    gc.fillOval(x + xOffset + 12 * factor, y + yOffset + 44 * factor, 48 * factor, 24 * factor)
     gc.globalAlpha = 1
     gc.stroke = color
-    gc.strokeOval(x + xOffset + 12, y + yOffset + 44, 48, 24)
+    gc.strokeOval(x + xOffset + 12 * factor, y + yOffset + 44 * factor, 48 * factor, 24 * factor)
     gc.restore()
   }
 }

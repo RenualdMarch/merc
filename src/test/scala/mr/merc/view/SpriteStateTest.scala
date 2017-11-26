@@ -15,7 +15,7 @@ class SpriteStateTest extends FunSuite with BeforeAndAfter {
   var sprite: Sprite[SpriteState] = _
 
   before {
-    sprite = Sprite(images, TestState2)
+    sprite = Sprite(images, TestState2, 1.0)
     sprite.duration = 50
   }
 

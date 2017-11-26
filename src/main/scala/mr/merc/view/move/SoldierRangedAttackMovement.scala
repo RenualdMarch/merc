@@ -21,11 +21,12 @@ import mr.merc.map.hex.view.TerrainHexFieldView
 class SoldierRangedAttackMovement(val fromHex: TerrainHexView, val toHex: TerrainHexView, val dir: Direction,
   val attacker: SoldierView, val defender: SoldierView, result: AttackResult, field: TerrainHexFieldView) extends Movement {
 
+  private val factor = fromHex.factor
   val from = fromHex.coords
   val to = toHex.coords
   private val attackViews = SoldierTypeViewInfo(attacker.soldier.soldierType.name).attacks
   private val projectileName = attackViews.find(_.index == result.attackIndex).get.projectileName(result.success).get
-  val projectileView = Projectile(projectileName).buildView(dir, from, to)
+  val projectileView = Projectile(projectileName).buildView(dir, from, to, factor)
   private var attackerFinishedHisThrowingMove = false
   private var painSoundPlayed = false
 

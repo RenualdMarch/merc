@@ -9,6 +9,7 @@ import mr.merc.unit.SoldierType
 import mr.merc.map.hex.TerrainHex
 import mr.merc.map.terrain._
 import mr.merc.map.objects._
+
 import scalafx.scene.canvas.GraphicsContext
 import mr.merc.map.GameField
 import mr.merc.ui.common.SoldierWrapper
@@ -21,17 +22,20 @@ import mr.merc.battle.event.AttackModelEvent
 import mr.merc.ui.battle.BattleFrame
 import mr.merc.battle.event.EndMoveModelEvent
 import mr.merc.ui.battle.AttackSelectionDialog
+
 import scalafx.stage.Modality
 import mr.merc.unit.Attack
 import mr.merc.battle.event.HideDefence
 import mr.merc.battle.event.ShowDefence
+import mr.merc.conf.Conf
 import mr.merc.log.Logging
+
 import scalafx.geometry.Rectangle2D
 import mr.merc.ui.common.CanvasLayers
 
-class BattleController(gameField: GameField, parent: BattleControllerParent) extends Logging {
+class BattleController(gameField: GameField, parent: BattleControllerParent, factor: Double) extends Logging {
   val battleModel = new BattleModel(gameField)
-  val battleView = new BattleView(battleModel)
+  val battleView = new BattleView(battleModel, factor)
 
   val soldierToShow = new SoldierWrapper(None)
 

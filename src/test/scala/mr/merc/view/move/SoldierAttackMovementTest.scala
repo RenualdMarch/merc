@@ -29,17 +29,17 @@ class SoldierAttackMovementTest extends FunSuite with BeforeAndAfter {
   test("animation") {
     val soldier = new Soldier("1", SoldierType("testSoldier2"), Player("1"))
     val enemy = new Soldier("2", SoldierType("testSoldier2"), Player("2"))
-    val soldierView = new SoldierView(soldier)
-    val enemyView = new SoldierView(enemy)
+    val soldierView = new SoldierView(soldier, 1.0)
+    val enemyView = new SoldierView(enemy, 1.0)
     val direction = NE
 
     val field = new TerrainHexField(10, 10, TerrainHex.grassInit)
-    val fieldView = new TerrainHexFieldView(field, new SoldiersDrawer())
-    val from = new TerrainHexView(field.hex(0, 0), field, fieldView) {
+    val fieldView = new TerrainHexFieldView(field, new SoldiersDrawer(), 1.0)
+    val from = new TerrainHexView(field.hex(0, 0), field, fieldView, 1.0) {
       override def coords = (0, 10)
     }
 
-    val to = new TerrainHexView(field.hex(0, 1), field, fieldView) {
+    val to = new TerrainHexView(field.hex(0, 1), field, fieldView, 1.0) {
       override def coords = (300, 410)
     }
 

@@ -18,7 +18,7 @@ import mr.merc.map.view.SoldiersDrawer
 
 class BattleControllerTest extends FunSuite with BeforeAndAfter {
   var controller: BattleController = _
-  val fieldView = new TerrainHexFieldView(new TerrainHexField(10, 10, (x, y) => new TerrainHex(x, y, Grass)), new SoldiersDrawer())
+  val fieldView = new TerrainHexFieldView(new TerrainHexField(10, 10, (x, y) => new TerrainHex(x, y, Grass)), new SoldiersDrawer(), 1.0)
   val viewRect = new Rectangle2D(0, 0, 100, 100)
 
   before {
@@ -43,7 +43,7 @@ class BattleControllerTest extends FunSuite with BeforeAndAfter {
       def showBattleOverDialog(result: BattleResult) = ???
       def showAttackSelectionDialog(attacker: Soldier, defender: Soldier, attackerHex: TerrainHex,
         defenderHex: TerrainHex) = ???
-    }) {
+    }, 1.0) {
       override def selectAttack(attacker: Soldier, defender: Soldier,
         attackerHex: TerrainHex, defenderHex: TerrainHex) = Some(attacker.soldierType.attacks(0))
     }

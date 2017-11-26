@@ -1,12 +1,17 @@
 package mr.merc.image
 
+import mr.merc.conf.Conf
+import org.imgscalr.Scalr
+import org.imgscalr.Scalr.{Method, Mode}
+
+import scalafx.embed.swing.SwingFXUtils
 import scalafx.scene.image.Image
 import scalafx.scene.image.WritableImage
 
 object ImageUtil {
 	def mirrorVertically(image:Image):Image = {
 	  val writableImage = new WritableImage(image.width.value.toInt, image.height.value.toInt)
-	  val writer = writableImage.pixelWrit
+	  val writer = writableImage.pixelWriter
 	  val reader = image.pixelReader.get
 	  for (x <- 0 until image.width.value.toInt;
 		   y <- 0 until image.height.value.toInt) {
@@ -21,7 +26,7 @@ object ImageUtil {
 	
 	def mirrorHorizontally(image:Image):Image = {
 	  val writableImage = new WritableImage(image.width.value.toInt, image.height.value.toInt)
-	  val writer = writableImage.pixelWrit
+	  val writer = writableImage.pixelWriter
 	  val reader = image.pixelReader.get
 	  for (x <- 0 until image.width.value.toInt;
 		   y <- 0 until image.height.value.toInt) {
@@ -36,8 +41,14 @@ object ImageUtil {
 	
 	def emptyImage:Image = {
 	  val writableImage = new WritableImage(1, 1)
-	  val writer = writableImage.pixelWrit
+	  val writer = writableImage.pixelWriter
 	  writer.setArgb(0, 0, 0)
 	  return writableImage
+	}
+
+	def scale(image: Image, factor: Double): Image = {
+		val bi = SwingFXUtils.fromFXImage(image, null)
+		val result = Scalr.resize(bi, Method.ULTRA_QUALITY, Mode.AUTOMATIC, bi.getWidth * factor toInt, bi.getHeight * factor toInt)
+		SwingFXUtils.toFXImage(result, null)
 	}
 }

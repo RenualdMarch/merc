@@ -25,8 +25,8 @@ import scalafx.geometry.Rectangle2D
 import mr.merc.view.move.SmoothMovement
 
 // injecting soldier drawer for test purposes only
-class BattleView(model: BattleModel, soldierDrawer: SoldiersDrawer[SoldierView] = new SoldiersDrawer) extends Logging {
-  val mapView = new MapView(model.map.hexField, soldierDrawer)
+class BattleView(model: BattleModel, scalingFactor: Double, soldierDrawer: SoldiersDrawer[SoldierView] = new SoldiersDrawer) extends Logging {
+  val mapView = new MapView(model.map.hexField, scalingFactor, soldierDrawer)
 
   private val hexesViewMap = mapView.terrainView.realHexes.map(v => (v.hex -> v)) toMap
   private val soldiersMap = mapView.soldiers.map(s => (s.soldier -> s)) toMap

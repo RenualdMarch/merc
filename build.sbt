@@ -24,6 +24,8 @@ libraryDependencies += "com.miglayout" % "miglayout-javafx" % "4.2"
 
 libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.0.6"
 
+libraryDependencies += "org.imgscalr" % "imgscalr-lib" % "4.2"
+
 scalacOptions ++= Seq("-feature", "-deprecation", "-language:postfixOps", "-language:implicitConversions", "-language:reflectiveCalls")
 
 jfxSettings

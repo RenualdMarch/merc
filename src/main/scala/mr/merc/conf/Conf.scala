@@ -4,7 +4,7 @@ import java.util.Properties
 import java.io.FileReader
 import java.io.File
 import java.io.FileOutputStream
-import collection.JavaConversions._
+import collection.JavaConverters._
 import scala.concurrent._
 import java.util.concurrent.Executors
 import java.util.Locale
@@ -13,21 +13,21 @@ import mr.merc.local.Localization
 object Conf {
   private implicit val executor = ExecutionContext.fromExecutor(Executors.newSingleThreadExecutor())
   val confPath = "merc.properties"
-  val defaultConf = Map("Sound" -> "true", "Music" -> "false", "DevMode" -> "true") ++ localizationProps
+  val defaultConf = Map("Sound" -> "true", "Music" -> "false", "DevMode" -> "true", "MapScaling" -> "1.5") ++ localizationProps
 
   private def localizationProps: Map[String, String] = {
-    val currentLanguage = Locale.getDefault().getLanguage()
+    val currentLanguage = Locale.getDefault().getLanguage
     if (Localization.languages.contains(currentLanguage)) {
       Map("Language" -> currentLanguage)
     } else {
       Map("Language" -> "en")
     }
-
   }
 
   private var conf: Conf = readProperties
-  def string(name: String) = conf.properties(name)
-  def bool(name: String) = string(name: String).toBoolean
+  def string(name: String):String = conf.properties(name)
+  def bool(name: String):Boolean = string(name).toBoolean
+  def double(name: String):Double = string(name).toDouble
 
   private[conf] def readProperties: Conf = {
     val file = new File(confPath)
@@ -39,7 +39,7 @@ object Conf {
       } finally {
         reader.close()
       }
-      props toMap
+      props.asScala.toMap
     } else {
       Map[String, String]()
     }
@@ -72,5 +72,4 @@ object Conf {
 
 private class Conf(val properties: Map[String, String]) {
   def string(name: String) = properties(name)
-  def bool(name: String) = string(name: String).toBoolean
 }

@@ -7,8 +7,8 @@ class Polygon(points: (Double, Double)*) {
 
   private val fxPolygon = new scalafx.scene.shape.Polygon
   private val pointsArr = points.flatMap { case (x, y) => List(x, y) }
-  import collection.JavaConversions._
-  fxPolygon.points.setAll(pointsArr.map(double2Double))
+  import collection.JavaConverters._
+  fxPolygon.points.setAll(pointsArr.map(double2Double).asJava)
 
   def drawPolygon(xOffset: Int, yOffset: Int, gc: GraphicsContext, color: Color) {
     gc.save()

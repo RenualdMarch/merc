@@ -10,29 +10,29 @@ import mr.merc.view.Sprite
 class SoldierViewTest extends FunSuite {
 
   test("coords correction") {
-    val nCorr = SoldierView.coordsCorrection(N)
+    val nCorr = SoldierView.coordsCorrection(N, 1.0)
     assert(nCorr === (0, -72))
 
-    val neCorr = SoldierView.coordsCorrection(NE)
+    val neCorr = SoldierView.coordsCorrection(NE, 1.0)
     assert(neCorr === (54, -36))
 
-    val nwCorr = SoldierView.coordsCorrection(NW)
+    val nwCorr = SoldierView.coordsCorrection(NW, 1.0)
     assert(nwCorr === (-54, -36))
 
-    val sCorr = SoldierView.coordsCorrection(S)
+    val sCorr = SoldierView.coordsCorrection(S, 1.0)
     assert(sCorr === (0, 72))
 
-    val seCorr = SoldierView.coordsCorrection(SE)
+    val seCorr = SoldierView.coordsCorrection(SE, 1.0)
     assert(seCorr === (54, 36))
 
-    val swCorr = SoldierView.coordsCorrection(SW)
+    val swCorr = SoldierView.coordsCorrection(SW, 1.0)
     assert(swCorr === (-54, 36))
   }
 
   test("after setting state to death after animation is finished, noState is used") {
     val soldierType = SoldierType("testSoldier")
     val soldier = new Soldier("1", soldierType, Player("1"))
-    val view = new SoldierView(soldier)
+    val view = new SoldierView(soldier, 1.0)
 
     view.state = StandState
     view.updateTime(10000)
@@ -44,7 +44,7 @@ class SoldierViewTest extends FunSuite {
   test("after setting idle state after animation is over, standing state is used") {
     val soldierType = SoldierType("testSoldier")
     val soldier = new Soldier("1", soldierType, Player("1"))
-    val view = new SoldierView(soldier)
+    val view = new SoldierView(soldier, 1.0)
 
     view.state = StandState
     view.updateTime(10000)
