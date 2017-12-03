@@ -173,6 +173,12 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
     neigMapObj.flatMap(p => p.mapObj.get.images(hex, field)).toList
   }
 
+  def drawCastleAndWalls(gc: GraphicsContext, xOffset: Int, yOffset: Int): Unit = {
+    fieldView.castleImagesForHex(this.hex).foreach { wallImage =>
+      wallImage.image.scaledImage(factor).drawImage(gc, this.x + xOffset, this.y + yOffset)
+    }
+  }
+
   def drawTerrainImage(gc: GraphicsContext, xOffset: Int, yOffset: Int) {
     val x = this.x + xOffset
     val y = this.y + yOffset
@@ -198,6 +204,8 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
     stage match {
       case TerrainImageStage =>
         drawTerrainImage(gc, xOffset, yOffset)
+      case CastleStage =>
+        drawCastleAndWalls(gc, xOffset, yOffset)
       case MovementImpossibleStage =>
         drawMovementImpossibleIfNeeded(gc, xOffset, yOffset)
       case ArrowStage =>
@@ -262,4 +270,5 @@ case object MovementImpossibleStage extends HexDrawingStage
 case object ArrowStage extends HexDrawingStage
 case object DefenceStage extends HexDrawingStage
 case object HexGridStage extends HexDrawingStage
+case object CastleStage extends HexDrawingStage
 case object EndInterfaceDrawing extends HexDrawingStage

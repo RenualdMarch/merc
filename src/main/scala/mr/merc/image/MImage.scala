@@ -35,13 +35,13 @@ abstract class MImage private[image] (val xOffset: Int, val yOffset: Int, val al
   def drawImage(gc: GraphicsContext, x: Int, y: Int) {
     gc.save()
     gc.globalAlpha = alpha
-    gc.drawImage(image, x, y)
+    gc.drawImage(image, x + xOffset, y + yOffset)
     gc.restore()
   }
 
   def centeredRect(x: Double, y: Double, width: Double, height: Double): Rectangle2D = {
-    val actualX = x + (width - this.width) / 2
-    val actualY = y + (height - this.height) / 2
+    val actualX = x + xOffset + (width - this.width) / 2
+    val actualY = y + yOffset + (height - this.height) / 2
     new Rectangle2D(actualX.toInt, actualY.toInt, image.width.value, image.height.value)
   }
 

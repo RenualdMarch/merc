@@ -1,12 +1,7 @@
 package mr.merc.map.terrain
 
-import scalafx.scene.image.Image
-import mr.merc.map.hex.Direction
-import mr.merc.image.MImage
-import javafx.embed.swing.SwingFXUtils
-
 object TerrainType {
-  val list = List[TerrainType](Water, Forest, Grass, Sand, Swamp, Hill, Mountain, Dirt, Road)
+  val list = List[TerrainType](Water, Forest, Grass, Sand, Swamp, Hill, Mountain, Dirt, Road, Castle)
   val helperTypesList = List[TerrainType](BankInside, BankOutside)
   private val namesMap = (Village :: list ::: helperTypesList).map(t => (t.name.toLowerCase(), t)).toMap
 
@@ -15,7 +10,6 @@ object TerrainType {
 
 abstract sealed class TerrainType(val name: String, val layer: Int) {
   def imagePath = "/images/terrain/" + name + ".png"
-
 }
 
 case object Grass extends TerrainType("grass", 0)
@@ -29,6 +23,7 @@ case object Mountain extends TerrainType("mountain", 2)
 case object Road extends TerrainType("road", 0)
 case object Forest extends TerrainType("forest", 3)
 case object Dirt extends TerrainType("dirt", 0)
+case object Castle extends TerrainType("walls/cobbles", 1)
 
 // THIS TYPES ARE FORBIDDEN TO USE ON MAP
 case object Village extends TerrainType("village", 0)

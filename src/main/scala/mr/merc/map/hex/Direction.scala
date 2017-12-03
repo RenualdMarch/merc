@@ -1,7 +1,5 @@
 package mr.merc.map.hex
 
-import scala.math.Ordering
-
 object Direction {
   val list = List(N, NE, SE, S, SW, NW)
   type DirPair = (Direction, Direction)

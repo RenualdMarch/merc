@@ -1,18 +1,10 @@
 package mr.merc.map.hex.view
 
-import mr.merc.map.terrain.TerrainType
-import mr.merc.map.terrain.Hill
-import mr.merc.map.terrain.Water
-import mr.merc.map.terrain.BankOutside
-import mr.merc.map.terrain.BankInside
-import mr.merc.map.terrain.Mountain
-import mr.merc.map.terrain.Forest
-import mr.merc.map.terrain.Grass
+import mr.merc.map.terrain._
 import mr.merc.map.hex.Direction
 import mr.merc.map.hex.N
 import mr.merc.map.hex.NW
-import scala.Option.option2Iterable
-import mr.merc.map.terrain.Empty
+
 
 object TerrainHexViewAdditive {
   def extractAdditives(view: TerrainHexView): List[TerrainHexViewAdditive] = {
@@ -38,14 +30,14 @@ object TerrainHexViewAdditive {
 
   private def applyTerrainTypeCustomRules(add: TerrainHexViewAdditive): Option[TerrainHexViewAdditive] = {
     (add.hexTerrainType, add.neighbourTerrainType) match {
-      case (Empty, _) => None
-      case (_, Empty) => None
+      case (Empty, _) | (_, Empty)=> None
       case (Water, Water) => Some(add)
       case (Forest, _) => None
       case (_, Water) => Some(new TerrainHexViewAdditive(add.from, add.to, add.hexTerrainType, BankOutside))
       case (Water, _) => Some(new TerrainHexViewAdditive(add.from, add.to, Water, BankInside))
       case (Mountain, _) => None
       case (_, Forest) => Some(new TerrainHexViewAdditive(add.from, add.to, add.hexTerrainType, Grass))
+      case (Castle, _) | (_, Castle) => None
       case (_, _) => Some(add)
     }
   }

@@ -17,7 +17,7 @@ class HouseTest extends FunSuite {
   test("positive case"){
      val images = House.images(field.hex(1, 1), field)
      assert(images.size === 1)
-     assert(images(0).imagePath.get.contains("house.png"))
+     assert(images.head.imagePath.get.contains("house.png"))
   }
  
   test("negative case") {

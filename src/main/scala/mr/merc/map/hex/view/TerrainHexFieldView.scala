@@ -8,6 +8,7 @@ import mr.merc.map.hex.InfiniteHexField
 import mr.merc.map.hex.TerrainHex
 import mr.merc.map.terrain._
 import mr.merc.unit.SoldierDefence
+
 import scalafx.geometry.Rectangle2D
 import mr.merc.map.hex.Direction
 import mr.merc.map.view.SoldiersDrawer
@@ -16,6 +17,8 @@ import mr.merc.ui.common.geom.Line
 import mr.merc.ui.common.geom.Polygon
 import mr.merc.ui.common.geom.PolygonSet
 import mr.merc.log.Logging
+import mr.merc.map.objects.Walls
+import mr.merc.map.objects.view.{WallImage, WallView}
 
 class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer[_], factor: Double) extends Logging {
   private val infiniteField = new InfiniteHexField((x, y) => new TerrainHex(x, y, Empty))
@@ -30,8 +33,16 @@ class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer
     }.map(new TerrainHexView(_, field, this, factor))
   }
 
+  private val walls:Walls = realHexes.filter(_.hex.terrain == Castle).foldLeft(Walls()) {
+    case (w, hexView) =>
+      w.addWall(hexView.hex)
+  }
+  private val wallsView = new WallView(walls)
+  private val castleImages = wallsView.wallImages()
+  def castleImagesForHex(hex:Hex):List[WallImage] = castleImages.getOrElse(hex, Nil)
+
   // sorting is make sure that hexes are drawn in correct order, back before first
-  val hexesToDraw = (realHexes ++ blackHexes).toList.sortBy(h => (h.hex.terrain.layer, h.hex.y, h.hex.x))
+  val hexesToDraw = (realHexes ++ blackHexes).toList.sortBy(h => (h.hex.terrain.layer, h.hex.y + h.hex.x % 2, h.hex.x))
   val hexesToDrawMap = hexesToDraw.map(h => ((h.hex.x, h.hex.y), h)).toMap
 
   private var _movementOptions: Option[Set[TerrainHexView]] = None
@@ -121,7 +132,7 @@ class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer
 
     def drawLayer(gc: GraphicsContext, viewRect: Rectangle2D) {
       val visibleHexes = calculateVisibleHexes(viewRect)
-      List(TerrainImageStage, HexGridStage).foreach { stage =>
+      List(TerrainImageStage, CastleStage, HexGridStage).foreach { stage =>
         visibleHexes foreach (_.drawItself(gc, stage, -viewRect.minX.toInt, -viewRect.minY.toInt))
       }
     }

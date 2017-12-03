@@ -8,5 +8,5 @@ private[hex] case class CubeHex(x: Int, y: Int, z: Int) {
     new Hex(q, r)
   }
 
-  def toAxialHex = new AxialHex(x, z)
+  def toAxialHex = AxialHex(x, z)
 }

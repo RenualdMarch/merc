@@ -8,7 +8,7 @@ import scala.util.Random
 
 class RandomTerrainGenerator(houseChance: Double = 0.1, bridgeChance: Double = 0.1) extends MapGenerator {
 
-  val terrainTypesMap = Map(Water -> 1, Forest -> 1, Grass -> 3, Road -> 1, Sand -> 1, Swamp -> 1, Hill -> 1, Mountain -> 1, Dirt -> 1)
+  val terrainTypesMap = Map(Water -> 1, Forest -> 1, Grass -> 3, Road -> 1, Sand -> 1, Swamp -> 1, Hill -> 1, Mountain -> 1, Dirt -> 1, Castle -> 2)
   val terrainTypes: List[TerrainType] = terrainTypesMap.flatMap { case (t, i) => List.fill(i)(t) } toList
 
   def generateMap(width: Int, height: Int, seed: Int): TerrainHexField = {
@@ -30,6 +30,7 @@ class RandomTerrainGenerator(houseChance: Double = 0.1, bridgeChance: Double = 0
       } else {
         None
       }
+
       new TerrainHex(x, y, terrain, mapObj)
     }
 

@@ -14,7 +14,7 @@ class Hex(val x: Int, val y: Int) {
     val cubeX = x
     val cubeZ = y - (x - (x & 1)) / 2
     val cubeY = -cubeX - cubeZ
-    new CubeHex(cubeX, cubeY, cubeZ)
+    CubeHex(cubeX, cubeY, cubeZ)
   }
 
   private[hex] def toAxialHex = toCubeHex.toAxialHex
@@ -27,7 +27,7 @@ class Hex(val x: Int, val y: Int) {
   def distance(to: Hex): Int = {
     val fromCube = this.toCubeHex
     val toCube = to.toCubeHex
-    (Math.abs(fromCube.x - toCube.x) + Math.abs(fromCube.y - toCube.y) + Math.abs(fromCube.z - toCube.z)) / 2;
+    (Math.abs(fromCube.x - toCube.x) + Math.abs(fromCube.y - toCube.y) + Math.abs(fromCube.z - toCube.z)) / 2
   }
 
   override def hashCode = x + y
