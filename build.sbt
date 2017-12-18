@@ -26,7 +26,10 @@ libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.0.6"
 
 libraryDependencies += "org.imgscalr" % "imgscalr-lib" % "4.2"
 
-scalacOptions ++= Seq("-feature", "-deprecation", "-language:postfixOps", "-language:implicitConversions", "-language:reflectiveCalls")
+libraryDependencies += "org.typelevel" %% "cats-core" % "1.0.0-RC1"
+
+scalacOptions ++= Seq("-feature", "-deprecation", "-language:postfixOps", "-language:implicitConversions",
+  "-language:reflectiveCalls", "-Ypartial-unification")
 
 jfxSettings
 

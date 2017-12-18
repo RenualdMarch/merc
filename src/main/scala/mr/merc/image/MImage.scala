@@ -6,6 +6,8 @@ import scalafx.scene.image.ImageView
 import scalafx.scene.paint.Color
 import scala.util.Try
 import mr.merc.log.Logging
+import mr.merc.util.CacheFactoryMap
+
 import scalafx.geometry.Rectangle2D
 
 object MImage {
@@ -73,5 +75,9 @@ abstract class MImage private[image] (val xOffset: Int, val yOffset: Int, val al
     }
   }
 
-  def scaledImage(factor: Double): MImage = new ScaledMImage(image, factor, (xOffset * factor) toInt, (yOffset * factor) toInt, alpha)
+  private val scaledCache = new CacheFactoryMap[Double, MImage]({ factor =>
+    new ScaledMImage(image, factor, (xOffset * factor) toInt, (yOffset * factor) toInt, alpha)
+  })
+
+  def scaledImage(factor: Double): MImage = scaledCache(factor)
 }
