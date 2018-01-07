@@ -2,16 +2,20 @@ package mr.merc.economics
 
 import mr.merc.economics.Population._
 import mr.merc.economics.Products._
-import cats.implicits._
 
-class Population(val culture: Culture, val populationType: PopulationType, count: Int, startingMoney: Double) {
+import mr.merc.economics.MapUtil.MapWithOperations
+
+class Population(val culture: Culture, val populationType: PopulationType, private var count: Double,
+                 startingMoney: Double, private var startingLiteracy: Double) {
   require(needs.nonEmpty, s"Needs for culture $culture for type $populationType are empty!")
 
   private val needsFulfillmentRecordsMaxSize = 30
   private val salaryRecordsMaxSize = 30
 
+  def populationCount:Int = count.toInt
+
   def needs:Map[PopulationNeedsType, Map[Products.Product, Double]] = culture.race.needs(populationType.populationClass).
-    map{ case (nt, m) => nt -> m.mapValues(_ * count)}
+    map{ case (nt, m) => nt -> m.mapValues(_ * count * efficiency)}
 
   private var needsFulfillmentRecords = Vector[ProductFulfillmentRecord]()
 
@@ -55,6 +59,10 @@ class Population(val culture: Culture, val populationType: PopulationType, count
     }
   }
 
+  def efficiency:Double = 1 + literacy * literacy * (MaxLiteracyEfficiencyMultiplier - 1)
+
+  def literacy: Double = startingLiteracy
+
   private case class DemandInfo(product: Product, count: Double, price: Double)
 
   // returns spent money
@@ -79,7 +87,7 @@ class Population(val culture: Culture, val populationType: PopulationType, count
 
   // TODO add info about salary sources
   def receiveSalary(salary: Double): Unit = {
-    val salaryRecord = SalaryRecord(count, salary)
+    val salaryRecord = SalaryRecord(populationCount, salary)
     currentMoney = salary + currentMoney
     salaryRecords +:= salaryRecord
     if (salaryRecords.size > salaryRecordsMaxSize) {
@@ -89,6 +97,8 @@ class Population(val culture: Culture, val populationType: PopulationType, count
 }
 
 object Population {
+  val MaxLiteracyEfficiencyMultiplier = 10
+
   sealed abstract class PopulationNeedsType(val needImportance:Int)
   case object LifeNeeds extends PopulationNeedsType(5)
   case object RegularNeeds extends PopulationNeedsType(3)
@@ -208,18 +218,17 @@ object Population {
   class ProductFulfillmentRecord(needs: Map[PopulationNeedsType, Map[Products.Product, Double]], products: Map[Product, Double]) {
 
     val needsFulfillmentInfo:Map[PopulationNeedsType, List[ProductFulfillment]] = {
-      import EconomicUtil.subtractMapFromMap
 
       val lifeNeeds = needs(LifeNeeds)
-      val afterLifeNeeds = subtractMapFromMap(products, lifeNeeds)
+      val afterLifeNeeds = products |-| lifeNeeds
       val lifeNeedsFulfillment = calculateProductFulfillment(lifeNeeds, afterLifeNeeds)
       val beforeRegularNeeds = removeZeroesAndNegative(afterLifeNeeds)
       val regularNeeds = needs(RegularNeeds)
-      val afterRegularNeeds = subtractMapFromMap(beforeRegularNeeds, regularNeeds)
+      val afterRegularNeeds = beforeRegularNeeds |-| regularNeeds
       val regularNeedsFulfillment = calculateProductFulfillment(regularNeeds, afterRegularNeeds)
       val beforeLuxNeeds = removeZeroesAndNegative(afterRegularNeeds)
       val luxuryNeeds = needs(LuxuryNeeds)
-      val afterLuxNeeds = subtractMapFromMap(beforeLuxNeeds, luxuryNeeds)
+      val afterLuxNeeds = beforeLuxNeeds |-| luxuryNeeds
       val luxuryNeedsFulfillment = calculateProductFulfillment(luxuryNeeds, afterLuxNeeds)
 
       Map(LifeNeeds -> lifeNeedsFulfillment,

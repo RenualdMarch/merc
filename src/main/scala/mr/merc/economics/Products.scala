@@ -14,15 +14,13 @@ object Products {
   sealed abstract class FarmProduct extends Product
   sealed abstract class ResourceProduct extends Product
 
-  sealed abstract class FactoryProduct(goodsToProduce:(Product, Double)*) extends Product {
-    val components:Map[Product, Double] = goodsToProduce.toMap
+  sealed abstract class ProducibleProduct(val components:Map[Product, Double]) extends Product {
     require(components.nonEmpty, "Components can't be empty!")
   }
 
-  sealed abstract class MagicProduct(goodsToProduce:(Product, Double)*) extends Product {
-    val components:Map[Product, Double] = goodsToProduce.toMap
-    require(components.nonEmpty, "Components can't be empty!")
-  }
+  sealed abstract class IndustryProduct(goodsToProduce:(Product, Double)*) extends ProducibleProduct(goodsToProduce.toMap)
+
+  sealed abstract class MagicProduct(goodsToProduce:(Product, Double)*) extends ProducibleProduct(goodsToProduce.toMap)
 
   // farms
   // food
@@ -53,21 +51,21 @@ object Products {
 
   // factories
   // simple
-  case object Lumber extends FactoryProduct(Timber -> 3)
-  case object Cement extends FactoryProduct(Coal -> 3)
-  case object Fabric extends FactoryProduct(Cotton -> 3)
-  case object Fertilizer extends FactoryProduct(Sulphur -> 3)
-  case object Paper extends FactoryProduct(Timber -> 3)
-  case object Glass extends FactoryProduct(Coal -> 3)
-  case object Steel extends FactoryProduct(Iron -> 3)
+  case object Lumber extends IndustryProduct(Timber -> 3)
+  case object Cement extends IndustryProduct(Coal -> 3)
+  case object Fabric extends IndustryProduct(Cotton -> 3)
+  case object Fertilizer extends IndustryProduct(Sulphur -> 3)
+  case object Paper extends IndustryProduct(Timber -> 3)
+  case object Glass extends IndustryProduct(Coal -> 3)
+  case object Steel extends IndustryProduct(Iron -> 3)
 
   // complex
-  case object Furniture extends FactoryProduct(Lumber -> 1)
-  case object Liquor extends FactoryProduct(Glass -> 0.4, Grain -> 0.6)
-  case object Clothes extends FactoryProduct(Fabric -> 1)
-  case object Wine extends FactoryProduct(Glass -> 0.4, Fruit -> 0.6)
-  case object Weapons extends FactoryProduct(Steel -> 1)
-  case object MachineParts extends FactoryProduct(Coal -> 0.9, Steel -> 0.7)
+  case object Furniture extends IndustryProduct(Lumber -> 1)
+  case object Liquor extends IndustryProduct(Glass -> 0.4, Grain -> 0.6)
+  case object Clothes extends IndustryProduct(Fabric -> 1)
+  case object Wine extends IndustryProduct(Glass -> 0.4, Fruit -> 0.6)
+  case object Weapons extends IndustryProduct(Steel -> 1)
+  case object MachineParts extends IndustryProduct(Coal -> 0.9, Steel -> 0.7)
 
   // magic products
   case object Amulet extends MagicProduct(Timber -> 3)
@@ -75,6 +73,9 @@ object Products {
 
   // products to add: boots/shoes, horses, books
 
+  val PeoplePerOneFactoryLevel = 1000
+  val FactoryOutputMultiplier =  20
+  val GatheringOutputMultiplier = 20
 }
 
 

@@ -44,7 +44,7 @@ class WallTest extends FunSuite {
       addWall(Wall(new Hex(2, 2), fullSet), removeInnerWall = false)
 
     assert(result1 === result2)
-    assert(result1 === Walls(List(Wall(new Hex(1, 1), Set(N, NW, S, SE, SW)), Wall(new Hex(2, 2), Set(NE, NW, S, SE, SW))), List(Wall(new Hex(2, 1), fullSet))))
+    assert(result1 === Walls(List(Wall(new Hex(1, 1), Set(N, S, SE, SW, NW)), Wall(new Hex(2, 2), Set(NE, S, SE, SW))), List(Wall(new Hex(2, 1), fullSet))))
   }
 
   test("add one keep wall without inner walls") {

@@ -15,6 +15,9 @@ case class Walls(walls: List[Wall] = Nil, keepWalls: List[Wall] = Nil) {
   }
 
   def addKeepWall(wall: Wall, removeInnerWall: Boolean = true): Walls = {
+    require(!walls.exists(w => w.hex == wall.hex), s"wall in hex ${wall.hex} already present")
+    require(!keepWalls.exists(w => w.hex == wall.hex), s"wall in hex ${wall.hex} already present")
+
     val newKeepWalls = addWallToList(wall, keepWalls, removeInnerWall)
     val newWalls = removeIntersectionsFromList(wall, walls)
     Walls(newWalls, newKeepWalls)
@@ -25,6 +28,9 @@ case class Walls(walls: List[Wall] = Nil, keepWalls: List[Wall] = Nil) {
   }
 
   def addWall(wall:Wall, removeInnerWall: Boolean): Walls = {
+    require(!walls.exists(w => w.hex == wall.hex), s"wall in hex ${wall.hex} already present")
+    require(!keepWalls.exists(w => w.hex == wall.hex), s"wall in hex ${wall.hex} already present")
+
     val intersectionsWithKeeps = findIntersections(wall, keepWalls)
 
     val list = addWallToList(wall.copy(walls = wall.walls -- intersectionsWithKeeps),

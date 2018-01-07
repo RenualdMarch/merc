@@ -11,9 +11,9 @@ class MarketDayTest extends FunSuite {
     val demandRequest = new DemandRequest(250)
     marketDay.acceptRequests(supplyRequest1, supplyRequest2, demandRequest)
     marketDay.calculateSupplyAndDemand()
-    assert(marketDay.fulfilledDemands.get === Map(demandRequest -> FulfilledDemandRequest(250, 0, 10)))
-    assert(marketDay.fulfilledSupply.get === Map(supplyRequest1 -> FulfilledSupplyRequest(200, 600, 10),
-      supplyRequest2 -> FulfilledSupplyRequest(50, 150, 10)))
+    assert(marketDay.fulfilledDemands.get === List(FulfilledDemandRequest(250, 0, 10, demandRequest)))
+    assert(marketDay.fulfilledSupply.get.toSet === Set(FulfilledSupplyRequest(200, 600, 10, supplyRequest1),
+       FulfilledSupplyRequest(50, 150, 10, supplyRequest2)))
     assert(marketDay.tomorrowPrice.get < 10)
   }
 
@@ -25,10 +25,10 @@ class MarketDayTest extends FunSuite {
     val demandRequest2 = new DemandRequest(300)
     marketDay.acceptRequests(supplyRequest1, supplyRequest2, demandRequest1, demandRequest2)
     marketDay.calculateSupplyAndDemand()
-    assert(marketDay.fulfilledDemands.get === Map(demandRequest1 -> FulfilledDemandRequest(150, 150, 10),
-      demandRequest2 -> FulfilledDemandRequest(150, 150, 10)))
-    assert(marketDay.fulfilledSupply.get === Map(supplyRequest1 -> FulfilledSupplyRequest(100, 0, 10),
-      supplyRequest2 -> FulfilledSupplyRequest(200, 0, 10)))
+    assert(marketDay.fulfilledDemands.get.toSet === Set(FulfilledDemandRequest(150, 150, 10, demandRequest1),
+       FulfilledDemandRequest(150, 150, 10, demandRequest2)))
+    assert(marketDay.fulfilledSupply.get.toSet === Set(FulfilledSupplyRequest(100, 0, 10, supplyRequest1),
+       FulfilledSupplyRequest(200, 0, 10, supplyRequest2)))
     assert(marketDay.tomorrowPrice.get > 10)
   }
 
@@ -40,10 +40,10 @@ class MarketDayTest extends FunSuite {
     val demandRequest2 = new DemandRequest(100)
     marketDay.acceptRequests(supplyRequest1, supplyRequest2, demandRequest1, demandRequest2)
     marketDay.calculateSupplyAndDemand()
-    assert(marketDay.fulfilledDemands.get === Map(demandRequest1 -> FulfilledDemandRequest(500, 0, 10),
-      demandRequest2 -> FulfilledDemandRequest(100, 0, 10)))
-    assert(marketDay.fulfilledSupply.get === Map(supplyRequest1 -> FulfilledSupplyRequest(400, 0, 10),
-      supplyRequest2 -> FulfilledSupplyRequest(200, 0, 10)))
+    assert(marketDay.fulfilledDemands.get.toSet === Set(FulfilledDemandRequest(500, 0, 10, demandRequest1),
+      FulfilledDemandRequest(100, 0, 10, demandRequest2)))
+    assert(marketDay.fulfilledSupply.get.toSet === Set(FulfilledSupplyRequest(400, 0, 10, supplyRequest1),
+      FulfilledSupplyRequest(200, 0, 10, supplyRequest2)))
     assert(marketDay.tomorrowPrice.get === 10)
   }
 
@@ -60,7 +60,7 @@ class MarketDayTest extends FunSuite {
     marketDay.acceptRequests(request)
     marketDay.calculateSupplyAndDemand()
     assert(marketDay.fulfilledSupply.get.isEmpty)
-    assert(marketDay.fulfilledDemands.get === Map(request -> FulfilledDemandRequest(0, 100, 10)))
+    assert(marketDay.fulfilledDemands.get === List(FulfilledDemandRequest(0, 100, 10, request)))
   }
 
   test("no demand") {
@@ -68,7 +68,7 @@ class MarketDayTest extends FunSuite {
     val request = new SupplyRequest(100)
     marketDay.acceptRequests(request)
     marketDay.calculateSupplyAndDemand()
-    assert(marketDay.fulfilledSupply.get === Map(request -> FulfilledSupplyRequest(0, 100, 10)))
+    assert(marketDay.fulfilledSupply.get === List(FulfilledSupplyRequest(0, 100, 10, request)))
     assert(marketDay.fulfilledDemands.get.isEmpty)
   }
 

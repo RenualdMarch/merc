@@ -13,7 +13,7 @@ class PopulationTest extends FunSuite {
 
   object TestRace extends Race(Map(Middle -> smallNeeds))
   object TestCulture extends Culture("test", TestRace)
-  def newPopulation(money: Double) = new Population(TestCulture, Traders, 1000, money)
+  def newPopulation(money: Double) = new Population(TestCulture, Traders, 1000, money, 0)
 
   test("demands calculation") {
     def assertDemands(money: Double, prices:Map[Products.Product, Double], demands:Map[Products.Product, Double]) {
@@ -50,23 +50,23 @@ class PopulationTest extends FunSuite {
   test("fulfill demands") {
     val pop1 = newPopulation(15000)
 
-    pop1.receiveProductsAndPayChecks(Map(Grain -> FulfilledDemandRequest(5000, 0, 1),
-      Fruit -> FulfilledDemandRequest(3000, 0, 2), Coal -> FulfilledDemandRequest(3000, 0, 0.5)))
+    pop1.receiveProductsAndPayChecks(Map(Grain -> FulfilledDemandRequest(5000, 0, 1, null),
+      Fruit -> FulfilledDemandRequest(3000, 0, 2, null), Coal -> FulfilledDemandRequest(3000, 0, 0.5, null)))
 
     assert(pop1.moneyReserves === 2500)
     assert(pop1.needsFulfillment(1).head.needsFulfillment === Map(LifeNeeds -> 1, RegularNeeds -> 1, LuxuryNeeds -> 1))
 
     val pop2 = newPopulation(1000)
-    pop2.receiveProductsAndPayChecks(Map(Grain -> FulfilledDemandRequest(0, 1000, 1),
-      Fruit -> FulfilledDemandRequest(0, 1000, 2), Coal -> FulfilledDemandRequest(0, 1000, 0.5)))
+    pop2.receiveProductsAndPayChecks(Map(Grain -> FulfilledDemandRequest(0, 1000, 1, null),
+      Fruit -> FulfilledDemandRequest(0, 1000, 2, null), Coal -> FulfilledDemandRequest(0, 1000, 0.5, null)))
 
     assert(pop2.moneyReserves === 1000)
     assert(pop2.needsFulfillment(1).head.needsFulfillment === Map(LifeNeeds -> 0, RegularNeeds -> 0, LuxuryNeeds -> 0))
 
 
     val pop3 = newPopulation(15000)
-    pop3.receiveProductsAndPayChecks(Map(Grain -> FulfilledDemandRequest(500, 4500, 1),
-      Fruit -> FulfilledDemandRequest(1500, 0, 2), Coal -> FulfilledDemandRequest(2000, 1000, 0.5)))
+    pop3.receiveProductsAndPayChecks(Map(Grain -> FulfilledDemandRequest(500, 4500, 1, null),
+      Fruit -> FulfilledDemandRequest(1500, 0, 2, null), Coal -> FulfilledDemandRequest(2000, 1000, 0.5, null)))
 
     assert(pop3.moneyReserves === 10500)
     assert(pop3.needsFulfillment(1).head.needsFulfillment === Map(LifeNeeds -> 0.5, RegularNeeds -> 0.2, LuxuryNeeds -> 0.5))

@@ -2,7 +2,7 @@ package mr.merc.economics
 
 import scala.collection.mutable
 
-class MarketDay(price: Double) {
+class MarketDay(val price: Double) {
   private val priceIncrease = 1.03
   private val priceDecrease = 0.97
 
@@ -15,18 +15,18 @@ class MarketDay(price: Double) {
   private var demand = mutable.ArrayBuffer[DemandRequest]()
   private var supply = mutable.ArrayBuffer[SupplyRequest]()
 
-  private var _fulfilledDemands: Option[Map[DemandRequest, FulfilledDemandRequest]] = None
-  private var _fulfilledSupply: Option[Map[SupplyRequest, FulfilledSupplyRequest]] = None
+  private var _fulfilledDemands: Option[List[FulfilledDemandRequest]] = None
+  private var _fulfilledSupply: Option[List[FulfilledSupplyRequest]] = None
 
-  def fulfilledDemands: Option[Map[DemandRequest, FulfilledDemandRequest]] = _fulfilledDemands
-  def fulfilledSupply: Option[Map[SupplyRequest, FulfilledSupplyRequest]] = _fulfilledSupply
+  def fulfilledDemands: Option[List[FulfilledDemandRequest]] = _fulfilledDemands
+  def fulfilledSupply: Option[List[FulfilledSupplyRequest]] = _fulfilledSupply
 
   def calculateSupplyAndDemand(): Unit = {
     require(_fulfilledSupply.isEmpty && _fulfilledDemands.isEmpty, "Resulting supply and demand already calculated")
 
     if (supply.isEmpty && demand.isEmpty) {
-      _fulfilledSupply = Some(Map())
-      _fulfilledDemands = Some(Map())
+      _fulfilledSupply = Some(List())
+      _fulfilledDemands = Some(List())
       _tomorrowPrice = Some(price)
       return
     }
@@ -35,15 +35,14 @@ class MarketDay(price: Double) {
     val totalDemand = demand.foldLeft(0d)(_ + _.count)
 
     if (totalSupply > totalDemand) {
-      _fulfilledDemands = Some(demand.map(d =>
-        d -> FulfilledDemandRequest(d.count, 0, price)).toMap)
+      _fulfilledDemands = Some(demand.map(d =>  FulfilledDemandRequest(d.count, 0, price, d)).toList)
 
       val div = totalDemand / totalSupply
 
       val fulfilledSupplyMap = supply map { s =>
         val sold = s.count * div
-        s -> FulfilledSupplyRequest(sold, s.count - sold, price)
-      } toMap
+        FulfilledSupplyRequest(sold, s.count - sold, price, s)
+      } toList
 
       import scala.math.max
 
@@ -51,14 +50,14 @@ class MarketDay(price: Double) {
       _tomorrowPrice = Some(max(price * priceDecrease, lowestPossiblePrice))
     } else {
       _fulfilledSupply = Some(supply.map(s =>
-        s -> FulfilledSupplyRequest(s.count, 0, price)).toMap)
+        FulfilledSupplyRequest(s.count, 0, price, s)).toList)
 
       val div = totalSupply / totalDemand
 
       val fulfilledDemandMap = demand map { s  =>
         val bought = s.count * div
-        s -> FulfilledDemandRequest(bought, s.count - bought, price)
-      } toMap
+        FulfilledDemandRequest(bought, s.count - bought, price, s)
+      } toList
 
       _fulfilledDemands = Some(fulfilledDemandMap)
 
@@ -101,5 +100,5 @@ final class DemandRequest(val count: Double) extends MarketRequest
 final class SupplyRequest(val count: Double) extends MarketRequest
 
 
-case class FulfilledDemandRequest(bought: Double, shortage: Double, price: Double)
-case class FulfilledSupplyRequest(sold: Double, excess: Double, price: Double)
+case class FulfilledDemandRequest(bought: Double, shortage: Double, price: Double, request: DemandRequest)
+case class FulfilledSupplyRequest(sold: Double, excess: Double, price: Double, request: SupplyRequest)

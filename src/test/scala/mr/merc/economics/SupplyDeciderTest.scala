@@ -7,17 +7,26 @@ class SupplyDeciderTest extends FunSuite{
   private val region1:EconomicRegion = new EconomicRegion {
     override def economicNeighbours: Set[EconomicRegion] = Set(region2, region1)
 
+    override val regionMarket:RegionMarket = null
+    override val pops:RegionPopulation = null
+
     override def toString: String = "region1"
   }
 
   private val region2:EconomicRegion = new EconomicRegion {
     override def economicNeighbours: Set[EconomicRegion] = Set(region1, region3)
 
+    override val regionMarket:RegionMarket = null
+    override val pops:RegionPopulation = null
+
     override def toString: String = "region2"
   }
 
   private val region3:EconomicRegion = new EconomicRegion {
     override def economicNeighbours: Set[EconomicRegion] = Set(region1, region2)
+
+    override val regionMarket:RegionMarket = null
+    override val pops:RegionPopulation = null
 
     override def toString: String = "region3"
   }
@@ -50,7 +59,7 @@ class SupplyDeciderTest extends FunSuite{
 
   test("yesterday correction for unsold") {
     val supplyDecider = new SupplyDecider()
-    supplyDecider.receiveSupplyResults(Map(region2 -> FulfilledSupplyRequest(100, 50, 150)))
+    supplyDecider.receiveSupplyResults(Map(region2 -> FulfilledSupplyRequest(100, 50, 150, null)))
     val map1 = supplyDecider.decideSupply(200, demand)
     assert(map1 === Map(region2 -> 100, region1 -> 100))
     val map2 = supplyDecider.decideSupply(1000, demand)
@@ -59,7 +68,7 @@ class SupplyDeciderTest extends FunSuite{
 
   test("yesterday correction for sold") {
     val supplyDecider = new SupplyDecider()
-    supplyDecider.receiveSupplyResults(Map(region2 -> FulfilledSupplyRequest(100, 0, 150)))
+    supplyDecider.receiveSupplyResults(Map(region2 -> FulfilledSupplyRequest(100, 0, 150, null)))
     val map1 = supplyDecider.decideSupply(200, demand)
     assert(map1 === Map(region2 -> 125, region1 -> 75))
     val map2 = supplyDecider.decideSupply(100, demand)
