@@ -1,8 +1,9 @@
 package mr.merc.economics
 
 import scala.collection.mutable
+import Products.Product
 
-class MarketDay(val price: Double) {
+class MarketDay(product: Product, val price: Double) {
   private val priceIncrease = 1.03
   private val priceDecrease = 0.97
 
@@ -21,6 +22,9 @@ class MarketDay(val price: Double) {
   def fulfilledDemands: Option[List[FulfilledDemandRequest]] = _fulfilledDemands
   def fulfilledSupply: Option[List[FulfilledSupplyRequest]] = _fulfilledSupply
 
+  def totalSupply: Double = supply.foldLeft(0d)(_ + _.count)
+  def totalDemand: Double = demand.foldLeft(0d)(_ + _.count)
+
   def calculateSupplyAndDemand(): Unit = {
     require(_fulfilledSupply.isEmpty && _fulfilledDemands.isEmpty, "Resulting supply and demand already calculated")
 
@@ -31,17 +35,14 @@ class MarketDay(val price: Double) {
       return
     }
 
-    val totalSupply = supply.foldLeft(0d)(_ + _.count)
-    val totalDemand = demand.foldLeft(0d)(_ + _.count)
-
     if (totalSupply > totalDemand) {
-      _fulfilledDemands = Some(demand.map(d =>  FulfilledDemandRequest(d.count, 0, price, d)).toList)
+      _fulfilledDemands = Some(demand.map(d =>  FulfilledDemandRequest(d.count, price, d)).toList)
 
       val div = totalDemand / totalSupply
 
       val fulfilledSupplyMap = supply map { s =>
         val sold = s.count * div
-        FulfilledSupplyRequest(sold, s.count - sold, price, s)
+        FulfilledSupplyRequest(sold, s)
       } toList
 
       import scala.math.max
@@ -50,13 +51,13 @@ class MarketDay(val price: Double) {
       _tomorrowPrice = Some(max(price * priceDecrease, lowestPossiblePrice))
     } else {
       _fulfilledSupply = Some(supply.map(s =>
-        FulfilledSupplyRequest(s.count, 0, price, s)).toList)
+        FulfilledSupplyRequest(s.count, s)).toList)
 
       val div = totalSupply / totalDemand
 
       val fulfilledDemandMap = demand map { s  =>
         val bought = s.count * div
-        FulfilledDemandRequest(bought, s.count - bought, price, s)
+        FulfilledDemandRequest(bought, price, s)
       } toList
 
       _fulfilledDemands = Some(fulfilledDemandMap)
@@ -85,20 +86,31 @@ class MarketDay(val price: Double) {
   }
 
   private def acceptRequest(r: DemandRequest): Unit = {
+    require(r.product == this.product, s"Different products: [${r.product} and [$product]]")
     demand += r
   }
 
   private def acceptRequest(r: SupplyRequest): Unit = {
+    require(r.product == this.product, s"Different products: [${r.product} and [$product]]")
     supply += r
   }
 
 }
 
-// don't make it case classes, it will break using it as a key in result map
-sealed abstract class MarketRequest
-final class DemandRequest(val count: Double) extends MarketRequest
-final class SupplyRequest(val count: Double) extends MarketRequest
+sealed abstract class MarketRequest(val product: Product)
+abstract class DemandRequest(product: Product, val count: Double) extends MarketRequest(product) {
+  require(!count.isNaN, "Count can't be None")
+}
+abstract class SupplyRequest(product: Product, val count: Double) extends MarketRequest(product) {
+  require(!count.isNaN, "Count can't be None")
+}
+case class PopulationDemandRequest(pop: Population, override val product: Product, override val count: Double) extends DemandRequest(product, count)
+case class EnterpriseDemandRequest(enterprise: Enterprise, override val product: Product, override val count: Double) extends DemandRequest(product, count)
+case class EnterpriseSupplyRequest(enterprise: Enterprise, override val product: Product, override val count: Double) extends SupplyRequest(product, count)
 
-
-case class FulfilledDemandRequest(bought: Double, shortage: Double, price: Double, request: DemandRequest)
-case class FulfilledSupplyRequest(sold: Double, excess: Double, price: Double, request: SupplyRequest)
+case class FulfilledDemandRequest(bought: Double, price: Double, request: DemandRequest) {
+  def shortage: Double = request.count - bought
+}
+case class FulfilledSupplyRequest(sold: Double, request: SupplyRequest) {
+  def excess: Double = request.count - sold
+}

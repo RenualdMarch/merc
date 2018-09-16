@@ -2,7 +2,7 @@ package mr.merc.map.pathfind
 
 import scala.collection.mutable.ArrayBuffer
 
-class Node[T](val t:T, val selfPrice:Int, var parent:Option[Node[T]]) {
+class Node[T](val t:T, val selfPrice:Double, var parent:Option[Node[T]]) {
      
      def path:List[Node[T]] = {
        var result = ArrayBuffer(this)

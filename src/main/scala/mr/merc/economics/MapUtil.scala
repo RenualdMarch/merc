@@ -2,7 +2,7 @@ package mr.merc.economics
 
 object MapUtil {
 
-  implicit class MapWithOperations[K, V](map: Map[K, V])(implicit  num: Numeric[V]) {
+  implicit class MapWithOperations[K, V](map: Map[K, V])(implicit  num: Fractional[V]) {
 
     def |+| (other: Map[K, V]):Map[K, V] = {
       val keysInMapOnly = map.keySet -- other.keySet
@@ -25,6 +25,12 @@ object MapUtil {
       map.transform { case (_, v) =>
         num.times(v, q)
       }
+    }
+
+    def scaleToSum(sum: V): Map[K, V] = {
+      val currentSum = map.values.sum(num)
+      val mult = num.div(sum, currentSum)
+      map.transform { case (_, v) => num.times(v, mult) }
     }
   }
 }

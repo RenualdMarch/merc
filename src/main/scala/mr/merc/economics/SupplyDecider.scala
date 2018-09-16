@@ -35,17 +35,22 @@ class SupplyDecider {
       val mostProfitableRegions = sortedByProfit.take(regionsForRemainder).map(_._1)
       val supplyList = mostProfitableRegions.map(resultMap)
       val totalSupply = supplyList.sum
-      val corrections = supplyList.zip(mostProfitableRegions).map { case (currentSupply, region) =>
-        val newSupply = currentSupply + remain * currentSupply / totalSupply
-        region -> newSupply
-      } toMap
+
+      val corrections = if (totalSupply == 0) {
+        Map()
+      } else {
+        supplyList.zip(mostProfitableRegions).map { case (currentSupply, region) =>
+          val newSupply = currentSupply + remain * currentSupply / totalSupply
+          region -> newSupply
+        } toMap
+      }
 
       resultMap ++ corrections
     } else resultMap
   }
 
   def receiveSupplyResults(fulfilledSupply: Map[EconomicRegion, FulfilledSupplyRequest]): Unit = {
-    yesterdayResults = Some(fulfilledSupply)
+    yesterdayResults = Some(yesterdayResults.getOrElse(Map()) ++ fulfilledSupply)
   }
 
   def decideProduction(capacity: Double): Double = {

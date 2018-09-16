@@ -1,34 +1,43 @@
 package mr.merc.economics
 
+import mr.merc.politics.State
 import org.scalatest.FunSuite
 
 class SupplyDeciderTest extends FunSuite{
+
+  val country: State = new State(new StateBudget(0), TaxPolicy.zeroTaxes)
 
   private val region1:EconomicRegion = new EconomicRegion {
     override def economicNeighbours: Set[EconomicRegion] = Set(region2, region1)
 
     override val regionMarket:RegionMarket = null
-    override val pops:RegionPopulation = null
+    override val regionPopulation:RegionPopulation = null
 
     override def toString: String = "region1"
+
+    override def owner: State = country
   }
 
   private val region2:EconomicRegion = new EconomicRegion {
     override def economicNeighbours: Set[EconomicRegion] = Set(region1, region3)
 
     override val regionMarket:RegionMarket = null
-    override val pops:RegionPopulation = null
+    override val regionPopulation:RegionPopulation = null
 
     override def toString: String = "region2"
+
+    override def owner: State = country
   }
 
   private val region3:EconomicRegion = new EconomicRegion {
     override def economicNeighbours: Set[EconomicRegion] = Set(region1, region2)
 
     override val regionMarket:RegionMarket = null
-    override val pops:RegionPopulation = null
+    override val regionPopulation:RegionPopulation = null
 
     override def toString: String = "region3"
+
+    override def owner: State = country
   }
 
   private val demand = Map(region1 -> EconomicRegionDemand(count = 100, profit = 200),
@@ -59,7 +68,7 @@ class SupplyDeciderTest extends FunSuite{
 
   test("yesterday correction for unsold") {
     val supplyDecider = new SupplyDecider()
-    supplyDecider.receiveSupplyResults(Map(region2 -> FulfilledSupplyRequest(100, 50, 150, null)))
+    supplyDecider.receiveSupplyResults(Map(region2 -> FulfilledSupplyRequest(100, EnterpriseSupplyRequest(null, Products.Coal, 150))))
     val map1 = supplyDecider.decideSupply(200, demand)
     assert(map1 === Map(region2 -> 100, region1 -> 100))
     val map2 = supplyDecider.decideSupply(1000, demand)
@@ -68,7 +77,7 @@ class SupplyDeciderTest extends FunSuite{
 
   test("yesterday correction for sold") {
     val supplyDecider = new SupplyDecider()
-    supplyDecider.receiveSupplyResults(Map(region2 -> FulfilledSupplyRequest(100, 0, 150, null)))
+    supplyDecider.receiveSupplyResults(Map(region2 -> FulfilledSupplyRequest(100, EnterpriseSupplyRequest(null, Products.Coal, 100))))
     val map1 = supplyDecider.decideSupply(200, demand)
     assert(map1 === Map(region2 -> 125, region1 -> 75))
     val map2 = supplyDecider.decideSupply(100, demand)

@@ -48,7 +48,7 @@ class PathFindingBase {
   }
 
   // TODO test me
-  def calculatePathPrice[T](grid: Grid[T], path: List[T]): Int = {
+  def calculatePathPrice[T](grid: Grid[T], path: List[T]): Double = {
     path zip path.tail map {
       case (from, to) => grid.price(from, to)
     } sum

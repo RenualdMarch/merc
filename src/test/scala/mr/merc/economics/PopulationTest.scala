@@ -11,8 +11,10 @@ class PopulationTest extends FunSuite {
     RegularNeeds -> Map(Grain -> 3.0, Coal -> 2.0),
     LuxuryNeeds -> Map(Fruit -> 3.0))
 
-  object TestRace extends Race(Map(Middle -> smallNeeds))
-  object TestCulture extends Culture("test", TestRace)
+  object TestRace extends Race
+  object TestCulture extends Culture("test", TestRace) {
+    override def needs: PopulationNeeds = Map(Middle -> smallNeeds)
+  }
   def newPopulation(money: Double) = new Population(TestCulture, Traders, 1000, money, 0)
 
   test("demands calculation") {
@@ -50,33 +52,47 @@ class PopulationTest extends FunSuite {
   test("fulfill demands") {
     val pop1 = newPopulation(15000)
 
-    pop1.receiveProductsAndPayChecks(Map(Grain -> FulfilledDemandRequest(5000, 0, 1, null),
-      Fruit -> FulfilledDemandRequest(3000, 0, 2, null), Coal -> FulfilledDemandRequest(3000, 0, 0.5, null)))
+    val price1 = pop1.buyDemandedProducts(List(FulfilledDemandRequest(5000, 1, PopulationDemandRequest(pop1, Grain, 5000)),
+      FulfilledDemandRequest(3000, 2, PopulationDemandRequest(pop1, Fruit, 3000)), FulfilledDemandRequest(3000, 0.5,
+        PopulationDemandRequest(pop1, Coal, 3000))))
+
+    assert(price1 === 12500)
 
     assert(pop1.moneyReserves === 2500)
+
+    pop1.fulfillNeedsUsingAlreadyReceivedProducts()
     assert(pop1.needsFulfillment(1).head.needsFulfillment === Map(LifeNeeds -> 1, RegularNeeds -> 1, LuxuryNeeds -> 1))
 
     val pop2 = newPopulation(1000)
-    pop2.receiveProductsAndPayChecks(Map(Grain -> FulfilledDemandRequest(0, 1000, 1, null),
-      Fruit -> FulfilledDemandRequest(0, 1000, 2, null), Coal -> FulfilledDemandRequest(0, 1000, 0.5, null)))
+    val price2 = pop2.buyDemandedProducts(List(FulfilledDemandRequest(0, 1, PopulationDemandRequest(pop2, Grain, 1000)),
+      FulfilledDemandRequest(0, 2, PopulationDemandRequest(pop2, Fruit, 1000)),
+      FulfilledDemandRequest(0, 0.5, PopulationDemandRequest(pop2, Coal, 1000))))
 
+    assert(price2 === 0)
     assert(pop2.moneyReserves === 1000)
+    pop2.fulfillNeedsUsingAlreadyReceivedProducts()
     assert(pop2.needsFulfillment(1).head.needsFulfillment === Map(LifeNeeds -> 0, RegularNeeds -> 0, LuxuryNeeds -> 0))
 
 
     val pop3 = newPopulation(15000)
-    pop3.receiveProductsAndPayChecks(Map(Grain -> FulfilledDemandRequest(500, 4500, 1, null),
-      Fruit -> FulfilledDemandRequest(1500, 0, 2, null), Coal -> FulfilledDemandRequest(2000, 1000, 0.5, null)))
+    val price3 = pop3.buyDemandedProducts(List(FulfilledDemandRequest(500, 1,  PopulationDemandRequest(pop3, Grain, 5000)),
+      FulfilledDemandRequest(1500, 2, PopulationDemandRequest(pop3, Fruit, 1500)),
+      FulfilledDemandRequest(2000, 0.5, PopulationDemandRequest(pop3, Coal, 3000))))
+
+    assert(price3 === 4500)
 
     assert(pop3.moneyReserves === 10500)
+    pop3.fulfillNeedsUsingAlreadyReceivedProducts()
     assert(pop3.needsFulfillment(1).head.needsFulfillment === Map(LifeNeeds -> 0.5, RegularNeeds -> 0.2, LuxuryNeeds -> 0.5))
   }
 
   test("salary") {
     val pop = newPopulation(1000)
+    pop.newDay(SalaryTaxPolicy(Map(Middle -> 0)))
     pop.receiveSalary(10000)
     assert(pop.moneyReserves === 11000)
-    assert(pop.salary(1).head.totalMoney === 10000)
+    pop.newDay(SalaryTaxPolicy(Map(Middle -> 0)))
+    assert(pop.salary(1).head.totalMoney === 11000)
   }
 
 }

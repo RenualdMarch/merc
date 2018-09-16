@@ -1,39 +1,66 @@
 package mr.merc.economics
 
 import mr.merc.economics.Factory.FactoryRecord
-import mr.merc.economics.Population.{Capitalists, Craftsmen, LatinHuman, Slaves}
-import mr.merc.economics.Products.{Fruit, Glass, MachineParts, Product, Wine}
-import org.scalatest.FunSuite
+import mr.merc.economics.Population._
+import mr.merc.economics.Products._
+import mr.merc.politics.State
+import org.scalatest.{BeforeAndAfter, FunSuite}
 
-class FactoryTest extends FunSuite {
+class FactoryTest extends FunSuite with BeforeAndAfter {
 
-  private val region1:EconomicRegion = new EconomicRegion {
-    override def economicNeighbours: Set[EconomicRegion] = Set(region2, region1)
-    override val regionMarket:RegionMarket = null
-    override val pops:RegionPopulation = null
-    override def toString: String = "region1"
-  }
+  var capitalists: Population = _
+  var region1:EconomicRegion = _
+  var region2:EconomicRegion = _
+  var region3:EconomicRegion = _
+  var owner: State = _
 
-  private val region2:EconomicRegion = new EconomicRegion {
-    override def economicNeighbours: Set[EconomicRegion] = Set(region1, region3)
-    override val regionMarket:RegionMarket = null
-    override val pops:RegionPopulation = null
-    override def toString: String = "region2"
-  }
+  val zeroTaxes = SalaryTaxPolicy(Map(Upper -> 0, Middle -> 0, Lower -> 0))
 
-  private val region3:EconomicRegion = new EconomicRegion {
-    override def economicNeighbours: Set[EconomicRegion] = Set(region1, region2)
-    override val regionMarket:RegionMarket = null
-    override val pops:RegionPopulation = null
-    override def toString: String = "region3"
+  before {
+    capitalists = new Population(LatinHuman, Capitalists, 1000, 0, 0)
+    capitalists.newDay(zeroTaxes)
+    owner = new State(new StateBudget(0), TaxPolicy.zeroTaxes)
+
+    region1 = new EconomicRegion {
+      override def economicNeighbours: Set[EconomicRegion] = Set(region2, region1)
+
+      override val regionMarket: RegionMarket = null
+      override val regionPopulation: RegionPopulation = new RegionPopulation(List(capitalists))
+
+      override def toString: String = "region1"
+
+      override def owner: State = FactoryTest.this.owner
+    }
+
+    region2 = new EconomicRegion {
+      override def economicNeighbours: Set[EconomicRegion] = Set(region1, region3)
+
+      override val regionMarket: RegionMarket = null
+      override val regionPopulation: RegionPopulation = null
+
+      override def toString: String = "region2"
+
+      override def owner: State = FactoryTest.this.owner
+    }
+
+    region3 = new EconomicRegion {
+      override def economicNeighbours: Set[EconomicRegion] = Set(region1, region2)
+
+      override val regionMarket: RegionMarket = null
+      override val regionPopulation: RegionPopulation = null
+
+      override def toString: String = "region3"
+
+      override def owner: State = FactoryTest.this.owner
+    }
   }
 
   test("factory usage general flow - happy path") {
-    val factory = new IndustrialFactory(Wine, 2, 1000000)
+    val factory = new IndustrialFactory(region1, Wine, 2, 1000000, 40000, 20, 1)
 
     val prices = Map[Product, Double](Glass -> 10, Fruit -> 5, MachineParts -> 1)
 
-    factory.newDay(FactoryTaxPolicy(0.1))
+    factory.newDay(CorporateTaxPolicy(0.1))
     assert(factory.dayRecords === Vector())
     val requests = factory.componentDemandRequests(prices)
     assert(requests.mapValues(_.count) === Map(Glass -> 16000, Fruit -> 24000, MachineParts -> 1000))
@@ -47,7 +74,7 @@ class FactoryTest extends FunSuite {
     assert(sell.mapValues(_.count) === Map(region1 -> 40000))
 
     val fulfilledRequests = requests.transform { case (p, r) =>
-      FulfilledDemandRequest(r.count, 0, prices(p), r)
+      FulfilledDemandRequest(r.count, prices(p), r)
     }
 
     assert(factory.currentMoneyBalance === 1000000)
@@ -59,26 +86,25 @@ class FactoryTest extends FunSuite {
 
     assert(factory.currentMoneyBalance === 1000000 - moneySpentOnResources)
     val moneyBalanceAfterDemand = factory.currentMoneyBalance
-    val profit = Map(region1 -> FulfilledSupplyRequestProfit(
-      FulfilledSupplyRequest(40000, 0, 200, sell.head._2), 100))
-    factory.receiveSellingResultAndMoney(profit)
+    val profit = FulfilledSupplyRequestProfit(FulfilledSupplyRequest(40000, sell.head._2), 100)
+    factory.receiveSellingResultAndMoney(region1, profit)
     assert(factory.factoryStorage.unsoldProducts === 0)
     assert(factory.currentMoneyBalance === moneyBalanceAfterDemand + moneyEarned)
-
-    val owners = new Population(LatinHuman, Capitalists, 1000, 0, 0)
 
     assert(factory.workforceEfficiencyDemand(prices) === 2000)
 
     val workers = new Population(LatinHuman, Craftsmen, 10000, 0, 0)
+    workers.newDay(zeroTaxes)
     assert(workers.efficiency === 1)
 
     factory.receiveWorkforceRequest(Map(workers -> 2000))
 
-    factory.payMoneyToPops(List(owners))
+    factory.payMoneyToPops()
     val taxes = (moneyEarned - moneySpentOnResources) * 0.1
     assert(factory.payTaxes() === taxes)
 
     assert(workers.moneyReserves === (moneyEarned - moneySpentOnResources) * 0.9 * 0.4)
+    assert(capitalists.moneyReserves === (moneyEarned - moneySpentOnResources) * 0.9 * 0.4)
 
     factory.produce()
 
@@ -88,6 +114,8 @@ class FactoryTest extends FunSuite {
 
     factory.endOfDay()
 
+    assert(capitalists.moneyReserves === (moneyEarned - moneySpentOnResources) * 0.9 * 0.4)
+
     assert(factory.dayRecords === Vector(FactoryRecord(
       produced = 40000,
       moneySpentOnResources = moneySpentOnResources,
@@ -96,15 +124,15 @@ class FactoryTest extends FunSuite {
       corporateTax = taxes,
       moneyLeftInFactoryBudget = (moneyEarned - moneySpentOnResources) * 0.9 * 0.2,
       peopleResources = Map(workers -> 2000),
-      sold = profit
+      sold = Map(region1 -> profit)
     )))
   }
 
-  test("factory usage general flow - deficit path, half workers are slaves") {
-    val factory = new IndustrialFactory(Wine, 2, 2000)
+  test("factory usage general flow - deficit path") {
+    val factory = new IndustrialFactory(region1, Wine, 2, 2000, 40000, 20, 1)
     val prices = Map[Product, Double](Glass -> 1, Fruit -> 1, MachineParts -> 1)
 
-    factory.newDay(FactoryTaxPolicy(0.1))
+    factory.newDay(CorporateTaxPolicy(0.1))
     assert(factory.dayRecords === Vector())
     val requests = factory.componentDemandRequests(prices)
     assert(requests.mapValues(_.count) === Map(Glass -> 400, Fruit -> 600, MachineParts -> 1000))
@@ -118,7 +146,7 @@ class FactoryTest extends FunSuite {
     assert(sell.mapValues(_.count) === Map(region1 -> 20000, region2 -> 20000))
 
     val fulfilledRequests = requests.transform { case (p, r) =>
-      FulfilledDemandRequest(r.count / 2 , r.count / 2, prices(p), r)
+      FulfilledDemandRequest(r.count / 2 , prices(p), r)
     }
 
     assert(factory.currentMoneyBalance === 2000)
@@ -127,27 +155,29 @@ class FactoryTest extends FunSuite {
 
     val moneySpentOnResources = 1000
     val moneyEarned = 100
-
-    val profit = Map(region1 -> FulfilledSupplyRequestProfit(FulfilledSupplyRequest(50, 950, 200, sell.head._2), 2),
-      region2 -> FulfilledSupplyRequestProfit(FulfilledSupplyRequest(0, 1000, 200, sell.head._2), 5))
-    factory.receiveSellingResultAndMoney(profit)
+    assert(factory.factoryStorage.unsoldProducts === 40000)
+    val profit1 = FulfilledSupplyRequestProfit(FulfilledSupplyRequest(50, sell.head._2), 2)
+    val profit2 = FulfilledSupplyRequestProfit(FulfilledSupplyRequest(0, sell.head._2), 5)
+    factory.receiveSellingResultAndMoney(region1, profit1)
+    assert(factory.currentMoneyBalance === 2000 - moneySpentOnResources + moneyEarned)
+    assert(factory.factoryStorage.unsoldProducts === 39950)
+    factory.receiveSellingResultAndMoney(region2, profit2)
     assert(factory.factoryStorage.unsoldProducts === 39950)
     assert(factory.currentMoneyBalance === 2000 - moneySpentOnResources + moneyEarned)
-
-    val owners = new Population(LatinHuman, Capitalists, 1000, 0, 0)
 
     assert(factory.workforceEfficiencyDemand(prices) === 2.5)
 
     val workers = new Population(LatinHuman, Craftsmen, 10000, 0, 0)
+    workers.newDay(zeroTaxes)
     assert(workers.efficiency === 1)
-    val slaves = new Population(LatinHuman, Slaves, 10000, 0, 0)
-    assert(slaves.efficiency === 1)
 
-    factory.receiveWorkforceRequest(Map(workers -> 1.25, slaves -> 1.25))
+    factory.receiveWorkforceRequest(Map(workers -> 2.5))
 
-    factory.payMoneyToPops(List(owners))
+    factory.payMoneyToPops()
     val taxes = 0
     assert(factory.payTaxes() === taxes)
+    assert(capitalists.moneyReserves === 0)
+    assert(workers.moneyReserves === 0)
 
     assert(factory.factoryStorage.unsoldProducts === 39950)
     factory.produce()
@@ -164,17 +194,17 @@ class FactoryTest extends FunSuite {
       moneyOnOwnersPayment = 0,
       corporateTax = taxes,
       moneyLeftInFactoryBudget = 0,
-      peopleResources = Map(workers -> 1.25, slaves -> 1.25),
-      sold = profit
+      peopleResources = Map(workers -> 2.5),
+      sold = Map(region1 -> profit1, region2 -> profit2)
     )))
   }
 
-  test("factory usage general flow - happy path, half workers are slaves") {
-    val factory = new IndustrialFactory(Wine, 2, 1000000)
+  test("no workers came, factory sold from storage") {
+    val factory = new IndustrialFactory(region1, Wine, 2, 1000000, 40000, 20, 1)
 
     val prices = Map[Product, Double](Glass -> 10, Fruit -> 5, MachineParts -> 1)
 
-    factory.newDay(FactoryTaxPolicy(0.1))
+    factory.newDay(CorporateTaxPolicy(0.1))
     assert(factory.dayRecords === Vector())
     val requests = factory.componentDemandRequests(prices)
     assert(requests.mapValues(_.count) === Map(Glass -> 16000, Fruit -> 24000, MachineParts -> 1000))
@@ -188,7 +218,7 @@ class FactoryTest extends FunSuite {
     assert(sell.mapValues(_.count) === Map(region1 -> 40000))
 
     val fulfilledRequests = requests.transform { case (p, r) =>
-      FulfilledDemandRequest(r.count, 0, prices(p), r)
+      FulfilledDemandRequest(r.count, prices(p), r)
     }
 
     assert(factory.currentMoneyBalance === 1000000)
@@ -200,116 +230,37 @@ class FactoryTest extends FunSuite {
 
     assert(factory.currentMoneyBalance === 1000000 - moneySpentOnResources)
     val moneyBalanceAfterDemand = factory.currentMoneyBalance
-    val profit = Map(region1 -> FulfilledSupplyRequestProfit(
-      FulfilledSupplyRequest(40000, 0, 200, sell.head._2), 100))
-    factory.receiveSellingResultAndMoney(profit)
+    val profit = FulfilledSupplyRequestProfit(FulfilledSupplyRequest(40000, sell.head._2), 100)
+    factory.receiveSellingResultAndMoney(region1, profit)
     assert(factory.factoryStorage.unsoldProducts === 0)
     assert(factory.currentMoneyBalance === moneyBalanceAfterDemand + moneyEarned)
 
-    val owners = new Population(LatinHuman, Capitalists, 1000, 0, 0)
-
     assert(factory.workforceEfficiencyDemand(prices) === 2000)
 
-    val workers = new Population(LatinHuman, Craftsmen, 10000, 0, 0)
-    assert(workers.efficiency === 1)
-    val slaves = new Population(LatinHuman, Slaves, 10000, 0, 0)
-    assert(slaves.efficiency === 1)
+    factory.receiveWorkforceRequest(Map())
 
-    factory.receiveWorkforceRequest(Map(workers -> 1000, slaves -> 1000))
-
-    factory.payMoneyToPops(List(owners))
-    val taxes = (moneyEarned - moneySpentOnResources) * 0.1
-    assert(factory.payTaxes() === taxes)
-
-    assert(workers.moneyReserves === (moneyEarned - moneySpentOnResources) * 0.9 * 0.4 * 0.5)
-
-    factory.produce()
-
-    assert(factory.factoryStorage.unusedProducts.forall(_._2 == 0),
-      s"${factory.factoryStorage.unusedProducts} must be empty")
-    assert(factory.factoryStorage.unsoldProducts === 40000)
-
-    factory.endOfDay()
-
-    assert(factory.dayRecords === Vector(FactoryRecord(
-      produced = 40000,
-      moneySpentOnResources = moneySpentOnResources,
-      moneyOnWorkforceSalary = (moneyEarned - moneySpentOnResources) * 0.9 * 0.4 * 0.5,
-      moneyOnOwnersPayment = (moneyEarned - moneySpentOnResources) * 0.9 * 0.4,
-      corporateTax = taxes,
-      moneyLeftInFactoryBudget = (moneyEarned - moneySpentOnResources) * 0.9 * (0.2 + 0.4 * 0.5),
-      peopleResources = Map(workers -> 1000, slaves -> 1000),
-      sold = profit
-    )))
-  }
-
-  test("factory usage general flow - happy path, all workers are slaves") {
-    val factory = new IndustrialFactory(Wine, 2, 1000000)
-
-    val prices = Map[Product, Double](Glass -> 10, Fruit -> 5, MachineParts -> 1)
-
-    factory.newDay(FactoryTaxPolicy(0.1))
-    assert(factory.dayRecords === Vector())
-    val requests = factory.componentDemandRequests(prices)
-    assert(requests.mapValues(_.count) === Map(Glass -> 16000, Fruit -> 24000, MachineParts -> 1000))
-
-    assert(factory.factoryStorage.unsoldProducts === 40000)
-    assert(factory.factoryStorage.unusedProducts.forall(_._2 == 0),
-      s"${factory.factoryStorage.unusedProducts} must be empty")
-
-    val sell = factory.sellProduct(Map(region1 -> EconomicRegionDemand(40000, 100),
-      region2 -> EconomicRegionDemand(40000, 50)))
-    assert(sell.mapValues(_.count) === Map(region1 -> 40000))
-
-    val fulfilledRequests = requests.transform { case (p, r) =>
-      FulfilledDemandRequest(r.count, 0, prices(p), r)
-    }
-
-    assert(factory.currentMoneyBalance === 1000000)
-    factory.receiveFulfilledDemandRequestsAndPayChecks(fulfilledRequests)
-    assert(factory.factoryStorage.unusedProducts === Map(Glass -> 16000, Fruit -> 24000, MachineParts -> 1000))
-
-    val moneySpentOnResources = 16000 * 10 + 24000 * 5 + 1000
-    val moneyEarned = 40000 * 100
-
-    assert(factory.currentMoneyBalance === 1000000 - moneySpentOnResources)
-    val moneyBalanceAfterDemand = factory.currentMoneyBalance
-    val profit = Map(region1 -> FulfilledSupplyRequestProfit(
-      FulfilledSupplyRequest(40000, 0, 200, sell.head._2), 100))
-    factory.receiveSellingResultAndMoney(profit)
-    assert(factory.factoryStorage.unsoldProducts === 0)
-    assert(factory.currentMoneyBalance === moneyBalanceAfterDemand + moneyEarned)
-
-    val owners = new Population(LatinHuman, Capitalists, 1000, 0, 0)
-
-    assert(factory.workforceEfficiencyDemand(prices) === 2000)
-
-    val slaves = new Population(LatinHuman, Slaves, 10000, 0, 0)
-    assert(slaves.efficiency === 1)
-
-    factory.receiveWorkforceRequest(Map(slaves -> 2000))
-
-    factory.payMoneyToPops(List(owners))
+    factory.payMoneyToPops()
     val taxes = (moneyEarned - moneySpentOnResources) * 0.1
     assert(factory.payTaxes() === taxes)
 
     factory.produce()
 
-    assert(factory.factoryStorage.unusedProducts.forall(_._2 == 0),
-      s"${factory.factoryStorage.unusedProducts} must be empty")
-    assert(factory.factoryStorage.unsoldProducts === 40000)
+    assert(factory.factoryStorage.unusedProducts === Map(Glass -> 16000.0, Fruit -> 24000.0, MachineParts -> 0.0) )
+    assert(factory.factoryStorage.unsoldProducts === 0)
 
     factory.endOfDay()
 
+    assert(capitalists.moneyReserves === (moneyEarned - moneySpentOnResources) * 0.9 * 0.8)
+
     assert(factory.dayRecords === Vector(FactoryRecord(
-      produced = 40000,
+      produced = 0,
       moneySpentOnResources = moneySpentOnResources,
       moneyOnWorkforceSalary = 0,
-      moneyOnOwnersPayment = (moneyEarned - moneySpentOnResources) * 0.9 * 0.4,
+      moneyOnOwnersPayment = (moneyEarned - moneySpentOnResources) * 0.9 * 0.8,
       corporateTax = taxes,
-      moneyLeftInFactoryBudget = (moneyEarned - moneySpentOnResources) * 0.9 * (0.2 + 0.4),
-      peopleResources = Map(slaves -> 2000),
-      sold = profit
+      moneyLeftInFactoryBudget = (moneyEarned - moneySpentOnResources) * 0.9 * 0.2,
+      peopleResources = Map(),
+      sold = Map(region1 -> profit)
     )))
   }
 }

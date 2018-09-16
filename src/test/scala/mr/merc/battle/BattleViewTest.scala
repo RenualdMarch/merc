@@ -9,7 +9,7 @@ import mr.merc.map.terrain.Grass
 import org.scalatest.BeforeAndAfter
 import mr.merc.unit.SoldierType
 import mr.merc.unit.Soldier
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import mr.merc.map.view.SoldiersDrawer
 import org.mockito.Mockito._
 import mr.merc.battle.event.MoveBattleViewEvent

@@ -12,9 +12,12 @@ class Population(val culture: Culture, val populationType: PopulationType, priva
   private val needsFulfillmentRecordsMaxSize = 30
   private val salaryRecordsMaxSize = 30
 
+  private var tax: SalaryTaxPolicy = _
+  private var currentSalaryRecord: SalaryRecord = _
+
   def populationCount:Int = count.toInt
 
-  def needs:Map[PopulationNeedsType, Map[Products.Product, Double]] = culture.race.needs(populationType.populationClass).
+  def needs:Map[PopulationNeedsType, Map[Products.Product, Double]] = culture.needs(populationType.populationClass).
     map{ case (nt, m) => nt -> m.mapValues(_ * count * efficiency)}
 
   private var needsFulfillmentRecords = Vector[ProductFulfillmentRecord]()
@@ -61,42 +64,64 @@ class Population(val culture: Culture, val populationType: PopulationType, priva
 
   def efficiency:Double = 1 + literacy * literacy * (MaxLiteracyEfficiencyMultiplier - 1)
 
+  def totalPopEfficiency: Double = count * efficiency
+
   def literacy: Double = startingLiteracy
+
+  def newDay(tax: SalaryTaxPolicy): Unit = {
+    this.tax = tax
+    salaryRecords +:= this.currentSalaryRecord
+    if (salaryRecords.size > salaryRecordsMaxSize) {
+      salaryRecords = salaryRecords.take(salaryRecordsMaxSize)
+    }
+
+    this.currentSalaryRecord = SalaryRecord(populationCount, 0, 0, 0)
+  }
 
   private case class DemandInfo(product: Product, count: Double, price: Double)
 
+  private var alreadyReceivedProducts: List[FulfilledDemandRequest] = Nil
+
   // returns spent money
-  def receiveProductsAndPayChecks(products: Map[Product, FulfilledDemandRequest]): Double = {
-    val boughtProducts = products.map{ case (p, f) => p -> f.bought}
-    fulfillNeeds(boughtProducts)
+  def buyDemandedProducts(requests: List[FulfilledDemandRequest]): Double = {
+    assert(requests.forall(r => r.request.asInstanceOf[PopulationDemandRequest].pop == this))
 
-    val prices = products.map{ case (p, f) => p -> f.price}
+    alreadyReceivedProducts ++= requests
 
-    val spentMoney = moneyCost(prices, boughtProducts)
+    val spentMoney = requests.foldLeft(0d) { case (sum, request) =>
+        sum + request.bought * request.price
+    }
+
     currentMoney = currentMoney - spentMoney
     spentMoney
   }
 
-  private def fulfillNeeds(products:Map[Product, Double]): Unit = {
-    val productFulfillment = new ProductFulfillmentRecord(needs, products)
+  def fulfillNeedsUsingAlreadyReceivedProducts(): Unit = {
+    val receivedProductsMap = alreadyReceivedProducts.map { r =>
+      Map(r.request.product -> r.bought)
+    }.fold(Map())(_ |+| _)
+
+    val productFulfillment = new ProductFulfillmentRecord(needs, receivedProductsMap)
     needsFulfillmentRecords +:= productFulfillment
     if (needsFulfillmentRecords.size > needsFulfillmentRecordsMaxSize) {
-      needsFulfillmentRecords = needsFulfillmentRecords.take(needsFulfillmentRecordsMaxSize)
+      needsFulfillmentRecords = needsFulfillmentRecords.takeRight(needsFulfillmentRecordsMaxSize)
     }
   }
 
   // TODO add info about salary sources
   def receiveSalary(salary: Double): Unit = {
-    val salaryRecord = SalaryRecord(populationCount, salary)
-    currentMoney = salary + currentMoney
-    salaryRecords +:= salaryRecord
-    if (salaryRecords.size > salaryRecordsMaxSize) {
-      salaryRecords = salaryRecords.take(salaryRecordsMaxSize)
-    }
+    val taxPart = tax.salaryTax(this.populationType.populationClass) * salary
+    currentMoney = salary + currentMoney - taxPart
+    val r = this.currentSalaryRecord
+    this.currentSalaryRecord = this.currentSalaryRecord.copy(populationCount, r.receivedMoney + salary, currentMoney, r.taxes + taxPart)
   }
+
+  def payTaxes(): Double = this.currentSalaryRecord.taxes
+
+  override def toString: String = s"$culture $populationType"
 }
 
-object Population {
+object Population extends EconomicConfig {
   val MaxLiteracyEfficiencyMultiplier = 10
 
   sealed abstract class PopulationNeedsType(val needImportance:Int)
@@ -110,6 +135,8 @@ object Population {
   case object Middle extends PopulationClass
   case object Upper extends PopulationClass
 
+  def populationClasses:List[PopulationClass] = List(Lower, Middle, Upper)
+
   sealed abstract class PopulationType(val populationClass: PopulationClass)
 
   //// craftsmen work in factories
@@ -121,14 +148,14 @@ object Population {
   // labourers gather resources in mines
   case object Labourers extends PopulationType(Lower)
 
-  // can replace Farmers, Labourers or Craftsmen and work for food only
-  case object Slaves extends PopulationType(Lower)
-
   // Bureaucrats work with papers, they are administrators
   case object Bureaucrats extends PopulationType(Middle)
 
   // scholar teach people literacy and can invent
   case object Scholars extends PopulationType(Middle)
+
+  // priests produce rituals
+  case object Clergy extends PopulationType(Middle)
 
   // mages produce medicine and amulets
   case object Mages extends PopulationType(Middle)
@@ -143,59 +170,78 @@ object Population {
   // They are also best soldiers
   case object Aristocrats extends PopulationType(Upper)
 
+  // same as usual aristocrats
+  case object MagicalAristocrats extends PopulationType(Upper)
+
   def populationTypes:List[PopulationType] =
-    List(Craftsmen, Farmers, Labourers, Slaves, Bureaucrats,
+    List(Craftsmen, Farmers, Labourers, Bureaucrats,
       Scholars, Mages, Capitalists, Aristocrats)
 
   def populationTypesByClass:Map[PopulationClass, List[PopulationType]] =
     populationTypes.groupBy(_.populationClass)
 
-  type PopulationNeeds = Map[PopulationClass, Map[PopulationNeedsType, Map[Products.Product, Double]]]
+  type ProductBracket = Map[Products.Product, Double]
 
-  private val HumanNeeds:PopulationNeeds = Map(
+  type PopulationNeeds = Map[PopulationClass, Map[PopulationNeedsType, ProductBracket]]
+
+  private implicit class ScaleToConfig[T](map:Map[T, Double]) {
+    def scale(name: String):Map[T, Double] = {
+      import com.github.andr83.scalaconfig._
+      val s = config.asUnsafe[Double](name)
+      map.scaleToSum(s)
+    }
+  }
+
+  private def need(scalingConfigName: String, needs: Tuple2[Products.Product, Double]*): Map[Products.Product, Double] = {
+    needs.toMap.scale(s"population.needs.$scalingConfigName")
+  }
+
+  private def defaultHumanNeeds(culture: Culture):PopulationNeeds = Map(
     Lower -> Map(
-    LifeNeeds -> Map(Grain -> 3, Fish -> 1, Fruit -> 1, Cattle -> 1),
-    RegularNeeds -> Map(Tea -> 1, Clothes -> 1, Liquor -> 2, Furniture -> 1, Coal -> 1,
-      Amulet -> 1, Medicine -> 1, Lumber -> 1),
-    LuxuryNeeds -> Map(Furniture -> 2, Clothes -> 3, Paper -> 1, Coffee -> 1, Liquor -> 2,
-      Medicine -> 1, Amulet -> 1, Weapons -> 1, Coal -> 1)
+    LifeNeeds -> need("lower.life", Grain -> 3d, Fish -> 1d, Fruit -> 1d, Cattle -> 1d),
+    RegularNeeds -> need("lower.regular", Tea -> 1, Clothes -> 1, Liquor -> 2, Furniture -> 1, Coal -> 1,
+      Amulet -> 1, Medicine -> 1, Lumber -> 1, Ritual(culture) -> 1),
+    LuxuryNeeds -> need("lower.luxury", Furniture -> 2, Clothes -> 3, Paper -> 1, Coffee -> 1, Liquor -> 2,
+      Medicine -> 1, Amulet -> 1, Weapons -> 1, Coal -> 1, Ritual(culture) -> 2)
   ),
     Middle -> Map(
-    LifeNeeds -> Map(Grain -> 4, Fish -> 2, Fruit -> 2, Cattle -> 2),
-    RegularNeeds -> Map(Tea -> 2, Clothes -> 3, Liquor -> 2, Furniture -> 2, Coal -> 2,
+    LifeNeeds -> need("middle.life", Grain -> 4, Fish -> 2, Fruit -> 2, Cattle -> 2),
+    RegularNeeds -> need("middle.regular", Tea -> 2, Clothes -> 3, Liquor -> 2, Furniture -> 2, Coal -> 2, Ritual(culture) -> 1,
       Glass -> 1, Wine -> 2, Amulet -> 2, Medicine -> 2, Paper -> 3, Weapons -> 1, Cement -> 1),
-    LuxuryNeeds -> Map(Clothes -> 3, Wine -> 3, Amulet -> 3, Medicine -> 3,
-      Furniture -> 3, Opium -> 3, Paper -> 3, Weapons -> 2, Cement -> 2)
+    LuxuryNeeds -> need("middle.luxury", Clothes -> 3, Wine -> 3, Amulet -> 3, Medicine -> 3,
+      Furniture -> 3, Opium -> 3, Paper -> 3, Weapons -> 2, Cement -> 2, Ritual(culture) -> 2)
   ),
     Upper -> Map(
-      LifeNeeds -> Map(Grain -> 6, Fish -> 3, Fruit -> 3, Cattle -> 3),
-      RegularNeeds -> Map(Tea -> 5, Clothes -> 5, Liquor -> 5, Furniture -> 5, Coal -> 10, Cement -> 5,
-        Glass -> 5, Wine -> 10, Amulet -> 5, Medicine -> 5, Paper -> 10, Weapons -> 5, Opium -> 5),
-      LuxuryNeeds -> Map(Clothes -> 5, Furniture -> 5, Coal -> 5, Paper -> 5, Amulet -> 5,
-        Medicine -> 5, Weapons -> 5, Cement -> 5, Opium -> 5)
+      LifeNeeds -> need("upper.life", Grain -> 6, Fish -> 3, Fruit -> 3, Cattle -> 3),
+      RegularNeeds -> need("upper.regular", Tea -> 5, Clothes -> 5, Liquor -> 5, Furniture -> 5, Coal -> 10, Cement -> 5,
+        Glass -> 5, Wine -> 10, Amulet -> 5, Medicine -> 5, Paper -> 10, Weapons -> 5, Opium -> 5, Ritual(culture) -> 1),
+      LuxuryNeeds -> need("upper.luxury", Clothes -> 5, Furniture -> 5, Coal -> 5, Paper -> 5, Amulet -> 5,
+        Medicine -> 5, Weapons -> 5, Cement -> 5, Opium -> 5, Ritual(culture) -> 2)
     )
   )
 
 
   // removed sealed for test purposes only
-  abstract class Race(val needs: PopulationNeeds)
-  case object Humans extends Race(HumanNeeds)
+  abstract class Race()
+  case object Humans extends Race()
 
   //
   // DISABLED RACES
   //
-  case object Elves extends Race(Map())
-  case object Dwarfs extends Race(Map())
-  case object Orcs extends Race(Map())
-  case object Saurians extends Race(Map())
-  case object Drakes extends Race(Map())
-  case object Undead extends Race(Map())
-  case object Demons extends Race(Map())
+  case object Elves extends Race()
+  case object Dwarfs extends Race()
+  case object Orcs extends Race()
+  case object Saurians extends Race()
+  case object Drakes extends Race()
+  case object Undead extends Race()
+  case object Demons extends Race()
 
   def races = List(Humans) //, Elves, Dwarfs, Orcs, Saurians, Drakes, Undead, Demons)
 
   // removed sealed for test purposes only
-  abstract class Culture(val stateNameKey:String, val race:Race)
+  abstract class Culture(val stateNameKey:String, val race:Race) {
+    def needs: PopulationNeeds = defaultHumanNeeds(this)
+  }
   case object LatinHuman extends Culture("state.empire", Humans)
   case object WesternHuman extends Culture("state.kingdom", Humans)
 
@@ -260,6 +306,6 @@ object Population {
 
   case class ProductFulfillment(product:Product, demanded: Double, received: Double)
   // TODO add money source
-  case class SalaryRecord(count: Int, totalMoney: Double)
+  case class SalaryRecord(populationCount: Int, receivedMoney: Double, totalMoney: Double, taxes: Double)
 }
 

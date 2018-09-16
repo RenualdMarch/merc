@@ -1,18 +1,11 @@
 package mr.merc.map.view
 
 import org.scalatest.FunSuite
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import mr.merc.unit.view.SoldierView
-import mr.merc.view.move.Movement
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
 import scalafx.scene.canvas.GraphicsContext
-import mr.merc.map.hex.view.TerrainHexView
-import mr.merc.map.hex.TerrainHexField
-import mr.merc.map.hex.TerrainHex
-import mr.merc.map.hex.view.TerrainHexFieldView
-import mr.merc.view.move.MomentaryMovement
-import mr.merc.view.Sprite
 import scalafx.geometry.Rectangle2D
 
 class SoldierDrawerTest extends FunSuite with MockitoSugar with BeforeAndAfter {
