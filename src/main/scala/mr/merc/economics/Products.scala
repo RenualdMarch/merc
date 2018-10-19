@@ -6,8 +6,11 @@ object Products {
   val AllProducts:List[Product] = List(
     Grain, Fish, Fruit, Cattle, Tea, Coffee, Opium, Cotton, Herbs, Timber, Coal, Iron, Sulphur,
     Lumber, Cement, Fabric, Fertilizer, Paper, Glass, Steel, Amulet, Medicine,
-    Furniture, Liquor, Clothes, Wine, Weapons, MachineParts
+    Furniture, Liquor, Clothes, Wine, Weapons, MachineParts, PreciousMetal
   ) ++ Population.cultures.map(Ritual.apply)
+
+  def productByName(name: String): Product = AllProducts.find(_.toString.toLowerCase == name.toLowerCase).getOrElse(
+    sys.error(s"Didn't find product $name in $AllProducts"))
 
   sealed abstract class Product extends scala.Product with Serializable
   sealed abstract class GatheredProduct extends Product

@@ -24,7 +24,7 @@ class ResourceGatheringTest extends FunSuite with BeforeAndAfter{
     magicalAristocrats.newDay(zeroPolicy)
     workers = new Population(LatinHuman, Farmers, 4000, 0, 0)
     workers.newDay(zeroPolicy)
-    country = new State(new StateBudget(0), TaxPolicy.zeroTaxes)
+    country = new State("", WesternHuman, new StateBudget(0), TaxPolicy.zeroTaxes)
 
     region1 = new EconomicRegion {
       override def economicNeighbours: Set[EconomicRegion] = Set(region2, region1)

@@ -4,6 +4,8 @@ import mr.merc.economics.Population._
 import mr.merc.economics.Products.{Coal, Fruit, Grain}
 import org.scalatest.FunSuite
 
+import scala.util.Random
+
 class PopulationTest extends FunSuite {
 
   val smallNeeds:Map[PopulationNeedsType, Map[Products.Product, Double]] = Map(
@@ -13,7 +15,7 @@ class PopulationTest extends FunSuite {
 
   object TestRace extends Race
   object TestCulture extends Culture("test", TestRace) {
-    override def needs: PopulationNeeds = Map(Middle -> smallNeeds)
+    override def needs: PopulationNeeds = Map(Upper -> smallNeeds, Middle -> smallNeeds, Lower -> smallNeeds)
   }
   def newPopulation(money: Double) = new Population(TestCulture, Traders, 1000, money, 0)
 
@@ -93,6 +95,199 @@ class PopulationTest extends FunSuite {
     assert(pop.moneyReserves === 11000)
     pop.newDay(SalaryTaxPolicy(Map(Middle -> 0)))
     assert(pop.salary(1).head.totalMoney === 11000)
+  }
+
+  test("extraction of people") {
+    def newPop() = new Population(TestCulture, Traders, 1000, 0, 100)
+
+    val p1 = newPop()
+    val m1 = p1.extractRandomMovers(11)
+    assert(p1.populationCount === 989)
+    assert(p1.literateCount === 99)
+    assert(m1.literateCount === 1)
+    assert(m1.illiterateCount === 10)
+    assert(m1.totalCount === 11)
+
+    val p2 = newPop()
+    val m2 = p2.extractLiterateMovers(10)
+    assert(p2.populationCount === 990)
+    assert(p2.literateCount === 90)
+    assert(m2.literateCount === 10)
+    assert(m2.illiterateCount === 0)
+    assert(m2.totalCount === 10)
+
+    val p3 = newPop()
+    val m3 = p3.extractIlliterateMovers(10)
+    assert(p3.populationCount === 990)
+    assert(p3.literateCount === 100)
+    assert(m3.literateCount === 0)
+    assert(m3.illiterateCount === 10)
+    assert(m3.totalCount === 10)
+
+    val p4 = newPop()
+    val m4 = p4.extractLiterateThenIlliterate(110)
+    assert(p4.populationCount === 890)
+    assert(p4.literateCount === 0)
+    assert(m4.literateCount === 100)
+    assert(m4.illiterateCount === 10)
+    assert(m4.totalCount === 110)
+
+    val p5 = newPop()
+    val m5 = p5.extractLiterateThenIlliterate(1100)
+    assert(p5.populationCount === 0)
+    assert(p5.literateCount === 0)
+    assert(m5.literateCount === 100)
+    assert(m5.illiterateCount === 900)
+    assert(m5.totalCount === 1000)
+
+    val p6 = newPop()
+    val m6 = p6.extractIlliterateThenLiterate(950)
+    assert(p6.populationCount === 50)
+    assert(p6.literateCount === 50)
+    assert(m6.literateCount === 50)
+    assert(m6.illiterateCount === 900)
+    assert(m6.totalCount === 950)
+
+    val p7 = newPop()
+    val m7 = p7.extractLiterateThenIlliterate(10)
+    assert(p7.populationCount === 990)
+    assert(p7.literateCount === 90)
+    assert(m7.literateCount === 10)
+    assert(m7.illiterateCount === 0)
+    assert(m7.totalCount === 10)
+
+    val p8 = newPop()
+    val m8 = p8.extractLiterateThenIlliterate(10)
+    assert(p8.populationCount === 990)
+    assert(p8.literateCount === 90)
+    assert(m8.literateCount === 10)
+    assert(m8.illiterateCount === 0)
+    assert(m8.totalCount === 10)
+  }
+
+  test("promotion") {
+    val random = new Random(0) {
+      override def nextInt(n: Int): Int = 0
+    }
+
+    val pop = new Population(TestCulture, Traders, 1000, 10000, 100)
+    val pop2 = new Population(TestCulture, Capitalists, 10, 1000, 10)
+    val regionPopulation = new RegionPopulation(List(pop, pop2))
+
+
+    pop.buyDemandedProducts(List(FulfilledDemandRequest(6000, 1, PopulationDemandRequest(pop, Grain, 6000)),
+      FulfilledDemandRequest(4000, 2, PopulationDemandRequest(pop, Fruit, 4000)), FulfilledDemandRequest(4000, 0.5,
+        PopulationDemandRequest(pop, Coal, 4000))))
+
+
+    pop2.buyDemandedProducts(List(FulfilledDemandRequest(600, 1, PopulationDemandRequest(pop2, Grain, 600)),
+      FulfilledDemandRequest(400, 2, PopulationDemandRequest(pop2, Fruit, 400)), FulfilledDemandRequest(400, 0.5,
+        PopulationDemandRequest(pop2, Coal, 400))))
+
+    pop.fulfillNeedsUsingAlreadyReceivedProducts()
+    pop2.fulfillNeedsUsingAlreadyReceivedProducts()
+
+    assert(pop.needsFulfillment(1).head.needsFulfillment === Map(LifeNeeds -> 1, RegularNeeds -> 1, LuxuryNeeds -> 1))
+    assert(pop2.needsFulfillment(1).head.needsFulfillment === Map(LifeNeeds -> 1, RegularNeeds -> 1, LuxuryNeeds -> 1))
+
+
+    PopulationPromotionDemotion.promoteOrDemote(regionPopulation, random)
+    val traders = regionPopulation.pop(Traders, TestCulture)
+    assert(traders.populationCount === 965)
+    assert(traders.literateCount === 70)
+
+    // promotion from traders
+    val capitalists = regionPopulation.pop(Capitalists, TestCulture)
+    assert(capitalists.populationCount === 39)
+    assert(capitalists.literateCount === 39)
+
+    // movement from capitalists
+    val aristocrats = regionPopulation.pop(Aristocrats, TestCulture)
+    assert(aristocrats.populationCount === 1)
+    assert(aristocrats.literateCount === 1)
+
+    // random movement from traders
+    val craftsmen = regionPopulation.pop(Craftsmen, TestCulture)
+    assert(craftsmen.populationCount === 5)
+    assert(craftsmen.literateCount === 0)
+  }
+
+  test("no promotion") {
+    val random = new Random(0) {
+      override def nextInt(n: Int): Int = 0
+    }
+
+    val pop = new Population(TestCulture, Traders, 1000, 10000, 100)
+    val pop2 = new Population(TestCulture, Capitalists, 10, 0, 10)
+    val regionPopulation = new RegionPopulation(List(pop, pop2))
+
+
+    pop.buyDemandedProducts(List(FulfilledDemandRequest(6000, 1, PopulationDemandRequest(pop, Grain, 6000)),
+      FulfilledDemandRequest(4000, 2, PopulationDemandRequest(pop, Fruit, 4000)), FulfilledDemandRequest(4000, 0.5,
+        PopulationDemandRequest(pop, Coal, 4000))))
+
+
+    pop.fulfillNeedsUsingAlreadyReceivedProducts()
+    pop2.fulfillNeedsUsingAlreadyReceivedProducts()
+    assert(pop.needsFulfillment(1).head.needsFulfillment === Map(LifeNeeds -> 1, RegularNeeds -> 1, LuxuryNeeds -> 1))
+    assert(pop2.needsFulfillment(1).head.needsFulfillment === Map(LifeNeeds -> 0, RegularNeeds -> 0, LuxuryNeeds -> 0))
+
+
+    PopulationPromotionDemotion.promoteOrDemote(regionPopulation, random)
+    val traders = regionPopulation.pop(Traders, TestCulture)
+    assert(traders.populationCount === 996)
+    assert(traders.literateCount === 101)
+
+    // promotion from traders
+    val capitalists = regionPopulation.pop(Capitalists, TestCulture)
+    assert(capitalists.populationCount === 8)
+    assert(capitalists.literateCount === 8)
+
+    // movement from capitalists
+    val aristocrats = regionPopulation.pop(Aristocrats, TestCulture)
+    assert(aristocrats.populationCount === 1)
+    assert(aristocrats.literateCount === 1)
+
+    // random movement from traders
+    val craftsmen = regionPopulation.pop(Craftsmen, TestCulture)
+    assert(craftsmen.populationCount === 5)
+    assert(craftsmen.literateCount === 0)
+  }
+
+  test("demotion") {
+    val random = new Random(0) {
+      override def nextInt(n: Int): Int = 0
+    }
+
+    val pop = new Population(TestCulture, Traders, 1000, 10000, 100)
+    val pop2 = new Population(TestCulture, Farmers, 10, 0, 0)
+    val regionPopulation = new RegionPopulation(List(pop, pop2))
+
+
+    pop2.buyDemandedProducts(List(FulfilledDemandRequest(600, 1, PopulationDemandRequest(pop2, Grain, 600)),
+      FulfilledDemandRequest(400, 2, PopulationDemandRequest(pop2, Fruit, 400)), FulfilledDemandRequest(400, 0.5,
+        PopulationDemandRequest(pop2, Coal, 400))))
+
+
+    pop.fulfillNeedsUsingAlreadyReceivedProducts()
+    pop2.fulfillNeedsUsingAlreadyReceivedProducts()
+    assert(pop.needsFulfillment(1).head.needsFulfillment === Map(LifeNeeds -> 0, RegularNeeds -> 0, LuxuryNeeds -> 0))
+    assert(pop2.needsFulfillment(1).head.needsFulfillment === Map(LifeNeeds -> 1, RegularNeeds -> 1, LuxuryNeeds -> 1))
+
+
+    PopulationPromotionDemotion.promoteOrDemote(regionPopulation, random)
+    val traders = regionPopulation.pop(Traders, TestCulture)
+    assert(traders.populationCount === 965)
+    assert(traders.literateCount === 100)
+
+    val farmers = regionPopulation.pop(Farmers, TestCulture)
+    assert(farmers.populationCount === 39)
+    assert(farmers.literateCount === 0)
+
+    // random movement from traders and farmers
+    val craftsmen = regionPopulation.pop(Craftsmen, TestCulture)
+    assert(craftsmen.populationCount === 6)
+    assert(craftsmen.literateCount === 0)
   }
 
 }

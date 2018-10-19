@@ -36,4 +36,12 @@ class HexField[T <: Hex: ClassTag](val width: Int, val height: Int, init: (Int, 
 
     indices.filter(i => isLegalCoords(i._1, i._2)).map(i => hex(i._1, i._2))
   }
+
+  def map[K <: Hex: ClassTag](f:T => K):HexField[K] = {
+    def buildHex(x: Int, y: Int):K = {
+      f(this.hex(x, y))
+    }
+
+    new HexField[K](width, height, buildHex)
+  }
 }

@@ -1,10 +1,24 @@
 name:= "Merc"
 
-version := "0.2"
+version := "0.3"
 
-scalaVersion := "2.12.1"
+scalaVersion := "2.12.7"
 
-libraryDependencies += "org.scalafx" %% "scalafx" % "8.0.102-R11"
+// Add dependency on ScalaFX library
+libraryDependencies += "org.scalafx" %% "scalafx" % "11-R16"
+
+// Determine OS version of JavaFX binaries
+lazy val osName = System.getProperty("os.name") match {
+  case n if n.startsWith("Linux")   => "linux"
+  case n if n.startsWith("Mac")     => "mac"
+  case n if n.startsWith("Windows") => "win"
+  case _ => throw new Exception("Unknown platform!")
+}
+
+lazy val javaFXModules = Seq("base", "controls", "fxml", "graphics", "media", "swing", "web")
+libraryDependencies ++= javaFXModules.map( m =>
+  "org.openjfx" % s"javafx-$m" % "11" classifier osName
+)
 
 libraryDependencies += "org.scala-lang" % "scala-reflect" % "2.12.1"
 
@@ -32,17 +46,7 @@ libraryDependencies += "com.typesafe" % "config" % "1.3.2"
 
 libraryDependencies += "com.github.andr83" %% "scalaconfig" % "0.4"
 
-scalacOptions ++= Seq("-feature", "-deprecation", "-language:postfixOps", "-language:implicitConversions",
-  "-language:reflectiveCalls", "-Ypartial-unification")
-
-jfxSettings
-
-JFX.mainClass := Some("mr.merc.main.Main")
-
-JFX.devKit := JFX.jdk(System.getenv("JAVA_HOME"))
-
-JFX.addJfxrtToClasspath := false
-
-JFX.nativeBundles := "image"
+scalacOptions ++= Seq("-feature", "-deprecation", "-language:postfixOps",
+  "-language:implicitConversions", "-language:reflectiveCalls", "-Ypartial-unification")
 
 fork := true

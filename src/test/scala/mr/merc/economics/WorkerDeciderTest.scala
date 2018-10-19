@@ -15,7 +15,7 @@ class WorkerDeciderTest extends FunSuite with BeforeAndAfter {
 
   val populations = List(latinClergy, westFarmer, latinFarmer, westCraftsmen, latinCraftsmen)
 
-  val country: State = new State(new StateBudget(0), TaxPolicy.zeroTaxes)
+  val country: State = new State("", WesternHuman, new StateBudget(0), TaxPolicy.zeroTaxes)
 
   val region = new EconomicRegion {
     override def economicNeighbours: Set[EconomicRegion] = ???

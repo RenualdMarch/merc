@@ -13,7 +13,7 @@ class WorldMarketDayTest extends FunSuite {
 
     // region1 produces grain and has liquor factory, region2 produces coal, region3 produces glass
 
-    val state1 = new State(new StateBudget(0), TaxPolicy(CorporateTaxPolicy(0.2),
+    val state1 = new State("", WesternHuman, new StateBudget(0), TaxPolicy(CorporateTaxPolicy(0.2),
       SalaryTaxPolicy(Map[PopulationClass, Double](Lower -> 0.1, Middle -> 0.1, Upper -> 0.1)),
       SalesTaxPolicy(0), TariffTax(0.1), TransitTax(0.1)))
 

@@ -19,7 +19,7 @@ class FactoryTest extends FunSuite with BeforeAndAfter {
   before {
     capitalists = new Population(LatinHuman, Capitalists, 1000, 0, 0)
     capitalists.newDay(zeroTaxes)
-    owner = new State(new StateBudget(0), TaxPolicy.zeroTaxes)
+    owner = new State("", WesternHuman, new StateBudget(0), TaxPolicy.zeroTaxes)
 
     region1 = new EconomicRegion {
       override def economicNeighbours: Set[EconomicRegion] = Set(region2, region1)

@@ -1,5 +1,6 @@
 package mr.merc.ui.common
 
+import scalafx.beans.binding.NumberBinding
 import scalafx.scene.layout.Pane
 import scalafx.scene.canvas.GraphicsContext
 import scalafx.scene.canvas.Canvas
@@ -9,20 +10,26 @@ import scalafx.geometry.Orientation
 import scalafx.geometry.Rectangle2D
 
 // TODO handle case when CanvasLayer is resized - image shouldn't change position
-class CanvasLayers(layers: List[CanvasLayer], fullMapSize: Rectangle2D) extends Pane with ScrollPaneLike {
+class CanvasLayers(layers: List[CanvasLayer], fullMapSize: Rectangle2D, scrolls: Boolean) extends Pane with ScrollPaneLike {
   style = "-fx-background-color: black"
   val canvasList = layers map (l => (l, new Canvas()))
-  val horBar = new ScrollBar
+
+  private val horBar = new ScrollBar
+  private val verBar = new ScrollBar
+
   horBar.orientation.value = Orientation.Horizontal
   horBar.max = 1
   horBar.min = 0
-  val verBar = new ScrollBar
+
   verBar.orientation.value = Orientation.Vertical
   verBar.max = 1
   verBar.min = 0
 
-  children.add(horBar)
-  children.add(verBar)
+  if (scrolls) {
+    children.add(horBar)
+    children.add(verBar)
+  }
+
   canvasList foreach (c => children.add(c._2))
 
   private def redraw() {
@@ -38,6 +45,7 @@ class CanvasLayers(layers: List[CanvasLayer], fullMapSize: Rectangle2D) extends 
   def viewRect: Rectangle2D = {
     val hor = horBar.value.value
     val ver = verBar.value.value
+
     val horDiff = fullMapSize.width - canvasAreaWidth.value.doubleValue
     val verDiff = fullMapSize.height - canvasAreaHeight.value.doubleValue
     val x = hor * horDiff
@@ -55,9 +63,13 @@ class CanvasLayers(layers: List[CanvasLayer], fullMapSize: Rectangle2D) extends 
     }
   }
 
-  verBar.prefWidth.value = 25
-  horBar.prefHeight.value = 25
-
+  if (scrolls) {
+    verBar.prefWidth.value = 25
+    horBar.prefHeight.value = 25
+  } else {
+    verBar.prefWidth.value = 0
+    horBar.prefHeight.value = 0
+  }
   private val canvasAreaWidth = this.width - verBar.prefWidth
   private val canvasAreaHeight = this.height - horBar.prefHeight
   verBar.prefHeight <== canvasAreaHeight
@@ -102,5 +114,6 @@ class CanvasLayers(layers: List[CanvasLayer], fullMapSize: Rectangle2D) extends 
 
 trait CanvasLayer {
   def updateLayer(gc: GraphicsContext, viewRect: Rectangle2D)
+
   def drawLayer(gc: GraphicsContext, viewRect: Rectangle2D)
 }

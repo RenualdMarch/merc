@@ -1,6 +1,6 @@
 package mr.merc.economics
 
-import mr.merc.politics.State
+import mr.merc.politics.Province
 
 class WorldState(regions: List[EconomicRegion]) {
   def totalMoney:Double = totalBudgetMoney + totalPopMoney + totalEnterpriseMoney

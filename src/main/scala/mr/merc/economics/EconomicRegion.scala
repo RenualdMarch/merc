@@ -72,6 +72,16 @@ class RegionPopulation(initialPops: List[Population]) {
     }
   }
 
+  def pop(p: PopulationType, c: Culture): Population = {
+    pops.find(pop => pop.populationType == p && pop.culture == c) match {
+      case Some(x) => x
+      case None =>
+        val pop = new Population(c, p, 0, 0, 0)
+        currentPops = pop :: currentPops
+        pop
+    }
+  }
+
   def getPopTotalEfficiency(populationType: PopulationType): Double =
     pops.filter(_.populationType == populationType).map(_.totalPopEfficiency).sum
 

@@ -2,22 +2,14 @@ package mr.merc.map.view
 
 import mr.merc.map.hex.view.TerrainHexFieldView
 import mr.merc.map.hex.TerrainHexField
-import scalafx.scene.canvas.GraphicsContext
 import mr.merc.unit.view.SoldierView
-import mr.merc.map.hex.view.TerrainHexView
 import mr.merc.view.move.Movement
-import scalafx.scene.image.Image
-import scalafx.scene.image.WritableImage
-import scalafx.scene.canvas.Canvas
-import scalafx.scene.image.ImageView
-import scalafx.scene.SnapshotParameters
-import scalafx.scene.paint.Color
-import scalafx.geometry.Rectangle2D
 import mr.merc.log.Logging
+import mr.merc.map.hex.view.TerrainHexFieldView.{BattleFieldViewMode, FieldViewMode}
 
 // TODO add update method which handles case when soldiers changed
-class MapView(field: TerrainHexField, factor: Double, val soldiersDrawer: SoldiersDrawer[SoldierView] = new SoldiersDrawer[SoldierView]()) extends Logging {
-  val terrainView = new TerrainHexFieldView(field, soldiersDrawer, factor)
+class MapView(field: TerrainHexField, factor: Double, val soldiersDrawer: SoldiersDrawer[SoldierView] = new SoldiersDrawer[SoldierView](), mode:FieldViewMode = BattleFieldViewMode) extends Logging {
+  val terrainView = new TerrainHexFieldView(field, soldiersDrawer, factor, mode)
 
   createSoldiers foreach (soldiersDrawer.addSoldier)
 
@@ -46,7 +38,7 @@ class MapView(field: TerrainHexField, factor: Double, val soldiersDrawer: Soldie
     soldiersDrawer.update(time)
   }
 
-  def canvasBattleLayers = terrainView.canvasBattleLayers
+  def canvasBattleLayers = terrainView.canvasLayers
 
   def addMovement(movement: Movement) {
     soldiersDrawer.addMovement(movement)

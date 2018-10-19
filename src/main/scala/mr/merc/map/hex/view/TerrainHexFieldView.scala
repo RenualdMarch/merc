@@ -17,10 +17,11 @@ import mr.merc.ui.common.geom.Line
 import mr.merc.ui.common.geom.Polygon
 import mr.merc.ui.common.geom.PolygonSet
 import mr.merc.log.Logging
+import mr.merc.map.hex.view.TerrainHexFieldView.{BattleFieldViewMode, FieldViewMode, WorldMapViewMode}
 import mr.merc.map.objects.Walls
 import mr.merc.map.objects.view.{WallImage, WallView}
 
-class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer[_], factor: Double) extends Logging {
+class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer[_], factor: Double, mode:FieldViewMode = BattleFieldViewMode) extends Logging {
   private val infiniteField = new InfiniteHexField((x, y) => new TerrainHex(x, y, Empty))
 
   val realHexes = field.hexes.map(new TerrainHexView(_, field, this, factor))
@@ -113,7 +114,7 @@ class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer
   def hex(hex: Hex): TerrainHexView = this.hex(hex.x, hex.y)
   def hex(x: Int, y: Int) = realHexesMap(x, y)
 
-  def calculateVisibleHexes(viewRect: Rectangle2D) = hexesToDraw filter (isVisible(viewRect))
+  def calculateVisibleHexes(viewRect: Rectangle2D) = hexesToDraw filter isVisible(viewRect)
 
   private val soldierBattleLayer = new CanvasLayer {
     def updateLayer(gc: GraphicsContext, viewRect: Rectangle2D) {
@@ -138,7 +139,20 @@ class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer
     }
   }
 
-  private val interfaceBattleLayer = new CanvasLayer {
+  private val terrainWorldLayer = new CanvasLayer {
+    def updateLayer(gc: GraphicsContext, viewRect: Rectangle2D) {
+      // No changes possible
+    }
+
+    def drawLayer(gc: GraphicsContext, viewRect: Rectangle2D) {
+      val visibleHexes = calculateVisibleHexes(viewRect)
+      List(TerrainImageStage, CastleStage, ProvinceBordersStage).foreach { stage =>
+        visibleHexes foreach (_.drawItself(gc, stage, -viewRect.minX.toInt, -viewRect.minY.toInt))
+      }
+    }
+  }
+
+  private val battleInterfaceBattleLayer = new CanvasLayer {
     def updateLayer(gc: GraphicsContext, viewRect: Rectangle2D) {
       val dirty = calculateVisibleHexes(viewRect).filter(_.isInterfaceDirty)
       List(ClearStage, ArrowStage, DefenceStage, EndInterfaceDrawing).foreach { stage =>
@@ -175,13 +189,18 @@ class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer
     }
   }
 
-  def canvasBattleLayers = List(terrainBattleLayer, soldierBattleLayer, darkeningBattleLayer, interfaceBattleLayer)
+  def canvasLayers:List[CanvasLayer] = mode match {
+    case BattleFieldViewMode => List(terrainBattleLayer, soldierBattleLayer, darkeningBattleLayer, battleInterfaceBattleLayer)
+    case WorldMapViewMode => List(terrainWorldLayer, soldierBattleLayer)
+  }
+
 
   def neigsToRedrawFromCache(set: Set[TerrainHexView]): Set[TerrainHexView] = {
     set flatMap redrawNeigsCache
   }
 
-  val redrawNeigsCache: Map[TerrainHexView, Set[TerrainHexView]] = {
+  // TODO use or remove, it takes huge amount of time to calculate
+  lazy val redrawNeigsCache: Map[TerrainHexView, Set[TerrainHexView]] = {
     hexesToDraw.map { h =>
       (h -> hexesToRedrawWithNeighboursOfUpperLayer(Set(h)))
     } toMap
@@ -285,4 +304,10 @@ class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer
 
     new Polygon(begin1, begin2, end2, end1)
   }
+}
+
+object TerrainHexFieldView {
+  sealed trait FieldViewMode
+  object BattleFieldViewMode extends FieldViewMode
+  object WorldMapViewMode extends FieldViewMode
 }

@@ -1,18 +1,17 @@
 package mr.merc.game
 
-import mr.merc.map.hex.TerrainHexField
 import mr.merc.map.generator.RandomTerrainGenerator
-import mr.merc.players.Player
 import mr.merc.unit.Soldier
 import mr.merc.unit.SoldierType
 import mr.merc.players.Player
 import mr.merc.map.GameField
+
 import scalafx.scene.paint.Color
 import scala.util.Random
 import mr.merc.ai.BattleAI
 
-class QuickGameGenerator(player1: Player = new Player("Human", Color.Yellow),
-  player2: Player = new Player("AI", Color.Cyan, Some(BattleAI()))) extends GameGenerator {
+class QuickGameGenerator(player1: Player = Player("Human", Color.Yellow),
+  player2: Player = Player("AI", Color.Cyan, Some(BattleAI()))) extends GameGenerator {
 
   private val types = List("Human-Bowman", "Human-Cavalryman",
     "Human-Fencer", "Human-HeavyInfantryman", "Human-Horseman", "Human-Mage",

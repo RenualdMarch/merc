@@ -2,21 +2,16 @@ package mr.merc.map.hex.view
 
 import scalafx.scene.canvas.GraphicsContext
 import mr.merc.image.MImage
-import mr.merc.map.terrain.Grass
-import mr.merc.map.terrain.Forest
-import mr.merc.map.hex.TerrainHex
-import mr.merc.map.hex.TerrainHexField
-
+import mr.merc.map.terrain.{Forest, Grass, Mountain, Water}
+import mr.merc.map.hex._
 import scalafx.scene.paint.Color
-import mr.merc.map.hex.Direction
-
 import scalafx.scene.text.Font
 import scalafx.scene.text.FontWeight
 import scalafx.scene.image.Image
 import mr.merc.ui.common.ImageHelper._
 import mr.merc.unit.SoldierDefence
 import mr.merc.map.objects.House
-import mr.merc.map.terrain.Mountain
+import mr.merc.ui.common.geom.Line
 import mr.merc.util.CacheFactoryMap
 
 
@@ -30,6 +25,7 @@ object TerrainHexView {
     side =>
     drawImage(side, side) { gc =>
       gc.stroke = Color.Black
+      gc.lineWidth = 0.25
       gc.strokePolygon(angles(side))
     })
 
@@ -39,6 +35,14 @@ object TerrainHexView {
     val coef = Seq((1, 0), (3, 0), (4, 2), (3, 4), (1, 4), (0, 2))
     val pixelCorrection = Seq((1, 1), (-1, 1), (-1, 0), (-1, -1), (1, -1), (1, 0))
     (coef zip pixelCorrection).map { case ((x, y), (px, py)) => (x * a + px * pix, y * a + py * pix) }
+  }
+
+  private def pointsWithDirections(side: Int, pix: Int): Map[Direction, Line] = {
+    val points = angles(side, pix).toList
+    val cycledPoints = points.tail ::: List(points.head)
+    Direction.list.zip(points.zip(cycledPoints)).map {
+      case (dir, ((x1, y1), (x2, y2))) => dir -> Line(x1, y1, x2, y2)
+    } toMap
   }
 
   private val defenceImagesCache = new CacheFactoryMap[Int, Map[(Int, Boolean), Image]](defenceImages)
@@ -100,7 +104,7 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
   val y = findY
   var isInterfaceDirty = true
   var isDarkened = false
-  private var currentDarkened = false
+  private var currentDarkened = isDarkened
   private var _arrowStart: Option[Direction] = None
   def arrowStart = _arrowStart
   def arrowStart_=(as: Option[Direction]) {
@@ -126,6 +130,15 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
       isInterfaceDirty = true
     }
   }
+
+  var _provinceSelected = false
+  def provinceSelected: Boolean = _provinceSelected
+  def provinceSelected_=(ps: Boolean): Unit = {
+    _provinceSelected = ps
+    isInterfaceDirty = true
+  }
+
+  private var currentProvinceSelected = provinceSelected
 
   override def toString = s"TerrainHexView[coords=($hex.x, $hex.y), pixels=($x,$y)]"
 
@@ -198,7 +211,7 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
     }
   }
 
-  def darkeningShouldBeRedrawn = isDarkened != currentDarkened
+  def darkeningShouldBeRedrawn: Boolean = isDarkened != currentDarkened
 
   def drawItself(gc: GraphicsContext, stage: HexDrawingStage, xOffset: Int, yOffset: Int) {
     stage match {
@@ -219,6 +232,37 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
         isInterfaceDirty = false
       case ClearStage =>
         drawClearStage(gc, xOffset, yOffset)
+      case ProvinceBordersStage =>
+        drawProvinceBorder(gc, xOffset, yOffset)
+    }
+  }
+
+  private def drawProvinceBorder(gc: GraphicsContext, xOffset: Int, yOffset: Int): Unit = {
+    hex.province.foreach { province =>
+      val anotherProvince = field.neighboursWithDirections(hex).
+        filter(_._2.province.exists(_ != province)).filter(_._2.terrain != Water)
+      val (sameOwner, differentOwner) = anotherProvince.partition(_._2.province.get.owner == province.owner)
+
+      def drawLine(map: Map[Direction, TerrainHex], color:Color, lineWidth: Int): Unit = {
+        map.foreach{ case (direction, _) =>
+          val line = TerrainHexView.pointsWithDirections(side, lineWidth / 2)(direction)
+          gc.save()
+          gc.stroke = color
+          gc.lineWidth = lineWidth
+          gc.strokeLine(this.x + xOffset + line.beginX, line.beginY + this.y + yOffset, line.endX + this.x + xOffset, line.endY + this.y + yOffset)
+          gc.restore()
+        }
+      }
+
+      if (hex.terrain != Water) {
+        if (provinceSelected) {
+          drawLine(sameOwner, Color.Black, 4)
+          drawLine(differentOwner, province.owner.color, 8)
+        } else {
+          drawLine(sameOwner, Color.Black, 1)
+          drawLine(differentOwner, province.owner.color, 4)
+        }
+      }
     }
   }
 
@@ -272,3 +316,4 @@ case object DefenceStage extends HexDrawingStage
 case object HexGridStage extends HexDrawingStage
 case object CastleStage extends HexDrawingStage
 case object EndInterfaceDrawing extends HexDrawingStage
+case object ProvinceBordersStage extends HexDrawingStage

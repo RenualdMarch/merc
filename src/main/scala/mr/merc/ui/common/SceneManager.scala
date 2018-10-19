@@ -7,12 +7,14 @@ import mr.merc.ui.battle.BattleFrame
 import mr.merc.ui.menu.MainMenu
 import mr.merc.log.Logging
 import mr.merc.ui.menu.OptionsMenu
+import mr.merc.ui.world.WorldFrame
 
 class SceneManager(val stage: Stage) extends Logging {
 
   def startNewBattle() {
     info("starting new battle")
-    sceneRoot = new BattleFrame(this)
+    //sceneRoot = new BattleFrame(this)
+    sceneRoot = new WorldFrame(this)
   }
 
   def showMainMenu() {

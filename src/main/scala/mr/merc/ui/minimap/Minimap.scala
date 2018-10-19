@@ -162,11 +162,44 @@ class Minimap(field: TerrainHexField, pane: ScrollPaneLike, factor: Double) exte
     (w, h)
   }
 
+  private def neighbourFromOtherOwner(hex: TerrainHex): Boolean = {
+    field.neighbours(hex).exists { n =>
+      val opt = for {
+        thisProvince <- hex.province
+        thatProvince <- n.province
+      } yield {
+        thisProvince.owner != thatProvince.owner
+      }
+      opt.getOrElse(false)
+    }
+  }
+
+  private def smallerNeighbourFromCurrentOwner(hex:TerrainHex): Boolean = {
+    field.neighbours(hex).exists { n =>
+      val opt = for {
+        thisProvince <- hex.province
+        thatProvince <- n.province
+      } yield {
+        thisProvince.owner == thatProvince.owner && thisProvince.toString > thatProvince.toString
+      }
+      opt.getOrElse(false)
+    }
+  }
+
   private def color(hex: TerrainHex): Color = {
-    if (hex.soldier.nonEmpty) {
+    if (neighbourFromOtherOwner(hex) && hex.terrain != Water) {
+      hex.province.get.owner.color
+    //} else if (smallerNeighbourFromCurrentOwner(hex) && hex.terrain != Water) {
+    //  Color.Black
+    } else if (hex.soldier.nonEmpty) {
       hex.soldier.get.owner.color
     } else {
-      Color.Black
+      if(hex.terrain == Grass) Color.Green
+      else if (hex.terrain == Water) Color.Blue
+      else if (hex.terrain == Mountain) Color.Gray
+      else if (hex.terrain == Sand) Color.Yellow
+      else if (hex.terrain == Forest) Color.DarkGreen
+      else Color.Black
     }
   }
 }

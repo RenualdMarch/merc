@@ -4,7 +4,7 @@ Current issues:
 * Flickering in projectiles
 * Damage numbers not cleared in highest points
 * Redraw bugs during fast movement
-
+//"-Dglass.win.uiScale=100%"
 
 Consider following:
 
