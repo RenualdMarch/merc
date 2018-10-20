@@ -5,7 +5,7 @@ import mr.merc.economics.Population.{Culture, Lower, Middle, Upper}
 import mr.merc.economics.Products._
 import mr.merc.map.generator.WorldMapGenerator
 import mr.merc.map.hex.{Hex, InfiniteHexField, TerrainHex, TerrainHexField}
-import mr.merc.map.terrain.Empty
+import mr.merc.map.terrain.{Empty, Water}
 import mr.merc.players.{ColorGenerator, CyclicColorGeneratorWithNames}
 import mr.merc.politics.{Province, State}
 import mr.merc.util.WeightedRandom
@@ -149,7 +149,7 @@ class WorldGenerator(field:TerrainHexField) {
   }
 
   def generateStateAndProvinces(provincesHexes: Map[TerrainHex, Set[TerrainHex]]): Map[State, List[Province]] = {
-    val divisions = generateCultureStateDivisions(buildConnectivityMap(provincesHexes))
+    val divisions = generateCultureStateDivisions(WorldGenerator.buildConnectivityMap(field, provincesHexes))
 
     divisions.map{case (state, capitals) =>
       state -> capitals.map {capital =>
@@ -228,15 +228,6 @@ class WorldGenerator(field:TerrainHexField) {
     }
   }
 
-  private def buildConnectivityMap(map:Map[TerrainHex, Set[TerrainHex]]):ConnectivityMap = {
-    map.map { case (capital, provinceHexes) =>
-      val allNeigs = provinceHexes.flatMap(h => field.neighbours(h)) -- provinceHexes
-      capital -> allNeigs.flatMap {n =>
-        map.find(_._2.contains(n)).map(_._1)
-      }
-    }
-  }
-
   // everyone with everyone
   private def isContinuousPiece(connectivityMap:ConnectivityMap): Boolean = {
     var currentSet:Set[TerrainHex] = connectivityMap.headOption match {
@@ -257,7 +248,7 @@ class WorldGenerator(field:TerrainHexField) {
 object WorldGenerator {
   private val worldMapWidth = 100
   private val worldMapHeight = 100
-  private val hexesPerProvince = 150
+  private val hexesPerProvince = 200
   private val provinces = (worldMapHeight * worldMapWidth * WorldMapGenerator.landPercentage / hexesPerProvince).toInt
 
   def generateWorld(): (Map[State, List[Province]], TerrainHexField) = {
@@ -266,4 +257,14 @@ object WorldGenerator {
     val r = (generator.generateStateAndProvinces(world.provinces), world.terrain)
     r
   }
+
+  def buildConnectivityMap(field:TerrainHexField, map:Map[TerrainHex, Set[TerrainHex]]):Map[TerrainHex, Set[TerrainHex]] = {
+    map.map { case (capital, provinceHexes) =>
+      val allNeigs = provinceHexes.filter(_.terrain != Water).flatMap(h => field.neighbours(h)) -- provinceHexes
+      capital -> allNeigs.flatMap {n =>
+        map.find(_._2.contains(n)).map(_._1)
+      }
+    }
+  }
+
 }

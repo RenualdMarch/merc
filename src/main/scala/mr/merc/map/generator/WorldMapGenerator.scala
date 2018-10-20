@@ -1,7 +1,9 @@
 package mr.merc.map.generator
 
+import mr.merc.economics.WorldGenerator
 import mr.merc.map.ShortestGrid
 import mr.merc.map.hex._
+import mr.merc.map.objects.WoodenBridge
 import mr.merc.map.pathfind.PathFinder
 import mr.merc.map.terrain._
 import mr.merc.util.MercUtils
@@ -45,7 +47,7 @@ object WorldMapGenerator {
     }
 
     addRivers(terrainField)
-    connectCitiesByRoads(terrainField)
+    connectCitiesByRoads(terrainField, provincesMap)
 
     WorldMap(terrainField, provincesMap.map {
       case (capital, hexes) =>
@@ -68,13 +70,14 @@ object WorldMapGenerator {
     val riversCount = (field.width * field.height) / 200
     val hexesPerCurve = 4
 
-    val initialRivers = (0 until riversCount).flatMap {_ =>
+    val initialRivers = (0 until riversCount).flatMap { _ =>
       val x = Random.nextInt(field.width)
       val y = Random.nextInt(field.height - 1)
       val from = field.hex(x, y)
 
       field.findClosest(from, _.terrain == Water).flatMap { target =>
-        field.findPath(from, target, h => h.terrain == Castle)
+        field.findPath(from, target, h => h.terrain == Castle ||
+          field.neighbours(h).exists(_.terrain == Castle))
       }
     }
     val blocks = initialRivers.flatMap { river =>
@@ -89,9 +92,9 @@ object WorldMapGenerator {
         if (initialRiversHexes.contains(to)) h / 10d else h
       }
 
-      override def isBlocked(t: TerrainHex): Boolean = t.terrain == Castle || blocks.contains(t)
+      override def isBlocked(t: TerrainHex): Boolean = t.terrain == Castle || neighbours(t).exists(_.terrain == Castle) || blocks.contains(t)
 
-      override def price(from: TerrainHex, to: TerrainHex): Double =  if (initialRiversHexes.contains(to)) 0.1 else 1
+      override def price(from: TerrainHex, to: TerrainHex): Double = if (initialRiversHexes.contains(to)) 0.1 else 1
 
       override def neighbours(t: TerrainHex): Set[TerrainHex] = field.neighbours(t)
     }
@@ -105,8 +108,38 @@ object WorldMapGenerator {
     }
   }
 
-  def connectCitiesByRoads(field: TerrainHexField): Unit = {
-    //???
+  def connectCitiesByRoads(field: TerrainHexField, provincesMap: Map[TerrainHex, Set[TerrainHex]]): Unit = {
+    val connectivityMap = WorldGenerator.buildConnectivityMap(field, provincesMap)
+    val connections = connectivityMap.flatMap { case (capital, neigs) =>
+      neigs.map(h => Set(capital, h))
+    }.toSet
+
+    connections.map(_.toList).foreach { case List(from, to) =>
+      val grid = new ShortestGrid[TerrainHex] {
+        override def heuristic(from: TerrainHex, to: TerrainHex): Double = price(from, to)
+
+        override def isBlocked(t: TerrainHex): Boolean = !provincesMap(from).contains(t) && !provincesMap(to).contains(t)
+
+        override def price(from: TerrainHex, to: TerrainHex): Double =
+          if (to.terrain == Road) 0.5
+          else if (to.mapObj.contains(WoodenBridge)) 0.7
+          else if (to.terrain == Water) 3
+          else 1
+
+        override def neighbours(t: TerrainHex): Set[TerrainHex] = field.neighbours(t)
+      }
+
+      PathFinder.findPath(grid, from, to).foreach { path =>
+        path.foreach { h =>
+          if (h.terrain == Water) {
+            h.mapObj = Some(WoodenBridge)
+          } else if (h.terrain != Castle) {
+            h.terrain = Road
+          }
+        }
+      }
+    }
+
   }
 }
 

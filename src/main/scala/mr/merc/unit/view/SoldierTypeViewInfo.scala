@@ -2,12 +2,10 @@ package mr.merc.unit.view
 
 import mr.merc.image.MImage
 import scala.xml.XML
-import java.io.File
 import scala.xml.Node
 import scala.xml.NodeSeq
 import mr.merc.map.hex._
 import scalafx.scene.paint.Color
-import mr.merc.unit.Attack
 import mr.merc.unit.sound._
 import mr.merc.sound.Sound
 import mr.merc.sound.SoundConfig
@@ -41,7 +39,7 @@ object SoldierTypeViewInfo {
       val move = parseImagesList(typeName, node \ "move", stand)
       val idle = parseImagesList(typeName, node \ "idle", stand)
       val defence = parseImagesList(typeName, node \ "defence", stand)
-      val death = parseImagesList(typeName, node \ "death", createDeathAnimation(stand(0)))
+      val death = parseImagesList(typeName, node \ "death", createDeathAnimation(stand.head))
 
       val images: Map[SoldierViewState, List[mr.merc.image.MImage]] = Map(DefenceState -> defence, IdleState -> idle, MoveState -> move,
         StandState -> stand, DeathState -> death, NoState -> List(MImage.emptyImage))
@@ -79,20 +77,20 @@ object SoldierTypeViewInfo {
     death foreach (m => map += (DeathSound -> m))
     pain foreach (m => map += (PainSound -> m))
 
-    for (number <- 0 until SoldierType(name).attacks.size) {
+    for (number <- SoldierType(name).attacks.indices) {
       val attackNodeOpt = getNode(node, "attack" + (number + 1))
       attackNodeOpt match {
-        case Some(attackNode) => {
+        case Some(attackNode) =>
           if ((attackNode \ "@succ").nonEmpty) {
             val succ = (attackNode \ "@succ").toString()
-            map += AttackSound(number, true) -> succ
+            map += AttackSound(number, success = true) -> succ
           }
 
           if ((attackNode \ "@fail").nonEmpty) {
             val fail = (attackNode \ "@fail").toString()
-            map += AttackSound(number, false) -> fail
+            map += AttackSound(number, success = false) -> fail
           }
-        }
+
         case None => // do nothing
       }
     }
@@ -101,12 +99,7 @@ object SoldierTypeViewInfo {
   }
 
   private def getNode(node: NodeSeq, name: String): Option[Node] = {
-    val seq = node \ name
-    if (seq.isEmpty) {
-      None
-    } else {
-      Some(seq(0))
-    }
+    (node \ name).headOption
   }
 
   private def attacksMap(typeNode: Node, typeName: String): Map[SoldierViewAttackState, List[MImage]] = {
@@ -125,28 +118,14 @@ object SoldierTypeViewInfo {
 
   private def replaceAbsentFailWithSuccess(map: Map[SoldierViewAttackState, List[MImage]]): Map[SoldierViewAttackState, List[MImage]] = {
     val successes = map.filter(_._1.success)
-    val absent = successes flatMap (s => {
-      val st = SoldierViewAttackState(false, s._1.direction, s._1.number)
+    val absent = successes flatMap {case (s, list) =>
+      val st = SoldierViewAttackState(success = false, s.direction, s.number)
       if (map(st).isEmpty) {
-        Some(st, s._2)
+        Some(st, list)
       } else {
         None
       }
-    })
-
-    map ++ absent
-  }
-
-  private def replaceAbsentAttack2WithAttack1(map: Map[SoldierViewAttackState, List[MImage]]): Map[SoldierViewAttackState, List[MImage]] = {
-    val attack1 = map.filter(_._1.number == 0)
-    val absent = attack1 flatMap (a => {
-      val st = SoldierViewAttackState(a._1.success, a._1.direction, 1)
-      if (map(st).isEmpty) {
-        Some(st, a._2)
-      } else {
-        None
-      }
-    })
+    }
 
     map ++ absent
   }
@@ -162,8 +141,8 @@ object SoldierTypeViewInfo {
     val success = directions map (d => (d, parseAttackDirection(typeNode, typeName, attackName, "succ", d))) toMap
     val fail = directions map (d => (d, parseAttackDirection(typeNode, typeName, attackName, "fail", d))) toMap
 
-    val fullSuccess = success.map(p => (SoldierViewAttackState(true, p._1, attackNumber) -> p._2))
-    val fullFail = fail.map(p => (SoldierViewAttackState(false, p._1, attackNumber) -> p._2))
+    val fullSuccess = success.map(p => SoldierViewAttackState(success = true, p._1, attackNumber) -> p._2)
+    val fullFail = fail.map(p => SoldierViewAttackState(success = false, p._1, attackNumber) -> p._2)
 
     fullFail ++ fullSuccess
   }
@@ -199,13 +178,13 @@ object SoldierTypeViewInfo {
     val size = 5
     val startingAlpha = stand.alpha
     val list = List.fill(size)(startingAlpha)
-    val increment = 1.0f / size
-    val result = increment.to(1.0f).by(increment).reverse
+    val increment = BigDecimal(1.0) / size
+    val result = (increment to 1.0 by increment).reverse
     val multiplyers = result.take(size)
     val alpha = (list zip multiplyers).map(p => p._1 * p._2)
 
     val imagesList = List.fill(size)(stand)
-    (imagesList zip alpha).map(p => p._1.changeAlpha(p._2))
+    (imagesList zip alpha).map{ case (image, a) => image.changeAlpha(a.toFloat)}
   }
 
   private def parseImagesList(typeName: String, node: NodeSeq, default: List[MImage]): List[MImage] = {
@@ -226,7 +205,7 @@ object SoldierTypeViewInfo {
   }
 
   private def getOrElse(node: Node, attribute: String, default: String): String = {
-    val attr = (node \ ("@" + attribute))
+    val attr = node \ ("@" + attribute)
     if (attr.isEmpty) {
       default
     } else {
