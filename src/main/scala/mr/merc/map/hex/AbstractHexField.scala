@@ -1,13 +1,18 @@
 package mr.merc.map.hex
 
-import mr.merc.map.Grid
-import scala.reflect.ClassTag
+import mr.merc.map.{Grid, ShortestGrid, UniversalGrid}
+import mr.merc.map.pathfind.PathFinder
+import mr.merc.util.MercUtils
 
-abstract class AbstractHexField[T <: Hex](init: (Int, Int) => T) extends Grid[T] {
+abstract class AbstractHexField[T <: Hex](init: (Int, Int) => T) {
 
   def isLegalCoords(x: Int, y: Int): Boolean
 
   def hex(x: Int, y: Int): T
+
+  def hexOpt(x:Int, y:Int): Option[T] = {
+    if (isLegalCoords(x, y)) Some(hex(x, y)) else None
+  }
 
   def neighbours(hex: T): Set[T] = neighbours(hex.x, hex.y)
 
@@ -32,7 +37,7 @@ abstract class AbstractHexField[T <: Hex](init: (Int, Int) => T) extends Grid[T]
     resultList.map(df => (df._1, hex(df._2._1, df._2._2))).toMap
   }
 
-  def direction(hex: T, neig: T) = neighboursWithDirections(hex).find(_._2 == neig).get._1
+  def direction(hex: T, neig: T):Direction = neighboursWithDirections(hex).find(_._2 == neig).get._1
 
   private def correctionsList(even: Boolean): List[(Int, Int)] = {
     even match {
@@ -42,5 +47,55 @@ abstract class AbstractHexField[T <: Hex](init: (Int, Int) => T) extends Grid[T]
   }
 
   private val directionsList = List(NW, N, NE, SE, S, SW)
-  def distance(from: T, to: T) = from.distance(to)
+
+  def distance(from: T, to: T):Int = from.distance(to)
+
+  def hexRing(hex: T, radius:Int):List[T] = {
+    if (radius == 0) List(hex)
+    else {
+      val cube = hex.toCubeHex.neighbour(SW, radius)
+
+      val movements = for {
+        dir <- List(SE, NE, N, NW, SW, S)
+        _ <- 0 until radius
+      } yield {
+        dir
+      }
+
+      val cubes = movements.scanLeft(cube) {(c, direction) =>
+        c.neighbour(direction)
+      }
+
+      cubes.tail.flatMap {c =>
+        val h = c.toHex
+        this.hexOpt(h.x, h.y)
+      }
+    }
+  }
+
+  def closest(hex:T):Stream[T] = {
+    case class Ring(radius: Int) {
+      private lazy val ring = hexRing(hex, radius)
+      private def isEmpty = ring.isEmpty
+      def ringHexes:Stream[T] = if (isEmpty) Stream.Empty else
+        ring.toStream #::: Ring(radius + 1).ringHexes
+    }
+
+    Ring(0).ringHexes
+  }
+
+  def findClosest(start: T, predicate: T => Boolean):Option[T] = {
+    closest(start).find(predicate)
+  }
+
+  def findPath(from: T, to: T, blocking:T => Boolean):Option[List[T]] = {
+    val grid = new ShortestGrid[T] {
+      override def isBlocked(t: T) = blocking(t)
+      override def price(from: T, to: T): Double = 1
+      override def neighbours(t: T): Set[T] = AbstractHexField.this.neighbours(t)
+      override def heuristic(from: T, to: T): Double = math.abs(from.x - to.x) + math.abs(from.y - to.y)
+    }
+
+    PathFinder.findPath(grid, from, to)
+  }
 }

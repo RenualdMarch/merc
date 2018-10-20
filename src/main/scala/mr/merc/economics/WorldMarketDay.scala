@@ -92,7 +92,7 @@ class WorldMarketDay(regions: Set[EconomicRegion]) {
   private def buildSupplyInfoForProductAndRegion(product: Products.Product, from: EconomicRegion, to: EconomicRegion) : Option[SupplyInfo] = {
     val grid = new EconomicGrid(from)
 
-    PathFinder.findPath(grid, from, to, 100).flatMap { path =>
+    PathFinder.findOptimalPath(grid, from, to).flatMap { path =>
       val toOwner = to.owner
       val fromOwner = from.owner
 

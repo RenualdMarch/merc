@@ -13,23 +13,17 @@ import org.scalatest.mockito.MockitoSugar
 import mr.merc.map.view.SoldiersDrawer
 import org.mockito.Mockito._
 import mr.merc.battle.event.MoveBattleViewEvent
-import org.hamcrest.Matcher
-import org.hamcrest.BaseMatcher
 import org.mockito.ArgumentMatcher
-import mr.merc.view.move.MovementList
-import mr.merc.view.move.SoldierMoveMovement
+import mr.merc.view.move._
 import mr.merc.unit.view.SoldierView
 import mr.merc.unit.Attack
 import mr.merc.unit.Impact
 import mr.merc.unit.AttackResult
 import mr.merc.battle.event.AttackBattleViewEvent
-import mr.merc.view.move.SoldierRangedAttackMovement
 import mr.merc.map.hex.SE
-import mr.merc.view.move.SoldierAttackMovement
 import mr.merc.map.hex.NW
-import mr.merc.view.move.MomentaryMovement
-import mr.merc.view.move.SmoothMovement
 import mr.merc.view.Sprite
+import org.mockito.ArgumentMatchers._
 
 class BattleViewTest extends FunSuite with BeforeAndAfter with MockitoSugar {
   val field = new TerrainHexField(10, 10, (x, y) => new TerrainHex(x, y, Grass))
@@ -71,8 +65,8 @@ class BattleViewTest extends FunSuite with BeforeAndAfter with MockitoSugar {
 
     view.handleEvent(MoveBattleViewEvent(soldier, List(field.hex(0, 0), field.hex(1, 0), field.hex(2, 0))))
 
-    verify(soldierDrawer).addMovement(org.mockito.Matchers.argThat(new ArgumentMatcher {
-      def matches(argument: Any): Boolean = {
+    verify(soldierDrawer).addMovement(argThat(new ArgumentMatcher[Movement] {
+      def matches(argument: Movement): Boolean = {
         argument match {
           case moves: SmoothMovement => {
             assert(moves.list.size === 3)

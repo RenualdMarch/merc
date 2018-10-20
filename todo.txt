@@ -1,47 +1,29 @@
-For M5, (0.2) these things should be completed and tested
-
 Current issues:
 * Flickering in projectiles
 * Damage numbers not cleared in highest points
 * Redraw bugs during fast movement
+
+
 //"-Dglass.win.uiScale=100%"
 
 Consider following:
 
 terrain additives specifically for given terrain types
 add winter weather on maps
-Different images for same terrain type
 After wesnoth release take a look at images
-Levels of difficulty
 
+For M5, World Map changes are priority
 
-Economics model
++Add rivers
+Add roads between cities with bridges across seas
+Make cities of different size instead of lone castles
+Bug with lone sand
+Performance optimization for huge maps
+Add different images for same terrain type 
+Add some beauty to map - e.g fields with grain and other cool things
+Complete world map UI without soldiers
 
-1) Vic 2 model(simple but working)
-
-1) Artisans and factories make output, and place it on the domestic market
-2) POPs, Artisans and factories buy whatever they can from the domestic market, in order of need
-3) Whatever output is left on the domestic market is placed into the global market, or in the market of their sphere leader
-4) POPs, Artisans and factories buy whatever they can from the international market, in order of need, beginning with the most prestigious country and working down. Tariffs and subsidies are applied to change the cost.
-5) Unsold output is returned to firms. If there was any of a product unsold, prices fall by 0.01, otherwise they rise by the same amount
-
-Here a like that tomorrow prices are known today which makes planning possible. Prices shouldn't react too fast, it will make economy unbalanced.
-
-One universal currency - gold.
-
-1) All POPs are fierce patriots. They will buy domestic produce at all times, even when foreign goods are cheaper due to import subsidies
-2) Transport is free and instantaneous. Buying goods from New Zealand is as easy to a Brit as it would be from France.
-3) All products are the same quality. Mass-produced shoes from Britain are no better or worse than those made by Swiss artisans. - should remain.
-4) Countries have no capacity to discern the origins of goods, and countries have a huge gulf in their purchasing power, such that products are always offered in sequence down the rankings of purchasing power. Purchasing power is determined by how prestigious a country is internationally. it prevents trade embargoing. if a huge importer such as Britain is buying up all global coal, then Tibet will never be able to acquire any to fuel its own industry, however much it may want to. This ought in principle to be corrected by rising prices, but the game has an in-built price ceiling (and floor) that usually prevents this from happening.
-5) There are no direct political or economic consequences to taxation. People and firms will work at full capacity, regardless of taxation
-
-
-1) Have separate prices for each country (adjusted for tariffs), and have POPs consume the cheapest good available to them at all times.
-2) Add a transportation cost in ships/convoys, based on distance between the two trading economies. This cost should be very high at first, but fall by technology, with costs of trade being very low by the end game. A time delay would be a nice touch, but would probably be too much for AI countries to handle well.
-3) Allow tariffs to be both nation and product specific. This would add some real strategic depth to the tariff system, and allow for tactical embargos of key nations. An added bonus would be trade federations and free trade agreements - the former to allow countries to gang up on warmongers economically, and the latter to allow friendly nations to drop tariffs mutually.
-
-
-My points:
-1) Prices are per province. They include transportation fees and all manufacturer decides where to sell his production. They rise if supply was too low or too high - relative to unsold or overdemand.
-2) Manufacturer tries to produce as much as possible to maximize profit but reacts to previous day events - he can cut production if high amount is unsold.
-3) Capitalists in one pop are like clan so they are like collective owner
+For M6, interface will be a priority, basic politics, factory building
+For M7, soldiers and battles and wars
+For M8, save/load, game polishing and AI
+For M9

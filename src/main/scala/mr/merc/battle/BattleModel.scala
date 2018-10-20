@@ -54,8 +54,8 @@ class BattleModel(val map: GameField) extends BattleModelEventHandler with Loggi
 
   private[battle] def handleMovementEvent(soldier: Soldier, from: TerrainHex, to: TerrainHex): MovementModelEventResult = {
     require(validateMovementEvent(soldier, from, to), s"movement from $from to $to is invalid")
-    require(to.soldier == None)
-    val path = PathFinder.findPath(map.gridForSoldier(soldier), from, to, soldier.movePointsRemain, soldier.movedThisTurn)
+    require(to.soldier.isEmpty)
+    val path = PathFinder.findPath(map.gridForSoldier(soldier), from, to)
     val movePrice = pathPrice(soldier.movementCostFunction, path.get)
     soldier.movePointsRemain -= movePrice
     from.soldier = None
@@ -126,7 +126,7 @@ class BattleModel(val map: GameField) extends BattleModelEventHandler with Loggi
     }
 
     if (validatePath) {
-      val pathOpt = PathFinder.findPath(map.gridForSoldier(soldier), from, to, soldier.movePointsRemain, soldier.movedThisTurn)
+      val pathOpt = PathFinder.findOptimalPath(map.gridForSoldier(soldier), from, to, soldier.movePointsRemain, soldier.movedThisTurn)
       pathOpt match {
         case Some(path) => {
           val price = pathPrice(soldier.movementCostFunction, path)

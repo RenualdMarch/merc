@@ -145,4 +145,50 @@ class HexFieldTest extends FunSuite {
     val finish2 = bigField.hex(2, 2)
     assert(start.distance(finish2) === 3)
   }
+
+  test("ring test") {
+    val ring0 = bigField.hexRing(bigField.hex(2, 2), 0)
+    assert(ring0 === List(bigField.hex(2, 2)))
+    val ring1 = bigField.hexRing(bigField.hex(2, 2), 1)
+    assert(ring1.size === 6)
+    assertContainsHex(ring1, 1, 1)
+    assertContainsHex(ring1, 2, 1)
+    assertContainsHex(ring1, 3, 1)
+    assertContainsHex(ring1, 1, 2)
+    assertContainsHex(ring1, 2, 3)
+    assertContainsHex(ring1, 3, 2)
+
+    val ring2 = bigField.hexRing(bigField.hex(2, 2), 2)
+    assert(ring2.size === 12)
+
+    assertContainsHex(ring2, 0, 1)
+    assertContainsHex(ring2, 1, 0)
+    assertContainsHex(ring2, 2, 0)
+    assertContainsHex(ring2, 3, 0)
+    assertContainsHex(ring2, 4, 1)
+    assertContainsHex(ring2, 4, 2)
+    assertContainsHex(ring2, 4, 3)
+    assertContainsHex(ring2, 3, 3)
+    assertContainsHex(ring2, 2, 4)
+    assertContainsHex(ring2, 1, 3)
+    assertContainsHex(ring2, 0, 3)
+    assertContainsHex(ring2, 0, 2)
+
+    val ring3 = bigField.hexRing(bigField.hex(0, 0), 1)
+    assert(ring3.size === 2)
+
+    assertContainsHex(ring3, 0, 1)
+    assertContainsHex(ring3, 1, 0)
+  }
+
+  test("find closest") {
+    def truePredicate(hex: Hex) = hex.x == 1 && hex.y == 0
+    val r = bigField.findClosest(bigField.hex(2, 2), truePredicate)
+    assert(r.get.x === 1)
+    assert(r.get.y === 0)
+
+    def falsePredicate(h: Any) = false
+    val no = bigField.findClosest(bigField.hex(2, 2), falsePredicate)
+    assert(no.isEmpty)
+  }
 }

@@ -1,6 +1,6 @@
 package mr.merc.economics
 
-import mr.merc.map.Grid
+import mr.merc.map.{Grid, PossibleGrid}
 import Products.Product
 import mr.merc.economics.Population.{Culture, PopulationType}
 import mr.merc.politics.State
@@ -18,7 +18,7 @@ trait EconomicRegion {
   var enterprises:Vector[Enterprise] = Vector()
 }
 
-class EconomicGrid(region:EconomicRegion) extends Grid[EconomicRegion] {
+class EconomicGrid(region:EconomicRegion) extends PossibleGrid[EconomicRegion] {
 
   // TODO add cases of war and economic blockades
   override def isBlocked(t: EconomicRegion) = false
@@ -30,6 +30,10 @@ class EconomicGrid(region:EconomicRegion) extends Grid[EconomicRegion] {
     val stateTransit = if (region.owner == from.owner) 0 else new StateTransitPart(from.owner).extractionPart
     1 + new TradersTransitPart(from).extractionPart + stateTransit
   }
+
+  override def cellWhereItIsForbiddenToStop(t: EconomicRegion): Boolean = false
+
+  override def cellWhereMovementMustBeStopped(t: EconomicRegion): Boolean = false
 }
 
 class RegionPopulation(initialPops: List[Population]) {

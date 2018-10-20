@@ -23,4 +23,11 @@ object MercUtils {
       } else s
     }
   }
+
+  def printTime[T](message:String)(f: => T): T = {
+    val before = System.currentTimeMillis()
+    val res = f
+    println(message + " " + (System.currentTimeMillis() - before).toString)
+    res
+  }
 }

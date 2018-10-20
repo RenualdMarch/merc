@@ -196,7 +196,8 @@ class Minimap(field: TerrainHexField, pane: ScrollPaneLike, factor: Double) exte
     } else {
       if(hex.terrain == Grass) Color.Green
       else if (hex.terrain == Water) Color.Blue
-      else if (hex.terrain == Mountain) Color.Gray
+      else if (hex.terrain == Hill) Color.Gray
+      else if (hex.terrain == Mountain) Color.Black
       else if (hex.terrain == Sand) Color.Yellow
       else if (hex.terrain == Forest) Color.DarkGreen
       else Color.Black

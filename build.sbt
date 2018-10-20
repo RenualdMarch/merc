@@ -1,6 +1,6 @@
 name:= "Merc"
 
-version := "0.3"
+version := "0.2"
 
 scalaVersion := "2.12.7"
 
@@ -28,7 +28,7 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.1" % "test"
 
 libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.3"
 
-libraryDependencies += "org.mockito" % "mockito-core" % "1.9.5" % "test"
+libraryDependencies += "org.mockito" % "mockito-core" % "2.23.0" % "test"
 
 libraryDependencies += "com.projectdarkstar.ext.jorbis" % "jorbis" % "0.0.17"
 

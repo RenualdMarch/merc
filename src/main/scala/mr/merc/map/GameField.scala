@@ -8,8 +8,8 @@ import mr.merc.unit.Skirmisher
 
 // TODO add allies support
 class GameField(val hexField: TerrainHexField, val players: List[Player]) {
-  def gridForSoldier(soldier: Soldier): Grid[TerrainHex] = {
-    new Grid[TerrainHex] {
+  def gridForSoldier(soldier: Soldier): UniversalGrid[TerrainHex] = {
+    new UniversalGrid[TerrainHex] {
       private val mustStopHere = if (soldier.soldierType.attributes.contains(Skirmisher)) {
         Set.empty[TerrainHex]
       } else {
@@ -21,6 +21,8 @@ class GameField(val hexField: TerrainHexField, val players: List[Player]) {
       override def price(from: TerrainHex, to: TerrainHex) = soldier.movementCostFunction(to)
       override def cellWhereMovementMustBeStopped(t: TerrainHex) = mustStopHere.contains(t)
       override def cellWhereItIsForbiddenToStop(t: TerrainHex) = t.soldier.map(_ != soldier).getOrElse(false)
+
+      override def heuristic(from: TerrainHex, to: TerrainHex): Double = math.abs(from.x - to.x) + math.abs(from.y - to.y)
     }
   }
 

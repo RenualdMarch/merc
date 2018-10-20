@@ -8,7 +8,7 @@ class MercPossibleMovesFinderTest extends FunSuite {
   val finder = PossibleMovesFinder
 
   test("sanity check") {
-    val grid = new HexField[Hex](5, 5, Hex.hexInit)
+    val grid = new TestGrid(new HexField[Hex](5, 5, Hex.hexInit))
     val from = grid.hex(0, 1)
     val result = finder.findPossibleMoves(grid, from, 2, false)
     import grid.hex
@@ -17,7 +17,7 @@ class MercPossibleMovesFinderTest extends FunSuite {
   }
 
   test("when longest way is more effective") {
-    val grid = new HexField[Hex](5, 5, Hex.hexInit) {
+    val grid = new TestGrid(new HexField[Hex](5, 5, Hex.hexInit)) {
       override def price(from: Hex, h: Hex) = if (h.x == 0 && h.y == 1) 1000 else 1
     }
     val from = grid.hex(0, 0)
@@ -28,7 +28,7 @@ class MercPossibleMovesFinderTest extends FunSuite {
   }
 
   test("when we need to stop") {
-    val grid = new HexField[Hex](5, 5, Hex.hexInit) {
+    val grid = new TestGrid(new HexField[Hex](5, 5, Hex.hexInit)) {
       override def cellWhereMovementMustBeStopped(h: Hex) = h.x == 0 && h.y == 1
     }
 

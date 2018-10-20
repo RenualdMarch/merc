@@ -11,7 +11,7 @@ object TerrainHex {
 }
 
 // TODO extract soldier to TerrainHexWithSoldier
-class TerrainHex(x: Int, y: Int, val terrain: TerrainType, val mapObj: Option[MapObject] = None,
+class TerrainHex(x: Int, y: Int, var terrain: TerrainType, var mapObj: Option[MapObject] = None,
                  var province: Option[Province] = None) extends Hex(x, y) {
   private var _soldier: Option[Soldier] = None
   var soldierChangeListener: (Int, Int) => Unit = (x, y) => {}
