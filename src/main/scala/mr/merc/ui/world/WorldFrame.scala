@@ -1,21 +1,26 @@
 package mr.merc.ui.world
 
 import mr.merc.economics.WorldGenerator
+import mr.merc.map.hex.view.ProvinceView
 import mr.merc.map.hex.view.TerrainHexFieldView.WorldMapViewMode
 import mr.merc.map.view.MapView
 import mr.merc.ui.common.{CanvasLayers, SceneManager}
 import mr.merc.ui.minimap.Minimap
-
 import scalafx.geometry.{Insets, Rectangle2D}
 import scalafx.scene.layout.{GridPane, Pane}
 
 class WorldFrame(sceneManager: SceneManager) extends Pane {
-  import scalafx.Includes._
   val factor = 1d
 
   val (states, terrainField) = WorldGenerator.generateWorld()
   val mapView = new MapView(terrainField, factor, mode = WorldMapViewMode)
-  private val worldCanvas = new CanvasLayers(mapView.canvasBattleLayers, new Rectangle2D(0, 0, mapView.pixelWidth, mapView.pixelHeight), false)
+  val provinceViews = states.flatMap { case (_, pList) =>
+    pList.map { p =>
+      new ProvinceView(p, terrainField, mapView.terrainView)
+    }
+  }
+  provinceViews.foreach(_.refreshCity())
+  private val worldCanvas = new CanvasLayers(mapView.canvasBattleLayers, new Rectangle2D(0, 0, mapView.pixelWidth, mapView.pixelHeight))
 
   val interfacePane = new InterfacePane
 

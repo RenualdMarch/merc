@@ -387,7 +387,7 @@ class BattleModelTest extends FunSuite with BeforeAndAfter {
     def terrainHex(x: Int, y: Int) = if (x == 1 && y == 0) {
       new TerrainHex(x, y, Road)
     } else if (x == 0 && y == 1) {
-      new TerrainHex(x, y, Water, Some(House))
+      new TerrainHex(x, y, Water, Some(HumanCityHouse))
     } else {
       new TerrainHex(x, y, Sand)
     }

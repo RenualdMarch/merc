@@ -81,13 +81,13 @@ class Soldier(val name: String, val soldierType: SoldierType, val owner: Player)
       result += Regeneration(this)
     }
 
-    if (field.hex(x, y).mapObj == Some(House) && !attributes.contains(Regenerates)
+    if (field.hex(x, y).mapObj.exists(_.isInstanceOf[House]) && !attributes.contains(Regenerates)
       && (needsHealing || state.contains(Poisoned))) {
       result += Regeneration(this)
     }
 
     if (state.contains(Poisoned) && !attributes.contains(Regenerates)
-      && field.hex(x, y).mapObj != Some(House)) {
+      && !field.hex(x, y).mapObj.exists(_.isInstanceOf[House])) {
       result += PoisoningDamage(this)
     }
 
@@ -95,7 +95,7 @@ class Soldier(val name: String, val soldierType: SoldierType, val owner: Player)
   }
 
   def movementCostFunction(hex: TerrainHex): Int = {
-    if (hex.mapObj.contains(House) || hex.terrain == Castle) {
+    if (hex.mapObj.exists(_.isInstanceOf[House]) || hex.terrain == Castle) {
       soldierType.moveCost(Village)
     } else if (hex.mapObj.contains(WoodenBridge) || hex.terrain == Road || hex.terrain == Dirt) {
       soldierType.moveCost(Grass)

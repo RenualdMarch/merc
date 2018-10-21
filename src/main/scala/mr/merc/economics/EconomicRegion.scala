@@ -23,7 +23,7 @@ class EconomicGrid(region:EconomicRegion) extends PossibleGrid[EconomicRegion] {
   // TODO add cases of war and economic blockades
   override def isBlocked(t: EconomicRegion) = false
 
-  def neighbours(t: EconomicRegion): Set[EconomicRegion] = t.economicNeighbours
+  def neighbours(t: EconomicRegion): List[EconomicRegion] = t.economicNeighbours.toList
 
   // currently we think that movement from one province to another takes same time
   override def price(from: EconomicRegion, to: EconomicRegion): Double = {
@@ -90,6 +90,8 @@ class RegionPopulation(initialPops: List[Population]) {
     pops.filter(_.populationType == populationType).map(_.totalPopEfficiency).sum
 
   def pops:List[Population] = currentPops
+
+  def cultureMembers:Map[Culture, Int] = pops.groupBy(_.culture).mapValues(_.map(_.populationCount).sum)
 }
 
 class RegionMarket(initialPrices:Map[Product, Double]) {

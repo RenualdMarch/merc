@@ -44,7 +44,7 @@ class PathFindingBase {
     calculated toMap
   }
 
-  private def getNeighbours[T](parent: Node[T], grid: PossibleGrid[T]): Set[Node[T]] = {
+  private def getNeighbours[T](parent: Node[T], grid: PossibleGrid[T]): List[Node[T]] = {
     grid.neighbours(parent.t) filterNot grid.isBlocked map (n => {
       new Node(n, grid.price(parent.t, n), Some(parent))
     })
@@ -57,9 +57,9 @@ class PathFindingBase {
     } sum
   }
 
-  def astar[T](grid: ShortestGrid[T], from: T, to: T): Option[List[T]] = {
-    val cameFrom = mutable.Map[T, T]()
-    val costSoFar = mutable.Map[T, Double]()
+  def astar[T <: AnyRef](grid: ShortestGrid[T], from: T, to: T): Option[List[T]] = {
+    val cameFrom = mutable.AnyRefMap[T, T]()
+    val costSoFar = mutable.AnyRefMap[T, Double]()
 
     val ord: Ordering[(T, Double)] = new Ordering[(T, Double)] {
       override def compare(x: (T, Double), y: (T, Double)): Int = x._2.compare(y._2)

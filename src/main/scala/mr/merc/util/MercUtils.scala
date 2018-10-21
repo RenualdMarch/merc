@@ -30,4 +30,8 @@ object MercUtils {
     println(message + " " + (System.currentTimeMillis() - before).toString)
     res
   }
+
+  def stablePseudoRandomIndex(x: Int, y: Int, size: Int): Int = {
+    (x * 19 + y * 17) % size
+  }
 }

@@ -26,7 +26,7 @@ object TerrainHexViewAdditiveElement {
 
   def elementsByType(terrain: TerrainType): List[TerrainHexViewAdditiveElement] = {
     val ret = elements.filter(_.terrainType == terrain).sortBy(e => -Direction.length(e.from, e.to))
-    require(!ret.isEmpty, s"elements list for terrain type $terrain")
+    require(ret.nonEmpty, s"elements list for terrain type $terrain")
     ret
   }
 

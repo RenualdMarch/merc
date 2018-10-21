@@ -3,7 +3,7 @@ package mr.merc.map
 trait Grid[T] {
   def isBlocked(t: T):Boolean
   def price(from: T, to: T): Double
-  def neighbours(t: T): Set[T]
+  def neighbours(t: T): List[T]
 }
 
 trait PossibleGrid[T] extends Grid[T] {

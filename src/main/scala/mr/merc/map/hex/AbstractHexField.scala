@@ -1,8 +1,7 @@
 package mr.merc.map.hex
 
-import mr.merc.map.{Grid, ShortestGrid, UniversalGrid}
+import mr.merc.map.ShortestGrid
 import mr.merc.map.pathfind.PathFinder
-import mr.merc.util.MercUtils
 
 abstract class AbstractHexField[T <: Hex](init: (Int, Int) => T) {
 
@@ -14,9 +13,13 @@ abstract class AbstractHexField[T <: Hex](init: (Int, Int) => T) {
     if (isLegalCoords(x, y)) Some(hex(x, y)) else None
   }
 
-  def neighbours(hex: T): Set[T] = neighbours(hex.x, hex.y)
+  def neighbours(hex: T): List[T] = neighbours(hex.x, hex.y)
 
-  def neighbours(x: Int, y: Int): Set[T] = neighboursList(x, y).toSet
+  def neighboursSet(hex: T): Set[T] = neighbours(hex).toSet
+
+  def neighbours(x: Int, y: Int): List[T] = neighboursList(x, y)
+
+  def neighboursSet(x: Int, y: Int): Set[T] = neighboursList(x, y).toSet
 
   private def neighboursList(x: Int, y: Int): List[T] = {
     val allNeighboursCoords = neighboursListWithInvalid(x, y)
@@ -74,14 +77,7 @@ abstract class AbstractHexField[T <: Hex](init: (Int, Int) => T) {
   }
 
   def closest(hex:T):Stream[T] = {
-    case class Ring(radius: Int) {
-      private lazy val ring = hexRing(hex, radius)
-      private def isEmpty = ring.isEmpty
-      def ringHexes:Stream[T] = if (isEmpty) Stream.Empty else
-        ring.toStream #::: Ring(radius + 1).ringHexes
-    }
-
-    Ring(0).ringHexes
+    Stream.from(0).map(radius => hexRing(hex, radius)).takeWhile(_.nonEmpty).flatten
   }
 
   def findClosest(start: T, predicate: T => Boolean):Option[T] = {
@@ -92,7 +88,7 @@ abstract class AbstractHexField[T <: Hex](init: (Int, Int) => T) {
     val grid = new ShortestGrid[T] {
       override def isBlocked(t: T) = blocking(t)
       override def price(from: T, to: T): Double = 1
-      override def neighbours(t: T): Set[T] = AbstractHexField.this.neighbours(t)
+      override def neighbours(t: T): List[T] = AbstractHexField.this.neighbours(t)
       override def heuristic(from: T, to: T): Double = math.abs(from.x - to.x) + math.abs(from.y - to.y)
     }
 

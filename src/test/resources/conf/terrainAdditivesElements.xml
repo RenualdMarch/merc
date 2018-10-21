@@ -30,4 +30,11 @@
 	<element type="BankInside" from="SE" to="S"/>
 	<element type="BankInside" from="S" to="SW"/>
 	<element type="BankInside" from="SW" to="NW"/>
+
+	<element type="BankOutside" from="N" to="N"/>
+	<element type="BankOutside" from="NE" to="NE"/>
+	<element type="BankOutside" from="NW" to="NW"/>
+	<element type="BankOutside" from="S" to="S"/>
+	<element type="BankOutside" from="SE" to="SE"/>
+	<element type="BankOutside" from="SW" to="SW"/>
 </elements>

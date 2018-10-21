@@ -10,8 +10,8 @@ case class State(name: String, primeCulture:Culture, budget: StateBudget, taxPol
 
 }
 
-class Province(var owner: State, val regionMarket: RegionMarket,
-               val regionPopulation: RegionPopulation, hexes: Set[TerrainHex]) extends EconomicRegion {
+case class Province(var owner: State, regionMarket: RegionMarket,
+               regionPopulation: RegionPopulation, hexes: Set[TerrainHex], capital: TerrainHex) extends EconomicRegion {
 
   private var neighbourProvinces:Option[Set[Province]] = None
 

@@ -10,7 +10,7 @@ class TerrainHexViewAdditiveTest extends FunSuite with BeforeAndAfter {
 
   test("Elements loaded correctly") {
     val elements = TerrainHexViewAdditiveElement.elements
-    assert(elements.size === 26)
+    assert(elements.size === 32)
     assert(elements.contains(new TerrainHexViewAdditiveElement(Grass, N, N)))
     assert(elements.contains(new TerrainHexViewAdditiveElement(Grass, NE, NE)))
     assert(elements.contains(new TerrainHexViewAdditiveElement(Grass, NW, NW)))

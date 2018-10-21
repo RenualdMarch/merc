@@ -83,7 +83,7 @@ case class AIAgent(soldier: Soldier, hex: TerrainHex, conf: AIConfiguration) {
     val reachableHexes = model.possibleMoves(soldier, hex) ++ Set(hex)
     val reachableHexesAndNeigs = reachableHexes.flatMap(model.map.hexField.neighbours(_))
     val reachableEnemies = reachableHexesAndNeigs.filter(_.soldier.isDefined).filter(_.soldier.get.owner.isEnemy(soldier.owner))
-    val enemyAndAttackPossitions = reachableEnemies.map(h => (h, model.map.hexField.neighbours(h) & reachableHexes))
+    val enemyAndAttackPossitions = reachableEnemies.map(h => (h, model.map.hexField.neighboursSet(h) & reachableHexes))
     val targets = enemyAndAttackPossitions map {
       case (enemyHex, attackPositions) =>
         val bestHexForAttack = attackPositions.toList.sortBy(h => Attack.calculateSoldierDefence(soldier, h).defence).last

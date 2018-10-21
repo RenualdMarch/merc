@@ -157,7 +157,7 @@ class BattleModel(val map: GameField) extends BattleModelEventHandler with Loggi
   }
 
   def possibleAttacksWhenThereAreNoMoves(soldier: Soldier, currentHex: TerrainHex): Set[TerrainHex] = {
-    val neigbours = map.hexField.neighbours(currentHex)
+    val neigbours = map.hexField.neighboursSet(currentHex)
     val enemiesNear = neigbours.filter(_.soldier.map(_.owner.isEnemy(soldier.owner)).getOrElse(false))
     if (enemiesNear.isEmpty) {
       return Set()

@@ -19,7 +19,7 @@ private[image] object MImageCache extends Logging {
 
   def loadImage(path: String) = {
     try {
-      new Image(getClass().getResourceAsStream(path))
+      new Image(getClass.getResourceAsStream(path))
     } catch {
       case e: Exception =>
         error(s"Failed to load image with path $path", e)

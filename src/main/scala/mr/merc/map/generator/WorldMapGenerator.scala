@@ -6,7 +6,6 @@ import mr.merc.map.hex._
 import mr.merc.map.objects.WoodenBridge
 import mr.merc.map.pathfind.PathFinder
 import mr.merc.map.terrain._
-import mr.merc.util.MercUtils
 
 import scala.collection.mutable
 import scala.math.{abs, max, pow}
@@ -25,7 +24,7 @@ object WorldMapGenerator {
 
     def biome(x: Int, y: Int): TerrainType = {
       biomeNoise(x, width, y, height) match {
-        case n if n < biomeNoise.percentageBelow(0.1) => Sand
+        //case n if n < biomeNoise.percentageBelow(0.1) => Sand
         case n if n < biomeNoise.percentageBelow(0.6) => Grass
         case n if n < biomeNoise.percentageBelow(0.85) => Forest
         case n if n < biomeNoise.percentageBelow(0.98) => Hill
@@ -48,6 +47,9 @@ object WorldMapGenerator {
 
     addRivers(terrainField)
     connectCitiesByRoads(terrainField, provincesMap)
+    provincesMap.keys.foreach { cap =>
+      makeRoadAroundCapitals(terrainField, cap)
+    }
 
     WorldMap(terrainField, provincesMap.map {
       case (capital, hexes) =>
@@ -88,15 +90,14 @@ object WorldMapGenerator {
 
     val pathGrid = new ShortestGrid[TerrainHex] {
       override def heuristic(from: TerrainHex, to: TerrainHex): Double = {
-        val h = math.abs(from.x - to.x) + math.abs(from.y - to.y)
-        if (initialRiversHexes.contains(to)) h / 10d else h
+        math.abs(from.x - to.x) + math.abs(from.y - to.y)
       }
 
       override def isBlocked(t: TerrainHex): Boolean = t.terrain == Castle || neighbours(t).exists(_.terrain == Castle) || blocks.contains(t)
 
       override def price(from: TerrainHex, to: TerrainHex): Double = if (initialRiversHexes.contains(to)) 0.1 else 1
 
-      override def neighbours(t: TerrainHex): Set[TerrainHex] = field.neighbours(t)
+      override def neighbours(t: TerrainHex): List[TerrainHex] = field.neighbours(t)
     }
 
     initialRivers.foreach { river =>
@@ -126,7 +127,7 @@ object WorldMapGenerator {
           else if (to.terrain == Water) 3
           else 1
 
-        override def neighbours(t: TerrainHex): Set[TerrainHex] = field.neighbours(t)
+        override def neighbours(t: TerrainHex): List[TerrainHex] = field.neighbours(t)
       }
 
       PathFinder.findPath(grid, from, to).foreach { path =>
@@ -139,7 +140,14 @@ object WorldMapGenerator {
         }
       }
     }
+  }
 
+  def makeRoadAroundCapitals(field: TerrainHexField, capital:TerrainHex): Unit = {
+    field.hexRing(capital, 1).foreach { h =>
+      if (h.terrain != Water) {
+        h.terrain = Road
+      }
+    }
   }
 }
 
@@ -157,7 +165,7 @@ case class MapDivision[T <: Hex](capitals: Set[T], allHexes: Set[T]) {
   }
 
   def lloydRelaxationCapitals: Set[T] = {
-    voronoiDivision.map { case (capital, hexes) =>
+    voronoiDivision.map { case (_, hexes) =>
       val x = math.round(hexes.toList.map(_.x).sum.toDouble / hexes.size).toInt
       val y = math.round(hexes.toList.map(_.y).sum.toDouble / hexes.size).toInt
       val newCapitalCandidate = new Hex(x, y)

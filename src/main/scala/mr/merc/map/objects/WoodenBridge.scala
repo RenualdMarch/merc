@@ -8,7 +8,9 @@ import mr.merc.map.hex.TerrainHexField
 import mr.merc.map.hex._
 
 object WoodenBridge extends MapObject("woodenBridge") {
-	private val endsMap = Direction.list.map(dir => (dir, "end-" + dir.toString().toLowerCase())).toMap 
+	private[objects] def imagePath(fileName:String) = "/images/terrain/" + name + "/" + fileName + ".png"
+
+	private val endsMap = Direction.list.map(dir => (dir, "end-" + dir.toString().toLowerCase())).toMap
     private val centersMap = List((N, S), (NE, SW), (SE, NW)).
     							map(pair => (pair, pair._1.toString().toLowerCase() + "-" + 
     							    pair._2.toString().toLowerCase())).toMap

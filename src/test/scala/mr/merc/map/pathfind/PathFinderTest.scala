@@ -90,7 +90,7 @@ class PathFinderTest extends FunSuite {
     } else if (y == 2) {
       new TerrainHex(x, y, Forest)
     } else if (x == 4 && y == 3) {
-      new TerrainHex(x, y, Grass, Some(House))
+      new TerrainHex(x, y, Grass, Some(HumanCityHouse))
     } else {
       new TerrainHex(x, y, Sand)
     }

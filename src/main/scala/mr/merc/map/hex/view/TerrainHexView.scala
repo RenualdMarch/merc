@@ -99,9 +99,21 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
   val textLength = TerrainHexView.textLength(factor)
 
   val neighbours = field.neighboursWithDirections(hex.x, hex.y)
-  val directions = neighbours map (p => (p._2, p._1)) toMap
+  val directions = neighbours map (p => (p._2, p._1))
   val x = findX
   val y = findY
+  private var _isTerrainDirty = false
+  def isTerrainDirty: Boolean = _isTerrainDirty
+  def isTerrainDirty_=(v: Boolean): Unit = {
+    if(!_isTerrainDirty && v) {
+      this.elements = calculateElements()
+      this.sameOwnerBorders = calculateSameOwnerBorders()
+      this.differentOwnerBorders = calculateDifferentOwnerBorders()
+    }
+
+    _isTerrainDirty = v
+  }
+
   var isInterfaceDirty = true
   var isDarkened = false
   private var currentDarkened = isDarkened
@@ -154,13 +166,14 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
     side * hex.y + side / 2
   }
 
-  private lazy val elements: List[TerrainHexViewAdditiveElement] = {
+  private var elements:List[TerrainHexViewAdditiveElement] = calculateElements()
+  private def calculateElements(): List[TerrainHexViewAdditiveElement] = {
     val additives = TerrainHexViewAdditive.extractAdditives(this)
     val rule = new TerrainHexViewAdditiveRule
     rule.transform(additives)
   }
 
-  val image: MImage = {
+  def image: MImage = {
     if (hex.terrain == Forest) {
       MImage(Grass.imagePath)
     } else {
@@ -168,7 +181,7 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
     }
   }
 
-  val secondaryImage: Option[MImage] = {
+  def secondaryImage: Option[MImage] = {
     if (hex.terrain == Forest) {
       Some(MImage(Forest.imagePath))
     } else {
@@ -176,12 +189,12 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
     }
   }
 
-  val mapObject = hex.mapObj match {
+  def mapObject = hex.mapObj match {
     case Some(mapObj) => mapObj.images(hex, field)
     case None => Nil
   }
 
-  val neighbourMapObjects: List[MImage] = {
+  def neighbourMapObjects: List[MImage] = {
     val neigMapObj = field.neighbours(hex).filter(p => p.mapObj != None && p.mapObj != hex.mapObj)
     neigMapObj.flatMap(p => p.mapObj.get.images(hex, field)).toList
   }
@@ -204,11 +217,24 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
       elements foreach (_.drawItself(gc, x, y, factor))
     }
     neighbourMapObjects.foreach (_.scaledImage(factor).drawImage(gc, x, y))
-    secondaryImage.foreach(_.scaledImage(factor).drawCenteredImage(gc, x, y, side, side))
 
-    if (hex.mapObj != Some(House)) {
-      mapObject foreach (_.scaledImage(factor).drawImage(gc, x, y))
+    if (!hex.mapObj.exists(_.isInstanceOf[House])) {
+      mapObject foreach (_.scaledImage(factor).drawCenteredImage(gc, x, y, side, side))
     }
+  }
+
+  def drawHouseIfNeeded(gc: GraphicsContext, xOffset: Int, yOffset: Int): Unit = {
+    if (hex.mapObj.exists(_.isInstanceOf[House])) {
+      val x = this.x + xOffset
+      val y = this.y + yOffset
+      mapObject foreach (_.scaledImage(factor).drawCenteredImage(gc, x, y, side, side))
+    }
+  }
+
+  def drawForestIfNeeded(gc: GraphicsContext, xOffset: Int, yOffset: Int): Unit = {
+    val x = this.x + xOffset
+    val y = this.y + yOffset
+    secondaryImage.foreach(_.scaledImage(factor).drawCenteredImage(gc, x, y, side, side))
   }
 
   def darkeningShouldBeRedrawn: Boolean = isDarkened != currentDarkened
@@ -217,8 +243,6 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
     stage match {
       case TerrainImageStage =>
         drawTerrainImage(gc, xOffset, yOffset)
-      case CastleStage =>
-        drawCastleAndWalls(gc, xOffset, yOffset)
       case MovementImpossibleStage =>
         drawMovementImpossibleIfNeeded(gc, xOffset, yOffset)
       case ArrowStage =>
@@ -234,17 +258,39 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
         drawClearStage(gc, xOffset, yOffset)
       case ProvinceBordersStage =>
         drawProvinceBorder(gc, xOffset, yOffset)
+      case BuildingsForestStage =>
+        drawCastleAndWalls(gc, xOffset, yOffset)
+        drawHouseIfNeeded(gc, xOffset, yOffset)
+        drawForestIfNeeded(gc, xOffset, yOffset)
     }
   }
 
-  private def drawProvinceBorder(gc: GraphicsContext, xOffset: Int, yOffset: Int): Unit = {
-    hex.province.foreach { province =>
-      val anotherProvince = field.neighboursWithDirections(hex).
-        filter(_._2.province.exists(_ != province)).filter(_._2.terrain != Water)
-      val (sameOwner, differentOwner) = anotherProvince.partition(_._2.province.get.owner == province.owner)
 
-      def drawLine(map: Map[Direction, TerrainHex], color:Color, lineWidth: Int): Unit = {
-        map.foreach{ case (direction, _) =>
+  private val anotherProvince = hex.province.map { province =>
+    val neigsWithDirs = field.neighboursWithDirections(hex)
+    neigsWithDirs.filter{ case (dir, n) =>
+      n.province.exists(_ != province) && n.terrain != Water
+    }
+  }.getOrElse(Map())
+
+  private def calculateSameOwnerBorders():List[Direction] = {
+    anotherProvince.filter { case (_ , h) =>
+      h.province.get.owner == hex.province.get.owner
+    }.keys.toList
+  }
+
+  private def calculateDifferentOwnerBorders():List[Direction] = {
+    anotherProvince.filter { case (_, h) =>
+      h.province.get.owner != hex.province.get.owner
+    }.keys.toList
+  }
+
+  private var sameOwnerBorders = calculateSameOwnerBorders()
+  private var differentOwnerBorders = calculateDifferentOwnerBorders()
+
+  private def drawProvinceBorder(gc: GraphicsContext, xOffset: Int, yOffset: Int): Unit = {
+      def drawLine(map: List[Direction], color:Color, lineWidth: Int): Unit = {
+        map.foreach{ direction =>
           val line = TerrainHexView.pointsWithDirections(side, lineWidth / 2)(direction)
           gc.save()
           gc.stroke = color
@@ -254,13 +300,14 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
         }
       }
 
+    hex.province.foreach {province =>
       if (hex.terrain != Water) {
         if (provinceSelected) {
-          drawLine(sameOwner, Color.Black, 4)
-          drawLine(differentOwner, province.owner.color, 8)
+          drawLine(sameOwnerBorders, Color.Black, 4)
+          drawLine(differentOwnerBorders, province.owner.color, 8)
         } else {
-          drawLine(sameOwner, Color.Black, 1)
-          drawLine(differentOwner, province.owner.color, 4)
+          drawLine(sameOwnerBorders, Color.Black, 1)
+          drawLine(differentOwnerBorders, province.owner.color, 4)
         }
       }
     }
@@ -314,6 +361,6 @@ case object MovementImpossibleStage extends HexDrawingStage
 case object ArrowStage extends HexDrawingStage
 case object DefenceStage extends HexDrawingStage
 case object HexGridStage extends HexDrawingStage
-case object CastleStage extends HexDrawingStage
+case object BuildingsForestStage extends HexDrawingStage
 case object EndInterfaceDrawing extends HexDrawingStage
 case object ProvinceBordersStage extends HexDrawingStage

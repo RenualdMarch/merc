@@ -6,54 +6,64 @@ import scalafx.scene.paint.Color
 import mr.merc.map.hex.TerrainHex
 import mr.merc.map.terrain._
 import javafx.beans.property.SimpleDoubleProperty
+
 import scala.beans.BeanProperty
-import scalafx.scene.layout.VBox
+import scalafx.scene.layout.{Pane, VBox}
 import scalafx.scene.control.ScrollPane
 import mr.merc.map.view.MapView
 import scalafx.beans.binding.Bindings._
-import javafx.scene.{ input => jfxin }
+import javafx.scene.{input => jfxin}
+import mr.merc.image.ImageUtil
 import mr.merc.ui.common.ConversionUtils._
-import mr.merc.ui.common.ScrollPaneLike
+import mr.merc.ui.common.{ImageHelper, ScrollPaneLike}
+import scalafx.scene.image.Image
+import scalafx.Includes._
 
-class Minimap(field: TerrainHexField, pane: ScrollPaneLike, factor: Double) extends VBox {
-  private val canvas = new Canvas()
-  children = canvas
+class Minimap(field: TerrainHexField, pane: ScrollPaneLike, factor: Double) extends Pane {
+  private val mapCanvas = new Canvas()
+  private val scrollCanvas = new Canvas()
+  children = List(mapCanvas, scrollCanvas)
   private val mapView = new MapView(field, factor)
   private var updateOnPaneChange = true
 
   private def xOffset = (width.value - minimapSize.minimapUsefulWidth) / 2
+
   private def yOffset = (height.value - minimapSize.minimapUsefulHeight) / 2
 
   private def visiblePartWidth = Math.min(1, pane.width.value / mapView.pixelWidth)
+
   private def visiblePartHeight = Math.min(1, pane.height.value / mapView.pixelHeight)
+
   private def rectWidth = visiblePartWidth * minimapSize.minimapUsefulWidth
+
   private def rectHeight = visiblePartHeight * minimapSize.minimapUsefulHeight
+
   private def scrollableWidth = minimapSize.minimapUsefulWidth - rectWidth
+
   private def scrollableHeight = minimapSize.minimapUsefulHeight - rectHeight
 
   private var rectPosX = 0d
   private var rectPosY = 0d
 
-  canvas.width <== width
-  canvas.height <== height
-  canvas.width.onChange(redraw())
-  canvas.height.onChange(redraw())
+  mapCanvas.width <== this.width
+  mapCanvas.height <== this.height
+  mapCanvas.layoutX = 0
+  mapCanvas.layoutY = 0
+  scrollCanvas.width <== this.width
+  scrollCanvas.height <== this.height
+  scrollCanvas.layoutX = 0
+  scrollCanvas.layoutY = 0
 
-  def minimapSize = MinimapSize(field.width, field.height, width.value.toInt, height.value.toInt)
+  this.width.onChange(refreshMapCanvas())
+  this.height.onChange(refreshMapCanvas())
 
-  def redraw() {
-    val w = width.value
-    val h = height.value
-    if (w == 0 || h == 0) {
+  def minimapSize = MinimapSize(field.width, field.height, width.intValue, height.intValue)
 
-      return ;
-    }
-
-    val gc = canvas.graphicsContext2D
+  private def refreshMapCanvas() {
+    val gc = mapCanvas.graphicsContext2D
     gc.save()
     gc.fill = Color.Black
-    gc.fillRect(0, 0, w, h)
-
+    gc.fillRect(0, 0, width.value, height.value)
     val side = minimapSize.cellSide
     field.hexes.foreach { hex =>
       val x = hex.x * side + xOffset
@@ -61,8 +71,26 @@ class Minimap(field: TerrainHexField, pane: ScrollPaneLike, factor: Double) exte
       val y = hex.y * side + offset.ceil + yOffset
       gc.fill = color(hex)
       gc.fillRect(x, y, side, side)
+      hex.province.foreach { p =>
+        if (hex.terrain != Water) {
+          gc.fill = p.owner.color.opacity(0.7f)
+          gc.fillRect(x, y, side, side)
+        }
+      }
+    }
+    gc.restore()
+  }
+
+  def redraw() {
+    val w = width.value
+    val h = height.value
+    if (w == 0 || h == 0) {
+      return
     }
 
+    val gc = scrollCanvas.graphicsContext2D
+    gc.save()
+    gc.clearRect(0, 0, w, h)
     gc.stroke = Color.Gray
     gc.strokeRect(xOffset, yOffset, minimapSize.minimapUsefulWidth, minimapSize.minimapUsefulHeight)
 
@@ -74,12 +102,12 @@ class Minimap(field: TerrainHexField, pane: ScrollPaneLike, factor: Double) exte
     gc.restore()
   }
 
-  canvas.delegate.addEventHandler(jfxin.MouseEvent.MOUSE_CLICKED, canvasMouseClicked _)
-  canvas.delegate.addEventHandler(jfxin.MouseEvent.MOUSE_DRAGGED, canvasMouseClicked _)
+  scrollCanvas.delegate.addEventHandler(jfxin.MouseEvent.MOUSE_CLICKED, canvasMouseClicked _)
+  scrollCanvas.delegate.addEventHandler(jfxin.MouseEvent.MOUSE_DRAGGED, canvasMouseClicked _)
 
   private def canvasMouseClicked(event: jfxin.MouseEvent) {
-    val x = event.getX().toInt
-    val y = event.getY().toInt
+    val x = event.getX.toInt
+    val y = event.getY.toInt
     clickOnMinimap(x, y)
     redraw()
   }
@@ -96,8 +124,8 @@ class Minimap(field: TerrainHexField, pane: ScrollPaneLike, factor: Double) exte
       rectPosX = minimapSize.minimapUsefulWidth - rectWidth
     }
 
-    if (rectPosY + rectHeight.intValue > minimapSize.minimapUsefulHeight) {
-      rectPosY = minimapSize.minimapUsefulHeight - rectHeight.intValue
+    if (rectPosY + rectHeight > minimapSize.minimapUsefulHeight) {
+      rectPosY = minimapSize.minimapUsefulHeight - rectHeight
     }
 
     if (rectPosX < 0) {
@@ -174,7 +202,7 @@ class Minimap(field: TerrainHexField, pane: ScrollPaneLike, factor: Double) exte
     }
   }
 
-  private def smallerNeighbourFromCurrentOwner(hex:TerrainHex): Boolean = {
+  private def smallerNeighbourFromCurrentOwner(hex: TerrainHex): Boolean = {
     field.neighbours(hex).exists { n =>
       val opt = for {
         thisProvince <- hex.province
@@ -187,20 +215,25 @@ class Minimap(field: TerrainHexField, pane: ScrollPaneLike, factor: Double) exte
   }
 
   private def color(hex: TerrainHex): Color = {
-    if (neighbourFromOtherOwner(hex) && hex.terrain != Water) {
+    /*if (neighbourFromOtherOwner(hex) && hex.terrain != Water) {
       hex.province.get.owner.color
-    //} else if (smallerNeighbourFromCurrentOwner(hex) && hex.terrain != Water) {
-    //  Color.Black
-    } else if (hex.soldier.nonEmpty) {
+      //} else if (smallerNeighbourFromCurrentOwner(hex) && hex.terrain != Water) {
+      //  Color.Black
+    } else */if (hex.soldier.nonEmpty) {
       hex.soldier.get.owner.color
     } else {
-      if(hex.terrain == Grass) Color.Green
-      else if (hex.terrain == Water) Color.Blue
-      else if (hex.terrain == Hill) Color.Gray
-      else if (hex.terrain == Mountain) Color.Black
-      else if (hex.terrain == Sand) Color.Yellow
-      else if (hex.terrain == Forest) Color.DarkGreen
-      else Color.Black
+      hex.terrain match {
+        case Grass => Color.Green
+        case Water => Color.Blue
+        case Hill => Color.Gray
+        case Dirt => Color.Brown
+        case Mountain => Color.Black
+        case Sand => Color.Yellow
+        case Swamp => Color.Brown
+        case Forest => Color.DarkGreen
+        case Road => Color.LightGray
+        case _ => Color.Black
+      }
     }
   }
 }

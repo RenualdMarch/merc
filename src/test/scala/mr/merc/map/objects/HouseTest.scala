@@ -8,20 +8,20 @@ import mr.merc.map.terrain.Grass
 class HouseTest extends FunSuite {
   val field = new TerrainHexField(5, 5, (x:Int, y:Int) => {
     if (x == 1 && y == 1) {
-      new TerrainHex(x, y, Grass, Some(House))
+      new TerrainHex(x, y, Grass, Some(HumanCityHouse))
     } else {
       new TerrainHex(x, y, Grass)
     }
   })
   
   test("positive case"){
-     val images = House.images(field.hex(1, 1), field)
+     val images = HumanCityHouse.images(field.hex(1, 1), field)
      assert(images.size === 1)
-     assert(images.head.imagePath.get.contains("house.png"))
+     assert(images.head.imagePath.get.contains(".png"))
   }
- 
+
   test("negative case") {
-     val images = House.images(field.hex(1, 2), field)
+     val images = HumanCityHouse.images(field.hex(1, 2), field)
      assert(images.size === 0)
   }
 }

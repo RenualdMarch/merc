@@ -15,7 +15,7 @@ class TestGrid[T <: Hex](field: HexField[T]) extends UniversalGrid[T] {
 
   override def price(from: T, to: T): Double = 1
 
-  override def neighbours(t: T): Set[T] = field.neighbours(t)
+  override def neighbours(t: T): List[T] = field.neighbours(t)
 
   def hex(x: Int, y: Int):T = field.hex(x, y)
 }

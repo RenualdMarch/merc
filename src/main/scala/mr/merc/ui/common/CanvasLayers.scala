@@ -1,36 +1,22 @@
 package mr.merc.ui.common
 
-import scalafx.beans.binding.NumberBinding
+import mr.merc.util.MercUtils
+import scalafx.beans.property.DoubleProperty
 import scalafx.scene.layout.Pane
 import scalafx.scene.canvas.GraphicsContext
 import scalafx.scene.canvas.Canvas
-import scalafx.scene.paint.Color
-import scalafx.scene.control.ScrollBar
-import scalafx.geometry.Orientation
 import scalafx.geometry.Rectangle2D
 
 // TODO handle case when CanvasLayer is resized - image shouldn't change position
-class CanvasLayers(layers: List[CanvasLayer], fullMapSize: Rectangle2D, scrolls: Boolean) extends Pane with ScrollPaneLike {
+class CanvasLayers(layers: List[CanvasLayer], fullMapSize: Rectangle2D) extends Pane with ScrollPaneLike {
   style = "-fx-background-color: black"
   val canvasList = layers map (l => (l, new Canvas()))
 
-  private val horBar = new ScrollBar
-  private val verBar = new ScrollBar
-
-  horBar.orientation.value = Orientation.Horizontal
-  horBar.max = 1
-  horBar.min = 0
-
-  verBar.orientation.value = Orientation.Vertical
-  verBar.max = 1
-  verBar.min = 0
-
-  if (scrolls) {
-    children.add(horBar)
-    children.add(verBar)
+  canvasList foreach { case (_, c) =>
+    c.width <== this.width
+    c.height <== this.height
+    children.add(c)
   }
-
-  canvasList foreach (c => children.add(c._2))
 
   private def redraw() {
     canvasList foreach {
@@ -43,14 +29,11 @@ class CanvasLayers(layers: List[CanvasLayer], fullMapSize: Rectangle2D, scrolls:
   }
 
   def viewRect: Rectangle2D = {
-    val hor = horBar.value.value
-    val ver = verBar.value.value
-
-    val horDiff = fullMapSize.width - canvasAreaWidth.value.doubleValue
-    val verDiff = fullMapSize.height - canvasAreaHeight.value.doubleValue
-    val x = hor * horDiff
-    val y = ver * verDiff
-    new Rectangle2D(x, y, canvasAreaWidth.value.doubleValue, canvasAreaHeight.value.doubleValue)
+    val horDiff = fullMapSize.width - this.width.value
+    val verDiff = fullMapSize.height - this.height.value
+    val x = hvalue.value * horDiff
+    val y = vvalue.value * verDiff
+    new Rectangle2D(x, y, this.width.value, this.height.value)
   }
 
   def updateCanvas() {
@@ -63,34 +46,15 @@ class CanvasLayers(layers: List[CanvasLayer], fullMapSize: Rectangle2D, scrolls:
     }
   }
 
-  if (scrolls) {
-    verBar.prefWidth.value = 25
-    horBar.prefHeight.value = 25
-  } else {
-    verBar.prefWidth.value = 0
-    horBar.prefHeight.value = 0
-  }
-  private val canvasAreaWidth = this.width - verBar.prefWidth
-  private val canvasAreaHeight = this.height - horBar.prefHeight
-  verBar.prefHeight <== canvasAreaHeight
-  horBar.prefWidth <== canvasAreaWidth
-  verBar.visibleAmount <== canvasAreaHeight / fullMapSize.height
-  horBar.visibleAmount <== canvasAreaWidth / fullMapSize.width
-  verBar.unitIncrement = 0.1
-  horBar.unitIncrement = 0.1
+  private val canvasAreaWidth = this.width
+  private val canvasAreaHeight = this.height
+
 
   def positionComponents() {
     canvasList.map(_._2).foreach { c =>
       c.layoutX = 0
       c.layoutY = 0
-      c.width = canvasAreaWidth.value.doubleValue
-      c.height = canvasAreaHeight.value.doubleValue
     }
-
-    verBar.layoutX = canvasAreaWidth.value.doubleValue + 1
-    verBar.layoutY = 0
-    horBar.layoutX = 0
-    horBar.layoutY = canvasAreaHeight.value.doubleValue + 1
   }
 
   this.width.onChange {
@@ -102,11 +66,11 @@ class CanvasLayers(layers: List[CanvasLayer], fullMapSize: Rectangle2D, scrolls:
     redraw()
   }
 
-  val vvalue = verBar.value
+  val vvalue = DoubleProperty(0)
   vvalue.onChange {
     redraw()
   }
-  val hvalue = horBar.value
+  val hvalue = DoubleProperty(0)
   hvalue.onChange {
     redraw()
   }

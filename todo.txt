@@ -16,11 +16,11 @@ For M5, World Map changes are priority
 
 +Add rivers
 +Add roads between cities with bridges across seas
-Make cities of different size instead of lone castles
++Make cities of different size instead of lone castles
++Performance optimization for huge maps
+Add different images for same terrain type
 Bug with lone sand
 Bug with bridges
-Performance optimization for huge maps
-Add different images for same terrain type 
 Add some beauty to map - e.g fields with grain and other cool things
 Complete world map UI without soldiers
 

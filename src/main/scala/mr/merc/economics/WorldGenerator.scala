@@ -153,7 +153,7 @@ class WorldGenerator(field:TerrainHexField) {
 
     divisions.map{case (state, capitals) =>
       state -> capitals.map {capital =>
-        val p = new Province(state, generateRegionMarket,generateRegionPops(state.primeCulture), provincesHexes(capital))
+        val p = Province(state, generateRegionMarket,generateRegionPops(state.primeCulture), provincesHexes(capital), capital)
         provincesHexes(capital).foreach(_.province = Some(p))
         p
       }

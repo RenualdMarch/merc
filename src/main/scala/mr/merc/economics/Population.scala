@@ -3,6 +3,7 @@ package mr.merc.economics
 import mr.merc.economics.Population._
 import mr.merc.economics.Products._
 import mr.merc.economics.MapUtil.MapWithOperations
+import mr.merc.map.objects.{House, HumanCityHouse, HumanVillageHouse}
 
 import scala.util.Random
 
@@ -338,17 +339,17 @@ object Population extends EconomicConfig {
   def races = List(Humans) //, Elves, Dwarfs, Orcs, Saurians, Drakes, Undead, Demons)
 
   // removed sealed for test purposes only
-  abstract class Culture(val stateNameKey:String, val race:Race) {
+  abstract class Culture(val stateNameKey:String, val race:Race, val houseStyle: House) {
     def needs: PopulationNeeds = defaultHumanNeeds(this)
   }
 
-  case object LatinHuman extends Culture("state.empire", Humans)
-  case object WesternHuman extends Culture("state.kingdom", Humans)
+  case object LatinHuman extends Culture("state.empire", Humans, HumanCityHouse)
+  case object WesternHuman extends Culture("state.kingdom", Humans, HumanVillageHouse)
 
   //
   // DISABLED CULTURES
   //
-  case object HighElf extends Culture("state.federation", Elves)
+  /*case object HighElf extends Culture("state.federation", Elves)
   case object DarkElf extends Culture("state.confederation", Elves)
   case object BarbarianOrc extends Culture("state.horde", Orcs)
   case object RockDwarf extends Culture("state.clan", Dwarfs)
@@ -356,7 +357,7 @@ object Population extends EconomicConfig {
   case object OldDrakes extends Culture("state.dominion", Drakes)
   case object Forsaken extends Culture("state.collective", Undead)
   case object RedDemons extends Culture("state.legion", Demons)
-
+*/
   // good words: alliance, protectorate, tribe, army
 
   def cultures = List(LatinHuman, WesternHuman) //, HighElf, DarkElf, BarbarianOrc, RockDwarf, GreenSaurian, OldDrakes, Forsaken, RedDemons)

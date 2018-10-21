@@ -1,5 +1,6 @@
 package mr.merc.ui.common
 
+import mr.merc.image.ImageUtil
 import scalafx.scene.canvas.GraphicsContext
 import scalafx.scene.canvas.Canvas
 import scalafx.scene.image.WritableImage
@@ -9,6 +10,8 @@ import scalafx.scene.paint.Color
 
 object ImageHelper {
   def drawImage(width: Int, height: Int, params: SnapshotParameters = snapshotColor(Color(0, 0, 0, 0)))(f: GraphicsContext => Unit): Image = {
+    if (width == 0 || height == 0) return ImageUtil.emptyImage
+
     val canvas = new Canvas
     canvas.width = width
     canvas.height = height
