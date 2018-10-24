@@ -5,7 +5,6 @@ import mr.merc.battle.event._
 import mr.merc.unit.Soldier
 import mr.merc.map.hex.TerrainHex
 import mr.merc.map.pathfind.PathFinder
-import mr.merc.map.terrain.TerrainType
 import mr.merc.unit.Attack
 import mr.merc.map.pathfind.PossibleMovesFinder
 import mr.merc.unit.BeforeTurnAction
@@ -13,15 +12,8 @@ import mr.merc.unit.SoldierTurnState
 import mr.merc.unit.NotHisTurn
 import mr.merc.unit.HaveAttacked
 import mr.merc.unit.CanntMoveAnyMore
-import mr.merc.unit.HaventMoved
 import mr.merc.unit.StillCanMove
 import mr.merc.unit.HaventMoved
-import mr.merc.map.objects.House
-import mr.merc.map.terrain.Village
-import mr.merc.map.objects.WoodenBridge
-import mr.merc.map.terrain.Grass
-import mr.merc.map.terrain.Road
-import mr.merc.unit.SoldierDefence
 import mr.merc.log.Logging
 import mr.merc.players.Player
 

@@ -5,27 +5,24 @@ import org.scalatest.BeforeAndAfter
 import mr.merc.map.GameField
 import mr.merc.map.hex.TerrainHexField
 import mr.merc.map.hex.TerrainHex
-import mr.merc.map.terrain.Grass
 import mr.merc.players.Player
-import mr.merc.unit.SoldierType
-import mr.merc.unit.Attack
-import mr.merc.unit.Impact
-import mr.merc.unit.Soldier
+import mr.merc.unit._
 import mr.merc.map.hex.view.TerrainHexFieldView
+import mr.merc.map.terrain.{GrassKind, GreenGrass}
 import scalafx.beans.property.BooleanProperty
 import scalafx.geometry.Rectangle2D
 import mr.merc.map.view.SoldiersDrawer
 
 class BattleControllerTest extends FunSuite with BeforeAndAfter {
   var controller: BattleController = _
-  val fieldView = new TerrainHexFieldView(new TerrainHexField(10, 10, (x, y) => new TerrainHex(x, y, Grass)), new SoldiersDrawer(), 1.0)
+  val fieldView = new TerrainHexFieldView(new TerrainHexField(10, 10, (x, y) => new TerrainHex(x, y, GreenGrass)), new SoldiersDrawer(), 1.0)
   val viewRect = new Rectangle2D(0, 0, 100, 100)
 
   before {
-    val hexField = new TerrainHexField(10, 10, (x, y) => new TerrainHex(x, y, Grass))
+    val hexField = new TerrainHexField(10, 10, (x, y) => new TerrainHex(x, y, GreenGrass))
     val simpleSoldierType = new SoldierType("testType1", 1, 20, 6, 5, 1,
-      List(Attack(1, 10, 1, Impact, false)), Map(Grass -> 2),
-      Map(Grass -> 60), Map(Impact -> 0))
+      List(Attack(1, 10, 1, Impact, false)), Map(GrassKind -> 2),
+      Map(GrassDefence -> 60), Map(Impact -> 0))
     val soldier1 = new Soldier("1", simpleSoldierType, Player("1"))
     val soldier2 = new Soldier("2", simpleSoldierType, Player("1"))
     val soldier3 = new Soldier("3", simpleSoldierType, Player("2"))

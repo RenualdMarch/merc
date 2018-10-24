@@ -2,7 +2,7 @@ package mr.merc.ai
 
 import org.scalatest.FunSuite
 import mr.merc.map.hex.TerrainHex
-import mr.merc.map.terrain.Sand
+import mr.merc.map.terrain.DesertSand
 import mr.merc.unit.Soldier
 import mr.merc.players.Player
 import org.scalatest._
@@ -14,8 +14,8 @@ class AttackResultPredictorTest extends FunSuite with Matchers {
 
   import mr.merc.unit.Util._
 
-  val attackerHex = new TerrainHex(0, 0, Sand)
-  val defenderHex = new TerrainHex(0, 1, Sand)
+  val attackerHex = new TerrainHex(0, 0, DesertSand)
+  val defenderHex = new TerrainHex(0, 1, DesertSand)
 
   test("simple prediction") {
     val attacker = new Soldier("1", soldierType(10, 60, 10, 1), Player("1"))

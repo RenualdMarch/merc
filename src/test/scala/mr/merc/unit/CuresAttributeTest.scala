@@ -3,7 +3,7 @@ package mr.merc.unit
 import org.scalatest.FunSuite
 import org.scalatest.BeforeAndAfter
 import mr.merc.map.hex.TerrainHexField
-import mr.merc.map.terrain.Sand
+import mr.merc.map.terrain.{DesertSand, SandKind}
 import mr.merc.battle.BattleModel
 import mr.merc.map.hex.TerrainHex
 import mr.merc.map.GameField
@@ -12,11 +12,11 @@ import mr.merc.players.Player
 class CuresAttributeTest extends FunSuite with BeforeAndAfter {
   var field: TerrainHexField = _
   def simpleSoldierType(attributes: Set[SoldierTypeAttribute] = Set()) = new SoldierType("1", 1, 20, 10, 5, 1,
-    List(Attack(0, 10, 1, Impact, false), Attack(1, 6, 2, Impact, false)), Map(Sand -> 2),
-    Map(Sand -> 60), Map(Impact -> 0), attributes)
+    List(Attack(0, 10, 1, Impact, false), Attack(1, 6, 2, Impact, false)), Map(SandKind -> 2),
+    Map(SandDefence -> 60), Map(Impact -> 0), attributes)
 
   before {
-    field = new TerrainHexField(10, 10, (x, y) => new TerrainHex(x, y, Sand))
+    field = new TerrainHexField(10, 10, (x, y) => new TerrainHex(x, y, DesertSand))
   }
 
   test("cures poisoned neighbours before turn") {

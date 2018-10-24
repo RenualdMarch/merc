@@ -1,21 +1,15 @@
 package mr.merc.unit
 
 import org.scalatest.FunSuite
-import mr.merc.map.terrain.Sand
-import mr.merc.map.hex.TerrainHex
-import mr.merc.players.Player
-import org.scalatest.BeforeAndAfter
-import org.scalatest.FunSuite
-import org.scalatest.FunSuite
 
 object Util extends FunSuite {
   def soldierType(hp: Int, defence: Int, attackDamage: Int, attackCount: Int, attributes: Set[AttackAttribute] = Set(), resistance: Int = 0) =
     new SoldierType("type0", 1, hp, 1, 10, 1,
       List(new Attack(1, attackDamage, attackCount, Impact, false, attributes)),
-      Map(), Map(Sand -> defence), Map(Impact -> resistance))
+      Map(), Map(SandDefence -> defence), Map(Impact -> resistance))
   def soldierType(defence: Int, attacks: List[Attack]) =
     new SoldierType("type0", 1, 100, 1, 10, 1,
-      attacks, Map(), Map(Sand -> defence), Map(Impact -> 0))
+      attacks, Map(), Map(SandDefence -> defence), Map(Impact -> 0))
 
   def f(t: Int)(c: ChanceOfSuccess): Boolean = t <= c.chanceNumber
 

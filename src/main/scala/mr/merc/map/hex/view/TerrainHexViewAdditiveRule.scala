@@ -1,17 +1,18 @@
 package mr.merc.map.hex.view
 
 import mr.merc.map.terrain._
-import mr.merc.map.hex.Direction
-import mr.merc.log.Logging
+import mr.merc.map.hex._
+
+import scala.collection.BitSet
 
 object TerrainHexViewAdditiveRule {
   // first is drawn first
-  private val orderOfTypes = List(Hill, Mountain, Water, Forest, Swamp, Grass, Sand, Road, Dirt)
+  private def orderOfTypes = List[TerrainKind](HillKind, MountainKind, WaterKind, ForestKind, SwampKind, RoadKind, GrassKind, SandKind)
 }
 
 /**
- * Rule decides which elements should be drawn
- */
+  * Rule decides which elements should be drawn
+  */
 class TerrainHexViewAdditiveRule {
   def transform(add: Traversable[TerrainHexViewAdditive]): List[TerrainHexViewAdditiveElement] = {
     val filtered = filterNotNeededAdditives(add)
@@ -19,57 +20,64 @@ class TerrainHexViewAdditiveRule {
   }
 
   private[hex] def filterNotNeededAdditives(add: Traversable[TerrainHexViewAdditive]): List[TerrainHexViewAdditive] = {
-    add.filter(viewAdd => {
+    add.filter { viewAdd =>
       if (TerrainType.helperTypesList.contains(viewAdd.hexTerrainType) || TerrainType.helperTypesList.contains(viewAdd.neighbourTerrainType)) {
         true
       } else {
-        val strengthOfCurrent = TerrainHexViewAdditiveRule.orderOfTypes.indexOf(viewAdd.hexTerrainType)
-        val strengthOfNeighbour = TerrainHexViewAdditiveRule.orderOfTypes.indexOf(viewAdd.neighbourTerrainType)
-        strengthOfCurrent > strengthOfNeighbour
+        val strengthOfCurrent = TerrainHexViewAdditiveRule.orderOfTypes.indexOf(viewAdd.hexTerrainType.kind)
+        val strengthOfNeighbour = TerrainHexViewAdditiveRule.orderOfTypes.indexOf(viewAdd.neighbourTerrainType.kind)
+        if (strengthOfCurrent != strengthOfNeighbour) {
+          strengthOfCurrent > strengthOfNeighbour
+        } else {
+          // Some non-random ordering
+          viewAdd.hexTerrainType.getClass.getName > viewAdd.neighbourTerrainType.getClass.getName
+        }
       }
-    }).toList
+    }.toList
   }
 
-  // TODO make it optimal
   private[hex] def additivesToElements(add: TerrainHexViewAdditive): List[TerrainHexViewAdditiveElement] = {
-    val allElements = TerrainHexViewAdditiveElement.elementsByType(add.neighbourTerrainType).toList
+    val allElements = TerrainHexViewAdditiveElement.elements(add.neighbourTerrainType)
     val possibleElements = allElements.filter(e => additiveContainsElement(add, e))
-    additivesToElementsRec(add, Set(), possibleElements).toList
+    selectElements(add, possibleElements)
   }
 
-  private def additivesToElementsRec(add: TerrainHexViewAdditive, acc: Set[TerrainHexViewAdditiveElement], possible: List[TerrainHexViewAdditiveElement]): Set[TerrainHexViewAdditiveElement] = {
-    if (!acc.isEmpty && !areElementsOverlapping(acc) && sumOfElementsSlices(acc) == Set((add.from, add.to))) {
-      acc
-    } else if (!acc.isEmpty && sumOfElementsSlices(acc) != Set((add.from, add.to)) && possible.isEmpty) {
-      Set()
-    } else {
-      val possibleElements = possible.filter(p => !areElementsOverlapping(acc + p))
-      if (possibleElements.isEmpty) {
-        return Set()
+  private def selectElements(add: TerrainHexViewAdditive, possible: List[TerrainHexViewAdditiveElement]): List[TerrainHexViewAdditiveElement] = {
+    case class Answer(parent:Option[Answer], selected: TerrainHexViewAdditiveElement) {
+      val allElements:List[TerrainHexViewAdditiveElement] = {
+        parent match {
+          case None => selected :: Nil
+          case Some(p) => selected :: p.allElements
+        }
       }
-      val currentResult = additivesToElementsRec(add, acc + possibleElements.head, possibleElements.tail)
-      if (!currentResult.isEmpty) {
-        currentResult
-      } else {
-        additivesToElementsRec(add, acc, possible.tail)
+
+      val isValid:Boolean = {
+        val listOfRanges = allElements.map(el => DirectionsRange.apply(el.from, el.to))
+        val sumOfRangesSizes = listOfRanges.map(_.size).sum
+        val rangeOfSum = listOfRanges.reduce(_ + _)
+        sumOfRangesSizes == rangeOfSum.size && sumOfRangesSizes <= DirectionsRange(add.from, add.to).size
+      }
+
+      val isAnswer:Boolean = isValid && {
+        val sum = allElements.map(el => DirectionsRange.apply(el.from, el.to)).reduce(_ + _)
+        val target = DirectionsRange(add.from, add.to)
+        sum == target
+      }
+
+      def findSolutions():List[List[TerrainHexViewAdditiveElement]] = {
+        if (isAnswer) List(allElements)
+        else if (!isValid) Nil
+        else {
+          possible.flatMap(Answer(Some(this), _).findSolutions())
+        }
       }
     }
+
+    possible.flatMap(Answer(None, _).findSolutions()).sortBy(_.size).headOption.getOrElse(
+      sys.error(s"Couldn't select elements for additive $add with possibilities $possible"))
   }
 
   private def additiveContainsElement(add: TerrainHexViewAdditive, elem: TerrainHexViewAdditiveElement): Boolean = {
-    val addDirections = (add.from, add.to)
-    val elemDirection = (elem.from, elem.to)
-    Direction.leftSliceContainsRightSlice(addDirections, elemDirection)
-  }
-
-  private[hex] def areElementsOverlapping(elements: Traversable[TerrainHexViewAdditiveElement]): Boolean = {
-    elements.exists(el1 => {
-      elements.exists(el2 => el1 != el2 && Direction.overlapping((el1.from, el1.to), (el2.from, el2.to)))
-    })
-  }
-
-  private[hex] def sumOfElementsSlices(elements: Traversable[TerrainHexViewAdditiveElement]): Set[(Direction, Direction)] = {
-    val set = elements.map(el => (el.from, el.to)).toSet
-    Direction.unite(set)
+    DirectionsRange(add.from, add.to).contains(DirectionsRange(elem.from, elem.to))
   }
 }

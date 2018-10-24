@@ -2,7 +2,7 @@ package mr.merc.map.objects
 
 import org.scalatest.FunSuite
 import mr.merc.map.hex.TerrainHex
-import mr.merc.map.terrain.Grass
+import mr.merc.map.terrain.GreenGrass
 import mr.merc.map.hex.TerrainHexField
 import mr.merc.image.MImage
 
@@ -57,7 +57,7 @@ class MapObjectTest extends FunSuite {
   }
   
   class InitFunc(map:Map[(Int, Int), MapObject]) extends Function2[Int, Int, TerrainHex] {
-    def apply(x:Int, y:Int) = new TerrainHex(x, y, Grass, map.get(x, y))
+    def apply(x:Int, y:Int) = new TerrainHex(x, y, GreenGrass, map.get(x, y))
   }
   
   private def image(x:Int, y:Int)(implicit field:TerrainHexField):List[MImage] = {

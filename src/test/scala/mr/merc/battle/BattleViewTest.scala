@@ -5,7 +5,6 @@ import mr.merc.map.hex.TerrainHexField
 import mr.merc.map.GameField
 import mr.merc.map.hex.TerrainHex
 import mr.merc.players.Player
-import mr.merc.map.terrain.Grass
 import org.scalatest.BeforeAndAfter
 import mr.merc.unit.SoldierType
 import mr.merc.unit.Soldier
@@ -22,14 +21,15 @@ import mr.merc.unit.AttackResult
 import mr.merc.battle.event.AttackBattleViewEvent
 import mr.merc.map.hex.SE
 import mr.merc.map.hex.NW
+import mr.merc.map.terrain.{GrassKind, GreenGrass}
 import mr.merc.view.Sprite
 import org.mockito.ArgumentMatchers._
 
 class BattleViewTest extends FunSuite with BeforeAndAfter with MockitoSugar {
-  val field = new TerrainHexField(10, 10, (x, y) => new TerrainHex(x, y, Grass))
+  val field = new TerrainHexField(10, 10, (x, y) => new TerrainHex(x, y, GreenGrass))
   val model = new BattleModel(new GameField(field, List(Player("1"), Player("2"))))
   val simpleSoldierType = new SoldierType("testType1", 1, 20, 10, 5, 1,
-    List(), Map(Grass -> 2), Map(), Map())
+    List(), Map(GrassKind -> 2), Map(), Map())
   val rangedSoldierType = new SoldierType("testType1", 1, 20, 10, 5, 1,
     List(Attack(0, 1, 2, Impact, true)), Map(), Map(), Map())
   val closedSoldierType = new SoldierType("testType1", 1, 20, 10, 5, 1,

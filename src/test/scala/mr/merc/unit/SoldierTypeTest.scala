@@ -1,8 +1,7 @@
 package mr.merc.unit
 
 import org.scalatest.FunSuite
-import mr.merc.map.terrain.Sand
-import mr.merc.map.terrain.Grass
+import mr.merc.map.terrain.{GrassKind, SandKind}
 
 class SoldierTypeTest extends FunSuite {
   test("parsing") {
@@ -30,11 +29,11 @@ class SoldierTypeTest extends FunSuite {
     assert(attack1.damage === 2)
     assert(attack1.ranged === true)
     assert(attack1.index === 1)
-    assert(sType.moveCost(Sand) === 1)
-    assert(sType.moveCost(Grass) === 2)
+    assert(sType.moveCost(SandKind) === 1)
+    assert(sType.moveCost(GrassKind) === 2)
 
-    assert(sType.defence(Sand) === 50)
-    assert(sType.defence(Grass) === 30)
+    assert(sType.defence(SandDefence) === 50)
+    assert(sType.defence(GrassDefence) === 30)
 
     assert(sType.resistance(Impact) === 0)
     assert(sType.resistance(Pierce) === 20)

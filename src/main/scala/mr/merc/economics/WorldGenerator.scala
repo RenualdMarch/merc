@@ -4,9 +4,9 @@ import com.typesafe.config.ConfigFactory
 import mr.merc.economics.Population.{Culture, Lower, Middle, Upper}
 import mr.merc.economics.Products._
 import mr.merc.map.generator.WorldMapGenerator
-import mr.merc.map.hex.{Hex, InfiniteHexField, TerrainHex, TerrainHexField}
-import mr.merc.map.terrain.{Empty, Water}
-import mr.merc.players.{ColorGenerator, CyclicColorGeneratorWithNames}
+import mr.merc.map.hex.{TerrainHex, TerrainHexField}
+import mr.merc.map.terrain.WaterKind
+import mr.merc.players.CyclicColorGeneratorWithNames
 import mr.merc.politics.{Province, State}
 import mr.merc.util.WeightedRandom
 
@@ -260,7 +260,7 @@ object WorldGenerator {
 
   def buildConnectivityMap(field:TerrainHexField, map:Map[TerrainHex, Set[TerrainHex]]):Map[TerrainHex, Set[TerrainHex]] = {
     map.map { case (capital, provinceHexes) =>
-      val allNeigs = provinceHexes.filter(_.terrain != Water).flatMap(h => field.neighbours(h)) -- provinceHexes
+      val allNeigs = provinceHexes.filterNot(_.terrain.is(WaterKind)).flatMap(h => field.neighbours(h)) -- provinceHexes
       capital -> allNeigs.flatMap {n =>
         map.find(_._2.contains(n)).map(_._1)
       }

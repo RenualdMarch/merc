@@ -16,8 +16,8 @@ class AttackSelectionHelperTest extends FunSuite {
 
     val attacker = new Soldier("1", attackerType, Player("1"))
     val defender = new Soldier("2", attackerType, Player("2"))
-    val attackerHex = new TerrainHex(0, 0, Sand)
-    val defenderHex = new TerrainHex(0, 1, Sand)
+    val attackerHex = new TerrainHex(0, 0, DesertSand)
+    val defenderHex = new TerrainHex(0, 1, DesertSand)
 
     val attack = AttackSelectionHelper.selectBestAttack(attacker, defender, attackerHex, defenderHex)
     assert(attack === 0)
@@ -29,8 +29,8 @@ class AttackSelectionHelperTest extends FunSuite {
 
     val attacker = new Soldier("1", attackerType, Player("1"))
     val defender = new Soldier("2", attackerType, Player("2"))
-    val attackerHex = new TerrainHex(0, 0, Sand)
-    val defenderHex = new TerrainHex(0, 1, Sand)
+    val attackerHex = new TerrainHex(0, 0, DesertSand)
+    val defenderHex = new TerrainHex(0, 1, DesertSand)
 
     val attack = AttackSelectionHelper.selectBestAttack(attacker, defender, attackerHex, defenderHex)
     assert(attack === 1)
@@ -43,8 +43,8 @@ class AttackSelectionHelperTest extends FunSuite {
 
     val attacker = new Soldier("1", attackerType, Player("1"))
     val defender = new Soldier("2", attackerType, Player("2"))
-    val attackerHex = new TerrainHex(0, 0, Sand)
-    val defenderHex = new TerrainHex(0, 1, Sand)
+    val attackerHex = new TerrainHex(0, 0, DesertSand)
+    val defenderHex = new TerrainHex(0, 1, DesertSand)
 
     val attack = AttackSelectionHelper.selectBestAttack(attacker, defender, attackerHex, defenderHex)
     assert(attack === 0)
@@ -56,8 +56,8 @@ class AttackSelectionHelperTest extends FunSuite {
     val defenderType = soldierType(80, List(new Attack(1, 10, 2, Impact, false)))
     val attacker = new Soldier("1", attackerType, Player("1"))
     val defender = new Soldier("2", defenderType, Player("2"))
-    val attackerHex = new TerrainHex(0, 0, Sand)
-    val defenderHex = new TerrainHex(0, 1, Sand)
+    val attackerHex = new TerrainHex(0, 0, DesertSand)
+    val defenderHex = new TerrainHex(0, 1, DesertSand)
 
     val attack = AttackSelectionHelper.selectBestAttack(attacker, defender, attackerHex, defenderHex)
     assert(attack === 1)
@@ -69,8 +69,8 @@ class AttackSelectionHelperTest extends FunSuite {
     val defenderType = soldierType(80, List(new Attack(1, 10, 2, Impact, false)))
     val attacker = new Soldier("1", attackerType, Player("1"))
     val defender = new Soldier("2", defenderType, Player("2"))
-    val attackerHex = new TerrainHex(0, 0, Sand)
-    val defenderHex = new TerrainHex(0, 1, Sand)
+    val attackerHex = new TerrainHex(0, 0, DesertSand)
+    val defenderHex = new TerrainHex(0, 1, DesertSand)
     defender.hp = 10
 
     val attack = AttackSelectionHelper.selectBestAttack(attacker, defender, attackerHex, defenderHex)

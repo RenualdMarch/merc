@@ -1,9 +1,9 @@
 package mr.merc.map.hex.view
 
 import mr.merc.map.hex.TerrainHex
-import mr.merc.map.terrain.{Grass, TerrainType}
+import mr.merc.map.terrain.{GreenGrass, TerrainType}
 
-class TypeDeterminator(map: Map[(Int, Int), TerrainType], default: TerrainType = Grass)
+class TypeDeterminator(map: Map[(Int, Int), TerrainType], default: TerrainType = GreenGrass)
   extends Function2[Int, Int, TerrainHex] {
 
   def apply(x: Int, y: Int): TerrainHex = {

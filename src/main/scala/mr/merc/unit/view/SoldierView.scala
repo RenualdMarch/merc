@@ -19,7 +19,7 @@ object SoldierView {
   private[view] val attackDistancePercentage = 0.6
 
   private[view] def coordsCorrection(dir: Direction, factor: Double): (Int, Int) = {
-    val hexField = new TerrainHexField(4, 4, (x, y) => new TerrainHex(x, y, Grass))
+    val hexField = new TerrainHexField(4, 4, (x, y) => new TerrainHex(x, y, GreenGrass))
     val hexFieldView = new TerrainHexFieldView(hexField, new SoldiersDrawer, factor)
     val center = hexField.hex(1, 1)
     val centerView = new TerrainHexView(center, hexField, hexFieldView, factor)

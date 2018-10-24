@@ -24,18 +24,18 @@ object WorldMapGenerator {
 
     def biome(x: Int, y: Int): TerrainType = {
       biomeNoise(x, width, y, height) match {
-        //case n if n < biomeNoise.percentageBelow(0.1) => Sand
-        case n if n < biomeNoise.percentageBelow(0.6) => Grass
-        case n if n < biomeNoise.percentageBelow(0.85) => Forest
-        case n if n < biomeNoise.percentageBelow(0.98) => Hill
-        case _ => Mountain
+        //case n if n < biomeNoise.percentageBelow(0.2) => DesertSand
+        case n if n < biomeNoise.percentageBelow(0.6) => GreenGrass
+        case n if n < biomeNoise.percentageBelow(0.85) => DecForest
+        case n if n < biomeNoise.percentageBelow(0.98) => BasicHill
+        case _ => BasicMountain
       }
     }
 
     def f(x: Int, y: Int): TerrainHex = {
       val n = terrainNoise(x, width, y, height)
       if (n > terrainNoise.percentageBelow(1 - landPercentage)) new TerrainHex(x, y, biome(x, y))
-      else new TerrainHex(x, y, Water)
+      else new TerrainHex(x, y, ShallowWater)
     }
 
     val terrainField = new TerrainHexField(width, height, f)
@@ -58,7 +58,7 @@ object WorldMapGenerator {
   }
 
   def divideIntoProvinces(field: HexField[TerrainHex], provinces: Int): Map[TerrainHex, Set[TerrainHex]] = {
-    val totalHexes = field.hexes.filter(_.terrain != Water)
+    val totalHexes = field.hexes.filterNot(_.terrain.is(WaterKind))
     val firstCapitals = Random.shuffle(totalHexes).take(provinces)
     val division = 0.until(10).foldLeft(MapDivision(firstCapitals.toSet, totalHexes.toSet)) { case (div, _) =>
       val newCapitals = div.lloydRelaxationCapitals
@@ -77,7 +77,7 @@ object WorldMapGenerator {
       val y = Random.nextInt(field.height - 1)
       val from = field.hex(x, y)
 
-      field.findClosest(from, _.terrain == Water).flatMap { target =>
+      field.findClosest(from, _.terrain.is(WaterKind)).flatMap { target =>
         field.findPath(from, target, h => h.terrain == Castle ||
           field.neighbours(h).exists(_.terrain == Castle))
       }
@@ -104,7 +104,7 @@ object WorldMapGenerator {
       val head = river.head
       val last = river.last
       PathFinder.findPath(pathGrid, head, last).toList.flatten.foreach { h =>
-        h.terrain = Water
+        h.terrain = ShallowWater
       }
     }
   }
@@ -122,9 +122,9 @@ object WorldMapGenerator {
         override def isBlocked(t: TerrainHex): Boolean = !provincesMap(from).contains(t) && !provincesMap(to).contains(t)
 
         override def price(from: TerrainHex, to: TerrainHex): Double =
-          if (to.terrain == Road) 0.5
+          if (to.terrain.is(RoadKind)) 0.5
           else if (to.mapObj.contains(WoodenBridge)) 0.7
-          else if (to.terrain == Water) 3
+          else if (to.terrain.is(WaterKind)) 3
           else 1
 
         override def neighbours(t: TerrainHex): List[TerrainHex] = field.neighbours(t)
@@ -132,10 +132,10 @@ object WorldMapGenerator {
 
       PathFinder.findPath(grid, from, to).foreach { path =>
         path.foreach { h =>
-          if (h.terrain == Water) {
+          if (h.terrain.is(WaterKind)) {
             h.mapObj = Some(WoodenBridge)
           } else if (h.terrain != Castle) {
-            h.terrain = Road
+            h.terrain = GrassyRoad
           }
         }
       }
@@ -144,8 +144,8 @@ object WorldMapGenerator {
 
   def makeRoadAroundCapitals(field: TerrainHexField, capital:TerrainHex): Unit = {
     field.hexRing(capital, 1).foreach { h =>
-      if (h.terrain != Water) {
-        h.terrain = Road
+      if (h.terrain.isNot(WaterKind)) {
+        h.terrain = GrassyRoad
       }
     }
   }

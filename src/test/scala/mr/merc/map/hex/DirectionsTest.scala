@@ -1,45 +1,43 @@
 package mr.merc.map.hex
 
+import mr.merc.map.hex.view.DirectionsRange
 import org.scalatest.FunSuite
 
 class DirectionsTest extends FunSuite {
-	test("in the middle") {
-	  val set = S.neighbours
-	  assert(set === Set(SE, SW))
-	}
-	
-	test("beginning") {
-	  val set = N.neighbours
-	  assert(set === Set(NE, NW))
-	}
-	
-	test("end") {
-	  val set = NW.neighbours
-	  assert(set === Set(SW, N))
-	}
-		
-	test("comparing slices") {
-	  assert(Direction.leftSliceContainsRightSlice((NE, SW), (NE, S)))
-	  assert(!Direction.leftSliceContainsRightSlice((NE, S), (NE, SW)))
-	  assert(!Direction.leftSliceContainsRightSlice((NE, SW), (S, NW)))
-	  assert(Direction.leftSliceContainsRightSlice((NE, SW), (NE, SW)))
-	  assert(Direction.leftSliceContainsRightSlice((S, N), (SW, N)))
-	  assert(Direction.leftSliceContainsRightSlice((S, NE), (SW, N)))
-	  
-	  assert(Direction.leftSliceContainsRightSlice((NW, N), (NW, NW)))
-	  assert(Direction.leftSliceContainsRightSlice((NW, N), (N, N)))
-	  
-	}
-	
-	test("overlapping slices") {
-	  assert(Direction.overlapping((NE, SW), (NE, S)))
-	  assert(!Direction.overlapping((SW, NW), (NE, SE)))
-	  assert(Direction.overlapping((NW, SW), (NE, SE)))
-	  assert(Direction.overlapping((NE, SW), (NE, SW)))
-  	  assert(Direction.overlapping((S, NE), (NW, S)))
-  	  assert(Direction.overlapping((NW, N), (NW, NW)))
-	  assert(Direction.overlapping((NW, N), (N, N)))
+  test("in the middle") {
+    val set = S.neighbours
+    assert(set === Set(SE, SW))
+  }
 
-	  
-	}
+  test("beginning") {
+    val set = N.neighbours
+    assert(set === Set(NE, NW))
+  }
+
+  test("end") {
+    val set = NW.neighbours
+    assert(set === Set(SW, N))
+  }
+
+  test("comparing slices") {
+    assert(DirectionsRange(NE, SW).contains(DirectionsRange(NE, S)))
+    assert(!DirectionsRange(NE, S).contains(DirectionsRange(NE, SW)))
+    assert(!DirectionsRange(NE, SW).contains(DirectionsRange(S, NW)))
+    assert(DirectionsRange(NE, SW).contains(DirectionsRange(NE, SW)))
+    assert(DirectionsRange(S, N).contains(DirectionsRange(SW, N)))
+    assert(DirectionsRange(S, NE).contains(DirectionsRange(SW, N)))
+    assert(DirectionsRange(NW, N).contains(DirectionsRange(NW, NW)))
+    assert(DirectionsRange(NW, N).contains(DirectionsRange(N, N)))
+
+  }
+
+  test("overlapping slices") {
+    assert(DirectionsRange(NE, SW).intersects(DirectionsRange(NE, S)))
+    assert(!DirectionsRange(SW, NW).intersects(DirectionsRange(NE, SE)))
+    assert(DirectionsRange(NW, SW).intersects(DirectionsRange(NE, SE)))
+    assert(DirectionsRange(NE, SW).intersects(DirectionsRange(NE, SW)))
+    assert(DirectionsRange(S, NE).intersects(DirectionsRange(NW, S)))
+    assert(DirectionsRange(NW, N).intersects(DirectionsRange(NW, NW)))
+    assert(DirectionsRange(NW, N).intersects(DirectionsRange(N, N)))
+  }
 }

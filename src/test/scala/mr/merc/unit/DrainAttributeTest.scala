@@ -2,12 +2,12 @@ package mr.merc.unit
 
 import org.scalatest.FunSuite
 import mr.merc.players.Player
-import mr.merc.map.terrain.Sand
+import mr.merc.map.terrain.DesertSand
 import mr.merc.map.hex.TerrainHex
 class DrainAttributeTest extends FunSuite {
   import Util._
-  val attackerHex = new TerrainHex(0, 0, Sand)
-  val defenderHex = new TerrainHex(1, 0, Sand)
+  val attackerHex = new TerrainHex(0, 0, DesertSand)
+  val defenderHex = new TerrainHex(1, 0, DesertSand)
   test("unit which doesn't have drain ability has drain always 0") {
     val someType = soldierType(15, 50, 10, 2, Set(), 0)
     val attacker = new Soldier("1", someType, Player("1"))

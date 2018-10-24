@@ -8,10 +8,11 @@ import mr.merc.map.terrain._
 
 object Attack {
   private val maxChance = 100
+
   def resolveAttack(chance: ChanceOfSuccess) = chance.chanceNumber >= Random.nextInt(maxChance)
 
   def battle(attackerHex: TerrainHex, defenderHex: TerrainHex, attackerSelection: Attack, defenderSelection: Option[Attack],
-    f: ChanceOfSuccess => Boolean = resolveAttack): List[AttackResult] = {
+             f: ChanceOfSuccess => Boolean = resolveAttack): List[AttackResult] = {
     require(attackerHex.soldier.isDefined)
     require(defenderHex.soldier.isDefined)
 
@@ -19,7 +20,7 @@ object Attack {
     val defender = defenderHex.soldier.get
 
     val rounds = if (attackerSelection.attributes.contains(Berserk) ||
-      defenderSelection.map(_.attributes.contains(Berserk)).getOrElse(false)) {
+      defenderSelection.exists(_.attributes.contains(Berserk))) {
       30
     } else {
       1
@@ -34,7 +35,7 @@ object Attack {
         case None => Nil
       }
 
-      if (defenderSelection.map(_.attributes.contains(Firststrike)).getOrElse(false) && !attackerSelection.attributes.contains(Firststrike)) {
+      if (defenderSelection.exists(_.attributes.contains(Firststrike)) && !attackerSelection.attributes.contains(Firststrike)) {
         mergeAttacks(defenderStrikes, attackerStrikes)
       } else {
         mergeAttacks(attackerStrikes, defenderStrikes)
@@ -66,12 +67,19 @@ object Attack {
   }
 
   def calculateSoldierDefence(soldier: Soldier, hex: TerrainHex): SoldierDefence = {
-    if (hex.mapObj.exists(_.isInstanceOf[House]) || hex.terrain == Castle) {
-      SoldierDefence(soldier.soldierType.defence(Village))
-    } else if (hex.mapObj.contains(WoodenBridge) || hex.terrain == Road || hex.terrain == Dirt) {
-      SoldierDefence(soldier.soldierType.defence(Grass))
+    if (hex.mapObj.exists(_.isInstanceOf[House]) || hex.terrain.is(WallsKind)) {
+      SoldierDefence(soldier.soldierType.defence(BuildingDefence))
+    } else if (hex.mapObj.contains(WoodenBridge) || hex.terrain.isOneOf(RoadKind, GrassKind)) {
+      SoldierDefence(soldier.soldierType.defence(GrassDefence))
     } else {
-      SoldierDefence(soldier.soldierType.defence(hex.terrain))
+      val d = List[(TerrainKind, DefenceType)](MountainKind -> MountainDefence,
+        WaterKind -> WaterDefence,
+        SwampKind -> SwampDefence,
+        ForestKind -> ForestDefence,
+        HillKind -> HillDefence,
+        SandKind -> SandDefence).find(x => hex.terrain.is(x._1)).map(_._2).
+        getOrElse(sys.error(s"Failed to find defence for terrain type ${hex.terrain} for soldier type ${soldier.soldierType.name}"))
+      SoldierDefence(soldier.soldierType.defence(d))
     }
   }
 
@@ -175,7 +183,7 @@ object Attack {
 
     val damageWithResistances = attackersAttack.damage * (100 - resistance) / 100
     val damage = if (actualAttackerAttacks && attackersAttack.attributes.contains(Charge) ||
-      !actualAttackerAttacks && defendersAttack.map(_.attributes.contains(Charge)).getOrElse(false)) {
+      !actualAttackerAttacks && defendersAttack.exists(_.attributes.contains(Charge))) {
       damageWithResistances * 2
     } else {
       damageWithResistances
@@ -199,7 +207,7 @@ object Attack {
 }
 
 case class Attack(index: Int, damage: Int, count: Int, attackType: AttackType,
-  ranged: Boolean, attributes: Set[AttackAttribute] = Set()) {
+                  ranged: Boolean, attributes: Set[AttackAttribute] = Set()) {
 
   def chanceOfSuccess(enemysDefence: SoldierDefence): ChanceOfSuccess = if (attributes.contains(Magical)) {
     ChanceOfSuccess(70)
@@ -210,5 +218,6 @@ case class Attack(index: Int, damage: Int, count: Int, attackType: AttackType,
   }
 }
 
-case class ChanceOfSuccess(val chanceNumber: Int) extends AnyVal
-case class SoldierDefence(val defence: Int) extends AnyVal
+case class ChanceOfSuccess(chanceNumber: Int) extends AnyVal
+
+case class SoldierDefence(defence: Int) extends AnyVal

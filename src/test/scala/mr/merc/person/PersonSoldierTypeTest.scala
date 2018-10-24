@@ -1,6 +1,6 @@
 package mr.merc.person
 
-import mr.merc.map.terrain.{Mountain, Grass}
+import mr.merc.map.terrain.MountainKind
 import mr.merc.unit._
 import org.scalatest.FunSuite
 
@@ -25,13 +25,13 @@ class PersonSoldierTypeTest extends FunSuite {
     assert(inf.cost(20) === 20)
     assert(inf.cost(40) === 30)
 
-    assert(inf.defence(0)(Grass) === 30)
-    assert(inf.defence(20)(Grass) === 40)
-    assert(inf.defence(40)(Grass) === 50)
+    assert(inf.defence(0)(GrassDefence) === 30)
+    assert(inf.defence(20)(GrassDefence) === 40)
+    assert(inf.defence(40)(GrassDefence) === 50)
 
-    assert(inf.moveCost(0)(Mountain) === 4)
-    assert(inf.moveCost(20)(Mountain) === 3)
-    assert(inf.moveCost(40)(Mountain) === 2)
+    assert(inf.moveCost(0)(MountainKind) === 4)
+    assert(inf.moveCost(20)(MountainKind) === 3)
+    assert(inf.moveCost(40)(MountainKind) === 2)
 
     assert(inf.resistance(0)(Blade) === 30)
     assert(inf.resistance(20)(Blade) === 40)
@@ -56,13 +56,13 @@ class PersonSoldierTypeTest extends FunSuite {
     assert(inf.cost(30) === 25)
     assert(inf.cost(50) === 35)
 
-    assert(inf.defence(5)(Grass) === 30)
-    assert(inf.defence(25)(Grass) === 40)
-    assert(inf.defence(45)(Grass) === 50)
+    assert(inf.defence(5)(GrassDefence) === 30)
+    assert(inf.defence(25)(GrassDefence) === 40)
+    assert(inf.defence(45)(GrassDefence) === 50)
 
-    assert(inf.moveCost(5)(Mountain) === 4)
-    assert(inf.moveCost(25)(Mountain) === 3)
-    assert(inf.moveCost(45)(Mountain) === 2)
+    assert(inf.moveCost(5)(MountainKind) === 4)
+    assert(inf.moveCost(25)(MountainKind) === 3)
+    assert(inf.moveCost(45)(MountainKind) === 2)
 
     assert(inf.resistance(5)(Blade) === 30)
     assert(inf.resistance(25)(Blade) === 40)

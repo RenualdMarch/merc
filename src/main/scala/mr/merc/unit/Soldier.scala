@@ -95,12 +95,12 @@ class Soldier(val name: String, val soldierType: SoldierType, val owner: Player)
   }
 
   def movementCostFunction(hex: TerrainHex): Int = {
-    if (hex.mapObj.exists(_.isInstanceOf[House]) || hex.terrain == Castle) {
-      soldierType.moveCost(Village)
-    } else if (hex.mapObj.contains(WoodenBridge) || hex.terrain == Road || hex.terrain == Dirt) {
-      soldierType.moveCost(Grass)
+    if (hex.mapObj.exists(_.isInstanceOf[House]) || hex.terrain.is(WallsKind)) {
+      soldierType.moveCost(WallsKind)
+    } else if (hex.mapObj.contains(WoodenBridge) || hex.terrain.is(RoadKind)) {
+      soldierType.moveCost(GrassKind)
     } else {
-      soldierType.moveCost(hex.terrain)
+      soldierType.moveCost(hex.terrain.kind)
     }
   }
 }

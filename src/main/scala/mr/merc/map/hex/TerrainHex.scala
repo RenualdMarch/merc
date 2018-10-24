@@ -1,13 +1,12 @@
 package mr.merc.map.hex
 
-import mr.merc.map.terrain.TerrainType
-import mr.merc.map.terrain.Grass
+import mr.merc.map.terrain.{GreenGrass, TerrainType}
 import mr.merc.map.objects.MapObject
 import mr.merc.politics.Province
 import mr.merc.unit.Soldier
 
 object TerrainHex {
-  def grassInit(x: Int, y: Int) = new TerrainHex(x, y, Grass)
+  def grassInit(x: Int, y: Int) = new TerrainHex(x, y, GreenGrass)
 }
 
 // TODO extract soldier to TerrainHexWithSoldier

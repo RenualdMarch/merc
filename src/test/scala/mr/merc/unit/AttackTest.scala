@@ -12,16 +12,16 @@ class AttackTest extends FunSuite with BeforeAndAfter {
   val player2 = Player("2")
   val firstType = new SoldierType("type1", 1, 10, 1, 10, 1,
     List(new Attack(1, 3, 2, Impact, false), new Attack(2, 1, 2, Pierce, true)),
-    Map(), Map(Sand -> 50), Map(Impact -> 0, Pierce -> 0))
+    Map(), Map(SandDefence -> 50), Map(Impact -> 0, Pierce -> 0))
 
   val secondType = new SoldierType("type2", 1, 12, 1, 10, 1,
     List(new Attack(1, 2, 3, Impact, false)),
-    Map(), Map(Sand -> 30), Map(Impact -> 0, Pierce -> 0))
+    Map(), Map(SandDefence -> 30), Map(Impact -> 0, Pierce -> 0))
 
   var firstSoldier: Soldier = _
   var secondSoldier: Soldier = _
-  val attackerHex = new TerrainHex(0, 0, Sand)
-  val defenderHex = new TerrainHex(0, 1, Sand)
+  val attackerHex = new TerrainHex(0, 0, DesertSand)
+  val defenderHex = new TerrainHex(0, 1, DesertSand)
 
   def allMisses(x: ChanceOfSuccess) = false
   def firstHitsSecondMisses(x: ChanceOfSuccess) = if (x.chanceNumber == 70) true
@@ -144,11 +144,11 @@ class AttackTest extends FunSuite with BeforeAndAfter {
   }
 
   test("village defence is separate thing") {
-    val hex1 = new TerrainHex(0, 0, Sand)
-    val hex2 = new TerrainHex(0, 0, Sand, Some(HumanCityHouse))
+    val hex1 = new TerrainHex(0, 0, DesertSand)
+    val hex2 = new TerrainHex(0, 0, DesertSand, Some(HumanCityHouse))
 
     val someType = new SoldierType("type1", 1, 10, 1, 10, 1,
-      List(), Map(), Map(Sand -> 50, Village -> 60),
+      List(), Map(), Map(SandDefence -> 50, BuildingDefence -> 60),
       Map(Impact -> 0, Pierce -> 0))
 
     val soldier = new Soldier("1", someType, Player("1"))
@@ -157,11 +157,11 @@ class AttackTest extends FunSuite with BeforeAndAfter {
   }
 
   test("wooden bridge and road defence same as grass") {
-    val hex1 = new TerrainHex(0, 0, Road)
-    val hex2 = new TerrainHex(0, 0, Water, Some(WoodenBridge))
+    val hex1 = new TerrainHex(0, 0, OldRoad)
+    val hex2 = new TerrainHex(0, 0, ShallowWater, Some(WoodenBridge))
 
     val someType = new SoldierType("type1", 1, 10, 1, 10, 1,
-      List(), Map(), Map(Sand -> 50, Grass -> 60),
+      List(), Map(), Map(SandDefence -> 50, GrassDefence -> 60),
       Map(Impact -> 0, Pierce -> 0))
 
     val soldier = new Soldier("1", someType, Player("1"))

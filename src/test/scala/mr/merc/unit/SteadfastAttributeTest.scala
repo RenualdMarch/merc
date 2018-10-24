@@ -1,20 +1,19 @@
 package mr.merc.unit
 
 import org.scalatest.FunSuite
-
 import org.scalatest.FunSuite
 import org.scalatest.BeforeAndAfter
 import mr.merc.map.hex.TerrainHexField
-import mr.merc.map.terrain.Sand
 import mr.merc.battle.BattleModel
 import mr.merc.map.hex.TerrainHex
 import mr.merc.map.GameField
+import mr.merc.map.terrain.SandKind
 import mr.merc.players.Player
 
 class SteadfastAttributeTest extends FunSuite {
   def simpleSoldierType(attributes: Set[SoldierTypeAttribute] = Set(), resistance: Int) = new SoldierType("1", 1, 20, 10, 5, 1,
-    List(Attack(1, 10, 1, Impact, false), Attack(2, 6, 2, Impact, false)), Map(Sand -> 2),
-    Map(Sand -> 60), Map(Impact -> resistance), attributes)
+    List(Attack(1, 10, 1, Impact, false), Attack(2, 6, 2, Impact, false)), Map(SandKind -> 2),
+    Map(SandDefence -> 60), Map(Impact -> resistance), attributes)
 
   val steadfast = new Soldier("1", simpleSoldierType(Set(Steadfast), 10), Player("1"))
 

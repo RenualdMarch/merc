@@ -3,14 +3,14 @@ package mr.merc.map.objects
 import org.scalatest.FunSuite
 import mr.merc.map.hex.TerrainHexField
 import mr.merc.map.hex.TerrainHex
-import mr.merc.map.terrain.Grass
+import mr.merc.map.terrain.GreenGrass
 
 class HouseTest extends FunSuite {
   val field = new TerrainHexField(5, 5, (x:Int, y:Int) => {
     if (x == 1 && y == 1) {
-      new TerrainHex(x, y, Grass, Some(HumanCityHouse))
+      new TerrainHex(x, y, GreenGrass, Some(HumanCityHouse))
     } else {
-      new TerrainHex(x, y, Grass)
+      new TerrainHex(x, y, GreenGrass)
     }
   })
   

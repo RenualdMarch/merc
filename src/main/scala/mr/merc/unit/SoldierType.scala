@@ -1,9 +1,8 @@
 package mr.merc.unit
 
-import mr.merc.map.terrain.TerrainType
+import mr.merc.map.terrain._
+
 import scala.xml.XML
-import java.io.File
-import mr.merc.unit.view.Projectile
 
 object SoldierType {
   val list = parseTypes
@@ -37,13 +36,14 @@ object SoldierType {
       }).toList
 
       val moveCostsMap = (node \ "moveCosts" \ "moveCost").map(costNode => {
-        val terrainType = TerrainType((costNode \ "@type").toString())
+        val terrainType = parseTerrainKind((costNode \ "@type").toString())
         val cost = (costNode \ "@cost").toString().toInt
         (terrainType, cost)
       }).toMap
 
       val defencesMap = (node \ "defences" \ "defence").map(defenceNode => {
-        val terrainType = TerrainType((defenceNode \ "@type").toString())
+        val terrainType = DefenceType((defenceNode \ "@type").toString()).getOrElse(
+          sys.error(s"Failed to get defence type for [${(defenceNode \ "@type").toString()}]"))
         val defence = (defenceNode \ "@defence").toString().toInt
         (terrainType, defence)
       }).toMap
@@ -60,15 +60,51 @@ object SoldierType {
     parsed.toList
   }
 
-  private def split(line: String) = if (line.isEmpty()) {
+  private def split(line: String) = if (line.isEmpty) {
     Set()
   } else {
     line.split(",").map(_.trim()) toSet
   }
+
+  def parseTerrainKind(name: String):TerrainKind = {
+    val map = Map("Water" -> WaterKind,
+    "Forest" -> ForestKind,
+    "Swamp" -> SwampKind,
+    "Hill" -> HillKind,
+    "Mountain" -> MountainKind,
+    "Sand" -> SandKind,
+    "Grass" -> GrassKind,
+    "Building" -> WallsKind)
+
+    map.getOrElse(name, sys.error(s"Failed to parse Terrain kind for $name"))
+  }
 }
 
 case class SoldierType(name: String, cost: Int, hp: Int, movement: Int, exp: Int, level: Int,
-  attacks: List[Attack], moveCost: Map[TerrainType, Int], defence: Map[TerrainType, Int],
-  resistance: Map[AttackType, Int], attributes: Set[SoldierTypeAttribute] = Set()) {
-
+                       attacks: List[Attack], moveCost: Map[TerrainKind, Int], defence: Map[DefenceType, Int],
+                       resistance: Map[AttackType, Int], attributes: Set[SoldierTypeAttribute] = Set()) {
 }
+
+sealed trait DefenceType
+
+object DefenceType {
+
+  def apply(name: String): Option[DefenceType] = Map[String, DefenceType](
+    "Water" -> WaterDefence,
+    "Forest" -> ForestDefence,
+    "Swamp" -> SwampDefence,
+    "Hill" -> HillDefence,
+    "Mountain" -> MountainDefence,
+    "Sand" -> SandDefence,
+    "Grass" -> GrassDefence,
+    "Building" -> BuildingDefence).get(name)
+}
+
+case object WaterDefence extends DefenceType
+case object ForestDefence extends DefenceType
+case object SwampDefence extends DefenceType
+case object HillDefence extends DefenceType
+case object MountainDefence extends DefenceType
+case object SandDefence extends DefenceType
+case object GrassDefence extends DefenceType
+case object BuildingDefence extends DefenceType

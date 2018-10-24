@@ -2,7 +2,7 @@ package mr.merc.map.hex.view
 
 import scalafx.scene.canvas.GraphicsContext
 import mr.merc.image.MImage
-import mr.merc.map.terrain.{Forest, Grass, Mountain, Water}
+import mr.merc.map.terrain._
 import mr.merc.map.hex._
 import scalafx.scene.paint.Color
 import scalafx.scene.text.Font
@@ -114,6 +114,26 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
     _isTerrainDirty = v
   }
 
+  var _isAnimationDirty = false
+
+  def isAnimationDirty = _isAnimationDirty
+  def isAnimationDirty_=(v: Boolean): Unit = {
+    if (v && !isAnimationDirty) {
+      _isAnimationDirty = v
+      fieldView.neighboursWithDirections(this).filter(neighbourShouldBeSetAnimationDirty _ tupled).foreach { case (_, view) =>
+        view.isAnimationDirty = v
+      }
+    }
+
+  }
+
+  private def neighbourShouldBeSetAnimationDirty(dir: Direction, neig: TerrainHexView): Boolean = {
+    if (!neig.isAnimationDirty) {
+      // TODO implement me
+      false
+    } else false
+  }
+
   var isInterfaceDirty = true
   var isDarkened = false
   private var currentDarkened = isDarkened
@@ -152,7 +172,7 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
 
   private var currentProvinceSelected = provinceSelected
 
-  override def toString = s"TerrainHexView[coords=($hex.x, $hex.y), pixels=($x,$y)]"
+  override def toString = s"TerrainHexView[coords=(${hex.x}, ${hex.y}), pixels=($x,$y)]"
 
   private def findX = if (hex.x % 2 == 0) {
     hex.x * 6 * side / 8
@@ -167,6 +187,7 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
   }
 
   private var elements:List[TerrainHexViewAdditiveElement] = calculateElements()
+
   private def calculateElements(): List[TerrainHexViewAdditiveElement] = {
     val additives = TerrainHexViewAdditive.extractAdditives(this)
     val rule = new TerrainHexViewAdditiveRule
@@ -174,28 +195,28 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
   }
 
   def image: MImage = {
-    if (hex.terrain == Forest) {
-      MImage(Grass.imagePath)
+    if (hex.terrain.is(ForestKind)) {
+      GreenGrass.image(hex.x, hex.y)
     } else {
-      MImage(hex.terrain.imagePath)
+      hex.terrain.image(hex.x, hex.y)
     }
   }
 
   def secondaryImage: Option[MImage] = {
-    if (hex.terrain == Forest) {
-      Some(MImage(Forest.imagePath))
+    if (hex.terrain.is(ForestKind)) {
+      Some(hex.terrain.image(hex.x, hex.y))
     } else {
       None
     }
   }
 
-  def mapObject = hex.mapObj match {
+  def mapObject:List[MImage] = hex.mapObj match {
     case Some(mapObj) => mapObj.images(hex, field)
     case None => Nil
   }
 
   def neighbourMapObjects: List[MImage] = {
-    val neigMapObj = field.neighbours(hex).filter(p => p.mapObj != None && p.mapObj != hex.mapObj)
+    val neigMapObj = field.neighbours(hex).filter(p => p.mapObj.isDefined && p.mapObj != hex.mapObj)
     neigMapObj.flatMap(p => p.mapObj.get.images(hex, field)).toList
   }
 
@@ -209,7 +230,7 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
     val x = this.x + xOffset
     val y = this.y + yOffset
 
-    if (hex.terrain == Mountain) {
+    if (hex.terrain.is(MountainKind)) {
       elements.foreach (_.drawItself(gc, x, y, factor))
       image.scaledImage(factor).drawCenteredImage(gc, x, y, side, side)
     } else {
@@ -269,7 +290,7 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
   private val anotherProvince = hex.province.map { province =>
     val neigsWithDirs = field.neighboursWithDirections(hex)
     neigsWithDirs.filter{ case (dir, n) =>
-      n.province.exists(_ != province) && n.terrain != Water
+      n.province.exists(_ != province) && n.terrain.isNot(WaterKind)
     }
   }.getOrElse(Map())
 
@@ -301,7 +322,7 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
       }
 
     hex.province.foreach {province =>
-      if (hex.terrain != Water) {
+      if (hex.terrain.isNot(WaterKind)) {
         if (provinceSelected) {
           drawLine(sameOwnerBorders, Color.Black, 4)
           drawLine(differentOwnerBorders, province.owner.color, 8)

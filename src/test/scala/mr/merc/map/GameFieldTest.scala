@@ -2,14 +2,13 @@ package mr.merc.map
 
 import org.scalatest.FunSuite
 import mr.merc.players.Player
-import mr.merc.unit.Soldier
-import mr.merc.unit.SoldierType
+import mr.merc.unit.{GrassDefence, Soldier, SoldierType}
 import mr.merc.map.hex._
 import mr.merc.map.terrain._
 
 class GameFieldTest extends FunSuite {
   val soldierType = new SoldierType("someType", 10, 10, 6, 10, 1,
-    List(), Map((Grass -> 2)), Map((Grass -> 50)),
+    List(), Map((GrassKind -> 2)), Map((GrassDefence -> 50)),
     Map())
 
   val player1 = Player("1")
@@ -19,7 +18,7 @@ class GameFieldTest extends FunSuite {
   val soldier2 = new Soldier("2", soldierType, player2)
   val soldier3 = new Soldier("2", soldierType, player2)
 
-  val terrainField = new TerrainHexField(5, 5, (x, y) => new TerrainHex(x, y, Grass))
+  val terrainField = new TerrainHexField(5, 5, (x, y) => new TerrainHex(x, y, GreenGrass))
   val gameField = new GameField(terrainField, List(player1, player2))
 
   terrainField.hex(0, 1).soldier = Some(soldier1)

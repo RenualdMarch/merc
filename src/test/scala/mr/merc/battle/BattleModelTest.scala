@@ -5,35 +5,24 @@ import org.scalatest.BeforeAndAfter
 import mr.merc.map.hex.TerrainHexField
 import mr.merc.map.hex.TerrainHex
 import mr.merc.map.terrain._
-import mr.merc.unit.SoldierType
-import mr.merc.unit.Impact
-import mr.merc.unit.Attack
-import mr.merc.unit.Soldier
+import mr.merc.unit._
 import mr.merc.players.Player
 import mr.merc.map.GameField
 import mr.merc.battle.event.AttackModelEvent
 import mr.merc.battle.event.AttackModelEventResult
 import mr.merc.battle.event.MovementModelEvent
 import mr.merc.battle.event.MovementModelEventResult
-import mr.merc.unit.Cures
-import mr.merc.unit.Heals4
-import mr.merc.unit.Poisoned
-import mr.merc.unit.NotHisTurn
-import mr.merc.unit.HaventMoved
-import mr.merc.unit.CanntMoveAnyMore
-import mr.merc.unit.HaveAttacked
-import mr.merc.unit.StillCanMove
 import mr.merc.map.objects._
 
 class BattleModelTest extends FunSuite with BeforeAndAfter {
   var field: TerrainHexField = _
   val simpleSoldierType = new SoldierType("1", 1, 20, 10, 5, 1,
-    List(Attack(1, 10, 1, Impact, false), Attack(2, 6, 2, Impact, false)), Map(Grass -> 2, Village -> 3, Sand -> 5),
-    Map(Grass -> 60), Map(Impact -> 0))
+    List(Attack(1, 10, 1, Impact, false), Attack(2, 6, 2, Impact, false)), Map(GrassKind -> 2, WallsKind -> 3, SandKind -> 5),
+    Map(GrassDefence -> 60), Map(Impact -> 0))
   var model: BattleModel = _
 
   before {
-    field = new TerrainHexField(10, 10, (x, y) => new TerrainHex(x, y, Grass))
+    field = new TerrainHexField(10, 10, (x, y) => new TerrainHex(x, y, GreenGrass))
     model = new BattleModel(new GameField(field, List(Player("1"), Player("2"))))
   }
 
@@ -99,16 +88,16 @@ class BattleModelTest extends FunSuite with BeforeAndAfter {
   test("defender weapon selection") {
     val attackerSoldierType = new SoldierType("1", 1, 50, 10, 5, 1,
       List(Attack(1, 10, 1, Impact, false), Attack(2, 20, 1, Impact, true)),
-      Map(Grass -> 2), Map(Grass -> 60), Map(Impact -> 0))
+      Map(GrassKind -> 2), Map(GrassDefence -> 60), Map(Impact -> 0))
 
     val defenderSoldierTypeOnlyCloseCombat = new SoldierType("2", 1, 50, 10, 5, 1,
       List(Attack(1, 10, 1, Impact, false), Attack(2, 6, 2, Impact, false),
         Attack(3, 3, 3, Impact, false)),
-      Map(Grass -> 2), Map(Grass -> 60), Map(Impact -> 0))
+      Map(GrassKind -> 2), Map(GrassDefence -> 60), Map(Impact -> 0))
 
     val defenderSoldierTypeOnlyOneAttack = new SoldierType("3", 1, 50, 10, 5, 1,
       List(Attack(1, 10, 1, Impact, true)),
-      Map(Grass -> 2), Map(Grass -> 60), Map(Impact -> 0))
+      Map(GrassKind -> 2), Map(GrassDefence -> 60), Map(Impact -> 0))
 
     val attacker = new Soldier("1", attackerSoldierType, Player("1"))
     val defenderCloseCombat = new Soldier("2", defenderSoldierTypeOnlyCloseCombat, Player("2"))
@@ -182,7 +171,7 @@ class BattleModelTest extends FunSuite with BeforeAndAfter {
 
   test("possible moves") {
     val simpleSoldierType = new SoldierType("1", 1, 20, 4, 5, 1,
-      List(), Map(Grass -> 2),
+      List(), Map(GrassKind -> 2),
       Map(), Map())
     val soldier = new Soldier("1", simpleSoldierType, Player("1"))
     field.hex(0, 0).soldier = Some(soldier)
@@ -252,7 +241,7 @@ class BattleModelTest extends FunSuite with BeforeAndAfter {
 
   test("possible moves for player which move isn't now should think that he hasn't moved or attacked") {
     val simpleSoldierType = new SoldierType("1", 1, 20, 4, 5, 1,
-      List(), Map(Grass -> 2),
+      List(), Map(GrassKind -> 2),
       Map(), Map())
     val soldier = new Soldier("1", simpleSoldierType, Player("2"))
     field.hex(0, 0).soldier = Some(soldier)
@@ -283,8 +272,8 @@ class BattleModelTest extends FunSuite with BeforeAndAfter {
 
   test("end turn and before turn events") {
     val curer = new SoldierType("1", 1, 20, 10, 5, 1,
-      List(Attack(0, 10, 1, Impact, false), Attack(1, 6, 2, Impact, false)), Map(Grass -> 2),
-      Map(Grass -> 60), Map(Impact -> 0), Set(Cures, Heals4))
+      List(Attack(0, 10, 1, Impact, false), Attack(1, 6, 2, Impact, false)), Map(GrassKind -> 2),
+      Map(GrassDefence -> 60), Map(Impact -> 0), Set(Cures, Heals4))
     val poisonedSoldier = new Soldier("1", curer, Player("1"))
     val enemy = new Soldier("1", simpleSoldierType, Player("2"))
     val damagedSoldier = new Soldier("2", curer, Player("1"))
@@ -356,11 +345,11 @@ class BattleModelTest extends FunSuite with BeforeAndAfter {
 
   test("road and wooden bridge terrain units are counted as grass") {
     def terrainHex(x: Int, y: Int) = if (x == 1 && y == 0) {
-      new TerrainHex(x, y, Road)
+      new TerrainHex(x, y, OldRoad)
     } else if (x == 0 && y == 1) {
-      new TerrainHex(x, y, Water, Some(WoodenBridge))
+      new TerrainHex(x, y, ShallowWater, Some(WoodenBridge))
     } else {
-      new TerrainHex(x, y, Sand)
+      new TerrainHex(x, y, DesertSand)
     }
 
     field = new TerrainHexField(10, 10, terrainHex)
@@ -385,11 +374,11 @@ class BattleModelTest extends FunSuite with BeforeAndAfter {
 
   test("village movement takes its price disregardly to terrain type") {
     def terrainHex(x: Int, y: Int) = if (x == 1 && y == 0) {
-      new TerrainHex(x, y, Road)
+      new TerrainHex(x, y, OldRoad)
     } else if (x == 0 && y == 1) {
-      new TerrainHex(x, y, Water, Some(HumanCityHouse))
+      new TerrainHex(x, y, ShallowWater, Some(HumanCityHouse))
     } else {
-      new TerrainHex(x, y, Sand)
+      new TerrainHex(x, y, DesertSand)
     }
 
     field = new TerrainHexField(10, 10, terrainHex)

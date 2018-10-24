@@ -76,7 +76,7 @@ class PathFinderTest extends FunSuite {
   }
 
   test("simple pathfinding") {
-    val grid = new TestGrid(new TerrainHexField(10, 10, (x, y) => new TerrainHex(x, y, Grass)))
+    val grid = new TestGrid(new TerrainHexField(10, 10, (x, y) => new TerrainHex(x, y, GreenGrass)))
     val from = grid.hex(0, 0)
     val dest = grid.hex(5, 2)
     val result = finder.findPath(grid, from, dest)
@@ -86,26 +86,26 @@ class PathFinderTest extends FunSuite {
 
   test("complex pathfinding") {
     def mapInit(x: Int, y: Int) = if (x == 1 || x == 2) {
-      new TerrainHex(x, y, Water, if (y == 2) Some(WoodenBridge) else None)
+      new TerrainHex(x, y, ShallowWater, if (y == 2) Some(WoodenBridge) else None)
     } else if (y == 2) {
-      new TerrainHex(x, y, Forest)
+      new TerrainHex(x, y, DecForest)
     } else if (x == 4 && y == 3) {
-      new TerrainHex(x, y, Grass, Some(HumanCityHouse))
+      new TerrainHex(x, y, GreenGrass, Some(HumanCityHouse))
     } else {
-      new TerrainHex(x, y, Sand)
+      new TerrainHex(x, y, DesertSand)
     }
 
-    val costMap: Map[TerrainType, Int] = Map(Water -> 3, Forest -> 3, Swamp -> 4,
-      Hill -> 2, Mountain -> 1000, Road -> 1, Sand -> 2, Grass -> 1)
+    val costMap: Map[TerrainKind, Int] = Map(WaterKind -> 3, ForestKind -> 3, SwampKind -> 4,
+      HillKind -> 2, MountainKind -> 1000, RoadKind -> 1, SandKind -> 2, GrassKind -> 1)
 
     val field = new TestGrid(new TerrainHexField(5, 5, mapInit)) {
-      override def price(from: TerrainHex, hex: TerrainHex) = costMap(hex.terrain)
+      override def price(from: TerrainHex, hex: TerrainHex) = costMap(hex.terrain.kind)
     }
     val start = field.hex(4, 3)
     val finish = field.hex(1, 2)
 
     val path = finder.findPath(field, start, finish)
-    val pathSum = path.get.tail.map(h => costMap(h.terrain)).sum
+    val pathSum = path.get.tail.map(h => costMap(h.terrain.kind)).sum
     assert(path.get === List(field.hex(4, 3), field.hex(3, 3), field.hex(2, 3), field.hex(1, 2)))
   }
 }

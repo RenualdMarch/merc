@@ -2,23 +2,22 @@ package mr.merc.unit
 
 import org.scalatest.FunSuite
 import mr.merc.map.hex.TerrainHexField
-import mr.merc.map.terrain.Sand
+import mr.merc.map.terrain.{DesertSand, SandKind, WallsKind}
 import org.scalatest.BeforeAndAfter
 import mr.merc.map.hex.TerrainHex
-import mr.merc.map.terrain.Village
 import mr.merc.map.objects.{House, HumanCityHouse}
 import mr.merc.players.Player
 
 class HealingAtVillageTest extends FunSuite with BeforeAndAfter {
   var field: TerrainHexField = _
   def simpleSoldierType(attributes: Set[SoldierTypeAttribute] = Set()) = new SoldierType("1", 1, 20, 10, 5, 1,
-    List(), Map(Sand -> 2, Village -> 1),
-    Map(Sand -> 60, Village -> 60), Map(Impact -> 0), attributes)
+    List(), Map(SandKind -> 2, WallsKind -> 1),
+    Map(SandDefence -> 60, BuildingDefence -> 60), Map(Impact -> 0), attributes)
 
   before {
     field = new TerrainHexField(10, 10, (x, y) => if (x == 5 && y == 5)
-      new TerrainHex(x, y, Sand, Some(HumanCityHouse))
-    else new TerrainHex(x, y, Sand))
+      new TerrainHex(x, y, DesertSand, Some(HumanCityHouse))
+    else new TerrainHex(x, y, DesertSand))
   }
 
   test("Unit receives healing when he moved and is in village") {

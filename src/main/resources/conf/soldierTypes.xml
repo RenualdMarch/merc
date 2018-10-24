@@ -12,7 +12,7 @@
 			<moveCost type="Mountain" cost="8"/>
 			<moveCost type="Sand" cost="2"/>
 			<moveCost type="Grass" cost="1"/>
-			<moveCost type="Village" cost="2"/>
+			<moveCost type="Building" cost="2"/>
 		</moveCosts>
 		<defences>
 			<defence type="Water" defence="30"/>
@@ -22,7 +22,7 @@
 			<defence type="Mountain" defence="20"/>
 			<defence type="Sand" defence="30"/>
 			<defence type="Grass" defence="40"/>
-			<defence type="Village" defence="40"/>
+			<defence type="Building" defence="40"/>
 		</defences>
 		<resistances>
 			<resistance type="Blade" resistance="20"/>
@@ -46,7 +46,7 @@
 			<moveCost type="Mountain" cost="3"/>
 			<moveCost type="Sand" cost="2"/>
 			<moveCost type="Grass" cost="1"/>
-			<moveCost type="Village" cost="2"/>
+			<moveCost type="Building" cost="2"/>
 		</moveCosts>
 		<defences>
 			<defence type="Water" defence="20"/>
@@ -56,7 +56,7 @@
 			<defence type="Mountain" defence="60"/>
 			<defence type="Sand" defence="30"/>
 			<defence type="Grass" defence="40"/>
-			<defence type="Village" defence="60"/>
+			<defence type="Building" defence="60"/>
 		</defences>
 		<resistances>
 			<resistance type="Arcane" resistance="20"/>			
@@ -75,7 +75,7 @@
 			<moveCost type="Mountain" cost="3"/>
 			<moveCost type="Sand" cost="2"/>
 			<moveCost type="Grass" cost="1"/>
-			<moveCost type="Village" cost="1"/>
+			<moveCost type="Building" cost="1"/>
 		</moveCosts>
 		<defences>
 			<defence type="Water" defence="20"/>
@@ -85,7 +85,7 @@
 			<defence type="Mountain" defence="60"/>
 			<defence type="Sand" defence="30"/>
 			<defence type="Grass" defence="40"/>
-			<defence type="Village" defence="60"/>
+			<defence type="Building" defence="60"/>
 		</defences>
 		<resistances>
 			<resistance type="Arcane" resistance="20"/>			
@@ -104,7 +104,7 @@
 			<moveCost type="Mountain" cost="3"/>
 			<moveCost type="Sand" cost="2"/>
 			<moveCost type="Grass" cost="1"/>
-			<moveCost type="Village" cost="1"/>
+			<moveCost type="Building" cost="1"/>
 		</moveCosts>
 		<defences>
 			<defence type="Water" defence="20"/>
@@ -114,7 +114,7 @@
 			<defence type="Mountain" defence="60"/>
 			<defence type="Sand" defence="30"/>
 			<defence type="Grass" defence="40"/>
-			<defence type="Village" defence="60"/>
+			<defence type="Building" defence="60"/>
 		</defences>
 		<resistances>
 			<resistance type="Arcane" resistance="20"/>			
@@ -132,7 +132,7 @@
 			<moveCost type="Mountain" cost="3"/>
 			<moveCost type="Sand" cost="2"/>
 			<moveCost type="Grass" cost="1"/>
-			<moveCost type="Village" cost="1"/>
+			<moveCost type="Building" cost="1"/>
 		</moveCosts>
 		<defences>
 			<defence type="Water" defence="20"/>
@@ -142,7 +142,7 @@
 			<defence type="Mountain" defence="60"/>
 			<defence type="Sand" defence="30"/>
 			<defence type="Grass" defence="40"/>
-			<defence type="Village" defence="60"/>
+			<defence type="Building" defence="60"/>
 		</defences>
 		<resistances>
 			<resistance type="Arcane" resistance="20"/>			
@@ -161,7 +161,7 @@
 			<moveCost type="Mountain" cost="3"/>
 			<moveCost type="Sand" cost="2"/>
 			<moveCost type="Grass" cost="1"/>
-			<moveCost type="Village" cost="1"/>
+			<moveCost type="Building" cost="1"/>
 		</moveCosts>
 		<defences>
 			<defence type="Water" defence="20"/>
@@ -171,7 +171,7 @@
 			<defence type="Mountain" defence="60"/>
 			<defence type="Sand" defence="30"/>
 			<defence type="Grass" defence="40"/>
-			<defence type="Village" defence="60"/>
+			<defence type="Building" defence="60"/>
 		</defences>
 		<resistances>
 			<resistance type="Arcane" resistance="20"/>			
@@ -189,7 +189,7 @@
 			<moveCost type="Mountain" cost="8"/>
 			<moveCost type="Sand" cost="2"/>
 			<moveCost type="Grass" cost="1"/>
-			<moveCost type="Village" cost="1"/>
+			<moveCost type="Building" cost="1"/>
 		</moveCosts>
 		<defences>
 			<defence type="Water" defence="20"/>
@@ -199,7 +199,7 @@
 			<defence type="Mountain" defence="20"/>
 			<defence type="Sand" defence="30"/>
 			<defence type="Grass" defence="40"/>
-			<defence type="Village" defence="40"/>
+			<defence type="Building" defence="40"/>
 		</defences>
 		<resistances>
 			<resistance type="Blade" resistance="30"/>
@@ -222,7 +222,7 @@
 			<moveCost type="Mountain" cost="3"/>
 			<moveCost type="Sand" cost="2"/>
 			<moveCost type="Grass" cost="1"/>
-			<moveCost type="Village" cost="1"/>
+			<moveCost type="Building" cost="1"/>
 		</moveCosts>
 		<defences>
 			<defence type="Water" defence="40"/>
@@ -232,7 +232,7 @@
 			<defence type="Mountain" defence="70"/>
 			<defence type="Sand" defence="40"/>
 			<defence type="Grass" defence="60"/>
-			<defence type="Village" defence="70"/>
+			<defence type="Building" defence="70"/>
 		</defences>
 		<resistances>
 			<resistance type="Blade" resistance="-30"/>
@@ -255,7 +255,7 @@
 			<moveCost type="Mountain" cost="4"/>
 			<moveCost type="Sand" cost="2"/>
 			<moveCost type="Grass" cost="1"/>
-			<moveCost type="Village" cost="1"/>
+			<moveCost type="Building" cost="1"/>
 		</moveCosts>
 		<defences>
 			<defence type="Water" defence="10"/>
@@ -265,7 +265,7 @@
 			<defence type="Mountain" defence="10"/>
 			<defence type="Sand" defence="20"/>
 			<defence type="Grass" defence="30"/>
-			<defence type="Village" defence="40"/>
+			<defence type="Building" defence="40"/>
 		</defences>
 		<resistances>
 			<resistance type="Blade" resistance="50"/>
@@ -289,7 +289,7 @@
 			<moveCost type="Mountain" cost="3"/>
 			<moveCost type="Sand" cost="2"/>
 			<moveCost type="Grass" cost="1"/>
-			<moveCost type="Village" cost="1"/>
+			<moveCost type="Building" cost="1"/>
 		</moveCosts>
 		<defences>
 			<defence type="Water" defence="20"/>
@@ -299,7 +299,7 @@
 			<defence type="Mountain" defence="60"/>
 			<defence type="Sand" defence="30"/>
 			<defence type="Grass" defence="40"/>
-			<defence type="Village" defence="60"/>
+			<defence type="Building" defence="60"/>
 		</defences>
 		<resistances>
 			<resistance type="Blade" resistance="0"/>
@@ -323,7 +323,7 @@
 			<moveCost type="Mountain" cost="3"/>
 			<moveCost type="Sand" cost="2"/>
 			<moveCost type="Grass" cost="1"/>
-			<moveCost type="Village" cost="1"/>
+			<moveCost type="Building" cost="1"/>
 		</moveCosts>
 		<defences>
 			<defence type="Water" defence="20"/>
@@ -333,7 +333,7 @@
 			<defence type="Mountain" defence="60"/>
 			<defence type="Sand" defence="30"/>
 			<defence type="Grass" defence="40"/>
-			<defence type="Village" defence="60"/>
+			<defence type="Building" defence="60"/>
 		</defences>
 		<resistances>
 			<resistance type="Arcane" resistance="20"/>			
@@ -352,7 +352,7 @@
 			<moveCost type="Mountain" cost="8"/>
 			<moveCost type="Sand" cost="2"/>
 			<moveCost type="Grass" cost="1"/>
-			<moveCost type="Village" cost="1"/>
+			<moveCost type="Building" cost="1"/>
 		</moveCosts>
 		<defences>
 			<defence type="Water" defence="20"/>
@@ -362,7 +362,7 @@
 			<defence type="Mountain" defence="20"/>
 			<defence type="Sand" defence="30"/>
 			<defence type="Grass" defence="40"/>
-			<defence type="Village" defence="40"/>
+			<defence type="Building" defence="40"/>
 		</defences>
 		<resistances>
 			<resistance type="Blade" resistance="30"/>

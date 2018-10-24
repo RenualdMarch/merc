@@ -72,7 +72,7 @@ class Minimap(field: TerrainHexField, pane: ScrollPaneLike, factor: Double) exte
       gc.fill = color(hex)
       gc.fillRect(x, y, side, side)
       hex.province.foreach { p =>
-        if (hex.terrain != Water) {
+        if (hex.terrain.isNot(WaterKind)) {
           gc.fill = p.owner.color.opacity(0.7f)
           gc.fillRect(x, y, side, side)
         }
@@ -222,16 +222,15 @@ class Minimap(field: TerrainHexField, pane: ScrollPaneLike, factor: Double) exte
     } else */if (hex.soldier.nonEmpty) {
       hex.soldier.get.owner.color
     } else {
-      hex.terrain match {
-        case Grass => Color.Green
-        case Water => Color.Blue
-        case Hill => Color.Gray
-        case Dirt => Color.Brown
-        case Mountain => Color.Black
-        case Sand => Color.Yellow
-        case Swamp => Color.Brown
-        case Forest => Color.DarkGreen
-        case Road => Color.LightGray
+      hex.terrain.kind match {
+        case GrassKind => Color.Green
+        case WaterKind => Color.Blue
+        case HillKind => Color.Gray
+        case MountainKind => Color.Black
+        case SandKind => Color.Yellow
+        case SwampKind => Color.Brown
+        case ForestKind => Color.DarkGreen
+        case RoadKind => Color.LightGray
         case _ => Color.Black
       }
     }

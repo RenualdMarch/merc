@@ -19,7 +19,7 @@ class ProvinceView(province: Province, field: TerrainHexField, view: TerrainHexF
     }
 
     val hexesStream = field.closest(province.capital).
-      filter(t => !Set[TerrainType](Water, Mountain, Forest, Castle).contains(t.terrain)).
+      filterNot(_.terrain.isOneOf(WaterKind, MountainKind, ForestKind, WallsKind)).
       filter(province.hexes.contains).
       grouped(2).map(_.head).toStream
     val (_, newHouses) = newHousesCount.foldLeft((hexesStream, List[(TerrainHex, MapObject)]())) {
@@ -30,7 +30,7 @@ class ProvinceView(province: Province, field: TerrainHexField, view: TerrainHexF
 
     newHouses.foreach { case (h, m) =>
       h.mapObj = Some(m)
-      h.terrain = Road
+      h.terrain = GrassyRoad
     }
     newHouses.map(_._1).foreach { h =>
       view.setTerrainDirty(h.x, h.y)

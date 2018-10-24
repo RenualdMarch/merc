@@ -3,7 +3,7 @@ import org.scalatest.FunSuite
 import org.scalatest.BeforeAndAfter
 import mr.merc.map.hex.TerrainHexField
 import mr.merc.map.hex.TerrainHex
-import mr.merc.map.terrain.Grass
+import mr.merc.map.terrain.{GrassKind, GreenGrass}
 import mr.merc.players.Player
 import mr.merc.map.GameField
 import mr.merc.battle.event.AttackModelEvent
@@ -19,7 +19,7 @@ class SkirmisherAttributeTest extends FunSuite with BeforeAndAfter {
   var soldier: Soldier = _
 
   before {
-    field = new TerrainHexField(10, 10, (x, y) => new TerrainHex(x, y, Grass))
+    field = new TerrainHexField(10, 10, (x, y) => new TerrainHex(x, y, GreenGrass))
     model = new BattleModel(new GameField(field, List(Player("1"), Player("2"))))
     val enemy = new Soldier("2", simpleSoldierType(Set()), Player("2"))
     field.hex(1, 0).soldier = Some(enemy)
@@ -28,8 +28,8 @@ class SkirmisherAttributeTest extends FunSuite with BeforeAndAfter {
   }
 
   def simpleSoldierType(attributes: Set[SoldierTypeAttribute] = Set()) = new SoldierType("1", 1, 20, 6, 5, 1,
-    List(Attack(1, 10, 1, Impact, false), Attack(2, 6, 2, Impact, false)), Map(Grass -> 2),
-    Map(Grass -> 60), Map(Impact -> 0), attributes)
+    List(Attack(1, 10, 1, Impact, false), Attack(2, 6, 2, Impact, false)), Map(GrassKind -> 2),
+    Map(GrassDefence -> 60), Map(Impact -> 0), attributes)
 
   test("possible moves are correct with skirmisher soldier") {
     val currentField = field

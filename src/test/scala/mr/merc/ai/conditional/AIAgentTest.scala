@@ -2,12 +2,9 @@ package mr.merc.ai.conditional
 
 import org.scalatest.FunSuite
 import mr.merc.map.hex.TerrainHexField
-import mr.merc.unit.SoldierType
+import mr.merc.unit._
 import mr.merc.map.hex.TerrainHex
-import mr.merc.unit.Soldier
 import mr.merc.players.Player
-import mr.merc.unit.Attack
-import mr.merc.unit.Impact
 import mr.merc.map.terrain._
 import mr.merc.map.GameField
 import mr.merc.battle.BattleModel
@@ -18,7 +15,7 @@ class AIAgentTest extends FunSuite with BeforeAndAfter {
   val field = new TerrainHexField(10, 10, TerrainHex.grassInit)
   val model = new BattleModel(new GameField(field, List(Player("1"), Player("2"))))
   val soldierType = new SoldierType("", 20, 40, 4, 1, 1,
-    List(new Attack(0, 10, 2, Impact, false)), Map(Grass -> 2), Map(Grass -> 50), Map(Impact -> 0))
+    List(new Attack(0, 10, 2, Impact, false)), Map(GrassKind -> 2), Map(GrassDefence -> 50), Map(Impact -> 0))
   val attacker = new Soldier("1", soldierType, Player("1"))
   val defender1 = new Soldier("1", soldierType, Player("2"))
   val defender2 = new Soldier("1", soldierType, Player("2"))
@@ -63,11 +60,11 @@ class AIAgentTest extends FunSuite with BeforeAndAfter {
   }
 
   test("move closer to enemy") {
-    def hexInit(x: Int, y: Int) = if (y == 4) new TerrainHex(x, y, Sand) else new TerrainHex(x, y, Grass)
+    def hexInit(x: Int, y: Int) = if (y == 4) new TerrainHex(x, y, DesertSand) else new TerrainHex(x, y, GreenGrass)
     val field = new TerrainHexField(1, 10, hexInit)
     val model = new BattleModel(new GameField(field, List(Player("1"), Player("2"))))
     val soldierType = new SoldierType("", 20, 40, 10, 1, 1,
-      List(new Attack(0, 10, 2, Impact, false)), Map(Grass -> 2, Sand -> 2), Map(Grass -> 50, Sand -> 60), Map(Impact -> 0))
+      List(new Attack(0, 10, 2, Impact, false)), Map(GrassKind -> 2, SandKind -> 2), Map(GrassDefence -> 50, SandDefence -> 60), Map(Impact -> 0))
     val conf1 = AIConfiguration(0.4, 0, 0, 1, 10, 1)
     val soldier = new Soldier("1", soldierType, Player("1"))
     field.hex(0, 0).soldier = Some(soldier)

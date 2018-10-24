@@ -1,91 +1,64 @@
 package mr.merc.map.hex.view
 
 import org.scalatest.FunSuite
-import mr.merc.map.terrain.Grass
-import mr.merc.map.terrain.Sand
-import mr.merc.map.terrain.Hill
 import mr.merc.map.hex._
-import mr.merc.map.terrain.BankInside
-import mr.merc.map.terrain.Water
+import mr.merc.map.terrain._
 
 class TerrainHexAdditiveRuleTest extends FunSuite {
   val rule = new TerrainHexViewAdditiveRule
 
   test("filtering test") {
-    val list1 = List(new TerrainHexViewAdditive(N, S, Sand, Grass));
-
+    val list1 = List(new TerrainHexViewAdditive(N, S, DesertSand, OldRoad))
     assert(rule.filterNotNeededAdditives(list1) === list1)
 
-    val list2 = List(new TerrainHexViewAdditive(N, S, Hill, Grass));
+    val list2 = List(new TerrainHexViewAdditive(N, S, OldRoad, DesertSand))
     assert(rule.filterNotNeededAdditives(list2).isEmpty)
   }
 
   test("additive to elements conversion when there is element with same size") {
-    val add = new TerrainHexViewAdditive(N, N, Sand, Grass)
+    val add = new TerrainHexViewAdditive(N, N, OldRoad, DesertSand)
     val elements = rule.additivesToElements(add)
-
-    assert(elements.size === 1)
-    val element = elements(0)
-    assert(element === TerrainHexViewAdditiveElement(Grass, N, N))
-  }
-
-  test("additive to elements conversion when three elements must be combined") {
-    val add = new TerrainHexViewAdditive(NE, SW, Sand, Grass)
-    val elements = rule.additivesToElements(add)
-
-    assert(elements.size === 3)
-    assert(elements.contains(TerrainHexViewAdditiveElement(Grass, NE, NE)))
-    assert(elements.contains(TerrainHexViewAdditiveElement(Grass, S, SW)))
-    assert(elements.contains(TerrainHexViewAdditiveElement(Grass, SE, SE)))
+    assert(elements === List(TerrainHexViewAdditiveElement(DesertSand, N, N)))
   }
 
   test("additive to elements conversion when two elements must be combined") {
-    val add = new TerrainHexViewAdditive(N, S, Sand, Grass)
-    val elements = rule.additivesToElements(add)
+    val add = new TerrainHexViewAdditive(NE, NW, OldRoad, DesertSand)
+    val elements = rule.additivesToElements(add).toSet
 
-    assert(elements.size === 2)
-    assert(elements.contains(TerrainHexViewAdditiveElement(Grass, N, SE)))
-    assert(elements.contains(TerrainHexViewAdditiveElement(Grass, S, S)))
+    assert(elements.size == 2)
+    assert(elements.exists(_.to == NW))
+    assert(elements.exists(_.from == NE))
   }
 
-  // Make it optimal and make this test active
-  ignore("optimal additive") {
-    val add = new TerrainHexViewAdditive(N, NW, Water, BankInside)
+  test("optimal additive") {
+    val add = new TerrainHexViewAdditive(N, NW, ShallowWater, BankInside)
     val elements = rule.additivesToElements(add)
 
-    assert(elements.size === 3)
+    assert(elements === List(TerrainHexViewAdditiveElement(BankInside,NW,N)))
   }
 
   test("overlapping elements") {
-    val el1 = TerrainHexViewAdditiveElement(Grass, NE, NW)
-    val el2 = TerrainHexViewAdditiveElement(Grass, N, S)
-    val el3 = TerrainHexViewAdditiveElement(Grass, N, N)
+    val el1 = DirectionsRange(NE, NW)
+    val el2 = DirectionsRange(N, S)
+    val el3 = DirectionsRange(N, N)
 
-    assert(rule.areElementsOverlapping(List(el1, el2)))
-    assert(!rule.areElementsOverlapping(List(el2)))
-    assert(!rule.areElementsOverlapping(List(el1, el3)))
+    assert(el1.intersects(el2))
+    assert(!el1.intersects(el3))
   }
 
   test("sum of elements") {
-    val el1 = TerrainHexViewAdditiveElement(Grass, N, N)
-    val el2 = TerrainHexViewAdditiveElement(Grass, NE, NE)
-    val el3 = TerrainHexViewAdditiveElement(Grass, SE, S)
+    val el1 = DirectionsRange(N, N)
+    val el2 = DirectionsRange(NE, NE)
+    val el3 = DirectionsRange(SE, S)
 
-    assert(rule.sumOfElementsSlices(List(el1, el2, el3)) === Set((N, S)))
-  }
-
-  test("elements by terrain type") {
-    val grass = TerrainHexViewAdditiveElement.elementsByType(Grass)
-    assert(grass.size === 8)
-    val sand = TerrainHexViewAdditiveElement.elementsByType(Sand)
-    assert(sand.size === 6)
+    assert(el1 + el2 + el3 === DirectionsRange(N, S))
   }
 
   test("transform") {
-    val list = List(new TerrainHexViewAdditive(NE, NE, Sand, Grass),
-      new TerrainHexViewAdditive(N, N, Hill, Grass));
+    val list = List(new TerrainHexViewAdditive(NE, NE, DesertSand, GreenGrass),
+      new TerrainHexViewAdditive(N, N, BasicHill, GreenGrass))
     val result = rule.transform(list)
     assert(result.size === 1)
-    assert(result.contains(TerrainHexViewAdditiveElement(Grass, NE, NE)))
+    assert(result.contains(TerrainHexViewAdditiveElement(GreenGrass, NE, NE)))
   }
 }
