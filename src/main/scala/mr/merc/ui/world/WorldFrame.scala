@@ -20,6 +20,7 @@ class WorldFrame(sceneManager: SceneManager) extends Pane {
     }
   }
   provinceViews.foreach(_.refreshCity())
+  mapView.terrainView.refreshTerrainDirt()
   private val worldCanvas = new CanvasLayers(mapView.canvasBattleLayers, new Rectangle2D(0, 0, mapView.pixelWidth, mapView.pixelHeight))
 
   val interfacePane = new InterfacePane

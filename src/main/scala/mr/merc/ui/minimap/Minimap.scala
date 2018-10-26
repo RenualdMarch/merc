@@ -57,6 +57,9 @@ class Minimap(field: TerrainHexField, pane: ScrollPaneLike, factor: Double) exte
   this.width.onChange(refreshMapCanvas())
   this.height.onChange(refreshMapCanvas())
 
+  scrollCanvas.delegate.addEventHandler(jfxin.MouseEvent.MOUSE_CLICKED, canvasMouseClicked _)
+  scrollCanvas.delegate.addEventHandler(jfxin.MouseEvent.MOUSE_DRAGGED, canvasMouseClicked _)
+
   def minimapSize = MinimapSize(field.width, field.height, width.intValue, height.intValue)
 
   private def refreshMapCanvas() {
@@ -79,6 +82,7 @@ class Minimap(field: TerrainHexField, pane: ScrollPaneLike, factor: Double) exte
       }
     }
     gc.restore()
+    redraw()
   }
 
   def redraw() {
@@ -102,8 +106,6 @@ class Minimap(field: TerrainHexField, pane: ScrollPaneLike, factor: Double) exte
     gc.restore()
   }
 
-  scrollCanvas.delegate.addEventHandler(jfxin.MouseEvent.MOUSE_CLICKED, canvasMouseClicked _)
-  scrollCanvas.delegate.addEventHandler(jfxin.MouseEvent.MOUSE_DRAGGED, canvasMouseClicked _)
 
   private def canvasMouseClicked(event: jfxin.MouseEvent) {
     val x = event.getX.toInt
@@ -215,11 +217,7 @@ class Minimap(field: TerrainHexField, pane: ScrollPaneLike, factor: Double) exte
   }
 
   private def color(hex: TerrainHex): Color = {
-    /*if (neighbourFromOtherOwner(hex) && hex.terrain != Water) {
-      hex.province.get.owner.color
-      //} else if (smallerNeighbourFromCurrentOwner(hex) && hex.terrain != Water) {
-      //  Color.Black
-    } else */if (hex.soldier.nonEmpty) {
+    if (hex.soldier.nonEmpty) {
       hex.soldier.get.owner.color
     } else {
       hex.terrain.kind match {

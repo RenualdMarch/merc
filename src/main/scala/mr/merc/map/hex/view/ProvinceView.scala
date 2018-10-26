@@ -38,6 +38,7 @@ class ProvinceView(province: Province, field: TerrainHexField, view: TerrainHexF
     minus.foreach { case (house, count) =>
       housesStream.filter(_.mapObj.contains(house)).take(-count).foreach { h =>
         h.mapObj = None
+        view.setTerrainDirty(view.hex(h))
       }
     }
 
@@ -45,8 +46,8 @@ class ProvinceView(province: Province, field: TerrainHexField, view: TerrainHexF
       housesStream.filter(_.mapObj.isEmpty).take(count).foreach { h =>
         h.mapObj = Some(house)
         h.terrain = GrassyRoad
+        view.setTerrainDirty(view.hex(h))
       }
     }
-
   }
 }

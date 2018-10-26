@@ -19,7 +19,7 @@ For M5, World Map changes are priority
 +provinceView should not replace old houses when new culture arrives
 +provinceView should not use sqrt
 +Bug with bridges
-implement neighbours dirtying
++implement neighbours dirtying
 
 
 For M6, interface will be a priority, basic politics, factory building

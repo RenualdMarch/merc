@@ -104,19 +104,22 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
   val y: Int = findY
   private var _terrainDirty = false
   def terrainDirty: Boolean = _terrainDirty
-  def terrainDirty_=(v: Boolean): Unit = {
+  // to be called only from terrain hex field view !!!!!
+  private [view] def terrainDirty_=(v: Boolean): Unit = {
     if (!terrainDirty && v) {
       this._terrainDirty = v
-      fieldView.neighboursWithDirections(this).filter(neighbourShouldBeSetDirty _ tupled).foreach { case (_, view) =>
-        if (!view.terrainDirty) {
-          view.terrainDirty = v
+      if (thisHexViewIsHuge()) {
+        fieldView.neighbours(this).foreach {
+          _.terrainDirty = v
         }
       }
+    } else {
+      this._terrainDirty = v
     }
 
   }
 
-  private def recalculateTerrainDirtIfNeeded(): Unit = {
+  def recalculateTerrainDirtIfNeeded(): Unit = {
     if (terrainDirty) {
       this.elements = calculateElements()
       this.sameOwnerBorders = calculateSameOwnerBorders()
@@ -127,19 +130,21 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
 
   var _animationDirty = false
 
+  // to be called only from terrain hex field view !!!!!
   def animationDirty: Boolean = _animationDirty
-  def animationDirty_=(v: Boolean): Unit = {
+  private [view] def animationDirty_=(v: Boolean): Unit = {
     if (v && !animationDirty) {
       _animationDirty = v
-      fieldView.neighboursWithDirections(this).filter(neighbourShouldBeSetDirty _ tupled).foreach { case (_, view) =>
-        view.animationDirty = v
+      if (thisHexViewIsHuge()) {
+        fieldView.neighbours(this).foreach {
+          _.animationDirty = v
+        }
       }
     }
   }
 
-  private def neighbourShouldBeSetDirty(dir: Direction, neig: TerrainHexView): Boolean = {
-    // TODO implement me
-    false
+  private def thisHexViewIsHuge():Boolean = {
+    this.hex.terrain.isOneOf(MountainKind, ForestKind, WallsKind)
   }
 
   var interfaceDirty = true
@@ -258,6 +263,7 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
 
   def drawItself(gc: GraphicsContext, stage: HexDrawingStage, xOffset: Int, yOffset: Int) {
     recalculateTerrainDirtIfNeeded()
+    animationDirty = false
     stage match {
       case TerrainImageStage =>
         drawTerrainImage(gc, xOffset, yOffset)

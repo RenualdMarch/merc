@@ -1,16 +1,10 @@
 package mr.merc.map.hex.view
 
 import scalafx.scene.canvas.GraphicsContext
-import mr.merc.map.hex.TerrainHexField
-import mr.merc.map.hex.CubeHex
-import mr.merc.map.hex.Hex
-import mr.merc.map.hex.InfiniteHexField
-import mr.merc.map.hex.TerrainHex
+import mr.merc.map.hex._
 import mr.merc.map.terrain._
 import mr.merc.unit.SoldierDefence
-
 import scalafx.geometry.Rectangle2D
-import mr.merc.map.hex.Direction
 import mr.merc.map.view.SoldiersDrawer
 import mr.merc.ui.common.CanvasLayer
 import mr.merc.ui.common.geom.Line
@@ -21,10 +15,13 @@ import mr.merc.map.hex.view.TerrainHexFieldView.{BattleFieldViewMode, FieldViewM
 import mr.merc.map.objects.Walls
 import mr.merc.map.objects.view.{WallImage, WallView}
 
-class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer[_], factor: Double, mode:FieldViewMode = BattleFieldViewMode) extends Logging {
+import scala.collection.mutable
+
+class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer[_], factor: Double, mode: FieldViewMode = BattleFieldViewMode) extends Logging {
   private val infiniteField = new InfiniteHexField((x, y) => new TerrainHex(x, y, Empty))
 
   val realHexes = field.hexes.map(new TerrainHexView(_, field, this, factor))
+
   def blackHexes: Set[TerrainHexView] = {
     val hexSet = field.hexes.toSet
     val blackHexes = hexSet.flatMap(h => infiniteField.neighbours(h.x, h.y)) -- hexSet
@@ -34,20 +31,23 @@ class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer
     }.map(new TerrainHexView(_, field, this, factor))
   }
 
-  private val walls:Walls = realHexes.filter(_.hex.terrain == Castle).foldLeft(Walls()) {
+  private val walls: Walls = realHexes.filter(_.hex.terrain == Castle).foldLeft(Walls()) {
     case (w, hexView) =>
       w.addWall(hexView.hex)
   }
   private val wallsView = new WallView(walls)
   private val castleImages = wallsView.wallImages()
-  def castleImagesForHex(hex:Hex):List[WallImage] = castleImages.getOrElse(hex, Nil)
+
+  def castleImagesForHex(hex: Hex): List[WallImage] = castleImages.getOrElse(hex, Nil)
 
   // sorting is make sure that hexes are drawn in correct order, back before first
   val hexesToDraw = (realHexes ++ blackHexes).toList.sortBy(h => (h.hex.terrain.layer, h.hex.y + h.hex.x % 2 * 0.5, h.hex.x))
-  val hexesToDrawMap = hexesToDraw.map(h => ((h.hex.x, h.hex.y), h)).toMap
+  val hexesToDrawMap = mutable.LinkedHashMap() ++ hexesToDraw.map(h => ((h.hex.x, h.hex.y), h))
 
   private var _movementOptions: Option[Set[TerrainHexView]] = None
+
   def movementOptions = _movementOptions
+
   def movementOptions_=(viewsOpt: Option[Set[TerrainHexView]]) {
     def darkHexes(opts: Set[TerrainHexView]) = realHexes.toSet -- opts -- arrowHexes
 
@@ -77,7 +77,9 @@ class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer
   }
 
   private var _arrow: Option[(TerrainHexView, TerrainHexView)] = None
+
   def arrow = _arrow
+
   def arrow_=(ar: Option[(TerrainHexView, TerrainHexView)]) {
     _arrow.foreach {
       case (from, to) =>
@@ -95,8 +97,11 @@ class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer
   }
 
   def arrowHexes = arrow.map(p => Set(p._1, p._2)).getOrElse(Set())
+
   private var _defence: Option[(TerrainHexView, SoldierDefence, Boolean)] = None
+
   def defence = _defence
+
   def defence_=(d: Option[(TerrainHexView, SoldierDefence, Boolean)]) {
     if (_defence != d) {
       _defence.foreach {
@@ -114,14 +119,28 @@ class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer
   private val realHexesMap = realHexes map (h => ((h.hex.x, h.hex.y), h)) toMap
 
   def hex(hex: Hex): TerrainHexView = this.hex(hex.x, hex.y)
+
   def hex(x: Int, y: Int) = realHexesMap(x, y)
 
+  private val hexSide = TerrainHexView.side(factor)
+
   private var prevResult: (Rectangle2D, List[TerrainHexView]) = (new Rectangle2D(0, 0, 1, 1), Nil)
-  def calculateVisibleHexes(viewRect: Rectangle2D) = {
+
+  def calculateVisibleHexes(viewRect: Rectangle2D): List[TerrainHexView] = {
     if (prevResult._1 == viewRect) {
       prevResult._2
     } else {
-      val list = hexesToDraw filter isVisible(viewRect)
+      val x = viewRect.minX.toInt * 4 / hexSide / 3 - 1
+      val y = viewRect.minY.toInt / hexSide - 1
+      val xx = x + viewRect.width.toInt * 4 / hexSide / 3 + 2
+      val yy = y + viewRect.height.toInt / hexSide + 2
+
+      val list = (for { curX <- x to xx
+                       curY <- y to yy
+      } yield {
+        hexesToDrawMap.get(curX, curY)
+      }).toList.flatten
+
       prevResult = (viewRect, list)
       list
     }
@@ -145,7 +164,7 @@ class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer
 
     def drawLayer(gc: GraphicsContext, viewRect: Rectangle2D) {
       val visibleHexes = calculateVisibleHexes(viewRect)
-      List(TerrainImageStage, BuildingsForestStage,  HexGridStage).foreach { stage =>
+      List(TerrainImageStage, BuildingsForestStage, HexGridStage).foreach { stage =>
         visibleHexes foreach (_.drawItself(gc, stage, -viewRect.minX.toInt, -viewRect.minY.toInt))
       }
     }
@@ -154,7 +173,7 @@ class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer
   private val terrainWorldLayer = new CanvasLayer {
     def updateLayer(gc: GraphicsContext, viewRect: Rectangle2D) {
       val dirty = calculateVisibleHexes(viewRect).filter(_.terrainDirty)
-      List(TerrainImageStage, BuildingsForestStage,  ProvinceBordersStage).foreach { stage =>
+      List(TerrainImageStage, BuildingsForestStage, ProvinceBordersStage).foreach { stage =>
         dirty foreach (_.drawItself(gc, stage, -viewRect.minX.toInt, -viewRect.minY.toInt))
       }
       dirty.foreach(_.terrainDirty = false)
@@ -206,21 +225,9 @@ class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer
     }
   }
 
-  def canvasLayers:List[CanvasLayer] = mode match {
+  def canvasLayers: List[CanvasLayer] = mode match {
     case BattleFieldViewMode => List(terrainBattleLayer, soldierBattleLayer, darkeningBattleLayer, battleInterfaceBattleLayer)
     case WorldMapViewMode => List(terrainWorldLayer, soldierBattleLayer)
-  }
-
-
-  def neigsToRedrawFromCache(set: Set[TerrainHexView]): Set[TerrainHexView] = {
-    set flatMap redrawNeigsCache
-  }
-
-  // TODO use or remove, it takes huge amount of time to calculate
-  lazy val redrawNeigsCache: Map[TerrainHexView, Set[TerrainHexView]] = {
-    hexesToDraw.map { h =>
-      (h -> hexesToRedrawWithNeighboursOfUpperLayer(Set(h)))
-    } toMap
   }
 
   def hexesToRedrawWithNeighboursOfUpperLayer(set: Set[TerrainHexView]): Set[TerrainHexView] = {
@@ -247,12 +254,7 @@ class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer
     }
   }
 
-  def isVisible(viewPort: Rectangle2D)(hex: TerrainHexView): Boolean = {
-    val hexRect = new Rectangle2D(hex.x, hex.y, hex.side, hex.side)
-    viewPort.intersects(hexRect) || viewPort.contains(hexRect)
-  }
-
-  def side:Int = realHexes.head.side
+  def side: Int = realHexes.head.side
 
   def hexByPixelCoords(pixelX: Int, pixelY: Int): Option[TerrainHexView] = {
     // first part is transform hexes into squares
@@ -270,13 +272,16 @@ class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer
     val hex = infiniteField.hex(column, row)
     val neighbours = infiniteField.neighbours(hex)
     val candidates = (hex :: neighbours) map (h => new TerrainHexView(h, field, this, factor))
+
     def distanceSquare(x: Int, y: Int) = (x - pixelX) * (x - pixelX) + (y - pixelY) * (y - pixelY)
+
     val min = candidates.minBy(c => distanceSquare(c.center._1, c.center._2))
 
     realHexesMap.get(min.hex.x, min.hex.y)
   }
 
   def pixelWidth = hex(field.width - 1, 0).x + side
+
   def pixelHeight = hex(0, field.height - 1).y + side
 
   private val hexOffset = 60
@@ -321,10 +326,24 @@ class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer
 
     new Polygon(begin1, begin2, end2, end1)
   }
+
+  def setTerrainDirty(hex: TerrainHexView): Unit = {
+    hex :: neighbours(hex) foreach {
+      _.terrainDirty = true
+    }
+  }
+
+  def refreshTerrainDirt(): Unit = {
+    hexesToDraw.foreach(_.recalculateTerrainDirtIfNeeded())
+  }
 }
 
 object TerrainHexFieldView {
+
   sealed trait FieldViewMode
+
   object BattleFieldViewMode extends FieldViewMode
+
   object WorldMapViewMode extends FieldViewMode
+
 }
