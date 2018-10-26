@@ -13,10 +13,10 @@ object WoodenBridge extends MapObject("woodenBridge") {
 
   private val endsMap = Direction.list.map(dir => (dir, "end-" + dir.toString().toLowerCase())).toMap
 
-  private val centersMap = List((N, S), (NE, SW), (SE, NW), (NE, S), (N, SE), (SE, SW), (S, NW), (SW, N)).
-    map(pair => (pair, pair._1.toString().toLowerCase() + "-" +
+  private val selectionPriority = List((N, S), (NE, SW), (SE, NW), (NE, S), (N, SE), (SE, SW), (S, NW), (SW, N))
+  private val centersMap = selectionPriority.map(pair => (pair, pair._1.toString().toLowerCase() + "-" +
       pair._2.toString().toLowerCase())).toMap
-  private val selectionPriority = centersMap.keys.toList
+
 
   override def images(hex: TerrainHex, field: TerrainHexField): List[MImage] = {
     val neighbours = field.neighboursWithDirections(hex.x, hex.y)
@@ -51,6 +51,10 @@ object WoodenBridge extends MapObject("woodenBridge") {
   }
 
   private def imagesForWoodenBridgeNeighbour(hex: TerrainHex, field: TerrainHexField): List[MImage] = {
+    if (hex.mapObj.contains(WoodenBridge)) {
+      return Nil
+    }
+
     val bridges = field.neighboursWithDirections(hex.x, hex.y).
       filter(pair => pair._2.mapObj.contains(WoodenBridge))
     val directions = bridges.flatMap { case (direction, neig) =>

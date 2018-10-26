@@ -51,10 +51,10 @@ class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer
   def movementOptions_=(viewsOpt: Option[Set[TerrainHexView]]) {
     def darkHexes(opts: Set[TerrainHexView]) = realHexes.toSet -- opts -- arrowHexes
 
-    _movementOptions.foreach(darkHexes(_).foreach(_.isDarkened = false))
+    _movementOptions.foreach(darkHexes(_).foreach(_.darkened = false))
 
     viewsOpt match {
-      case Some(views) => darkHexes(views).foreach(_.isDarkened = true)
+      case Some(views) => darkHexes(views).foreach(_.darkened = true)
       case None => // do nothing
     }
     _movementOptions = viewsOpt
@@ -153,11 +153,11 @@ class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer
 
   private val terrainWorldLayer = new CanvasLayer {
     def updateLayer(gc: GraphicsContext, viewRect: Rectangle2D) {
-      val dirty = calculateVisibleHexes(viewRect).filter(_.isTerrainDirty)
+      val dirty = calculateVisibleHexes(viewRect).filter(_.terrainDirty)
       List(TerrainImageStage, BuildingsForestStage,  ProvinceBordersStage).foreach { stage =>
         dirty foreach (_.drawItself(gc, stage, -viewRect.minX.toInt, -viewRect.minY.toInt))
       }
-      dirty.foreach(_.isTerrainDirty = false)
+      dirty.foreach(_.terrainDirty = false)
     }
 
     def drawLayer(gc: GraphicsContext, viewRect: Rectangle2D) {
@@ -165,13 +165,13 @@ class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer
       List(TerrainImageStage, BuildingsForestStage, ProvinceBordersStage).foreach { stage =>
         visibleHexes foreach (_.drawItself(gc, stage, -viewRect.minX.toInt, -viewRect.minY.toInt))
       }
-      visibleHexes.foreach(_.isTerrainDirty = false)
+      visibleHexes.foreach(_.terrainDirty = false)
     }
   }
 
   private val battleInterfaceBattleLayer = new CanvasLayer {
     def updateLayer(gc: GraphicsContext, viewRect: Rectangle2D) {
-      val dirty = calculateVisibleHexes(viewRect).filter(_.isInterfaceDirty)
+      val dirty = calculateVisibleHexes(viewRect).filter(_.interfaceDirty)
       List(ClearStage, ArrowStage, DefenceStage, EndInterfaceDrawing).foreach { stage =>
         dirty foreach (_.drawItself(gc, stage, -viewRect.minX.toInt, -viewRect.minY.toInt))
       }

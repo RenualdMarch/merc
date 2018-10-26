@@ -6,11 +6,7 @@ Current issues:
 
 //"-Dglass.win.uiScale=100%"
 
-Consider following:
 
-terrain additives specifically for given terrain types
-add winter weather on maps
-After wesnoth release take a look at images
 
 For M5, World Map changes are priority
 
@@ -23,14 +19,19 @@ For M5, World Map changes are priority
 +provinceView should not replace old houses when new culture arrives
 +provinceView should not use sqrt
 +Bug with bridges
-add water animation
-add windmill animation
-Add some beauty to map - e.g fields with grain and other cool things
 implement neighbours dirtying
-Complete world map UI without soldiers
 
 
 For M6, interface will be a priority, basic politics, factory building
 For M7, soldiers and battles and wars
 For M8, save/load, game polishing and AI
 For M9
+
+
+Consider following:
+
+terrain additives specifically for given terrain types
+add winter weather on maps
+water animation
+windmill animation
+Let map reflect actual province factories and resources

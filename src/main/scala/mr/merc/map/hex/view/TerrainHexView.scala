@@ -95,21 +95,21 @@ object TerrainHexView {
 class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: TerrainHexFieldView, val factor: Double) {
   private val arrowPath = "/images/arrows/"
 
-  val side = TerrainHexView.side(factor)
-  val textLength = TerrainHexView.textLength(factor)
+  val side: Int = TerrainHexView.side(factor)
+  val textLength: Int = TerrainHexView.textLength(factor)
 
-  val neighbours = field.neighboursWithDirections(hex.x, hex.y)
-  val directions = neighbours map (p => (p._2, p._1))
-  val x = findX
-  val y = findY
-  private var _isTerrainDirty = false
-  def isTerrainDirty = _isTerrainDirty
-  def isTerrainDirty_=(v: Boolean): Unit = {
-    if (!isTerrainDirty && v) {
-      this._isTerrainDirty = v
+  val neighbours: Map[Direction, TerrainHex] = field.neighboursWithDirections(hex.x, hex.y)
+  val directions: Map[TerrainHex, Direction]= neighbours map (p => (p._2, p._1))
+  val x: Int = findX
+  val y: Int = findY
+  private var _terrainDirty = false
+  def terrainDirty: Boolean = _terrainDirty
+  def terrainDirty_=(v: Boolean): Unit = {
+    if (!terrainDirty && v) {
+      this._terrainDirty = v
       fieldView.neighboursWithDirections(this).filter(neighbourShouldBeSetDirty _ tupled).foreach { case (_, view) =>
-        if (!view.isTerrainDirty) {
-          view.isTerrainDirty = v
+        if (!view.terrainDirty) {
+          view.terrainDirty = v
         }
       }
     }
@@ -117,22 +117,22 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
   }
 
   private def recalculateTerrainDirtIfNeeded(): Unit = {
-    if (isTerrainDirty) {
+    if (terrainDirty) {
       this.elements = calculateElements()
       this.sameOwnerBorders = calculateSameOwnerBorders()
       this.differentOwnerBorders = calculateDifferentOwnerBorders()
-      isTerrainDirty = false
+      terrainDirty = false
     }
   }
 
-  var _isAnimationDirty = false
+  var _animationDirty = false
 
-  def isAnimationDirty = _isAnimationDirty
-  def isAnimationDirty_=(v: Boolean): Unit = {
-    if (v && !isAnimationDirty) {
-      _isAnimationDirty = v
+  def animationDirty: Boolean = _animationDirty
+  def animationDirty_=(v: Boolean): Unit = {
+    if (v && !animationDirty) {
+      _animationDirty = v
       fieldView.neighboursWithDirections(this).filter(neighbourShouldBeSetDirty _ tupled).foreach { case (_, view) =>
-        view.isAnimationDirty = v
+        view.animationDirty = v
       }
     }
   }
@@ -142,43 +142,34 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
     false
   }
 
-  var isInterfaceDirty = true
-  var isDarkened = false
-  private var currentDarkened = isDarkened
+  var interfaceDirty = true
+  var darkened = false
+  private var currentDarkened = darkened
   private var _arrowStart: Option[Direction] = None
-  def arrowStart = _arrowStart
+  def arrowStart: Option[Direction] = _arrowStart
   def arrowStart_=(as: Option[Direction]) {
     if (as != _arrowStart) {
       _arrowStart = as
-      isInterfaceDirty = true
+      interfaceDirty = true
     }
   }
   private var _arrowEnd: Option[Direction] = None
-  def arrowEnd = _arrowEnd
+  def arrowEnd: Option[Direction] = _arrowEnd
   def arrowEnd_=(ae: Option[Direction]) {
     if (ae != _arrowEnd) {
       _arrowEnd = ae
-      isInterfaceDirty = true
+      interfaceDirty = true
     }
   }
 
   private var _defence: Option[(SoldierDefence, Boolean)] = None
-  def defence = _defence
+  def defence: Option[(SoldierDefence, Boolean)] = _defence
   def defence_=(d: Option[(SoldierDefence, Boolean)]) {
     if (_defence != d) {
       _defence = d
-      isInterfaceDirty = true
+      interfaceDirty = true
     }
   }
-
-  var _provinceSelected = false
-  def provinceSelected: Boolean = _provinceSelected
-  def provinceSelected_=(ps: Boolean): Unit = {
-    _provinceSelected = ps
-    isInterfaceDirty = true
-  }
-
-  private var currentProvinceSelected = provinceSelected
 
   override def toString = s"TerrainHexView[coords=(${hex.x}, ${hex.y}), pixels=($x,$y)]"
 
@@ -263,7 +254,7 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
     secondaryImage.foreach(_.scaledImage(factor).drawCenteredImage(gc, x, y, side, side))
   }
 
-  def darkeningShouldBeRedrawn: Boolean = isDarkened != currentDarkened
+  def darkeningShouldBeRedrawn: Boolean = darkened != currentDarkened
 
   def drawItself(gc: GraphicsContext, stage: HexDrawingStage, xOffset: Int, yOffset: Int) {
     recalculateTerrainDirtIfNeeded()
@@ -280,7 +271,7 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
       case HexGridStage =>
         drawHexGrid(gc, xOffset, yOffset)
       case EndInterfaceDrawing =>
-        isInterfaceDirty = false
+        interfaceDirty = false
       case ClearStage =>
         drawClearStage(gc, xOffset, yOffset)
       case ProvinceBordersStage =>
@@ -329,13 +320,9 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
 
     hex.province.foreach {province =>
       if (hex.terrain.isNot(WaterKind)) {
-        if (provinceSelected) {
-          drawLine(sameOwnerBorders, Color.Black, 4)
-          drawLine(differentOwnerBorders, province.owner.color, 8)
-        } else {
           drawLine(sameOwnerBorders, Color.Black, 1)
           drawLine(differentOwnerBorders, province.owner.color, 4)
-        }
+
       }
     }
   }
@@ -345,10 +332,10 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
   }
 
   private def drawMovementImpossibleIfNeeded(gc: GraphicsContext, xOffset: Int, yOffset: Int) {
-    if (isDarkened && arrowEnd.isEmpty) {
+    if (darkened && arrowEnd.isEmpty) {
       gc.drawImage(TerrainHexView.movementImpossibleCache(side), x + xOffset, y + yOffset)
     }
-    currentDarkened = isDarkened
+    currentDarkened = darkened
   }
 
   private def drawArrowStartIfNeeded(gc: GraphicsContext, xOffset: Int, yOffset: Int) {
@@ -377,8 +364,8 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
     gc.drawImage(TerrainHexView.hexGridImageCache(side), x + xOffset, y + yOffset)
   }
 
-  def center = (x + side / 2, y + side / 2)
-  def coords = (x, y)
+  def center:(Int, Int) = (x + side / 2, y + side / 2)
+  def coords:(Int, Int) = (x, y)
 }
 
 sealed trait HexDrawingStage
