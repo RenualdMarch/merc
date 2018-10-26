@@ -2,7 +2,7 @@ package mr.merc.economics
 
 import mr.merc.economics.Population._
 import mr.merc.economics.Products._
-import mr.merc.economics.MapUtil.MapWithOperations
+import mr.merc.economics.MapUtil.MapWithFloatOperations
 import mr.merc.map.objects.{House, HumanCityHouse, HumanVillageHouse}
 
 import scala.util.Random

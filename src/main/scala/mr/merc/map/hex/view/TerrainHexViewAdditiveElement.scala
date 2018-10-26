@@ -29,7 +29,11 @@ object TerrainHexViewAdditiveElement {
   def scanElements():Map[TerrainType, List[TerrainHexViewAdditiveElement]] = {
     (TerrainType.list ::: TerrainType.helperTypesList) map { t =>
       t -> possibleCombinations.flatMap { case x@(from, to) =>
-        val name = fileName(t, x)
+        val name = t.belowTerrainType match {
+          case None => fileName(t, x)
+          case Some(below) => fileName(below, x)
+        }
+
         Option(getClass.getResource(name)).map {_ =>
           TerrainHexViewAdditiveElement(t, from, to)
         }
@@ -45,7 +49,12 @@ case class TerrainHexViewAdditiveElement(terrainType: TerrainType, from: Directi
     from.toString().toLowerCase() + "-" + to.toString().toLowerCase()
   }
 
-  def path:String = "/images/terrain/" + terrainType.name + "/" + namePart + ".png"
+  private def name = terrainType.belowTerrainType match {
+    case Some(b) => b.name
+    case None => terrainType.name
+  }
+
+  def path:String = "/images/terrain/" + this.name + "/" + namePart + ".png"
 
   private lazy val image = MImage(path)
 

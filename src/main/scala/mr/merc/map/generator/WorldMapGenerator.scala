@@ -3,7 +3,7 @@ package mr.merc.map.generator
 import mr.merc.economics.WorldGenerator
 import mr.merc.map.ShortestGrid
 import mr.merc.map.hex._
-import mr.merc.map.objects.WoodenBridge
+import mr.merc.map.objects.{Flowers, WoodenBridge}
 import mr.merc.map.pathfind.PathFinder
 import mr.merc.map.terrain._
 
@@ -50,6 +50,7 @@ object WorldMapGenerator {
     provincesMap.keys.foreach { cap =>
       makeRoadAroundCapitals(terrainField, cap)
     }
+    addFlowers(terrainField)
 
     WorldMap(terrainField, provincesMap.map {
       case (capital, hexes) =>
@@ -147,6 +148,12 @@ object WorldMapGenerator {
       if (h.terrain.isNot(WaterKind)) {
         h.terrain = GrassyRoad
       }
+    }
+  }
+
+  def addFlowers(field: TerrainHexField): Unit = {
+    field.hexes.filter(_.terrain.is(GrassKind)).filter(_.mapObj.isEmpty).grouped(10).map(_.head).foreach {
+      h => h.mapObj = Some(Flowers)
     }
   }
 }

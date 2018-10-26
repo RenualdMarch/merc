@@ -6,7 +6,7 @@ import mr.merc.economics.Products._
 import mr.merc.map.generator.WorldMapGenerator
 import mr.merc.map.hex.{TerrainHex, TerrainHexField}
 import mr.merc.map.terrain.WaterKind
-import mr.merc.players.CyclicColorGeneratorWithNames
+import mr.merc.players.{BestColorsGeneratorWithNames, CyclicColorGeneratorWithNames}
 import mr.merc.politics.{Province, State}
 import mr.merc.util.WeightedRandom
 
@@ -34,7 +34,7 @@ class WorldGenerator(field:TerrainHexField) {
 
   import scala.collection.JavaConverters._
   private val config = ConfigFactory.load("conf/worldGenerationEconomics")
-  private val colorGenerator = new CyclicColorGeneratorWithNames()
+  private val colorGenerator = new BestColorsGeneratorWithNames()
 
   private val minResources = config.getInt("world.resources.resourcesPerRegion.min")
   private val maxResources = config.getInt("world.resources.resourcesPerRegion.max")
@@ -248,7 +248,7 @@ class WorldGenerator(field:TerrainHexField) {
 object WorldGenerator {
   private val worldMapWidth = 100
   private val worldMapHeight = 100
-  private val hexesPerProvince = 200
+  private val hexesPerProvince = 250
   private val provinces = (worldMapHeight * worldMapWidth * WorldMapGenerator.landPercentage / hexesPerProvince).toInt
 
   def generateWorld(): (Map[State, List[Province]], TerrainHexField) = {

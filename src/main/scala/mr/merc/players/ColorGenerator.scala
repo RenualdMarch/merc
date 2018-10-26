@@ -48,7 +48,7 @@ class ColorGenerator {
 }
 
 class CyclicColorGeneratorWithNames {
-  private val colors:Vector[(String, Color)] = Random.shuffle(Vector(
+  private val colors: Vector[(String, Color)] = Random.shuffle(Vector(
     "AliceBlue" -> Color.AliceBlue,
     "AntiqueWhite" -> Color.AntiqueWhite,
     "Aqua" -> Color.Aqua,
@@ -199,7 +199,34 @@ class CyclicColorGeneratorWithNames {
   ))
 
   private var counter = 0
-  def nextNameAndColor():(String, Color) = {
+
+  def nextNameAndColor(): (String, Color) = {
+    val result = colors(counter)
+    if (counter + 1 == colors.size) {
+      counter = 0
+    } else {
+      counter += 1
+    }
+    result
+  }
+}
+
+class BestColorsGeneratorWithNames {
+
+  private val colors: Vector[(String, Color)] = Random.shuffle(Vector(
+    "White" -> Color.White,
+    "Black" -> Color.Black,
+    "Red" -> Color.Red,
+    "Green" -> Color.Green,
+    "Blue" -> Color.Blue,
+    "Yellow" -> Color.Yellow,
+    "Magenta" -> Color.Magenta,
+    "Cyan" -> Color.Cyan
+  ))
+
+  private var counter = 0
+
+  def nextNameAndColor(): (String, Color) = {
     val result = colors(counter)
     if (counter + 1 == colors.size) {
       counter = 0

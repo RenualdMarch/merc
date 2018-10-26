@@ -3,7 +3,6 @@ package mr.merc.map.hex.view
 import mr.merc.map.terrain._
 import mr.merc.map.hex._
 
-import scala.collection.BitSet
 
 object TerrainHexViewAdditiveRule {
   // first is drawn first

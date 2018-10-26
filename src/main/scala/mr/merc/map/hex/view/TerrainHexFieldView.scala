@@ -321,13 +321,6 @@ class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer
 
     new Polygon(begin1, begin2, end2, end1)
   }
-
-  def setTerrainDirty(x: Int, y: Int): Unit = {
-    hex(x, y).isTerrainDirty = true
-    neighbours(hex(x, y)).foreach { h =>
-      h.isTerrainDirty = true
-    }
-  }
 }
 
 object TerrainHexFieldView {

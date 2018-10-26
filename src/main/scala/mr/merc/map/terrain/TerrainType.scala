@@ -5,12 +5,12 @@ import mr.merc.util.MercUtils
 
 object TerrainType {
   def list:List[TerrainType] = List(GreenGrass, DryGrass, SemidryGrass, ShallowWater, BasicMountain, DesertSand,
-    BasicHill, CleanRoad, OldRoad, DirtRoad, GrassyRoad, DecForest, PineForest, MixedForest, Castle, Mud)
+    BasicHill, CleanRoad, OldRoad, DirtRoad, GrassyRoad, DecForest, PineForest, MixedForest, Castle, Mud, LeafLitter)
 
   def helperTypesList:List[TerrainType] = List(BankInside, BankOutside)
 }
 
-abstract sealed class TerrainType(val name: String, val kind:TerrainKind, val layer: Int = 0) {
+abstract sealed class TerrainType(val name: String, val kind:TerrainKind, val layer: Int = 0, val belowTerrainType:Option[TerrainType] = None) {
   lazy val imagePaths:Vector[MImage] = {
     val result = Stream.from(1).map { i =>
       val path = s"/images/terrain/$name/$i.png"
@@ -51,6 +51,8 @@ case object EmptyKind extends TerrainKind
 case object GreenGrass extends TerrainType("green", GrassKind)
 case object DryGrass extends TerrainType("dry", GrassKind)
 case object SemidryGrass extends TerrainType("semidry", GrassKind)
+case object LeafLitter extends TerrainType(name="leafLitter", GrassKind)
+case object Farm extends TerrainType("farm", GrassKind, belowTerrainType = Some(LeafLitter))
 
 case object ShallowWater extends TerrainType("water", WaterKind)
 // helper types
@@ -67,9 +69,9 @@ case object OldRoad extends TerrainType("oldRoad", RoadKind)
 case object DirtRoad extends TerrainType("dirt", RoadKind)
 case object GrassyRoad extends TerrainType("grassyRoad", RoadKind)
 
-case object DecForest extends TerrainType("decForest", ForestKind)
-case object PineForest extends TerrainType("pineForest", ForestKind)
-case object MixedForest extends TerrainType("mixedForest", ForestKind)
+case object DecForest extends TerrainType("decForest", ForestKind, belowTerrainType = Some(GreenGrass))
+case object PineForest extends TerrainType("pineForest", ForestKind, belowTerrainType = Some(GreenGrass))
+case object MixedForest extends TerrainType("mixedForest", ForestKind, belowTerrainType = Some(GreenGrass))
 
 case object Castle extends TerrainType("cobbles", WallsKind) {
   override lazy val imagePaths: Vector[MImage] = {

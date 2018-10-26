@@ -32,7 +32,7 @@ object TerrainHexViewAdditive {
     (add.hexTerrainType.kind, add.neighbourTerrainType.kind) match {
       case (EmptyKind, _) | (_, EmptyKind)=> None
       case (WaterKind, WaterKind) => Some(add)
-      case (ForestKind, _) => None
+      case (_, _) if add.hexTerrainType.belowTerrainType.isDefined => None
       case (_, WaterKind) => Some(new TerrainHexViewAdditive(add.from, add.to, add.hexTerrainType, BankOutside))
       case (WaterKind, _) => Some(new TerrainHexViewAdditive(add.from, add.to, add.hexTerrainType, BankInside))
       case (MountainKind, _) => None

@@ -103,15 +103,26 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
   val x = findX
   val y = findY
   private var _isTerrainDirty = false
-  def isTerrainDirty: Boolean = _isTerrainDirty
+  def isTerrainDirty = _isTerrainDirty
   def isTerrainDirty_=(v: Boolean): Unit = {
-    if(!_isTerrainDirty && v) {
+    if (!isTerrainDirty && v) {
+      this._isTerrainDirty = v
+      fieldView.neighboursWithDirections(this).filter(neighbourShouldBeSetDirty _ tupled).foreach { case (_, view) =>
+        if (!view.isTerrainDirty) {
+          view.isTerrainDirty = v
+        }
+      }
+    }
+
+  }
+
+  private def recalculateTerrainDirtIfNeeded(): Unit = {
+    if (isTerrainDirty) {
       this.elements = calculateElements()
       this.sameOwnerBorders = calculateSameOwnerBorders()
       this.differentOwnerBorders = calculateDifferentOwnerBorders()
+      isTerrainDirty = false
     }
-
-    _isTerrainDirty = v
   }
 
   var _isAnimationDirty = false
@@ -120,18 +131,15 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
   def isAnimationDirty_=(v: Boolean): Unit = {
     if (v && !isAnimationDirty) {
       _isAnimationDirty = v
-      fieldView.neighboursWithDirections(this).filter(neighbourShouldBeSetAnimationDirty _ tupled).foreach { case (_, view) =>
+      fieldView.neighboursWithDirections(this).filter(neighbourShouldBeSetDirty _ tupled).foreach { case (_, view) =>
         view.isAnimationDirty = v
       }
     }
-
   }
 
-  private def neighbourShouldBeSetAnimationDirty(dir: Direction, neig: TerrainHexView): Boolean = {
-    if (!neig.isAnimationDirty) {
-      // TODO implement me
-      false
-    } else false
+  private def neighbourShouldBeSetDirty(dir: Direction, neig: TerrainHexView): Boolean = {
+    // TODO implement me
+    false
   }
 
   var isInterfaceDirty = true
@@ -195,18 +203,15 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
   }
 
   def image: MImage = {
-    if (hex.terrain.is(ForestKind)) {
-      GreenGrass.image(hex.x, hex.y)
-    } else {
-      hex.terrain.image(hex.x, hex.y)
+    hex.terrain.belowTerrainType match {
+      case Some(b) => b.image(hex.x, hex.y)
+      case None => hex.terrain.image(hex.x, hex.y)
     }
   }
 
   def secondaryImage: Option[MImage] = {
-    if (hex.terrain.is(ForestKind)) {
-      Some(hex.terrain.image(hex.x, hex.y))
-    } else {
-      None
+    hex.terrain.belowTerrainType.map {_ =>
+      hex.terrain.image(hex.x, hex.y)
     }
   }
 
@@ -217,7 +222,7 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
 
   def neighbourMapObjects: List[MImage] = {
     val neigMapObj = field.neighbours(hex).filter(p => p.mapObj.isDefined && p.mapObj != hex.mapObj)
-    neigMapObj.flatMap(p => p.mapObj.get.images(hex, field)).toList
+    neigMapObj.flatMap(p => p.mapObj.get.images(hex, field))
   }
 
   def drawCastleAndWalls(gc: GraphicsContext, xOffset: Int, yOffset: Int): Unit = {
@@ -244,7 +249,7 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
     }
   }
 
-  def drawHouseIfNeeded(gc: GraphicsContext, xOffset: Int, yOffset: Int): Unit = {
+  def drawMapObjectIfNeeded(gc: GraphicsContext, xOffset: Int, yOffset: Int): Unit = {
     if (hex.mapObj.exists(_.isInstanceOf[House])) {
       val x = this.x + xOffset
       val y = this.y + yOffset
@@ -252,7 +257,7 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
     }
   }
 
-  def drawForestIfNeeded(gc: GraphicsContext, xOffset: Int, yOffset: Int): Unit = {
+  def drawSecondaryImageIfNeeded(gc: GraphicsContext, xOffset: Int, yOffset: Int): Unit = {
     val x = this.x + xOffset
     val y = this.y + yOffset
     secondaryImage.foreach(_.scaledImage(factor).drawCenteredImage(gc, x, y, side, side))
@@ -261,6 +266,7 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
   def darkeningShouldBeRedrawn: Boolean = isDarkened != currentDarkened
 
   def drawItself(gc: GraphicsContext, stage: HexDrawingStage, xOffset: Int, yOffset: Int) {
+    recalculateTerrainDirtIfNeeded()
     stage match {
       case TerrainImageStage =>
         drawTerrainImage(gc, xOffset, yOffset)
@@ -281,8 +287,8 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
         drawProvinceBorder(gc, xOffset, yOffset)
       case BuildingsForestStage =>
         drawCastleAndWalls(gc, xOffset, yOffset)
-        drawHouseIfNeeded(gc, xOffset, yOffset)
-        drawForestIfNeeded(gc, xOffset, yOffset)
+        drawMapObjectIfNeeded(gc, xOffset, yOffset)
+        drawSecondaryImageIfNeeded(gc, xOffset, yOffset)
     }
   }
 

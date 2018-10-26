@@ -20,13 +20,15 @@ For M5, World Map changes are priority
 +Performance optimization for huge maps
 +Add different images for same terrain type
 +Bug with lone sand
++provinceView should not replace old houses when new culture arrives
++provinceView should not use sqrt
++Bug with bridges
 add water animation
 add windmill animation
-Bug with bridges
 Add some beauty to map - e.g fields with grain and other cool things
+implement neighbours dirtying
 Complete world map UI without soldiers
-provinceView should not replace old houses when new culture arrives
-provinceView should not use sqrt
+
 
 For M6, interface will be a priority, basic politics, factory building
 For M7, soldiers and battles and wars
