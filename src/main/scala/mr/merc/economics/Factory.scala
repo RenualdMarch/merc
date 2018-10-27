@@ -9,7 +9,7 @@ object Factory {
   case class FactoryStorage(unsoldProducts: Double, money: Double, unusedProducts: Map[Product, Double])
 
   case class FactoryRecord(produced: Double, moneySpentOnResources: Double, moneyOnWorkforceSalary: Double,
-                           moneyOnOwnersPayment: Double, corporateTax: Double, moneyLeftInFactoryBudget: Double,
+                           moneyOnOwnersPayment: Double, corporateTax: Double, moneyToFactoryBudget: Double,
                            peopleResources:Map[Population, Double], sold: Map[EconomicRegion, FulfilledSupplyRequestProfit]) {
     def earnings: Double = sold.values.map(p => p.profitPerItem * p.request.sold).sum
     def itemsSold: Double = sold.values.map(_.request.sold).sum
@@ -22,10 +22,9 @@ abstract class Factory[Producible <: ProducibleProduct](val region: EconomicRegi
 
   private val FactoryRecordsMax = 30
 
-  private val ProfitPartToWorkers = 0.4
-  private val ProfitPartToOwners = 0.4
+  private val ProfitPartToWorkers = 0.5
+  private val ProfitPartToOwners = 0.5
   // TODO move money to storage smartly
-  private val ProfitPartToStorage = 0.2
 
   private val noMaintenancePenalty = 0.3
 
@@ -50,6 +49,15 @@ abstract class Factory[Producible <: ProducibleProduct](val region: EconomicRegi
   private def costOfOneOutput(prices:Map[Product, Double]): Double = product.components.map { case (p, count) => prices(p) * count }.sum
 
   def factoryStorage: FactoryStorage = storage
+
+  private [economics] def maxMoneyReserves: Double = {
+    val neededForProduction = product.components.mapValues(_ * maxPossibleInputToUse)
+    val neededForMaintenance = requiredMaintenance
+    val maxNeededForDay = neededForProduction |+| neededForMaintenance
+    maxNeededForDay.map { case (p, c) =>
+      region.regionMarket.currentPrices(p) * c
+    }.sum
+  }
 
   private def capacity(prices:Map[Product, Double]): Double = {
     val maintenancePrice = requiredMaintenance.toList.map { case (p, count) =>
@@ -129,25 +137,39 @@ abstract class Factory[Producible <: ProducibleProduct](val region: EconomicRegi
   private def efficiency(pop:Population, workers: Double):Double = pop.efficiency * workers
 
   private def calculateEarningsDistribution(): Unit = {
-    val moneyToShare = currentRecord.factoryBuySellProfit * (1 - currentTaxPolicy.corporateTax)
-    if (moneyToShare < 0) {
-      return
-    } //do nothing because all values are already zero
-
-    if (currentRecord.peopleResources.values.sum == 0) {
+    val tax = currentRecord.factoryBuySellProfit * currentTaxPolicy.corporateTax
+    if (tax < 0) {
       currentRecord = currentRecord.copy(
-        corporateTax = currentRecord.factoryBuySellProfit * currentTaxPolicy.corporateTax,
+        corporateTax = 0,
         moneyOnWorkforceSalary = 0,
-        moneyOnOwnersPayment = moneyToShare * ProfitPartToOwners + moneyToShare * ProfitPartToWorkers,
-        moneyLeftInFactoryBudget = moneyToShare * ProfitPartToStorage
+        moneyOnOwnersPayment = 0,
+        moneyToFactoryBudget = 0
       )
     } else {
-      currentRecord = currentRecord.copy(
-        corporateTax = currentRecord.factoryBuySellProfit * currentTaxPolicy.corporateTax,
-        moneyOnWorkforceSalary = moneyToShare * ProfitPartToWorkers,
-        moneyOnOwnersPayment = moneyToShare * ProfitPartToOwners,
-        moneyLeftInFactoryBudget = moneyToShare * ProfitPartToStorage
-      )
+      val moneyToPeople = storage.money - tax - maxMoneyReserves
+      if (moneyToPeople < 0) {
+        // then all money goes to storage, no salary and no dividents
+        currentRecord = currentRecord.copy(
+          corporateTax = tax,
+          moneyOnWorkforceSalary = 0,
+          moneyOnOwnersPayment = 0,
+          moneyToFactoryBudget = storage.money - tax
+        )
+      } else if (currentRecord.peopleResources.values.sum == 0) {
+        currentRecord = currentRecord.copy(
+          corporateTax = tax,
+          moneyOnWorkforceSalary = 0,
+          moneyOnOwnersPayment = moneyToPeople,
+          moneyToFactoryBudget = maxMoneyReserves
+        )
+      } else {
+        currentRecord = currentRecord.copy(
+          corporateTax = currentRecord.factoryBuySellProfit * currentTaxPolicy.corporateTax,
+          moneyOnWorkforceSalary = moneyToPeople * ProfitPartToWorkers,
+          moneyOnOwnersPayment = moneyToPeople * ProfitPartToOwners,
+          moneyToFactoryBudget = maxMoneyReserves
+        )
+      }
     }
   }
 

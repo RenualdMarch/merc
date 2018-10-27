@@ -7,22 +7,22 @@ Current issues:
 //"-Dglass.win.uiScale=100%"
 
 
-
-For M5, World Map changes are priority
-
-+Add rivers
-+Add roads between cities with bridges across seas
-+Make cities of different size instead of lone castles
-+Performance optimization for huge maps
-+Add different images for same terrain type
-+Bug with lone sand
-+provinceView should not replace old houses when new culture arrives
-+provinceView should not use sqrt
-+Bug with bridges
-+implement neighbours dirtying
-
-
 For M6, interface will be a priority, basic politics, factory building
++fix factory saving percentage - it should create reserve for next n days(n = 1 or more)
+
+interface - Province population, hapiness, literacy, salary, moneyReserves
+interface - Province enterprises: resources, factories, avg
+no more than percentage of people can be capitalists and aristocrats
+add churches to provinces
+Budget interface
+inner politics - parties, government, types of states, party loyalty
+migration(with churches creation and destruction)
+people have two sources of unhappiness - not fulfilled needs and political stuff
+projects - when capitalists or ruler want to expand factory, or hire a soldier, eventual price is unknown.
+if there is no supply but demand, price rises faster.
+More tasks???
+
+
 For M7, soldiers and battles and wars
 For M8, save/load, game polishing and AI
 For M9

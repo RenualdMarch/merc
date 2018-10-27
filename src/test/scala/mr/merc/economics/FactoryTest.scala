@@ -4,9 +4,11 @@ import mr.merc.economics.Factory.FactoryRecord
 import mr.merc.economics.Population._
 import mr.merc.economics.Products._
 import mr.merc.politics.State
+import org.mockito.Mockito._
+import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfter, FunSuite}
 
-class FactoryTest extends FunSuite with BeforeAndAfter {
+class FactoryTest extends FunSuite with BeforeAndAfter with MockitoSugar {
 
   var capitalists: Population = _
   var region1:EconomicRegion = _
@@ -16,15 +18,18 @@ class FactoryTest extends FunSuite with BeforeAndAfter {
 
   val zeroTaxes = SalaryTaxPolicy(Map(Upper -> 0, Middle -> 0, Lower -> 0))
 
+  var testRegionMarket: RegionMarket = _
+
   before {
     capitalists = new Population(LatinHuman, Capitalists, 1000, 0, 0)
     capitalists.newDay(zeroTaxes)
     owner = new State("", WesternHuman, new StateBudget(0), TaxPolicy.zeroTaxes)
+    testRegionMarket = mock[RegionMarket]
 
     region1 = new EconomicRegion {
       override def economicNeighbours: Set[EconomicRegion] = Set(region2, region1)
 
-      override val regionMarket: RegionMarket = null
+      override val regionMarket: RegionMarket = testRegionMarket
       override val regionPopulation: RegionPopulation = new RegionPopulation(List(capitalists))
 
       override def toString: String = "region1"
@@ -35,7 +40,7 @@ class FactoryTest extends FunSuite with BeforeAndAfter {
     region2 = new EconomicRegion {
       override def economicNeighbours: Set[EconomicRegion] = Set(region1, region3)
 
-      override val regionMarket: RegionMarket = null
+      override val regionMarket: RegionMarket = testRegionMarket
       override val regionPopulation: RegionPopulation = null
 
       override def toString: String = "region2"
@@ -46,7 +51,7 @@ class FactoryTest extends FunSuite with BeforeAndAfter {
     region3 = new EconomicRegion {
       override def economicNeighbours: Set[EconomicRegion] = Set(region1, region2)
 
-      override val regionMarket: RegionMarket = null
+      override val regionMarket: RegionMarket = testRegionMarket
       override val regionPopulation: RegionPopulation = null
 
       override def toString: String = "region3"
@@ -59,6 +64,8 @@ class FactoryTest extends FunSuite with BeforeAndAfter {
     val factory = new IndustrialFactory(region1, Wine, 2, 1000000, 40000, 20, 1)
 
     val prices = Map[Product, Double](Glass -> 10, Fruit -> 5, MachineParts -> 1)
+
+    when(testRegionMarket.currentPrices).thenReturn(prices)
 
     factory.newDay(CorporateTaxPolicy(0.1))
     assert(factory.dayRecords === Vector())
@@ -102,9 +109,13 @@ class FactoryTest extends FunSuite with BeforeAndAfter {
     factory.payMoneyToPops()
     val taxes = (moneyEarned - moneySpentOnResources) * 0.1
     assert(factory.payTaxes() === taxes)
+    val maxReserves = 16000 * prices(Glass) + 24000 * prices(Fruit) + 1000 * prices(MachineParts)
+    assert(factory.maxMoneyReserves === maxReserves)
+    val moneyToSpend = moneyBalanceAfterDemand + moneyEarned - taxes - maxReserves
 
-    assert(workers.moneyReserves === (moneyEarned - moneySpentOnResources) * 0.9 * 0.4)
-    assert(capitalists.moneyReserves === (moneyEarned - moneySpentOnResources) * 0.9 * 0.4)
+    assert(workers.moneyReserves === moneyToSpend * 0.5)
+    assert(capitalists.moneyReserves === moneyToSpend * 0.5)
+    assert(factory.currentMoneyBalance === maxReserves)
 
     factory.produce()
 
@@ -114,15 +125,13 @@ class FactoryTest extends FunSuite with BeforeAndAfter {
 
     factory.endOfDay()
 
-    assert(capitalists.moneyReserves === (moneyEarned - moneySpentOnResources) * 0.9 * 0.4)
-
     assert(factory.dayRecords === Vector(FactoryRecord(
       produced = 40000,
       moneySpentOnResources = moneySpentOnResources,
-      moneyOnWorkforceSalary = (moneyEarned - moneySpentOnResources) * 0.9 * 0.4,
-      moneyOnOwnersPayment = (moneyEarned - moneySpentOnResources) * 0.9 * 0.4,
+      moneyOnWorkforceSalary = moneyToSpend * 0.5,
+      moneyOnOwnersPayment = moneyToSpend * 0.5,
       corporateTax = taxes,
-      moneyLeftInFactoryBudget = (moneyEarned - moneySpentOnResources) * 0.9 * 0.2,
+      moneyToFactoryBudget = maxReserves,
       peopleResources = Map(workers -> 2000),
       sold = Map(region1 -> profit)
     )))
@@ -131,6 +140,7 @@ class FactoryTest extends FunSuite with BeforeAndAfter {
   test("factory usage general flow - deficit path") {
     val factory = new IndustrialFactory(region1, Wine, 2, 2000, 40000, 20, 1)
     val prices = Map[Product, Double](Glass -> 1, Fruit -> 1, MachineParts -> 1)
+    when(testRegionMarket.currentPrices).thenReturn(prices)
 
     factory.newDay(CorporateTaxPolicy(0.1))
     assert(factory.dayRecords === Vector())
@@ -193,16 +203,18 @@ class FactoryTest extends FunSuite with BeforeAndAfter {
       moneyOnWorkforceSalary = 0,
       moneyOnOwnersPayment = 0,
       corporateTax = taxes,
-      moneyLeftInFactoryBudget = 0,
+      moneyToFactoryBudget = 0,
       peopleResources = Map(workers -> 2.5),
       sold = Map(region1 -> profit1, region2 -> profit2)
     )))
   }
 
   test("no workers came, factory sold from storage") {
-    val factory = new IndustrialFactory(region1, Wine, 2, 1000000, 40000, 20, 1)
+    val startingMoney = 1000000
+    val factory = new IndustrialFactory(region1, Wine, 2, startingMoney, 40000, 20, 1)
 
     val prices = Map[Product, Double](Glass -> 10, Fruit -> 5, MachineParts -> 1)
+    when(testRegionMarket.currentPrices).thenReturn(prices)
 
     factory.newDay(CorporateTaxPolicy(0.1))
     assert(factory.dayRecords === Vector())
@@ -228,7 +240,7 @@ class FactoryTest extends FunSuite with BeforeAndAfter {
     val moneySpentOnResources = 16000 * 10 + 24000 * 5 + 1000
     val moneyEarned = 40000 * 100
 
-    assert(factory.currentMoneyBalance === 1000000 - moneySpentOnResources)
+    assert(factory.currentMoneyBalance === startingMoney - moneySpentOnResources)
     val moneyBalanceAfterDemand = factory.currentMoneyBalance
     val profit = FulfilledSupplyRequestProfit(FulfilledSupplyRequest(40000, sell.head._2), 100)
     factory.receiveSellingResultAndMoney(region1, profit)
@@ -250,15 +262,15 @@ class FactoryTest extends FunSuite with BeforeAndAfter {
 
     factory.endOfDay()
 
-    assert(capitalists.moneyReserves === (moneyEarned - moneySpentOnResources) * 0.9 * 0.8)
+    assert(capitalists.moneyReserves === startingMoney + moneyEarned - moneySpentOnResources - taxes - factory.maxMoneyReserves)
 
     assert(factory.dayRecords === Vector(FactoryRecord(
       produced = 0,
       moneySpentOnResources = moneySpentOnResources,
       moneyOnWorkforceSalary = 0,
-      moneyOnOwnersPayment = (moneyEarned - moneySpentOnResources) * 0.9 * 0.8,
+      moneyOnOwnersPayment = startingMoney + moneyEarned - moneySpentOnResources - taxes - factory.maxMoneyReserves,
       corporateTax = taxes,
-      moneyLeftInFactoryBudget = (moneyEarned - moneySpentOnResources) * 0.9 * 0.2,
+      moneyToFactoryBudget = factory.maxMoneyReserves,
       peopleResources = Map(),
       sold = Map(region1 -> profit)
     )))
