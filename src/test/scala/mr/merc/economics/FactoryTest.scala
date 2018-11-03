@@ -23,7 +23,7 @@ class FactoryTest extends FunSuite with BeforeAndAfter with MockitoSugar {
   before {
     capitalists = new Population(LatinHuman, Capitalists, 1000, 0, 0)
     capitalists.newDay(zeroTaxes)
-    owner = new State("", WesternHuman, new StateBudget(0), TaxPolicy.zeroTaxes)
+    owner = new State("", KnightHuman, new StateBudget(0), TaxPolicy.zeroTaxes)
     testRegionMarket = mock[RegionMarket]
 
     region1 = new EconomicRegion {

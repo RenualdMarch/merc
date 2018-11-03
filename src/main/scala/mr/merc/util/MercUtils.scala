@@ -1,5 +1,7 @@
 package mr.merc.util
 
+import scalafx.scene.paint.Color
+
 import scala.util.Random
 
 object MercUtils {
@@ -33,5 +35,9 @@ object MercUtils {
 
   def stablePseudoRandomIndex(x: Int, y: Int, size: Int): Int = {
     (x * 19 + y * 17) % size
+  }
+
+  def colorToStyle(color: Color):String = {
+    s"rgb(${(color.red * 255).toInt},${(color.green * 255).toInt},${(color.blue * 255).toInt})"
   }
 }

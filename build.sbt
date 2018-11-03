@@ -34,7 +34,7 @@ libraryDependencies += "com.projectdarkstar.ext.jorbis" % "jorbis" % "0.0.17"
 
 libraryDependencies += "de.huxhorn.sulky" % "de.huxhorn.sulky.3rdparty.jlayer" % "1.0"
 
-libraryDependencies += "com.miglayout" % "miglayout-javafx" % "4.2"
+libraryDependencies += "com.miglayout" % "miglayout-javafx" % "5.1"
 
 libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.0.6"
 
@@ -43,6 +43,16 @@ libraryDependencies += "org.imgscalr" % "imgscalr-lib" % "4.2"
 libraryDependencies += "org.typelevel" %% "cats-core" % "1.0.0-RC1"
 
 libraryDependencies += "com.typesafe" % "config" % "1.3.2"
+
+libraryDependencies += "org.kordamp.ikonli" % "ikonli-javafx" % "11.0.0"
+
+libraryDependencies += "org.kordamp.ikonli" % "ikonli-fontawesome-pack" % "11.0.0"
+
+libraryDependencies += "org.kordamp.ikonli" % "ikonli-entypo-pack" % "11.0.0"
+
+libraryDependencies += "org.controlsfx" % "controlsfx" % "9.0.0"
+
+libraryDependencies += "com.object-refinery" % "orsoncharts" % "1.7"
 
 libraryDependencies += "com.github.andr83" %% "scalaconfig" % "0.4"
 

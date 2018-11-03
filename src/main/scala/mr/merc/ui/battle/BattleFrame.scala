@@ -1,42 +1,26 @@
 package mr.merc.ui.battle
 
-import java.net.URL
-import java.util.ResourceBundle
 
 import scalafx.scene.layout.VBox
-import scalafx.scene.canvas.Canvas
 import scalafx.scene.layout.BorderPane
-import scalafx.scene.image.ImageView
 import scalafx.scene.text.Text
-import mr.merc.ui.common.SoldierWrapper
 
 import scalafx.animation.Timeline
 import scalafx.animation.KeyFrame
 import mr.merc.battle.BattleController
 
-import scalafx.scene.paint.Color
-import scalafx.util.Duration
 import scalafx.animation.Animation
 import mr.merc.battle.BattleControllerParent
-import mr.merc.map.hex.TerrainHexField
 import mr.merc.unit.Soldier
-import mr.merc.map.GameField
-import mr.merc.players.Player
-import mr.merc.unit.SoldierType
 import mr.merc.map.hex.TerrainHex
-import mr.merc.map.objects._
-import mr.merc.map.terrain._
-
 import scalafx.scene.control.Button
 import scalafx.event.ActionEvent
 import scalafx.scene.Node
-import scalafx.stage.Window
 import mr.merc.ui.minimap.Minimap
 
 import scalafx.geometry.Pos._
 import scalafx.scene.layout.GridPane
 import mr.merc.local.Localization
-import javafx.{event => jfxe}
 import javafx.scene.{input => jfxin}
 
 import mr.merc.ui.common.ConversionUtils._

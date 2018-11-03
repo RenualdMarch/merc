@@ -1,11 +1,13 @@
 package mr.merc.map.view
 
-import mr.merc.map.hex.view.TerrainHexFieldView
+import mr.merc.map.hex.view.{TerrainHexFieldView, TerrainHexView}
 import mr.merc.map.hex.TerrainHexField
 import mr.merc.unit.view.SoldierView
 import mr.merc.view.move.Movement
 import mr.merc.log.Logging
 import mr.merc.map.hex.view.TerrainHexFieldView.{BattleFieldViewMode, FieldViewMode}
+import mr.merc.map.terrain.WaterKind
+import mr.merc.politics.Province
 
 // TODO add update method which handles case when soldiers changed
 class MapView(field: TerrainHexField, factor: Double, val soldiersDrawer: SoldiersDrawer[SoldierView] = new SoldiersDrawer[SoldierView](), mode:FieldViewMode = BattleFieldViewMode) extends Logging {
@@ -13,7 +15,12 @@ class MapView(field: TerrainHexField, factor: Double, val soldiersDrawer: Soldie
 
   createSoldiers foreach (soldiersDrawer.addSoldier)
 
-  def hexByPixel(x: Int, y: Int) = terrainView.hexByPixelCoords(x, y)
+  def hexByPixel(x: Int, y: Int):Option[TerrainHexView] = terrainView.hexByPixelCoords(x, y)
+
+  def provinceByPixel(x: Int, y: Int):Option[Province] = {
+    val hexOpt = hexByPixel(x, y)
+    hexOpt.filter(_.hex.terrain.isNot(WaterKind)).flatMap(_.hex.province)
+  }
 
   def soldiers = soldiersDrawer.soldiers
 

@@ -1,6 +1,5 @@
 package mr.merc.ui.common
 
-import mr.merc.util.MercUtils
 import scalafx.beans.property.DoubleProperty
 import scalafx.scene.layout.Pane
 import scalafx.scene.canvas.GraphicsContext

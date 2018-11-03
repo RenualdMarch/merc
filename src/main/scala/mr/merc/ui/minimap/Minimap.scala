@@ -18,6 +18,7 @@ import mr.merc.ui.common.ConversionUtils._
 import mr.merc.ui.common.{ImageHelper, ScrollPaneLike}
 import scalafx.scene.image.Image
 import scalafx.Includes._
+import scalafx.scene.input.MouseEvent
 
 class Minimap(field: TerrainHexField, pane: ScrollPaneLike, factor: Double) extends Pane {
   private val mapCanvas = new Canvas()
@@ -57,8 +58,8 @@ class Minimap(field: TerrainHexField, pane: ScrollPaneLike, factor: Double) exte
   this.width.onChange(refreshMapCanvas())
   this.height.onChange(refreshMapCanvas())
 
-  scrollCanvas.delegate.addEventHandler(jfxin.MouseEvent.MOUSE_CLICKED, canvasMouseClicked _)
-  scrollCanvas.delegate.addEventHandler(jfxin.MouseEvent.MOUSE_DRAGGED, canvasMouseClicked _)
+  scrollCanvas.onMouseClicked = canvasMouseClicked _
+  scrollCanvas.onMouseDragged = canvasMouseClicked _
 
   def minimapSize = MinimapSize(field.width, field.height, width.intValue, height.intValue)
 
@@ -107,11 +108,12 @@ class Minimap(field: TerrainHexField, pane: ScrollPaneLike, factor: Double) exte
   }
 
 
-  private def canvasMouseClicked(event: jfxin.MouseEvent) {
-    val x = event.getX.toInt
-    val y = event.getY.toInt
+  private def canvasMouseClicked(event: MouseEvent) {
+    val x = event.x.toInt
+    val y = event.y.toInt
     clickOnMinimap(x, y)
     redraw()
+    event.consume()
   }
 
   def clickOnMinimap(x: Int, y: Int) {

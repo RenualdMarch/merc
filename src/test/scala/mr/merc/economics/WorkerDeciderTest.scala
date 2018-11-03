@@ -9,13 +9,13 @@ class WorkerDeciderTest extends FunSuite with BeforeAndAfter {
 
   val latinClergy = new Population(LatinHuman, Clergy, 1000, 0, 0)
   val westFarmer = new Population(LatinHuman, Farmers, 2000, 0, 0)
-  val latinFarmer = new Population(WesternHuman, Farmers, 2000, 0, 0)
-  val westCraftsmen = new Population(WesternHuman, Craftsmen, 3000, 0, 0)
+  val latinFarmer = new Population(KnightHuman, Farmers, 2000, 0, 0)
+  val westCraftsmen = new Population(KnightHuman, Craftsmen, 3000, 0, 0)
   val latinCraftsmen = new Population(LatinHuman, Craftsmen, 1000, 0, 0)
 
   val populations = List(latinClergy, westFarmer, latinFarmer, westCraftsmen, latinCraftsmen)
 
-  val country: State = new State("", WesternHuman, new StateBudget(0), TaxPolicy.zeroTaxes)
+  val country: State = new State("", KnightHuman, new StateBudget(0), TaxPolicy.zeroTaxes)
 
   val region = new EconomicRegion {
     override def economicNeighbours: Set[EconomicRegion] = ???
@@ -149,7 +149,7 @@ class WorkerDeciderTest extends FunSuite with BeforeAndAfter {
   }
 
   test("clergy works only for its church") {
-    val westClergy = new Population(WesternHuman, Clergy, 500, 0, 0)
+    val westClergy = new Population(KnightHuman, Clergy, 500, 0, 0)
 
     val region = new EconomicRegion {
       override def economicNeighbours: Set[EconomicRegion] = ???
@@ -162,7 +162,7 @@ class WorkerDeciderTest extends FunSuite with BeforeAndAfter {
     }
 
     val westChurch = new MockEnterprise(Clergy, 10, 100000, true, "westChurch") {
-      override val product: Product = Ritual(WesternHuman)
+      override val product: Product = Ritual(KnightHuman)
     }
 
     val latinChurch = new MockEnterprise(Clergy, 15, 100000, true, "latinChurch") {

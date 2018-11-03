@@ -77,7 +77,7 @@ class AttackSelectionDialog(attacker: Soldier, defender: Soldier, attackerHex: T
   }
 
   this.width = 700
-  table.prefWidth <== scene.width
+  table.prefWidth <== 900
 
   private def tableColumns: List[TableColumn[AttackPair, _]] = {
 

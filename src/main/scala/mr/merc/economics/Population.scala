@@ -3,7 +3,8 @@ package mr.merc.economics
 import mr.merc.economics.Population._
 import mr.merc.economics.Products._
 import mr.merc.economics.MapUtil.MapWithFloatOperations
-import mr.merc.map.objects.{House, HumanCityHouse, HumanVillageHouse}
+import mr.merc.map.objects.{House, HumanCityHouse, HumanCottage, HumanVillageHouse}
+import scalafx.scene.paint.Color
 
 import scala.util.Random
 
@@ -336,15 +337,14 @@ object Population extends EconomicConfig {
   case object Undead extends Race()
   case object Demons extends Race()
 
-  def races = List(Humans) //, Elves, Dwarfs, Orcs, Saurians, Drakes, Undead, Demons)
-
   // removed sealed for test purposes only
-  abstract class Culture(val stateNameKey:String, val race:Race, val houseStyle: House) {
+  abstract class Culture(val cultureNameKey:String, val stateNameKey:String, val race:Race, val houseStyle: House, val color: Color) {
     def needs: PopulationNeeds = defaultHumanNeeds(this)
   }
 
-  case object LatinHuman extends Culture("state.empire", Humans, HumanCityHouse)
-  case object WesternHuman extends Culture("state.kingdom", Humans, HumanVillageHouse)
+  case object LatinHuman extends Culture("culture.latin","state.empire", Humans, HumanCityHouse, Color.Red)
+  case object KnightHuman extends Culture("culture.knight","state.kingdom", Humans, HumanVillageHouse, Color.Blue)
+  case object DarkHuman extends Culture("culture.darkHuman", "state.empire", Humans, HumanCottage, Color.Black)
 
   //
   // DISABLED CULTURES
@@ -360,7 +360,7 @@ object Population extends EconomicConfig {
 */
   // good words: alliance, protectorate, tribe, army
 
-  def cultures = List(LatinHuman, WesternHuman) //, HighElf, DarkElf, BarbarianOrc, RockDwarf, GreenSaurian, OldDrakes, Forsaken, RedDemons)
+  def cultures = List(LatinHuman, KnightHuman, DarkHuman) //, HighElf, DarkElf, BarbarianOrc, RockDwarf, GreenSaurian, OldDrakes, Forsaken, RedDemons)
 
   class ProductFulfillmentRecord(needs: Map[PopulationNeedsType, Map[Products.Product, Double]], products: Map[Product, Double]) {
 

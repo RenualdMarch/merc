@@ -1,6 +1,6 @@
 package mr.merc.map.hex.view
 
-import mr.merc.economics.Population.{Culture, LatinHuman, WesternHuman}
+import mr.merc.economics.Population.{Culture, LatinHuman, KnightHuman}
 import mr.merc.economics.RegionPopulation
 import mr.merc.map.hex.{TerrainHex, TerrainHexField}
 import mr.merc.map.objects.{House, HumanCityHouse, HumanVillageHouse}
@@ -31,9 +31,9 @@ class ProvinceViewTest extends FunSuite with MockitoSugar with BeforeAndAfter {
     when(province.capital).thenReturn(field.hex(2, 2))
     when(province.hexes).thenReturn(field.hexes.toSet)
     val firstMap = Map[Culture, Int](LatinHuman -> ProvinceView.housePerPopulation * 3)
-    val secondMap = Map[Culture, Int](LatinHuman -> ProvinceView.housePerPopulation * 3, WesternHuman -> 1)
-    val thirdMap = Map[Culture, Int](LatinHuman -> ProvinceView.housePerPopulation * 2, WesternHuman -> ProvinceView.housePerPopulation)
-    val fourthMap = Map[Culture, Int](LatinHuman -> ProvinceView.housePerPopulation * 3, WesternHuman -> ProvinceView.housePerPopulation)
+    val secondMap = Map[Culture, Int](LatinHuman -> ProvinceView.housePerPopulation * 3, KnightHuman -> 1)
+    val thirdMap = Map[Culture, Int](LatinHuman -> ProvinceView.housePerPopulation * 2, KnightHuman -> ProvinceView.housePerPopulation)
+    val fourthMap = Map[Culture, Int](LatinHuman -> ProvinceView.housePerPopulation * 3, KnightHuman -> ProvinceView.housePerPopulation)
 
 
     when(population.cultureMembers).thenReturn(firstMap, secondMap, thirdMap, fourthMap)

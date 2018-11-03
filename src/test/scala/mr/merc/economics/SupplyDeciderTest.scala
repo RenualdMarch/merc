@@ -1,12 +1,12 @@
 package mr.merc.economics
 
-import mr.merc.economics.Population.WesternHuman
+import mr.merc.economics.Population.KnightHuman
 import mr.merc.politics.State
 import org.scalatest.FunSuite
 
 class SupplyDeciderTest extends FunSuite{
 
-  val country: State = new State("", WesternHuman, new StateBudget(0), TaxPolicy.zeroTaxes)
+  val country: State = new State("", KnightHuman, new StateBudget(0), TaxPolicy.zeroTaxes)
 
   private val region1:EconomicRegion = new EconomicRegion {
     override def economicNeighbours: Set[EconomicRegion] = Set(region2, region1)
