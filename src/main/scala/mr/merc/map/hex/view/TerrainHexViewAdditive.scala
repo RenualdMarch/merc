@@ -29,10 +29,14 @@ object TerrainHexViewAdditive {
   }
 
   private def applyTerrainTypeCustomRules(add: TerrainHexViewAdditive): Option[TerrainHexViewAdditive] = {
-    (add.hexTerrainType.kind, add.neighbourTerrainType.kind) match {
+
+    def kindBelowOfThis(tt: TerrainType): TerrainKind = {
+      tt.belowTerrainType.map(_.kind).getOrElse(tt.kind)
+    }
+
+    (kindBelowOfThis(add.hexTerrainType), kindBelowOfThis(add.neighbourTerrainType)) match {
       case (EmptyKind, _) | (_, EmptyKind)=> None
       case (WaterKind, WaterKind) => Some(add)
-      case (_, _) if add.hexTerrainType.belowTerrainType.isDefined => None
       case (_, WaterKind) => Some(new TerrainHexViewAdditive(add.from, add.to, add.hexTerrainType, BankOutside))
       case (WaterKind, _) => Some(new TerrainHexViewAdditive(add.from, add.to, add.hexTerrainType, BankInside))
       case (MountainKind, _) => None

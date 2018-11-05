@@ -6,7 +6,7 @@ import mr.merc.map.hex._
 
 object TerrainHexViewAdditiveRule {
   // first is drawn first
-  private def orderOfTypes = List[TerrainKind](HillKind, MountainKind, WaterKind, ForestKind, SwampKind, RoadKind, GrassKind, SandKind)
+  private def orderOfTypes = List[TerrainKind](MountainKind, WaterKind, HillKind, ForestKind, SwampKind, RoadKind, GrassKind, SandKind)
 }
 
 /**

@@ -23,14 +23,14 @@ object TerrainHexView {
 
   private val hexGridImageCache = new CacheFactoryMap[Int, Image](
     side =>
-    drawImage(side, side) { gc =>
-      gc.stroke = Color.Black
-      gc.lineWidth = 0.25
-      gc.strokePolygon(angles(side))
-    })
+      drawImage(side, side) { gc =>
+        gc.stroke = Color.Black
+        gc.lineWidth = 0.25
+        gc.strokePolygon(angles(side))
+      })
 
 
-  private [this] def angles(side: Int, pix: Int = 0): Seq[(Double, Double)] = {
+  private[this] def angles(side: Int, pix: Int = 0): Seq[(Double, Double)] = {
     val a = side / 4.0
     val coef = Seq((1, 0), (3, 0), (4, 2), (3, 4), (1, 4), (0, 2))
     val pixelCorrection = Seq((1, 1), (-1, 1), (-1, 0), (-1, -1), (1, -1), (1, 0))
@@ -47,7 +47,7 @@ object TerrainHexView {
 
   private val defenceImagesCache = new CacheFactoryMap[Int, Map[(Int, Boolean), Image]](defenceImages)
 
-  private [this] def defenceImages(side: Int): Map[(Int, Boolean), Image] = {
+  private[this] def defenceImages(side: Int): Map[(Int, Boolean), Image] = {
     val textLength = side / 2
     val list = for (d <- 0 to 100 by 10; drawPolygon <- List(true, false)) yield {
       ((d, drawPolygon), drawImage(side, side) { gc =>
@@ -66,7 +66,7 @@ object TerrainHexView {
     list toMap
   }
 
-  private [this] def defenceColor(d: Int): Color = {
+  private[this] def defenceColor(d: Int): Color = {
     if (d <= 20) {
       Color.DarkRed
     } else if (d <= 30) {
@@ -99,13 +99,15 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
   val textLength: Int = TerrainHexView.textLength(factor)
 
   val neighbours: Map[Direction, TerrainHex] = field.neighboursWithDirections(hex.x, hex.y)
-  val directions: Map[TerrainHex, Direction]= neighbours map (p => (p._2, p._1))
+  val directions: Map[TerrainHex, Direction] = neighbours map (p => (p._2, p._1))
   val x: Int = findX
   val y: Int = findY
   private var _terrainDirty = false
+
   def terrainDirty: Boolean = _terrainDirty
+
   // to be called only from terrain hex field view !!!!!
-  private [view] def terrainDirty_=(v: Boolean): Unit = {
+  private[view] def terrainDirty_=(v: Boolean): Unit = {
     if (!terrainDirty && v) {
       this._terrainDirty = v
       if (thisHexViewIsHuge()) {
@@ -132,7 +134,8 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
 
   // to be called only from terrain hex field view !!!!!
   def animationDirty: Boolean = _animationDirty
-  private [view] def animationDirty_=(v: Boolean): Unit = {
+
+  private[view] def animationDirty_=(v: Boolean): Unit = {
     if (v && !animationDirty) {
       _animationDirty = v
       if (thisHexViewIsHuge()) {
@@ -143,7 +146,7 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
     }
   }
 
-  private def thisHexViewIsHuge():Boolean = {
+  private def thisHexViewIsHuge(): Boolean = {
     this.hex.terrain.isOneOf(MountainKind, ForestKind, WallsKind) || this.mapObject.nonEmpty
   }
 
@@ -151,15 +154,20 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
   var darkened = false
   private var currentDarkened = darkened
   private var _arrowStart: Option[Direction] = None
+
   def arrowStart: Option[Direction] = _arrowStart
+
   def arrowStart_=(as: Option[Direction]) {
     if (as != _arrowStart) {
       _arrowStart = as
       interfaceDirty = true
     }
   }
+
   private var _arrowEnd: Option[Direction] = None
+
   def arrowEnd: Option[Direction] = _arrowEnd
+
   def arrowEnd_=(ae: Option[Direction]) {
     if (ae != _arrowEnd) {
       _arrowEnd = ae
@@ -168,7 +176,9 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
   }
 
   private var _defence: Option[(SoldierDefence, Boolean)] = None
+
   def defence: Option[(SoldierDefence, Boolean)] = _defence
+
   def defence_=(d: Option[(SoldierDefence, Boolean)]) {
     if (_defence != d) {
       _defence = d
@@ -190,7 +200,7 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
     side * hex.y + side / 2
   }
 
-  private var elements:List[TerrainHexViewAdditiveElement] = calculateElements()
+  private var elements: List[TerrainHexViewAdditiveElement] = calculateElements()
 
   private def calculateElements(): List[TerrainHexViewAdditiveElement] = {
     val additives = TerrainHexViewAdditive.extractAdditives(this)
@@ -206,12 +216,12 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
   }
 
   def secondaryImage: Option[MImage] = {
-    hex.terrain.belowTerrainType.map {_ =>
+    hex.terrain.belowTerrainType.map { _ =>
       hex.terrain.image(hex.x, hex.y)
     }
   }
 
-  def mapObject:List[MImage] = hex.mapObj match {
+  def mapObject: List[MImage] = hex.mapObj match {
     case Some(mapObj) => mapObj.images(hex, field)
     case None => Nil
   }
@@ -231,26 +241,17 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
     val x = this.x + xOffset
     val y = this.y + yOffset
 
-    if (hex.terrain.is(MountainKind)) {
-      elements.foreach (_.drawItself(gc, x, y, factor))
-      image.scaledImage(factor).drawCenteredImage(gc, x, y, side, side)
-    } else {
-      image.scaledImage(factor).drawCenteredImage(gc, x, y, side, side)
-      elements foreach (_.drawItself(gc, x, y, factor))
-    }
-    neighbourMapObjects.foreach (_.scaledImage(factor).drawImage(gc, x, y))
 
-    if (!hex.mapObj.exists(_.isInstanceOf[House])) {
-      mapObject foreach (_.scaledImage(factor).drawCenteredImage(gc, x, y, side, side))
-    }
+    image.scaledImage(factor).drawCenteredImage(gc, x, y, side, side)
+    elements foreach (_.drawItself(gc, x, y, factor))
+
+    neighbourMapObjects.foreach(_.scaledImage(factor).drawImage(gc, x, y))
   }
 
   def drawMapObjectIfNeeded(gc: GraphicsContext, xOffset: Int, yOffset: Int): Unit = {
-    if (hex.mapObj.exists(_.isInstanceOf[House])) {
-      val x = this.x + xOffset
-      val y = this.y + yOffset
-      mapObject foreach (_.scaledImage(factor).drawCenteredImage(gc, x, y, side, side))
-    }
+    val x = this.x + xOffset
+    val y = this.y + yOffset
+    mapObject foreach (_.scaledImage(factor).drawCenteredImage(gc, x, y, side, side))
   }
 
   def drawSecondaryImageIfNeeded(gc: GraphicsContext, xOffset: Int, yOffset: Int): Unit = {
@@ -282,7 +283,7 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
         drawClearStage(gc, xOffset, yOffset)
       case ProvinceBordersStage =>
         drawProvinceBorder(gc, xOffset, yOffset)
-      case BuildingsForestStage =>
+      case BuildingsForestMountainsStage =>
         drawCastleAndWalls(gc, xOffset, yOffset)
         drawMapObjectIfNeeded(gc, xOffset, yOffset)
         drawSecondaryImageIfNeeded(gc, xOffset, yOffset)
@@ -292,18 +293,18 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
 
   private val anotherProvince = hex.province.map { province =>
     val neigsWithDirs = field.neighboursWithDirections(hex)
-    neigsWithDirs.filter{ case (dir, n) =>
+    neigsWithDirs.filter { case (dir, n) =>
       n.province.exists(_ != province) && n.terrain.isNot(WaterKind)
     }
   }.getOrElse(Map())
 
-  private def calculateSameOwnerBorders():List[Direction] = {
-    anotherProvince.filter { case (_ , h) =>
+  private def calculateSameOwnerBorders(): List[Direction] = {
+    anotherProvince.filter { case (_, h) =>
       h.province.get.owner == hex.province.get.owner
     }.keys.toList
   }
 
-  private def calculateDifferentOwnerBorders():List[Direction] = {
+  private def calculateDifferentOwnerBorders(): List[Direction] = {
     anotherProvince.filter { case (_, h) =>
       h.province.get.owner != hex.province.get.owner
     }.keys.toList
@@ -313,21 +314,21 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
   private var differentOwnerBorders = calculateDifferentOwnerBorders()
 
   private def drawProvinceBorder(gc: GraphicsContext, xOffset: Int, yOffset: Int): Unit = {
-      def drawLine(map: List[Direction], color:Color, lineWidth: Int): Unit = {
-        map.foreach{ direction =>
-          val line = TerrainHexView.pointsWithDirections(side, lineWidth / 2)(direction)
-          gc.save()
-          gc.stroke = color
-          gc.lineWidth = lineWidth
-          gc.strokeLine(this.x + xOffset + line.beginX, line.beginY + this.y + yOffset, line.endX + this.x + xOffset, line.endY + this.y + yOffset)
-          gc.restore()
-        }
+    def drawLine(map: List[Direction], color: Color, lineWidth: Int): Unit = {
+      map.foreach { direction =>
+        val line = TerrainHexView.pointsWithDirections(side, lineWidth / 2)(direction)
+        gc.save()
+        gc.stroke = color
+        gc.lineWidth = lineWidth
+        gc.strokeLine(this.x + xOffset + line.beginX, line.beginY + this.y + yOffset, line.endX + this.x + xOffset, line.endY + this.y + yOffset)
+        gc.restore()
       }
+    }
 
-    hex.province.foreach {province =>
+    hex.province.foreach { province =>
       if (hex.terrain.isNot(WaterKind)) {
-          drawLine(sameOwnerBorders, Color.Black, 1)
-          drawLine(differentOwnerBorders, province.owner.color, 4)
+        drawLine(sameOwnerBorders, Color.Black, 1)
+        drawLine(differentOwnerBorders, province.owner.color, 4)
 
       }
     }
@@ -370,17 +371,27 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
     gc.drawImage(TerrainHexView.hexGridImageCache(side), x + xOffset, y + yOffset)
   }
 
-  def center:(Int, Int) = (x + side / 2, y + side / 2)
-  def coords:(Int, Int) = (x, y)
+  def center: (Int, Int) = (x + side / 2, y + side / 2)
+
+  def coords: (Int, Int) = (x, y)
 }
 
 sealed trait HexDrawingStage
+
 case object ClearStage extends HexDrawingStage
+
 case object TerrainImageStage extends HexDrawingStage
+
 case object MovementImpossibleStage extends HexDrawingStage
+
 case object ArrowStage extends HexDrawingStage
+
 case object DefenceStage extends HexDrawingStage
+
 case object HexGridStage extends HexDrawingStage
-case object BuildingsForestStage extends HexDrawingStage
+
+case object BuildingsForestMountainsStage extends HexDrawingStage
+
 case object EndInterfaceDrawing extends HexDrawingStage
+
 case object ProvinceBordersStage extends HexDrawingStage

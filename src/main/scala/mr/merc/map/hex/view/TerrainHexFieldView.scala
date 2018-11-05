@@ -41,7 +41,9 @@ class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer
   def castleImagesForHex(hex: Hex): List[WallImage] = castleImages.getOrElse(hex, Nil)
 
   // sorting is make sure that hexes are drawn in correct order, back before first
-  val hexesToDraw = (realHexes ++ blackHexes).toList.sortBy(h => (h.hex.terrain.layer, h.hex.y + h.hex.x % 2 * 0.5, h.hex.x))
+  def hexSortingKey(h: TerrainHexView): (Double, Int) = (h.hex.y + h.hex.x % 2 * 0.5, h.hex.x)
+
+  val hexesToDraw = (realHexes ++ blackHexes).toList.sortBy(hexSortingKey)
   val hexesToDrawMap = mutable.LinkedHashMap() ++ hexesToDraw.map(h => ((h.hex.x, h.hex.y), h))
 
   private var _movementOptions: Option[Set[TerrainHexView]] = None
@@ -139,7 +141,7 @@ class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer
                        curY <- y to yy
       } yield {
         hexesToDrawMap.get(curX, curY)
-      }).toList.flatten
+      }).toList.flatten.sortBy(hexSortingKey)
 
       prevResult = (viewRect, list)
       list
@@ -164,7 +166,7 @@ class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer
 
     def drawLayer(gc: GraphicsContext, viewRect: Rectangle2D) {
       val visibleHexes = calculateVisibleHexes(viewRect)
-      List(TerrainImageStage, BuildingsForestStage, HexGridStage).foreach { stage =>
+      List(TerrainImageStage, BuildingsForestMountainsStage, HexGridStage).foreach { stage =>
         visibleHexes foreach (_.drawItself(gc, stage, -viewRect.minX.toInt, -viewRect.minY.toInt))
       }
     }
@@ -173,7 +175,7 @@ class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer
   private val terrainWorldLayer = new CanvasLayer {
     def updateLayer(gc: GraphicsContext, viewRect: Rectangle2D) {
       val dirty = calculateVisibleHexes(viewRect).filter(_.terrainDirty)
-      List(TerrainImageStage, BuildingsForestStage, ProvinceBordersStage).foreach { stage =>
+      List(TerrainImageStage, BuildingsForestMountainsStage, ProvinceBordersStage).foreach { stage =>
         dirty foreach (_.drawItself(gc, stage, -viewRect.minX.toInt, -viewRect.minY.toInt))
       }
       dirty.foreach(_.terrainDirty = false)
@@ -181,7 +183,7 @@ class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer
 
     def drawLayer(gc: GraphicsContext, viewRect: Rectangle2D) {
       val visibleHexes = calculateVisibleHexes(viewRect)
-      List(TerrainImageStage, BuildingsForestStage, ProvinceBordersStage).foreach { stage =>
+      List(TerrainImageStage, BuildingsForestMountainsStage, ProvinceBordersStage).foreach { stage =>
         visibleHexes foreach (_.drawItself(gc, stage, -viewRect.minX.toInt, -viewRect.minY.toInt))
       }
       visibleHexes.foreach(_.terrainDirty = false)
@@ -228,30 +230,6 @@ class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer
   def canvasLayers: List[CanvasLayer] = mode match {
     case BattleFieldViewMode => List(terrainBattleLayer, soldierBattleLayer, darkeningBattleLayer, battleInterfaceBattleLayer)
     case WorldMapViewMode => List(terrainWorldLayer, soldierBattleLayer)
-  }
-
-  def hexesToRedrawWithNeighboursOfUpperLayer(set: Set[TerrainHexView]): Set[TerrainHexView] = {
-    val alreadyCalculated = collection.mutable.Set[TerrainHexView]()
-    var lastStep = set
-    while (lastStep.nonEmpty) {
-      val newSteps = lastStep.flatMap(neighboursToBeRedrawn)
-      alreadyCalculated ++= lastStep
-      lastStep = newSteps -- alreadyCalculated
-    }
-
-    alreadyCalculated.toSet
-  }
-
-  def neighboursToBeRedrawn(view: TerrainHexView): List[TerrainHexView] = {
-    val neigs = neighbours(view)
-    if (view.hex.terrain.layer == 0) {
-      neigs.filter(_.hex.terrain.layer > 0)
-    } else {
-      val neigsSameLayer = neigs.filter(_.hex.terrain.layer == view.hex.terrain.layer)
-      val neigsSameLayerToBeRepainted = neigsSameLayer.filter(n => n.hex.x > view.hex.x || n.hex.y > view.hex.x)
-      val neigsOfBiggerLayer = neigs.filter(_.hex.terrain.layer < view.hex.terrain.layer)
-      neigsOfBiggerLayer ++ neigsSameLayerToBeRepainted
-    }
   }
 
   def side: Int = realHexes.head.side

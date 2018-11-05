@@ -10,7 +10,7 @@ object TerrainType {
   def helperTypesList:List[TerrainType] = List(BankInside, BankOutside)
 }
 
-abstract sealed class TerrainType(val name: String, val kind:TerrainKind, val layer: Int = 0, val belowTerrainType:Option[TerrainType] = None) {
+abstract sealed class TerrainType(val name: String, val kind:TerrainKind, val belowTerrainType:Option[TerrainType] = None) {
   lazy val imagePaths:Vector[MImage] = {
     val result = Stream.from(1).map { i =>
       val path = s"/images/terrain/$name/$i.png"
@@ -59,7 +59,7 @@ case object ShallowWater extends TerrainType("water", WaterKind)
 case object BankInside extends TerrainType("bankInside", WaterKind)
 case object BankOutside extends TerrainType("bankOutside", WaterKind)
 
-case object BasicMountain extends TerrainType("mountain", MountainKind,1)
+case object BasicMountain extends TerrainType("mountain", MountainKind,belowTerrainType = Some(BasicHill))
 
 case object DesertSand extends TerrainType("sand", SandKind)
 case object BasicHill extends TerrainType("hill", HillKind)

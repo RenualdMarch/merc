@@ -20,7 +20,6 @@ migration(with churches creation and destruction)
 people have two sources of unhappiness - not fulfilled needs and political stuff
 projects - when capitalists or ruler want to expand factory, or hire a soldier, eventual price is unknown.
 if there is no supply but demand, price rises faster.
-Fix bug with houses after wall drawn above walls
 More tasks???
 
 
