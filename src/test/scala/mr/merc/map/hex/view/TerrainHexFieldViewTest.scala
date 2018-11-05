@@ -41,4 +41,25 @@ class TerrainHexFieldViewTest extends FunSuite {
     val blackHexes = field.blackHexes.map(h => (h.hex.x, h.hex.y))
     assert(blackHexes === Set((-1, 0), (-1, -1), (-1, 1), (1, -1), (1, 1), (3, 0), (3, 1), (3, -1)))
   }
+
+  test("hex drawing order") {
+    val field = new TerrainHexFieldView(new TerrainHexField(3, 3, TerrainHex.grassInit), new SoldiersDrawer(), 1.0)
+    val order = field.hexesToDraw
+
+    def assertEarlier(f:(Int, Int), s:(Int, Int)): Unit = {
+      val hex1 = field.hex(f._1, f._2)
+      val hex2 = field.hex(s._1, s._2)
+
+      assert(order.indexOf(hex1) < order.indexOf(hex2))
+    }
+
+    assertEarlier((0, 0),(1, 0))
+    assertEarlier((2, 0),(1, 0))
+    assertEarlier((1, 0),(0, 1))
+    assertEarlier((1, 0),(2, 1))
+    assertEarlier((0, 1),(1, 1))
+    assertEarlier((2, 1),(1, 1))
+    assertEarlier((1, 1),(0, 2))
+    assertEarlier((1, 1),(2, 2))
+  }
 }

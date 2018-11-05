@@ -2,12 +2,15 @@ package mr.merc.politics
 
 import mr.merc.economics.Population.Culture
 import mr.merc.economics._
+import mr.merc.local.Localization
 import mr.merc.map.hex.TerrainHex
-
 import scalafx.scene.paint.Color
 
-case class State(name: String, primeCulture:Culture, budget: StateBudget, taxPolicy: TaxPolicy,color: Color = Color.Black) {
-
+case class State(initialName: String, primeCulture:Culture, budget: StateBudget, taxPolicy: TaxPolicy,color: Color = Color.Black) {
+  def name: String = {
+    val governmentType = Localization(Culture.cultureConfig(primeCulture).stateForm.monarchy)
+    s"$initialName $governmentType"
+  }
 }
 
 case class Province(name: String, var owner: State, regionMarket: RegionMarket,

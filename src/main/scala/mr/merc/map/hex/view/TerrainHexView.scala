@@ -144,7 +144,7 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
   }
 
   private def thisHexViewIsHuge():Boolean = {
-    this.hex.terrain.isOneOf(MountainKind, ForestKind, WallsKind)
+    this.hex.terrain.isOneOf(MountainKind, ForestKind, WallsKind) || this.mapObject.nonEmpty
   }
 
   var interfaceDirty = true

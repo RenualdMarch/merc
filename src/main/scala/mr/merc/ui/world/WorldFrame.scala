@@ -55,10 +55,10 @@ class WorldFrame(sceneManager: SceneManager) extends Pane with Logging {
     layoutX = 0
     layoutY = 0
 
-    minimap.layoutX <== this.width - this.width / 6
-    minimap.layoutY <== this.height - this.width / 6
-    minimap.prefWidth <== this.width / 6
-    minimap.prefHeight <== this.width / 6
+    minimap.layoutX <== this.width - this.width / 5
+    minimap.layoutY <== this.height - this.width / 5
+    minimap.prefWidth <== this.width / 5
+    minimap.prefHeight <== this.width / 5
 
     private var rightTopPanel: Option[Pane] = None
     private var facePanel: Option[Pane] = None
@@ -67,10 +67,10 @@ class WorldFrame(sceneManager: SceneManager) extends Pane with Logging {
       removeRightTopPanel()
       rightTopPanel = Some(pane)
       children.add(pane)
-      pane.layoutX <== this.width - this.width / 6
+      pane.layoutX <== this.width - this.width / 5
       pane.layoutY = 0
-      pane.prefWidth <== this.width / 6
-      pane.prefHeight <== this.height - this.width / 6
+      pane.prefWidth <== this.width / 5
+      pane.prefHeight <== this.height - this.width / 5
     }
 
     def removeRightTopPanel(): Unit = {
@@ -91,9 +91,9 @@ class WorldFrame(sceneManager: SceneManager) extends Pane with Logging {
       removeFacePanel()
       facePanel = Some(pane)
       children.add(pane)
-      pane.layoutX <== this.width / 6
+      pane.layoutX <== 0
       pane.layoutY = 0
-      pane.prefWidth <== this.width * 4 / 6
+      pane.prefWidth <== this.width * 4 / 5
       pane.prefHeight <== this.height
     }
 

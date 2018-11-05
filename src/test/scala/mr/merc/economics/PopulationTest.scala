@@ -16,7 +16,7 @@ class PopulationTest extends FunSuite {
     LuxuryNeeds -> Map(Fruit -> 3.0))
 
   object TestRace extends Race
-  object TestCulture extends Culture("test","test", TestRace, HumanCityHouse, Color.Black) {
+  object TestCulture extends Culture("test",TestRace, HumanCityHouse, Color.Black) {
     override def needs: PopulationNeeds = Map(Upper -> smallNeeds, Middle -> smallNeeds, Lower -> smallNeeds)
   }
   def newPopulation(money: Double) = new Population(TestCulture, Traders, 1000, money, 0)

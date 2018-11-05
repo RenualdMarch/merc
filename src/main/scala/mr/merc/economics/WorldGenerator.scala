@@ -6,11 +6,10 @@ import mr.merc.economics.Products._
 import mr.merc.map.generator.WorldMapGenerator
 import mr.merc.map.hex.{TerrainHex, TerrainHexField}
 import mr.merc.map.terrain.WaterKind
-import mr.merc.players.{BestColorsGeneratorWithNames, CyclicColorGeneratorWithNames}
+import mr.merc.players.{ColorGenerator, NamesGenerator}
 import mr.merc.politics.{Province, State}
 import mr.merc.util.WeightedRandom
 
-import scala.annotation.tailrec
 import scala.util.Random
 
 class WorldGenerator(field:TerrainHexField) {
@@ -34,7 +33,10 @@ class WorldGenerator(field:TerrainHexField) {
 
   import scala.collection.JavaConverters._
   private val config = ConfigFactory.load("conf/worldGenerationEconomics")
-  private val colorGenerator = new BestColorsGeneratorWithNames()
+  private val colorGenerator = new ColorGenerator()
+  private val namesGenerators:Map[Culture, NamesGenerator] = Population.cultures.map { c =>
+    c -> new NamesGenerator(Culture.cultureConfig(c))
+  } toMap
 
   private val minResources = config.getInt("world.resources.resourcesPerRegion.min")
   private val maxResources = config.getInt("world.resources.resourcesPerRegion.max")
@@ -104,7 +106,8 @@ class WorldGenerator(field:TerrainHexField) {
   }
 
   private def generateState(culture: Culture):State = {
-    val (name, color) = colorGenerator.nextNameAndColor()
+    val color = colorGenerator.nextColor()
+    val name = namesGenerators(culture).stateNames.extract()
     State(name, culture, new StateBudget(config.getDouble("world.state.startingMoney")), TaxPolicy.zeroTaxes, color)
   }
 
@@ -153,7 +156,8 @@ class WorldGenerator(field:TerrainHexField) {
 
     divisions.map{case (state, capitals) =>
       state -> capitals.map {capital =>
-        val p = Province(Random.nextInt().toString, state, generateRegionMarket,generateRegionPops(state.primeCulture), provincesHexes(capital), capital)
+        val name = namesGenerators(state.primeCulture).cityNames.extract()
+        val p = Province(name, state, generateRegionMarket,generateRegionPops(state.primeCulture), provincesHexes(capital), capital)
         provincesHexes(capital).foreach(_.province = Some(p))
         p
       }

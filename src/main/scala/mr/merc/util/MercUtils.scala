@@ -1,5 +1,7 @@
 package mr.merc.util
 
+import pureconfig.{BasicReaders, CamelCase, ConfigFieldMapping}
+import pureconfig.generic.ProductHint
 import scalafx.scene.paint.Color
 
 import scala.util.Random
@@ -39,5 +41,9 @@ object MercUtils {
 
   def colorToStyle(color: Color):String = {
     s"rgb(${(color.red * 255).toInt},${(color.green * 255).toInt},${(color.blue * 255).toInt})"
+  }
+
+  object ConfigConvertProtocol {
+    implicit def camelCaseHint[T]: ProductHint[T] = ProductHint[T](ConfigFieldMapping(CamelCase, CamelCase))
   }
 }

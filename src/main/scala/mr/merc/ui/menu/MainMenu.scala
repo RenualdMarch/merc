@@ -11,28 +11,26 @@ import javafx.event.ActionEvent
 import scalafx.scene.Scene
 import mr.merc.ui.battle.BattleFrame
 import mr.merc.ui.common.SceneManager
+import mr.merc.ui.world.BigButton
 
 class MainMenu(sceneManager: SceneManager) extends BorderPane {
 
   styleClass.add("mainMenuContainer")
   stylesheets.add("/css/mainMenu.css")
 
-  val newBattleButton = new Button {
-    text = Localization("menu.quickBattle")
+  val newBattleButton = new BigButton(Localization("menu.quickBattle")) {
     onAction = { e: ActionEvent =>
       sceneManager.startNewBattle()
     }
   }
 
-  val optionsButton = new Button {
-    text = Localization("menu.options")
+  val optionsButton = new BigButton(Localization("menu.options")) {
     onAction = { e: ActionEvent =>
       sceneManager.showOptionsMenu()
     }
   }
 
-  val exitButton = new Button {
-    text = Localization("menu.exit")
+  val exitButton = new BigButton(Localization("menu.exit")) {
     onAction = { e: ActionEvent =>
       sceneManager.exit()
     }

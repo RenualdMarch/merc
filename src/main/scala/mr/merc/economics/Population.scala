@@ -1,10 +1,13 @@
 package mr.merc.economics
 
+import com.typesafe.config.{Config, ConfigFactory}
 import mr.merc.economics.Population._
 import mr.merc.economics.Products._
 import mr.merc.economics.MapUtil.MapWithFloatOperations
 import mr.merc.map.objects.{House, HumanCityHouse, HumanCottage, HumanVillageHouse}
 import scalafx.scene.paint.Color
+import pureconfig.loadConfigOrThrow
+import pureconfig.generic.auto._
 
 import scala.util.Random
 
@@ -337,14 +340,26 @@ object Population extends EconomicConfig {
   case object Undead extends Race()
   case object Demons extends Race()
 
-  // removed sealed for test purposes only
-  abstract class Culture(val cultureNameKey:String, val stateNameKey:String, val race:Race, val houseStyle: House, val color: Color) {
-    def needs: PopulationNeeds = defaultHumanNeeds(this)
+  object Culture {
+    case class StateForm(monarchy: String, democracy: String)
+    case class CultureInfo(stateForm: StateForm, cities: List[String], states: List[String])
+
+    private val config = ConfigFactory.load("conf/cultures.conf")
+    val cultureConfig:Map[Culture, CultureInfo] = Population.cultures.map { c =>
+      import mr.merc.util.MercUtils.ConfigConvertProtocol._
+      c -> loadConfigOrThrow[CultureInfo](config.getConfig(c.name))
+    } toMap
   }
 
-  case object LatinHuman extends Culture("culture.latin","state.empire", Humans, HumanCityHouse, Color.Red)
-  case object KnightHuman extends Culture("culture.knight","state.kingdom", Humans, HumanVillageHouse, Color.Blue)
-  case object DarkHuman extends Culture("culture.darkHuman", "state.empire", Humans, HumanCottage, Color.Black)
+  // removed sealed for test purposes only
+  abstract class Culture(val name:String, val race:Race, val houseStyle: House, val color: Color) {
+    def needs: PopulationNeeds = defaultHumanNeeds(this)
+    def cultureNameKey:String = "culture." + name
+  }
+
+  case object LatinHuman extends Culture("latin", Humans, HumanCityHouse, Color.Red)
+  case object KnightHuman extends Culture("french", Humans, HumanVillageHouse, Color.Blue)
+  case object DarkHuman extends Culture("german", Humans, HumanCottage, Color.Black)
 
   //
   // DISABLED CULTURES
@@ -360,7 +375,7 @@ object Population extends EconomicConfig {
 */
   // good words: alliance, protectorate, tribe, army
 
-  def cultures = List(LatinHuman, KnightHuman, DarkHuman) //, HighElf, DarkElf, BarbarianOrc, RockDwarf, GreenSaurian, OldDrakes, Forsaken, RedDemons)
+  def cultures:List[Culture] = List(LatinHuman, KnightHuman, DarkHuman) //, HighElf, DarkElf, BarbarianOrc, RockDwarf, GreenSaurian, OldDrakes, Forsaken, RedDemons)
 
   class ProductFulfillmentRecord(needs: Map[PopulationNeedsType, Map[Products.Product, Double]], products: Map[Product, Double]) {
 

@@ -9,7 +9,7 @@ import java.io.InputStream
 object Localization {
   private[local] lazy val messages: Map[String, Map[String, String]] = initMessages()
 
-  def languages = List("en", "ua", "ru")
+  def languages = List("en") //List("en", "ua", "ru")
 
   private val MessageSeparator = "="
   private val ParamHolder = "%s"
@@ -17,7 +17,7 @@ object Localization {
   //TODO take from configuration
   private def currentLanguage = Conf.string("Language")
   private val filenamePattern = "/local/messages"
-  def apply(key: String, params: Any*) = getMessage(currentLanguage, key, params: _*)
+  def apply(key: String, params: Any*): String = getMessage(currentLanguage, key, params: _*)
 
   private def getMessage(language: String, key: String, params: Any*) = {
     messages(language).get(key) match {
@@ -31,7 +31,7 @@ object Localization {
       msg.replaceFirst(ParamHolder, p.toString))
   }
 
-  private def initMessages() = languages.view.map(l => (l -> parseMessages(l))) toMap
+  private def initMessages() = languages.view.map(l => l -> parseMessages(l)) toMap
 
   private def parseMessages(language: String): Map[String, String] = {
     val fileName = filenamePattern + "." + language
@@ -43,7 +43,7 @@ object Localization {
     lines.map(line => {
       val separatorIndex = line.indexOf(MessageSeparator)
       val key = line.take(separatorIndex)
-      val message = line.drop(separatorIndex + MessageSeparator.size)
+      val message = line.drop(separatorIndex + MessageSeparator.length)
       key -> message
     }).toMap
   }

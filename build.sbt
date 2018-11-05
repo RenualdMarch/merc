@@ -44,6 +44,8 @@ libraryDependencies += "org.typelevel" %% "cats-core" % "1.0.0-RC1"
 
 libraryDependencies += "com.typesafe" % "config" % "1.3.2"
 
+libraryDependencies += "com.github.pureconfig" %% "pureconfig" % "0.10.0"
+
 libraryDependencies += "org.kordamp.ikonli" % "ikonli-javafx" % "11.0.0"
 
 libraryDependencies += "org.kordamp.ikonli" % "ikonli-fontawesome-pack" % "11.0.0"
