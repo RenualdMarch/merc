@@ -35,3 +35,10 @@ trait WorldInterfaceNode {
   styleClass.add("interfacePane")
   stylesheets.add("/css/worldPane.css")
 }
+
+trait WorldInterfaceJavaNode {
+  self: javafx.scene.layout.Region =>
+
+  getStyleClass.add("interfacePane")
+  getStylesheets.add("/css/worldPane.css")
+}

@@ -3,8 +3,9 @@ package mr.merc.economics
 import com.typesafe.config.{Config, ConfigFactory}
 import mr.merc.economics.Population._
 import mr.merc.economics.Products._
-import mr.merc.economics.MapUtil.MapWithFloatOperations
+import mr.merc.economics.MapUtil.FloatOperations._
 import mr.merc.map.objects.{House, HumanCityHouse, HumanCottage, HumanVillageHouse}
+import mr.merc.politics.PoliticalViews
 import scalafx.scene.paint.Color
 import pureconfig.loadConfigOrThrow
 import pureconfig.generic.auto._
@@ -12,7 +13,7 @@ import pureconfig.generic.auto._
 import scala.util.Random
 
 class Population(val culture: Culture, val populationType: PopulationType, private var count: Double,
-                 startingMoney: Double, private val startingliterateCount: Int) extends EconomicConfig {
+                 startingMoney: Double, private val startingliterateCount: Int, var politicalViews: PoliticalViews) extends EconomicConfig {
   require(needs.nonEmpty, s"Needs for culture $culture for type $populationType are empty!")
 
   private var literatePeople = startingliterateCount
@@ -203,7 +204,7 @@ object Population extends EconomicConfig {
   case object RegularNeeds extends PopulationNeedsType(3)
   case object LuxuryNeeds extends PopulationNeedsType(1)
 
-  sealed trait PopulationClass extends Ordered[PopulationClass] {
+  sealed trait PopulationClass extends scala.Product with Serializable with Ordered[PopulationClass] {
     override def compare(that: PopulationClass): Int = {
       def toInt(pc: PopulationClass): Int = {
         pc match {
@@ -215,6 +216,8 @@ object Population extends EconomicConfig {
 
       toInt(this) - toInt(that)
     }
+
+    def name: String = this.productPrefix.toLowerCase
   }
 
   case object Lower extends PopulationClass
@@ -227,6 +230,8 @@ object Population extends EconomicConfig {
     override def compare(that: PopulationType): Int = {
       this.populationClass.compare(that.populationClass)
     }
+
+    def name: String = this.productPrefix.toLowerCase
   }
 
   //// craftsmen work in factories
@@ -326,19 +331,22 @@ object Population extends EconomicConfig {
 
 
   // removed sealed for test purposes only
-  abstract class Race()
-  case object Humans extends Race()
+  abstract class Race extends scala.Product with Serializable {
+    def name: String = productPrefix.toLowerCase
+  }
+
+  case object Humans extends Race
 
   //
   // DISABLED RACES
   //
-  case object Elves extends Race()
-  case object Dwarfs extends Race()
-  case object Orcs extends Race()
-  case object Saurians extends Race()
-  case object Drakes extends Race()
-  case object Undead extends Race()
-  case object Demons extends Race()
+  case object Elves extends Race
+  case object Dwarfs extends Race
+  case object Orcs extends Race
+  case object Saurians extends Race
+  case object Drakes extends Race
+  case object Undead extends Race
+  case object Demons extends Race
 
   object Culture {
     case class StateForm(monarchy: String, democracy: String)
@@ -499,6 +507,8 @@ object PopulationPromotionDemotion extends EconomicConfig {
         } else {
           movement.from.extractRandomMovers(count)
         }
+        movement.to.politicalViews = PoliticalViews.sumViews(movement.to.populationCount, movement.to.politicalViews,
+          count, movement.from.politicalViews)
         movement.to.applyMovers(move)
       }
     }

@@ -5,6 +5,7 @@ import mr.merc.log.Logging
 import mr.merc.map.hex.view.ProvinceView
 import mr.merc.map.hex.view.TerrainHexFieldView.WorldMapViewMode
 import mr.merc.map.view.MapView
+import mr.merc.politics.Province
 import mr.merc.ui.common.{CanvasLayers, SceneManager}
 import mr.merc.ui.minimap.Minimap
 import scalafx.geometry.Rectangle2D
@@ -37,14 +38,23 @@ class WorldFrame(sceneManager: SceneManager) extends Pane with Logging {
   worldCanvas.prefHeight <== this.height
 
   worldCanvas.onMouseClicked = (event:MouseEvent) => {
-    info(s"clicked on (${event.screenX}, ${event.screenY}")
+    info(s"clicked on (${event.x}, ${event.y}")
     val rect = worldCanvas.viewRect
-    val provinceOpt = mapView.provinceByPixel(event.screenX + rect.minX toInt, event.screenY + rect.minY toInt)
+    val provinceOpt = mapView.provinceByPixel(event.x + rect.minX toInt, event.y + rect.minY toInt)
     provinceOpt.foreach { p =>
       info(s"selected province ${p.name}")
       val pane = new InterfacePane(new ProvinceDetailsPane(p, this), () => interfacePane.removeRightTopPanel())
       interfacePane.setRightTopPanel(pane)
     }
+  }
+
+  def showPopulationPane(province: Province) {
+    val pane = new PopulationViewPane(province)
+    interfacePane.setFacePanel(new InterfacePane(pane, () => hideFacePane()))
+  }
+
+  def hideFacePane(): Unit = {
+    interfacePane.removeFacePanel()
   }
 
   class WorldInterfacePane extends Pane {

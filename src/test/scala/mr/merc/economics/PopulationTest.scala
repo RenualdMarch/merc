@@ -3,23 +3,25 @@ package mr.merc.economics
 import mr.merc.economics.Population._
 import mr.merc.economics.Products.{Coal, Fruit, Grain}
 import mr.merc.map.objects.HumanCityHouse
-import org.scalatest.FunSuite
+import mr.merc.politics.ForeignPolicy.{Expansionism, Pacifism}
+import mr.merc.politics.{IssuePositionPopularity, PoliticalViews}
+import org.scalatest.{FunSuite, Matchers}
 import scalafx.scene.paint.Color
 
 import scala.util.Random
 
-class PopulationTest extends FunSuite {
+class PopulationTest extends FunSuite with Matchers {
 
   val smallNeeds:Map[PopulationNeedsType, Map[Products.Product, Double]] = Map(
     LifeNeeds -> Map(Grain -> 2.0, Coal -> 1.0),
     RegularNeeds -> Map(Grain -> 3.0, Coal -> 2.0),
     LuxuryNeeds -> Map(Fruit -> 3.0))
 
-  object TestRace extends Race
+  case object TestRace extends Race
   object TestCulture extends Culture("test",TestRace, HumanCityHouse, Color.Black) {
     override def needs: PopulationNeeds = Map(Upper -> smallNeeds, Middle -> smallNeeds, Lower -> smallNeeds)
   }
-  def newPopulation(money: Double) = new Population(TestCulture, Traders, 1000, money, 0)
+  def newPopulation(money: Double) = new Population(TestCulture, Traders, 1000, money, 0, PoliticalViews.averagePoliticalViews)
 
   test("demands calculation") {
     def assertDemands(money: Double, prices:Map[Products.Product, Double], demands:Map[Products.Product, Double]) {
@@ -100,7 +102,7 @@ class PopulationTest extends FunSuite {
   }
 
   test("extraction of people") {
-    def newPop() = new Population(TestCulture, Traders, 1000, 0, 100)
+    def newPop() = new Population(TestCulture, Traders, 1000, 0, 100, PoliticalViews.averagePoliticalViews)
 
     val p1 = newPop()
     val m1 = p1.extractRandomMovers(11)
@@ -172,8 +174,10 @@ class PopulationTest extends FunSuite {
       override def nextInt(n: Int): Int = 0
     }
 
-    val pop = new Population(TestCulture, Traders, 1000, 10000, 100)
-    val pop2 = new Population(TestCulture, Capitalists, 10, 1000, 10)
+    val pop = new Population(TestCulture, Traders, 1000, 10000, 100, PoliticalViews.averagePoliticalViews)
+    pop.politicalViews = pop.politicalViews.copy(foreignPolicy = new IssuePositionPopularity(Map(Expansionism -> 1d, Pacifism -> 0d)))
+    val pop2 = new Population(TestCulture, Capitalists, 10, 1000, 10, PoliticalViews.averagePoliticalViews)
+    pop2.politicalViews = pop2.politicalViews.copy(foreignPolicy = new IssuePositionPopularity(Map(Expansionism -> 0d, Pacifism -> 1d)))
     val regionPopulation = new RegionPopulation(List(pop, pop2))
 
 
@@ -202,16 +206,22 @@ class PopulationTest extends FunSuite {
     val capitalists = regionPopulation.pop(Capitalists, TestCulture)
     assert(capitalists.populationCount === 39)
     assert(capitalists.literateCount === 39)
+    assert(capitalists.politicalViews.foreignPolicy.popularity === Map(Expansionism -> 0.75, Pacifism -> 0.25))
+
 
     // movement from capitalists
     val aristocrats = regionPopulation.pop(Aristocrats, TestCulture)
     assert(aristocrats.populationCount === 1)
     assert(aristocrats.literateCount === 1)
+    assert(aristocrats.politicalViews.foreignPolicy.popularity === Map(Expansionism -> 0.75, Pacifism -> 0.25))
+
 
     // random movement from traders
     val craftsmen = regionPopulation.pop(Craftsmen, TestCulture)
     assert(craftsmen.populationCount === 5)
     assert(craftsmen.literateCount === 0)
+    assert(craftsmen.politicalViews.foreignPolicy.popularity === Map(Expansionism -> 1d, Pacifism -> 0d))
+
   }
 
   test("no promotion") {
@@ -219,8 +229,8 @@ class PopulationTest extends FunSuite {
       override def nextInt(n: Int): Int = 0
     }
 
-    val pop = new Population(TestCulture, Traders, 1000, 10000, 100)
-    val pop2 = new Population(TestCulture, Capitalists, 10, 0, 10)
+    val pop = new Population(TestCulture, Traders, 1000, 10000, 100, PoliticalViews.averagePoliticalViews)
+    val pop2 = new Population(TestCulture, Capitalists, 10, 0, 10, PoliticalViews.averagePoliticalViews)
     val regionPopulation = new RegionPopulation(List(pop, pop2))
 
 
@@ -261,8 +271,11 @@ class PopulationTest extends FunSuite {
       override def nextInt(n: Int): Int = 0
     }
 
-    val pop = new Population(TestCulture, Traders, 1000, 10000, 100)
-    val pop2 = new Population(TestCulture, Farmers, 10, 0, 0)
+    val pop = new Population(TestCulture, Traders, 1000, 10000, 100, PoliticalViews.averagePoliticalViews)
+    pop.politicalViews = pop.politicalViews.copy(foreignPolicy = new IssuePositionPopularity(Map(Expansionism -> 1d, Pacifism -> 0d)))
+    val pop2 = new Population(TestCulture, Farmers, 10, 0, 0, PoliticalViews.averagePoliticalViews)
+    pop2.politicalViews = pop2.politicalViews.copy(foreignPolicy = new IssuePositionPopularity(Map(Expansionism -> 0d, Pacifism -> 1d)))
+
     val regionPopulation = new RegionPopulation(List(pop, pop2))
 
 
@@ -281,15 +294,20 @@ class PopulationTest extends FunSuite {
     val traders = regionPopulation.pop(Traders, TestCulture)
     assert(traders.populationCount === 965)
     assert(traders.literateCount === 100)
+    assert(traders.politicalViews.foreignPolicy.popularity === Map(Expansionism -> 1d, Pacifism -> 0d))
 
     val farmers = regionPopulation.pop(Farmers, TestCulture)
     assert(farmers.populationCount === 39)
     assert(farmers.literateCount === 0)
+    assert(farmers.politicalViews.foreignPolicy.popularity === Map(Expansionism -> 0.75, Pacifism -> 0.25))
 
     // random movement from traders and farmers
     val craftsmen = regionPopulation.pop(Craftsmen, TestCulture)
     assert(craftsmen.populationCount === 6)
     assert(craftsmen.literateCount === 0)
+    craftsmen.politicalViews.foreignPolicy.popularity(Expansionism) shouldBe (5.75/6 +- 0.0000001)
+    craftsmen.politicalViews.foreignPolicy.popularity(Pacifism) shouldBe (0.25 / 6 +- 0.0000001)
+
   }
 
 }

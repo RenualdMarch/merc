@@ -1,7 +1,7 @@
 package mr.merc.economics
 
 import mr.merc.economics.Population._
-import mr.merc.economics.MapUtil.MapWithOperations
+import mr.merc.economics.MapUtil.FloatOperations._
 import mr.merc.economics.Products.Ritual
 
 class WorkerDecider(region: EconomicRegion, equalPart:Double = 0.5) {

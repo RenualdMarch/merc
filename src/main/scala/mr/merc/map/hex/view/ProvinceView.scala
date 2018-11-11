@@ -4,7 +4,7 @@ import mr.merc.map.hex.TerrainHexField
 import mr.merc.map.objects.{House, Signpost}
 import mr.merc.map.terrain._
 import mr.merc.politics.Province
-import mr.merc.economics.MapUtil.MapWithOperations
+import mr.merc.economics.MapUtil.NumericOperations._
 
 object ProvinceView {
   val housePerPopulation = 20000

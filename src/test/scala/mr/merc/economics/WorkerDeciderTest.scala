@@ -2,16 +2,16 @@ package mr.merc.economics
 
 import mr.merc.economics.Population._
 import mr.merc.economics.Products.{Coal, Product, Ritual}
-import mr.merc.politics.State
+import mr.merc.politics.{PoliticalViews, State}
 import org.scalatest.{BeforeAndAfter, FunSuite}
 
 class WorkerDeciderTest extends FunSuite with BeforeAndAfter {
 
-  val latinClergy = new Population(LatinHuman, Clergy, 1000, 0, 0)
-  val westFarmer = new Population(LatinHuman, Farmers, 2000, 0, 0)
-  val latinFarmer = new Population(KnightHuman, Farmers, 2000, 0, 0)
-  val westCraftsmen = new Population(KnightHuman, Craftsmen, 3000, 0, 0)
-  val latinCraftsmen = new Population(LatinHuman, Craftsmen, 1000, 0, 0)
+  val latinClergy = new Population(LatinHuman, Clergy, 1000, 0, 0, PoliticalViews.averagePoliticalViews)
+  val westFarmer = new Population(LatinHuman, Farmers, 2000, 0, 0, PoliticalViews.averagePoliticalViews)
+  val latinFarmer = new Population(KnightHuman, Farmers, 2000, 0, 0, PoliticalViews.averagePoliticalViews)
+  val westCraftsmen = new Population(KnightHuman, Craftsmen, 3000, 0, 0, PoliticalViews.averagePoliticalViews)
+  val latinCraftsmen = new Population(LatinHuman, Craftsmen, 1000, 0, 0, PoliticalViews.averagePoliticalViews)
 
   val populations = List(latinClergy, westFarmer, latinFarmer, westCraftsmen, latinCraftsmen)
 
@@ -149,7 +149,7 @@ class WorkerDeciderTest extends FunSuite with BeforeAndAfter {
   }
 
   test("clergy works only for its church") {
-    val westClergy = new Population(KnightHuman, Clergy, 500, 0, 0)
+    val westClergy = new Population(KnightHuman, Clergy, 500, 0, 0, PoliticalViews.averagePoliticalViews)
 
     val region = new EconomicRegion {
       override def economicNeighbours: Set[EconomicRegion] = ???

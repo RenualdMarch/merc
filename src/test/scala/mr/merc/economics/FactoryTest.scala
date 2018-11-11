@@ -3,7 +3,7 @@ package mr.merc.economics
 import mr.merc.economics.Factory.FactoryRecord
 import mr.merc.economics.Population._
 import mr.merc.economics.Products._
-import mr.merc.politics.State
+import mr.merc.politics.{PoliticalViews, State}
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfter, FunSuite}
@@ -21,7 +21,7 @@ class FactoryTest extends FunSuite with BeforeAndAfter with MockitoSugar {
   var testRegionMarket: RegionMarket = _
 
   before {
-    capitalists = new Population(LatinHuman, Capitalists, 1000, 0, 0)
+    capitalists = new Population(LatinHuman, Capitalists, 1000, 0, 0, PoliticalViews.averagePoliticalViews)
     capitalists.newDay(zeroTaxes)
     owner = new State("", KnightHuman, new StateBudget(0), TaxPolicy.zeroTaxes)
     testRegionMarket = mock[RegionMarket]
@@ -100,7 +100,7 @@ class FactoryTest extends FunSuite with BeforeAndAfter with MockitoSugar {
 
     assert(factory.workforceEfficiencyDemand(prices) === 2000)
 
-    val workers = new Population(LatinHuman, Craftsmen, 10000, 0, 0)
+    val workers = new Population(LatinHuman, Craftsmen, 10000, 0, 0, PoliticalViews.averagePoliticalViews)
     workers.newDay(zeroTaxes)
     assert(workers.efficiency === 1)
 
@@ -177,7 +177,7 @@ class FactoryTest extends FunSuite with BeforeAndAfter with MockitoSugar {
 
     assert(factory.workforceEfficiencyDemand(prices) === 2.5)
 
-    val workers = new Population(LatinHuman, Craftsmen, 10000, 0, 0)
+    val workers = new Population(LatinHuman, Craftsmen, 10000, 0, 0, PoliticalViews.averagePoliticalViews)
     workers.newDay(zeroTaxes)
     assert(workers.efficiency === 1)
 

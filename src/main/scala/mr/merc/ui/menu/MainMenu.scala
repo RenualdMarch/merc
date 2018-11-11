@@ -18,19 +18,22 @@ class MainMenu(sceneManager: SceneManager) extends BorderPane {
   styleClass.add("mainMenuContainer")
   stylesheets.add("/css/mainMenu.css")
 
-  val newBattleButton = new BigButton(Localization("menu.quickBattle")) {
+  val newBattleButton = new BigButton() {
+    text = Localization("menu.quickBattle")
     onAction = { e: ActionEvent =>
       sceneManager.startNewBattle()
     }
   }
 
-  val optionsButton = new BigButton(Localization("menu.options")) {
+  val optionsButton = new BigButton() {
+    text = Localization("menu.options")
     onAction = { e: ActionEvent =>
       sceneManager.showOptionsMenu()
     }
   }
 
-  val exitButton = new BigButton(Localization("menu.exit")) {
+  val exitButton = new BigButton() {
+    text = Localization("menu.exit")
     onAction = { e: ActionEvent =>
       sceneManager.exit()
     }

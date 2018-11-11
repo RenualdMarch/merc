@@ -3,7 +3,7 @@ package mr.merc.economics
 import Products._
 import mr.merc.economics.Factory.{FactoryRecord, FactoryStorage}
 import mr.merc.economics.Population._
-import mr.merc.economics.MapUtil.MapWithOperations
+import mr.merc.economics.MapUtil.FloatOperations._
 
 object Factory {
   case class FactoryStorage(unsoldProducts: Double, money: Double, unusedProducts: Map[Product, Double])

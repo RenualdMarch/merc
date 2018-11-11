@@ -2,7 +2,7 @@ package mr.merc.economics
 
 import mr.merc.economics.Population._
 import mr.merc.economics.Products.Grain
-import mr.merc.politics.State
+import mr.merc.politics.{PoliticalViews, State}
 import org.scalatest.{BeforeAndAfter, FunSuite}
 
 class ResourceGatheringTest extends FunSuite with BeforeAndAfter{
@@ -18,11 +18,11 @@ class ResourceGatheringTest extends FunSuite with BeforeAndAfter{
   val zeroPolicy = SalaryTaxPolicy(Map(Upper -> 0, Middle -> 0, Lower -> 0))
 
   before {
-    aristocrats = new Population(LatinHuman, Aristocrats, 1000, 0, 0)
+    aristocrats = new Population(LatinHuman, Aristocrats, 1000, 0, 0, PoliticalViews.averagePoliticalViews)
     aristocrats.newDay(zeroPolicy)
-    magicalAristocrats = new Population(LatinHuman, MagicalAristocrats, 600, 0, 0)
+    magicalAristocrats = new Population(LatinHuman, MagicalAristocrats, 600, 0, 0, PoliticalViews.averagePoliticalViews)
     magicalAristocrats.newDay(zeroPolicy)
-    workers = new Population(LatinHuman, Farmers, 4000, 0, 0)
+    workers = new Population(LatinHuman, Farmers, 4000, 0, 0, PoliticalViews.averagePoliticalViews)
     workers.newDay(zeroPolicy)
     country = new State("", KnightHuman, new StateBudget(0), TaxPolicy.zeroTaxes)
 

@@ -1,7 +1,7 @@
 package mr.merc.economics
 
 import mr.merc.economics.TaxPolicy.Tax
-import mr.merc.economics.MapUtil.MapWithOperations
+import mr.merc.economics.MapUtil.FloatOperations._
 
 class StateBudget(startingMoney: Double) {
 

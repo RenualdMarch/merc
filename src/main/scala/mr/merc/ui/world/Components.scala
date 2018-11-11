@@ -1,34 +1,66 @@
 package mr.merc.ui.world
 
+import scalafx.beans.property.ReadOnlyStringProperty
 import scalafx.scene.control.Button
 import scalafx.scene.text.{Font, Text}
 
 object Components {
-  val largeSize = 24
-  val mediumSize = 20
-  val smallSize = 16
+  val largeFontSize = 24
+  val smallFontSize = 20
 }
 
-case class BigText(t: String) extends Text(t) {
-  this.font = Font(Components.largeSize)
+object BigText {
+  def apply(t: String): BigText = new BigText {
+    this.text = t
+  }
+
+  def apply(t:ReadOnlyStringProperty): BigText = new BigText {
+    this.text <== t
+  }
 }
 
-case class MediumText(t: String) extends Text(t) {
-  this.font = Font(Components.mediumSize)
+class BigText extends Text {
+  this.font = Font(Components.largeFontSize)
 }
 
-case class SmallText(t: String) extends Text(t) {
-  this.font = Font(Components.smallSize)
+object SmallText {
+  def apply(t: String): SmallText = new SmallText {
+    this.text = t
+  }
+
+  def apply(t:ReadOnlyStringProperty): SmallText = new SmallText {
+    this.text <== t
+  }
 }
 
-case class BigButton(t: String) extends Button(t) {
-  this.font = Font(Components.largeSize)
+class SmallText extends Text {
+  this.font = Font(Components.smallFontSize)
 }
 
-case class MediumButton(t: String) extends Button(t) {
-  this.font = Font(Components.mediumSize)
+object BigButton {
+  def apply(t: String): BigButton = new BigButton {
+    this.text = t
+  }
+
+  def apply(t:ReadOnlyStringProperty): BigButton = new BigButton {
+    this.text <== t
+  }
 }
 
-class SmallButton(t: String) extends Button(t) {
-  this.font = Font(Components.smallSize)
+class BigButton extends Button {
+  this.font = Font(Components.largeFontSize)
+}
+
+object SmallButton {
+  def apply(t: String): SmallButton = new SmallButton {
+    this.text = t
+  }
+
+  def apply(t:ReadOnlyStringProperty): SmallButton = new SmallButton {
+    this.text <== t
+  }
+}
+
+class SmallButton extends Button {
+  this.font = Font(Components.smallFontSize)
 }

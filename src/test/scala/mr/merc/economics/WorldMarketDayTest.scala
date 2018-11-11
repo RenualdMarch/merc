@@ -2,7 +2,7 @@ package mr.merc.economics
 
 import mr.merc.economics.Population._
 import mr.merc.economics.Products._
-import mr.merc.politics.State
+import mr.merc.politics.{PoliticalViews, State}
 import org.scalatest.FunSuite
 
 class WorldMarketDayTest extends FunSuite {
@@ -33,11 +33,11 @@ class WorldMarketDayTest extends FunSuite {
       override val regionMarket: RegionMarket = new RegionMarket(initialPrices)
 
       override val regionPopulation: RegionPopulation = new RegionPopulation(List(
-        new Population(KnightHuman, Farmers, 1000, 200, 0),
-        new Population(KnightHuman, Aristocrats, 10, 200, 0),
-        new Population(KnightHuman, Craftsmen, 1000, 200, 0),
-        new Population(KnightHuman, Capitalists, 20, 200, 0),
-        new Population(KnightHuman, Traders, 200, 200, 0)))
+        new Population(KnightHuman, Farmers, 1000, 200, 0, PoliticalViews.averagePoliticalViews),
+        new Population(KnightHuman, Aristocrats, 10, 200, 0, PoliticalViews.averagePoliticalViews),
+        new Population(KnightHuman, Craftsmen, 1000, 200, 0, PoliticalViews.averagePoliticalViews),
+        new Population(KnightHuman, Capitalists, 20, 200, 0, PoliticalViews.averagePoliticalViews),
+        new Population(KnightHuman, Traders, 200, 200, 0, PoliticalViews.averagePoliticalViews)))
 
       enterprises = Vector(new Farm(Grain, this, 1000, 1.0), new IndustrialFactory(this, Liquor, 1, 2000, 1000, 1, 1))
     }
@@ -50,9 +50,9 @@ class WorldMarketDayTest extends FunSuite {
       override val regionMarket: RegionMarket = new RegionMarket(initialPrices)
 
       override val regionPopulation: RegionPopulation = new RegionPopulation(List(
-        new Population(KnightHuman, Labourers, 1000, 500, 0),
-        new Population(KnightHuman, Aristocrats, 10, 200, 0),
-        new Population(KnightHuman, Traders, 200, 300, 0)))
+        new Population(KnightHuman, Labourers, 1000, 500, 0, PoliticalViews.averagePoliticalViews),
+        new Population(KnightHuman, Aristocrats, 10, 200, 0, PoliticalViews.averagePoliticalViews),
+        new Population(KnightHuman, Traders, 200, 300, 0, PoliticalViews.averagePoliticalViews)))
 
 
       enterprises = Vector(new Mine(Coal, this, 1000, 1.0))
@@ -65,9 +65,9 @@ class WorldMarketDayTest extends FunSuite {
 
       override val regionMarket: RegionMarket = new RegionMarket(initialPrices)
       override val regionPopulation: RegionPopulation = new RegionPopulation(List(
-        new Population(KnightHuman, Craftsmen, 1000, 300, 0),
-        new Population(KnightHuman, Capitalists, 20, 400, 0),
-        new Population(KnightHuman, Traders, 200, 300, 0)
+        new Population(KnightHuman, Craftsmen, 1000, 300, 0, PoliticalViews.averagePoliticalViews),
+        new Population(KnightHuman, Capitalists, 20, 400, 0, PoliticalViews.averagePoliticalViews),
+        new Population(KnightHuman, Traders, 200, 300, 0, PoliticalViews.averagePoliticalViews)
       ))
 
       enterprises = Vector(new IndustrialFactory(this, Glass, 1, 2000, 1000, 1, 1))

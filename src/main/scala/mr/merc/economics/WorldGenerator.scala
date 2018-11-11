@@ -7,7 +7,7 @@ import mr.merc.map.generator.WorldMapGenerator
 import mr.merc.map.hex.{TerrainHex, TerrainHexField}
 import mr.merc.map.terrain.WaterKind
 import mr.merc.players.{ColorGenerator, NamesGenerator}
-import mr.merc.politics.{Province, State}
+import mr.merc.politics.{PoliticalViews, Province, State}
 import mr.merc.util.WeightedRandom
 
 import scala.util.Random
@@ -89,7 +89,8 @@ class WorldGenerator(field:TerrainHexField) {
         }
 
         val count = countMultiplier * pq / 2 + Random.nextInt(countMultiplier * pq / 2)
-        new Population(culture, tp, count, count * moneyPerPerson, (count * literacy).toInt)
+        val views = PoliticalViews.initPoliticalViews(tp, literacy)
+        new Population(culture, tp, count, count * moneyPerPerson, (count * literacy).toInt, views)
       }
     }
 

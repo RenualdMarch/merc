@@ -22,16 +22,17 @@ import scala.collection.JavaConverters._
 class ProvinceDetailsPane(province: Province, parent: WorldFrame) extends MigPane("", "") with Logging {
 
     add(BigText(province.name), "span,center,wrap")
-    add(MediumText(Localization("owner")))
+    add(SmallText(Localization("owner")))
     add(new StatePropertyNode(province.owner), "wrap")
-    add(MediumText(Localization("populationCount")))
+    add(SmallText(Localization("populationCount")))
     add(populationCountText, "wrap")
-    add(MediumText(Localization("cultures")), "span,center,wrap")
+    add(SmallText(Localization("cultures")), "span,center,wrap")
     add(culturesDiagram, "span,wrap")
     add(new MigPane("", "") {
-      val populationViewButton = MediumButton(Localization("population"))
-      val factoriesViewButton = MediumButton(Localization("factories"))
-      val armyViewButton = MediumButton(Localization("army"))
+      val populationViewButton = SmallButton(Localization("population"))
+      populationViewButton.onAction = _ => parent.showPopulationPane(province)
+      val factoriesViewButton = SmallButton(Localization("factories"))
+      val armyViewButton = SmallButton(Localization("army"))
       add(populationViewButton, "pushx,growx,wrap")
       add(factoriesViewButton, "pushx,growx,wrap")
       add(armyViewButton, "pushx,growx,wrap")
@@ -43,33 +44,16 @@ class ProvinceDetailsPane(province: Province, parent: WorldFrame) extends MigPan
     format.setGroupingSize(3)
     format.setGroupingUsed(true)
     val str = format.format(province.totalPopulation)
-    MediumText(str)
+    SmallText(str)
   }
 
   private def culturesDiagram: PieChart = {
     val pies = province.regionPopulation.cultureMembers.map { case (culture, count) =>
-      PieChart.Data(Localization(culture.cultureNameKey), count)
+      PieChartBuilder.PiePart(culture.color, Localization(culture.cultureNameKey), count)
     }.toList
 
-    val chart = PieChart(ObservableBuffer(pies))
-    chart.labelsVisible = false
-    chart.legendSide = Side.Bottom
-
-    province.regionPopulation.cultureMembers.zip(Stream.from(0)).foreach { case ((culture, _), i) =>
-      chart.lookupAll(s".data$i").asScala.foreach { node =>
-        node.style = s"-fx-pie-color:${MercUtils.colorToStyle(culture.color)};"
-      }
-      val items = chart.delegate.lookupAll(".chart-legend").asScala.collect { case e:Legend =>
-          e.getItems.asScala.find(_.getText == Localization(culture.cultureNameKey))
-      }
-      items.flatten.foreach { li =>
-        li.getSymbol.setStyle(s"-fx-pie-color: ${MercUtils.colorToStyle(culture.color)};")
-      }
-    }
-
-    chart
+    PieChartBuilder.build(pies)
   }
-
 }
 
 class StatePropertyNode(state: State) extends MigPane("") {
@@ -80,7 +64,7 @@ class StatePropertyNode(state: State) extends MigPane("") {
   colorSquare.width = 20
   colorSquare.fill = state.color
   colorSquare.stroke = Color.Black
-  private val name = MediumText(state.name)
+  private val name = SmallText(state.name)
   this.add(colorSquare)
   this.add(name)
 }
