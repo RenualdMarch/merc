@@ -1,12 +1,15 @@
 package mr.merc.ui.world
 
+import mr.merc.log.Logging
 import scalafx.beans.property.ReadOnlyStringProperty
 import scalafx.scene.control.Button
+import scalafx.scene.layout.{Pane, Region}
 import scalafx.scene.text.{Font, Text}
 
 object Components {
   val largeFontSize = 24
-  val smallFontSize = 20
+  val mediumFontSize = 20
+  val smallFontSize = 16
 }
 
 object BigText {
@@ -23,18 +26,18 @@ class BigText extends Text {
   this.font = Font(Components.largeFontSize)
 }
 
-object SmallText {
-  def apply(t: String): SmallText = new SmallText {
+object MediumText {
+  def apply(t: String): MediumText = new MediumText {
     this.text = t
   }
 
-  def apply(t:ReadOnlyStringProperty): SmallText = new SmallText {
+  def apply(t:ReadOnlyStringProperty): MediumText = new MediumText {
     this.text <== t
   }
 }
 
-class SmallText extends Text {
-  this.font = Font(Components.smallFontSize)
+class MediumText extends Text {
+  this.font = Font(Components.mediumFontSize)
 }
 
 object BigButton {
@@ -51,16 +54,38 @@ class BigButton extends Button {
   this.font = Font(Components.largeFontSize)
 }
 
-object SmallButton {
-  def apply(t: String): SmallButton = new SmallButton {
+object MediumButton {
+  def apply(t: String): MediumButton = new MediumButton {
     this.text = t
   }
 
-  def apply(t:ReadOnlyStringProperty): SmallButton = new SmallButton {
+  def apply(t:ReadOnlyStringProperty): MediumButton = new MediumButton {
     this.text <== t
   }
 }
 
-class SmallButton extends Button {
-  this.font = Font(Components.smallFontSize)
+class MediumButton extends Button {
+  this.font = Font(Components.mediumFontSize)
+}
+
+class PaneWithPropertyChild() extends Pane with Logging {
+
+  def setNewChild(child: Region): Unit = {
+    removeChild()
+    addChild(child)
+  }
+
+  private def addChild(child: Region): Unit = {
+    this.children.add(child)
+    child.layoutX = 0
+    child.layoutY = 0
+    child.prefHeight <== this.height
+    child.prefWidth <== this.width
+  }
+
+  private def removeChild(): Unit ={
+    this.children.clear()
+  }
+
+
 }

@@ -70,7 +70,7 @@ object WorldMapGenerator {
   }
 
   def addRivers(field: TerrainHexField): Unit = {
-    val riversCount = 0//(field.width + field.height) / 3
+    val riversCount = (field.width + field.height) / 3
     val hexesPerCurve = 4
 
     val initialRivers = (0 until riversCount).flatMap { _ =>

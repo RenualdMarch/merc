@@ -48,12 +48,14 @@ trait Issue[T <: IssuePosition] {
   def distanceBetweenPositions(first: T, second: T): Int = {
     math.abs(first.positionNumber - second.positionNumber)
   }
+
+  def name: String
 }
 
 object Migration extends Issue[MigrationPosition] {
 
   case object OpenBorders extends MigrationPosition {
-    override def color: Color = Color.White
+    override def color: Color = Color.Yellow
 
     override def populationModifier(pop: Population): Double = {
       0.5 + pop.literacy
@@ -76,13 +78,15 @@ object Migration extends Issue[MigrationPosition] {
     new IssuePositionPopularity(Map(OpenBorders -> openBorders, ClosedBorders -> closedBorders))
   }
 
+  override def name: String = "migration"
+
   override val possiblePositions: Vector[MigrationPosition] = Vector(OpenBorders, ClosedBorders)
 }
 
 object Regime extends Issue[RegimePosition] {
 
   case object Absolute extends RegimePosition {
-    override def color: Color = Color.White
+    override def color: Color = Color.Gray
 
     override def populationModifier(pop: Population): Double = {
       val x = 1 - pop.literacy
@@ -109,6 +113,8 @@ object Regime extends Issue[RegimePosition] {
   }
 
   override val possiblePositions: Vector[RegimePosition] = Vector(Absolute, Constitutional, Democracy)
+
+  override def name: String = "regime"
 
   def popularity(absoulute: Double, constitutional: Double, democracy: Double): Popularity = {
     new IssuePositionPopularity(Map(Absolute -> absoulute, Constitutional -> constitutional, Democracy -> democracy))
@@ -147,6 +153,8 @@ object Economy extends Issue[EconomyPosition] {
     new IssuePositionPopularity(Map(StateEconomy -> state, Interventionism -> interventionism, FreeMarket -> freeMarket))
   }
 
+  override def name: String = "economy"
+
   override val possiblePositions: Vector[EconomyPosition] = Vector(StateEconomy, Interventionism, FreeMarket)
 }
 
@@ -174,13 +182,15 @@ object ForeignPolicy extends Issue[ForeignPolicyPosition] {
     new IssuePositionPopularity(Map(Expansionism -> expansionism, Pacifism -> pacifism))
   }
 
+  override def name: String = "foreignPolicy"
+
   override val possiblePositions: Vector[ForeignPolicyPosition] = Vector(Expansionism, Pacifism)
 }
 
 object SocialPolicy extends Issue[SocialPolicyPosition] {
 
   case object NoSocialSecurity extends SocialPolicyPosition {
-    override def color: Color = Color.White
+    override def color: Color = Color.Gray
 
     override def populationModifier(pop: Population): Double =
       if (Set(Capitalists, Aristocrats, MagicalAristocrats).contains(pop.populationType)) 5.0 else 1.0
@@ -207,13 +217,15 @@ object SocialPolicy extends Issue[SocialPolicyPosition] {
       RegularNeedsSocialSecurity -> regularNeeds))
   }
 
+  override def name: String = "socialPolicy"
+
   override val possiblePositions: Vector[SocialPolicyPosition] = Vector(NoSocialSecurity, LifeNeedsSocialSecurity, RegularNeedsSocialSecurity)
 }
 
 object VotersPolicy extends Issue[VotersPolictyPosition] {
 
   case object NoVoting extends VotersPolictyPosition {
-    override def color: Color = Color.White
+    override def color: Color = Color.Gray
 
     override def populationModifier(pop: Population): Double = 2 * (1 - pop.literacy)
 
@@ -281,6 +293,8 @@ object VotersPolicy extends Issue[VotersPolictyPosition] {
       super.distanceBetweenPositions(first, second)
     }
   }
+
+  override def name: String = "votersPolicy"
 
   override val possiblePositions: Vector[VotersPolictyPosition] = Vector(NoVoting, PrimaryUpperClass,
     PrimaryUpperAndMiddleClass, Everyone, MagesOnly, ClericsOnly)

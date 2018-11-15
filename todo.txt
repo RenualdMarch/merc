@@ -11,7 +11,7 @@ For M6, interface will be a priority, basic politics, factory building
 +fix factory saving percentage - it should create reserve for next n days(n = 1 or more)
 +cultures - names
 +inner politics - parties, government, types of states, party loyalty
-interface - Province population, hapiness, literacy, salary, moneyReserves
++interface - Province population, hapiness, literacy, salary, moneyReserves
 interface - Province enterprises: resources, factories, avg
 no more than percentage of people can be capitalists and aristocrats
 add churches to provinces

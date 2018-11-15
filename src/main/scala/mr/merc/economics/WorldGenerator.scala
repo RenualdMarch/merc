@@ -251,8 +251,8 @@ class WorldGenerator(field:TerrainHexField) {
 }
 
 object WorldGenerator {
-  private val worldMapWidth = 100
-  private val worldMapHeight = 100
+  private val worldMapWidth = 50
+  private val worldMapHeight = 50
   private val hexesPerProvince = 250
   private val provinces = (worldMapHeight * worldMapWidth * WorldMapGenerator.landPercentage / hexesPerProvince).toInt
 

@@ -1,0 +1,6 @@
+.tooltip {
+    -fx-text-fill: black;
+    -fx-background-color: white;
+    -fx-border-color: black;
+    -fx-border-width: 1;
+}

@@ -5,15 +5,15 @@ import java.text.DecimalFormat
 import javafx.scene.control.SelectionMode
 import mr.merc.economics.{Population, RegionPopulation}
 import mr.merc.local.Localization
-import mr.merc.politics.Province
+import mr.merc.politics._
+import mr.merc.ui.world.PieChartBuilder.PiePart
 import org.tbee.javafx.scene.layout.MigPane
-import scalafx.scene.layout.Pane
+import scalafx.scene.layout.{BorderPane, Pane}
 import scalafx.Includes._
-import scalafx.beans.binding.Bindings
 import scalafx.beans.property.{ReadOnlyObjectProperty, StringProperty}
 import scalafx.collections.ObservableBuffer
-import scalafx.scene.control.{TableColumn, TableView}
-import scalafx.scene.text.Text
+import scalafx.scene.Node
+import scalafx.scene.control.{Accordion, TableColumn, TableView, TitledPane}
 
 import scala.collection.JavaConverters._
 
@@ -37,7 +37,7 @@ class PopulationViewPane(province: Province) extends Pane {
 
 class PopsTablePane(regionPopulation: RegionPopulation) extends MigPane with WorldInterfaceJavaNode {
   private val populationTable = new TableView[Population]()
-  populationTable.style = s"-fx-font-size: ${Components.smallFontSize}"
+  populationTable.style = s"-fx-font-size: ${Components.mediumFontSize}"
 
   private val raceColumn = new TableColumn[Population, String] {
     text = Localization("race")
@@ -109,37 +109,91 @@ class PopDetailsPane(populationProperty: ReadOnlyObjectProperty[Population], pro
     text <== titleText
   }.delegate, "span,center")
 
-  add(SmallText(Localization("population.populationCount")),"")
-  add(new SmallText{
-    private val formatter = new DecimalFormat()
-    formatter.setGroupingSize(3)
-    formatter.setGroupingUsed(true)
-    text <== populationProperty.map(p => formatter.format(p.populationCount))
-  }.delegate, "wrap")
+  private val generalInfoPane = new TitledPane() {
+    text = Localization("generalInfo")
+    style = s"-fx-font-size: ${Components.largeFontSize}"
+    content = new MigPane() {
+      add(MediumText(Localization("population.populationCount")),"")
+      add(new MediumText{
+        private val formatter = new DecimalFormat()
+        formatter.setGroupingSize(3)
+        formatter.setGroupingUsed(true)
+        text <== populationProperty.map(p => formatter.format(p.populationCount))
+      }.delegate, "wrap")
 
-  add(SmallText(Localization("population.hapiness")))
-  add(new SmallText{
-    private val formatter = new DecimalFormat("#00.00")
-    text <== populationProperty.map(p => formatter.format(p.happiness * 100) + "%")
-  }.delegate, "wrap")
+      add(MediumText(Localization("population.literacy")),"")
+      add(new MediumText{
+        private val formatter = new DecimalFormat("#0.00")
+        text <== populationProperty.map(p => formatter.format(p.literacy * 100) + "%")
+      }.delegate, "wrap")
 
-  private val moneyFormatter = new DecimalFormat("0.00")
-  add(SmallText(Localization("population.moneyReserves")),"")
-  add(new SmallText{
-    text <== populationProperty.map(p => moneyFormatter.format(p.moneyReserves))
-  }.delegate, "wrap")
+      add(MediumText(Localization("population.hapiness")))
+      add(new MediumText{
+        private val formatter = new DecimalFormat("#00.00")
+        text <== populationProperty.map(p => formatter.format(p.happiness * 100) + "%")
+      }.delegate, "wrap")
 
-  add(SmallText(Localization("population.netSalary")))
-  add(new SmallText{
-    text <== populationProperty.map(p => p.salary(0).headOption.
-      map(h => moneyFormatter.format(h.receivedMoney)).getOrElse(""))
-  }.delegate, "wrap")
+      private val moneyFormatter = new DecimalFormat("0.00")
+      add(MediumText(Localization("population.moneyReserves")),"")
+      add(new MediumText{
+        text <== populationProperty.map(p => moneyFormatter.format(p.moneyReserves))
+      }.delegate, "wrap")
 
-  add(SmallText(Localization("population.taxes")))
-  add(new SmallText{
-    text <== populationProperty.map(p => p.salary(0).headOption.
-      map(h => moneyFormatter.format(h.taxes)).getOrElse(""))
-  }.delegate, "wrap")
+      add(MediumText(Localization("population.netSalary")))
+      add(new MediumText{
+        text <== populationProperty.map(p => p.salary(0).headOption.
+          map(h => moneyFormatter.format(h.receivedMoney)).getOrElse(""))
+      }.delegate, "wrap")
 
+      add(MediumText(Localization("population.taxes")))
+      add(new MediumText{
+        text <== populationProperty.map(p => p.salary(0).headOption.
+          map(h => moneyFormatter.format(h.taxes)).getOrElse(""))
+      }.delegate, "wrap")
+    }
+  }
+
+  private val politicalViewsPane = new TitledPane() {
+    text = Localization("politicalViews")
+    style = s"-fx-font-size: ${Components.largeFontSize}"
+    content = new MigPane("fill") {
+      add(popToPie(_.foreignPolicy, ForeignPolicy), "span 1,growx,growy")
+      add(popToPie(_.votersPolicy, VotersPolicy), "span 1,growx,growy")
+      add(popToPie(_.economy, Economy), "span 1,wrap,growx,growy")
+      add(popToPie(_.socialPolicy, SocialPolicy), "span 1,growx,growy")
+      add(popToPie(_.migration, Migration), "span 1,growx,growy")
+      add(popToPie(_.regime, Regime), "span 1, wrap,growx,growy")
+    }
+  }
+
+  private val accordion = new Accordion()
+
+  accordion.panes = List(generalInfoPane, politicalViewsPane)
+  accordion.expandedPane = generalInfoPane
+
+  add(accordion, "growx,growy,pushx,pushy")
+
+  private def popToPie[T <: IssuePosition](f:PoliticalViews => IssuePositionPopularity[T], issue:Issue[T]):Pane = {
+    val pane = new BorderPane()
+
+    def reload(): Unit = {
+      pane.center = politicalPointsToPie(f(populationProperty.value.politicalViews), issue)
+    }
+
+    populationProperty.onChange {
+      reload()
+    }
+    reload()
+
+    pane
+  }
+
+  private def politicalPointsToPie[T <: IssuePosition](position: IssuePositionPopularity[T], issue:Issue[T]):Node = {
+    val percentFormatter = new DecimalFormat("#0.00")
+    val pies = position.popularity.map {case (k, v) => PiePart(k.color, k.name, v * 100, Some(k.name + " " + percentFormatter.format(v * 100) + "%"))}.toList
+    val chart = PieChartBuilder.build(pies)
+    chart.title = Localization(issue.name)
+    chart
+  }
 
 }
