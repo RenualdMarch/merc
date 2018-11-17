@@ -10,9 +10,7 @@ object Factory {
 
   case class FactoryRecord(produced: Double, moneySpentOnResources: Double, moneyOnWorkforceSalary: Double,
                            moneyOnOwnersPayment: Double, corporateTax: Double, moneyToFactoryBudget: Double,
-                           peopleResources:Map[Population, Double], sold: Map[EconomicRegion, FulfilledSupplyRequestProfit]) {
-    def earnings: Double = sold.values.map(p => p.profitPerItem * p.request.sold).sum
-    def itemsSold: Double = sold.values.map(_.request.sold).sum
+                           peopleResources:Map[Population, Double], sold: Map[EconomicRegion, FulfilledSupplyRequestProfit]) extends DayRecord {
     def factoryBuySellProfit: Double = earnings - moneySpentOnResources
   }
 }
@@ -112,11 +110,12 @@ abstract class Factory[Producible <: ProducibleProduct](val region: EconomicRegi
     val notEnoughMaintenancePenalty = notEnoughMaintenancePercentage * noMaintenancePenalty
 
     val fromPeople = scala.math.min(workforceCanProduce * inputMultiplier, maxPossibleInputToUse)
-    val produce = scala.math.min(minFromProducts, fromPeople) * (1 - notEnoughMaintenancePenalty) * outputMultiplier
+    val produce = scala.math.min(minFromProducts, fromPeople) * (1 - notEnoughMaintenancePenalty)
     val spentResources = (product.components |*| produce) |+| (requiredMaintenance |+| notEnoughMaintenance)
     storage = storage.copy(unusedProducts = storage.unusedProducts |-| spentResources)
-    currentRecord = currentRecord.copy(produced = produce)
-    storage = storage.copy(unsoldProducts = storage.unsoldProducts + produce)
+    val actualProduce = produce * outputMultiplier
+    currentRecord = currentRecord.copy(produced = actualProduce)
+    storage = storage.copy(unsoldProducts = storage.unsoldProducts + actualProduce)
   }
 
   def sellProduct(demand:Map[EconomicRegion, EconomicRegionDemand]):Map[EconomicRegion, SupplyRequest] = {
@@ -215,6 +214,8 @@ abstract class Factory[Producible <: ProducibleProduct](val region: EconomicRegi
   val possibleWorkers: PopulationType
 
   def currentMoneyBalance:Double = storage.money
+
+  def unsoldProducts:Double = storage.unsoldProducts
 
   def owners: List[Population]
 

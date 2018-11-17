@@ -1,4 +1,4 @@
-Current issues:
+Current battle issues:
 * Flickering in projectiles
 * Damage numbers not cleared in highest points
 * Redraw bugs during fast movement
@@ -12,15 +12,26 @@ For M6, interface will be a priority, basic politics, factory building
 +cultures - names
 +inner politics - parties, government, types of states, party loyalty
 +interface - Province population, hapiness, literacy, salary, moneyReserves
-interface - Province enterprises: resources, factories, avg
++add factory test for output multiplier
++interface - Province enterprises: resources, factories, avg
+add aggregated pop types(all, upper, medium, lower) to pops list
+add needs fulfillment to population pane
+pie chart legend must be removed and replaced with scroolable legend
+issues - change multipliers to better reflect "reality"
 no more than percentage of people can be capitalists and aristocrats
 add churches to provinces
 Budget interface
+Market button on province with details
+gdp info per province
 migration(with churches creation and destruction)
 people have two sources of unhappiness - not fulfilled needs and political stuff
 projects - when capitalists or ruler want to expand factory, or hire a soldier, eventual price is unknown.
 if there is no supply but demand, price rises faster.
-More tasks???
+taxes must go through buerocrats
+ability to hide map(from menu is ok) and move by moving cursor to the screen borders
+check  historical records - last for factories and first for population, is it correct? add aggregated records
+localization - add parameters order, like %1, %2, %3
+More tasks??? - game must be working except for war(no revolutions) and diplomacy
 
 
 For M7, soldiers and battles and wars

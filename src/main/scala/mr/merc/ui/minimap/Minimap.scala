@@ -5,18 +5,10 @@ import mr.merc.map.hex.TerrainHexField
 import scalafx.scene.paint.Color
 import mr.merc.map.hex.TerrainHex
 import mr.merc.map.terrain._
-import javafx.beans.property.SimpleDoubleProperty
 
-import scala.beans.BeanProperty
-import scalafx.scene.layout.{Pane, VBox}
-import scalafx.scene.control.ScrollPane
+import scalafx.scene.layout.Pane
 import mr.merc.map.view.MapView
-import scalafx.beans.binding.Bindings._
-import javafx.scene.{input => jfxin}
-import mr.merc.image.ImageUtil
-import mr.merc.ui.common.ConversionUtils._
-import mr.merc.ui.common.{ImageHelper, ScrollPaneLike}
-import scalafx.scene.image.Image
+import mr.merc.ui.common.ScrollPaneLike
 import scalafx.Includes._
 import scalafx.scene.input.MouseEvent
 
@@ -182,41 +174,18 @@ class Minimap(field: TerrainHexField, pane: ScrollPaneLike, factor: Double) exte
     val w = if (scrollableWidth == 0) {
       0
     } else {
-      rectPosX.toDouble / scrollableWidth
+      rectPosX / scrollableWidth
     }
 
     val h = if (scrollableHeight == 0) {
       0
     } else {
-      rectPosY.toDouble / scrollableHeight
+      rectPosY / scrollableHeight
     }
 
     (w, h)
   }
 
-  private def neighbourFromOtherOwner(hex: TerrainHex): Boolean = {
-    field.neighbours(hex).exists { n =>
-      val opt = for {
-        thisProvince <- hex.province
-        thatProvince <- n.province
-      } yield {
-        thisProvince.owner != thatProvince.owner
-      }
-      opt.getOrElse(false)
-    }
-  }
-
-  private def smallerNeighbourFromCurrentOwner(hex: TerrainHex): Boolean = {
-    field.neighbours(hex).exists { n =>
-      val opt = for {
-        thisProvince <- hex.province
-        thatProvince <- n.province
-      } yield {
-        thisProvince.owner == thatProvince.owner && thisProvince.toString > thatProvince.toString
-      }
-      opt.getOrElse(false)
-    }
-  }
 
   private def color(hex: TerrainHex): Color = {
     if (hex.soldier.nonEmpty) {

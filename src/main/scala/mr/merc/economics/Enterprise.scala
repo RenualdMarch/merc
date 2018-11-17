@@ -2,6 +2,7 @@ package mr.merc.economics
 
 import mr.merc.economics.Population.PopulationType
 import mr.merc.economics.Products.Product
+import mr.merc.economics.ResourceGathering.ResourceGatheringRecord
 
 trait Enterprise {
 
@@ -41,6 +42,10 @@ trait Enterprise {
 
   def currentMoneyBalance: Double
 
+  def unsoldProducts:Double
+
+  def dayRecords:Vector[DayRecord]
+
   protected def paySalaryProportionallyToEfficiency(map:Map[Population, Double], salary: Double): Unit = {
     (map.toList, salary) match {
       case (Nil, sum) =>
@@ -56,3 +61,13 @@ trait Enterprise {
   }
 }
 
+trait DayRecord {
+  def produced: Double
+  def moneyOnWorkforceSalary: Double
+  def moneyOnOwnersPayment: Double
+  def corporateTax: Double
+  def peopleResources:Map[Population, Double]
+  def sold: Map[EconomicRegion, FulfilledSupplyRequestProfit]
+  def earnings: Double = sold.values.map(p => p.profitPerItem * p.request.sold).sum
+  def itemsSold: Double = sold.values.map(_.request.sold).sum
+}

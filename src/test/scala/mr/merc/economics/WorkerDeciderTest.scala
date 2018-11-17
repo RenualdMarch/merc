@@ -46,9 +46,13 @@ class WorkerDeciderTest extends FunSuite with BeforeAndAfter {
 
     def endOfDay() = ???
 
+    def unsoldProducts: Double = ???
+
     def newDay(taxPolicy: CorporateTaxPolicy): Unit = ???
 
     def owners: List[Population] = ???
+
+    override def dayRecords: Vector[DayRecord] = ???
 
     def receiveWorkforceRequest(result: Map[Population, Double]) = ???
 

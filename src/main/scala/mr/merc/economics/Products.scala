@@ -12,7 +12,9 @@ object Products {
   def productByName(name: String): Product = AllProducts.find(_.toString.toLowerCase == name.toLowerCase).getOrElse(
     sys.error(s"Didn't find product $name in $AllProducts"))
 
-  sealed abstract class Product extends scala.Product with Serializable
+  sealed abstract class Product extends scala.Product with Serializable {
+    def name: String = productPrefix
+  }
   sealed abstract class GatheredProduct extends Product
   sealed abstract class FarmProduct extends GatheredProduct
   sealed abstract class ResourceProduct extends GatheredProduct

@@ -67,25 +67,3 @@ object MediumButton {
 class MediumButton extends Button {
   this.font = Font(Components.mediumFontSize)
 }
-
-class PaneWithPropertyChild() extends Pane with Logging {
-
-  def setNewChild(child: Region): Unit = {
-    removeChild()
-    addChild(child)
-  }
-
-  private def addChild(child: Region): Unit = {
-    this.children.add(child)
-    child.layoutX = 0
-    child.layoutY = 0
-    child.prefHeight <== this.height
-    child.prefWidth <== this.width
-  }
-
-  private def removeChild(): Unit ={
-    this.children.clear()
-  }
-
-
-}

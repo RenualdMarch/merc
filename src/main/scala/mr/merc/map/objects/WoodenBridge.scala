@@ -44,9 +44,10 @@ object WoodenBridge extends MapObject("woodenBridge") {
 
   private def pointsForNeighbour(neig: TerrainHex): Int = {
     if (neig.mapObj.contains(WoodenBridge)) 20
+    else if (neig.terrain.is(RoadKind) && neig.mapObj.nonEmpty) 4
     else if (neig.terrain.is(RoadKind)) 5
     else if (neig.terrain.is(MountainKind)) 1
-    else if (neig.terrain.is(WaterKind)) 0
+    else if (neig.terrain.is(WaterKind)) -2
     else 2
   }
 

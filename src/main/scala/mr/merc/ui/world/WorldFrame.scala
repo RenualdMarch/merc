@@ -43,13 +43,21 @@ class WorldFrame(sceneManager: SceneManager) extends Pane with Logging {
     val provinceOpt = mapView.provinceByPixel(event.x + rect.minX toInt, event.y + rect.minY toInt)
     provinceOpt.foreach { p =>
       info(s"selected province ${p.name}")
-      val pane = new InterfacePane(new ProvinceDetailsPane(p, this), () => interfacePane.removeRightTopPanel())
+      val pane = new InterfacePane(new ProvinceDetailsPane(p, this), () => {
+        interfacePane.removeRightTopPanel()
+        interfacePane.removeFacePanel()
+      })
       interfacePane.setRightTopPanel(pane)
     }
   }
 
   def showPopulationPane(province: Province) {
     val pane = new PopulationViewPane(province)
+    interfacePane.setFacePanel(new InterfacePane(pane, () => hideFacePane()))
+  }
+
+  def showEnterprisesPane(province: Province): Unit = {
+    val pane = new EnterprisesViewPane(province)
     interfacePane.setFacePanel(new InterfacePane(pane, () => hideFacePane()))
   }
 

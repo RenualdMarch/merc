@@ -79,7 +79,7 @@ class PopsTablePane(regionPopulation: RegionPopulation) extends MigPane with Wor
 
   private val hapinessFormatter = new DecimalFormat("#00.00")
   private val hapinessColumn = new TableColumn[Population, String] {
-    text = Localization("hapiness")
+    text = Localization("happiness")
     cellValueFactory = p => StringProperty(hapinessFormatter.format(p.value.happiness * 100) + "%")
     editable = false
     prefWidth <== populationTable.width * 0.144
@@ -101,12 +101,10 @@ class PopsTablePane(regionPopulation: RegionPopulation) extends MigPane with Wor
 class PopDetailsPane(populationProperty: ReadOnlyObjectProperty[Population], province: Province) extends MigPane with WorldInterfaceJavaNode {
   import mr.merc.util.MercUtils.PropertyBindingMap
 
-  private val titleText = populationProperty.map { p =>
-    Localization("population.title", p.culture.race.name, p.culture.name, p.populationType.name, province.name)
-  }
-
   add(new BigText{
-    text <== titleText
+    text <== populationProperty.map { p =>
+      Localization("population.title", p.culture.race.name, p.culture.name, p.populationType.name, province.name)
+    }
   }.delegate, "span,center")
 
   private val generalInfoPane = new TitledPane() {

@@ -27,6 +27,8 @@ abstract class ResourceGathering[Prod <: GatheredProduct](val product: Prod, val
 
   private val supplyDecider = new SupplyDecider()
 
+  def dayRecords:Vector[ResourceGatheringRecord] = records
+
   private def addCurrentRecord(): Unit = {
     records :+= currentRecord
     if (records.size > RecordsMax) {
@@ -40,27 +42,26 @@ abstract class ResourceGathering[Prod <: GatheredProduct](val product: Prod, val
   }
 
   override def produce(): Unit = {
-    val efficiency = currentRecord.workers.map{case (p, c) => p.efficiency * c}.sum
+    val efficiency = currentRecord.peopleResources.map{case (p, c) => p.efficiency * c}.sum
     val produced = efficiency * gatheringEfficiencyMultiplier
     unsold = unsold + produced
-    currentRecord = currentRecord.copy(gathered = produced)
+    currentRecord = currentRecord.copy(produced = produced)
   }
 
   override def payMoneyToPops(): Unit = {
     val earns = currentRecord.sold.values.map(f => f.profitPerItem * f.request.sold).sum
-    val totalEfficiency = currentRecord.workers.map{case (p, c) => p.efficiency * c}.sum
 
     currentRecord = currentRecord.copy(
-      tax = earns * currentTax.corporateTax,
-      moneyToWorkers = earns * (1 - currentTax.corporateTax) * profitPartToWorkers,
-      moneyToOwners = earns * (1 - currentTax.corporateTax) * profitPartToOwners
+      corporateTax = earns * currentTax.corporateTax,
+      moneyOnWorkforceSalary = earns * (1 - currentTax.corporateTax) * profitPartToWorkers,
+      moneyOnOwnersPayment = earns * (1 - currentTax.corporateTax) * profitPartToOwners
     )
 
-    paySalaryProportionallyToEfficiency(currentRecord.workers, currentRecord.moneyToWorkers)
-    paySalaryProportionallyToEfficiency(owners.map(p => p -> p.populationCount.toDouble).toMap, currentRecord.moneyToOwners)
+    paySalaryProportionallyToEfficiency(currentRecord.peopleResources, currentRecord.moneyOnWorkforceSalary)
+    paySalaryProportionallyToEfficiency(owners.map(p => p -> p.populationCount.toDouble).toMap, currentRecord.moneyOnOwnersPayment)
   }
 
-  override def payTaxes(): Double = currentRecord.tax
+  override def payTaxes(): Double = currentRecord.corporateTax
 
 
   override def receiveSellingResultAndMoney(region: EconomicRegion, profit:FulfilledSupplyRequestProfit): Unit = {
@@ -70,7 +71,7 @@ abstract class ResourceGathering[Prod <: GatheredProduct](val product: Prod, val
   }
 
   override def receiveWorkforceRequest(result: Map[Population, Double]): Unit = {
-    currentRecord = currentRecord.copy(workers = result)
+    currentRecord = currentRecord.copy(peopleResources = result)
   }
 
   override def sellProduct(demand: Map[EconomicRegion, EconomicRegionDemand]): Map[EconomicRegion, SupplyRequest] = {
@@ -94,8 +95,8 @@ abstract class ResourceGathering[Prod <: GatheredProduct](val product: Prod, val
   override def expectedSalaryPerEfficiency: Double = {
     records.headOption match {
       case Some(r) =>
-        val m = r.moneyToWorkers
-        val w = r.workers.map {
+        val m = r.moneyOnWorkforceSalary
+        val w = r.peopleResources.map {
           case (p, count) => p.efficiency * count
         }.sum
         if (w != 0) m / w
@@ -115,12 +116,12 @@ abstract class ResourceGathering[Prod <: GatheredProduct](val product: Prod, val
 }
 
 object ResourceGathering {
-  case class ResourceGatheringRecord(workers: Map[Population, Double], gathered: Double, sold: Map[EconomicRegion, FulfilledSupplyRequestProfit],
-                                     moneyToWorkers: Double, moneyToOwners: Double, unsoldInStorage: Double, tax: Double)
+  case class ResourceGatheringRecord(peopleResources: Map[Population, Double], produced: Double, sold: Map[EconomicRegion, FulfilledSupplyRequestProfit],
+                                     moneyOnWorkforceSalary: Double, moneyOnOwnersPayment: Double, unsoldInStorage: Double, corporateTax: Double) extends DayRecord
 }
 
 class Farm(product: FarmProduct, region: EconomicRegion, startingProducts: Double, gatheringEfficiencyMultiplier: Double) extends ResourceGathering(product, region, startingProducts, gatheringEfficiencyMultiplier) {
-  override def possibleWorkers: Population.PopulationType = Farmers
+    override def possibleWorkers: Population.PopulationType = Farmers
 }
 
 class Mine(product: ResourceProduct, region: EconomicRegion, startingProducts: Double, gatheringEfficiencyMultiplier: Double) extends ResourceGathering(product, region, startingProducts, gatheringEfficiencyMultiplier) {

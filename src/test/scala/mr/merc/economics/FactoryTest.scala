@@ -275,4 +275,81 @@ class FactoryTest extends FunSuite with BeforeAndAfter with MockitoSugar {
       sold = Map(region1 -> profit)
     )))
   }
+
+  test("factory usage general flow - happy path with output multiplier") {
+    val factory = new IndustrialFactory(region1, Wine, 2, 1000000, 40000, 20, 10)
+
+    val prices = Map[Product, Double](Glass -> 10, Fruit -> 5, MachineParts -> 1)
+
+    when(testRegionMarket.currentPrices).thenReturn(prices)
+
+    factory.newDay(CorporateTaxPolicy(0.1))
+    assert(factory.dayRecords === Vector())
+    val requests = factory.componentDemandRequests(prices)
+    assert(requests.mapValues(_.count) === Map(Glass -> 16000, Fruit -> 24000, MachineParts -> 1000))
+
+    assert(factory.factoryStorage.unsoldProducts === 40000)
+    assert(factory.factoryStorage.unusedProducts.forall(_._2 == 0),
+      s"${factory.factoryStorage.unusedProducts} must be empty")
+
+    val sell = factory.sellProduct(Map(region1 -> EconomicRegionDemand(40000, 100),
+      region2 -> EconomicRegionDemand(400000, 50)))
+    assert(sell.mapValues(_.count) === Map(region1 -> 40000))
+
+    val fulfilledRequests = requests.transform { case (p, r) =>
+      FulfilledDemandRequest(r.count, prices(p), r)
+    }
+
+    assert(factory.currentMoneyBalance === 1000000)
+    factory.receiveFulfilledDemandRequestsAndPayChecks(fulfilledRequests)
+    assert(factory.factoryStorage.unusedProducts === Map(Glass -> 16000, Fruit -> 24000, MachineParts -> 1000))
+
+    val moneySpentOnResources = 16000 * 10 + 24000 * 5 + 1000
+    val moneyEarned = 40000 * 100
+
+    assert(factory.currentMoneyBalance === 1000000 - moneySpentOnResources)
+    val moneyBalanceAfterDemand = factory.currentMoneyBalance
+    val profit = FulfilledSupplyRequestProfit(FulfilledSupplyRequest(40000, sell.head._2), 100)
+    factory.receiveSellingResultAndMoney(region1, profit)
+    assert(factory.factoryStorage.unsoldProducts === 0)
+    assert(factory.currentMoneyBalance === moneyBalanceAfterDemand + moneyEarned)
+
+    assert(factory.workforceEfficiencyDemand(prices) === 2000)
+
+    val workers = new Population(LatinHuman, Craftsmen, 10000, 0, 0, PoliticalViews.averagePoliticalViews)
+    workers.newDay(zeroTaxes)
+    assert(workers.efficiency === 1)
+
+    factory.receiveWorkforceRequest(Map(workers -> 2000))
+
+    factory.payMoneyToPops()
+    val taxes = (moneyEarned - moneySpentOnResources) * 0.1
+    assert(factory.payTaxes() === taxes)
+    val maxReserves = 16000 * prices(Glass) + 24000 * prices(Fruit) + 1000 * prices(MachineParts)
+    assert(factory.maxMoneyReserves === maxReserves)
+    val moneyToSpend = moneyBalanceAfterDemand + moneyEarned - taxes - maxReserves
+
+    assert(workers.moneyReserves === moneyToSpend * 0.5)
+    assert(capitalists.moneyReserves === moneyToSpend * 0.5)
+    assert(factory.currentMoneyBalance === maxReserves)
+
+    factory.produce()
+
+    assert(factory.factoryStorage.unusedProducts.forall(_._2 == 0),
+      s"${factory.factoryStorage.unusedProducts} must be empty")
+    assert(factory.factoryStorage.unsoldProducts === 400000)
+
+    factory.endOfDay()
+
+    assert(factory.dayRecords === Vector(FactoryRecord(
+      produced = 400000,
+      moneySpentOnResources = moneySpentOnResources,
+      moneyOnWorkforceSalary = moneyToSpend * 0.5,
+      moneyOnOwnersPayment = moneyToSpend * 0.5,
+      corporateTax = taxes,
+      moneyToFactoryBudget = maxReserves,
+      peopleResources = Map(workers -> 2000),
+      sold = Map(region1 -> profit)
+    )))
+  }
 }
