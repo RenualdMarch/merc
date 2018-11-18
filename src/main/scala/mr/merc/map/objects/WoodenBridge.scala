@@ -5,7 +5,6 @@ import mr.merc.map.hex.TerrainHex
 import mr.merc.image.MImage
 
 import mr.merc.map.hex.TerrainHexField
-import mr.merc.map.hex._
 import mr.merc.map.terrain.{MountainKind, RoadKind, WaterKind}
 
 object WoodenBridge extends MapObject("woodenBridge") {
@@ -13,10 +12,15 @@ object WoodenBridge extends MapObject("woodenBridge") {
 
   private val endsMap = Direction.list.map(dir => (dir, "end-" + dir.toString().toLowerCase())).toMap
 
-  private val selectionPriority = List((N, S), (NE, SW), (SE, NW), (NE, S), (N, SE), (SE, SW), (S, NW), (SW, N))
-  private val centersMap = selectionPriority.map(pair => (pair, pair._1.toString().toLowerCase() + "-" +
-      pair._2.toString().toLowerCase())).toMap
+  private val possibleCenters:List[(Direction, Direction)] = for {
+    from <- Direction.list
+    to <- Direction.list if from != to && Option(getClass.getResource(imagePath(centerToPath(from, to)))).nonEmpty
+  } yield (from, to)
 
+  private def centerToPath(from: Direction, to: Direction): String =
+    from.toString().toLowerCase() + "-" + to.toString().toLowerCase()
+
+  private def centerToPath(pair:(Direction, Direction)): String = centerToPath(pair._1, pair._2)
 
   override def images(hex: TerrainHex, field: TerrainHexField): List[MImage] = {
     val neighbours = field.neighboursWithDirections(hex.x, hex.y)
@@ -27,12 +31,12 @@ object WoodenBridge extends MapObject("woodenBridge") {
   }
 
   private def imagesForWoodenBridge(neighbours: Map[Direction, TerrainHex]):MImage = {
-    val part = centersMap(directionsForWoodenBridge(neighbours))
+    val part = centerToPath(directionsForWoodenBridge(neighbours))
     MImage(imagePath(part))
   }
 
   private def directionsForWoodenBridge(neighbours: Map[Direction, TerrainHex]): (Direction, Direction) = {
-    val list = selectionPriority.map {
+    val list = possibleCenters.map {
       case (from, to) => (from, to) -> pointsForBridge(neighbours, from, to)
     }
     list.maxBy(_._2)._1

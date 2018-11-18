@@ -14,10 +14,13 @@ For M6, interface will be a priority, basic politics, factory building
 +interface - Province population, hapiness, literacy, salary, moneyReserves
 +add factory test for output multiplier
 +interface - Province enterprises: resources, factories, avg
-add aggregated pop types(all, upper, medium, lower) to pops list
+++add aggregated pop types(all, upper, medium, lower) to pops list
+add wooden bridge with 3 ends
+add menu with state politics and other things
+player controls one faction, enemy province view
+add minimap hide/show button
 add needs fulfillment to population pane
 pie chart legend must be removed and replaced with scroolable legend
-issues - change multipliers to better reflect "reality"
 no more than percentage of people can be capitalists and aristocrats
 add churches to provinces
 Budget interface
@@ -33,6 +36,8 @@ check  historical records - last for factories and first for population, is it c
 localization - add parameters order, like %1, %2, %3
 More tasks??? - game must be working except for war(no revolutions) and diplomacy
 
+Polishing:
+issues - change multipliers to better reflect "reality"
 
 For M7, soldiers and battles and wars
 For M8, save/load, game polishing and AI

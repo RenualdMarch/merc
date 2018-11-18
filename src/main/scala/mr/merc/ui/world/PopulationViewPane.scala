@@ -3,6 +3,7 @@ package mr.merc.ui.world
 import java.text.DecimalFormat
 
 import javafx.scene.control.SelectionMode
+import mr.merc.economics.Population.{Lower, Middle, Upper}
 import mr.merc.economics.{Population, RegionPopulation}
 import mr.merc.local.Localization
 import mr.merc.politics._
@@ -18,8 +19,8 @@ import scalafx.scene.control.{Accordion, TableColumn, TableView, TitledPane}
 import scala.collection.JavaConverters._
 
 class PopulationViewPane(province: Province) extends Pane {
-  val popsTablePane = new PopsTablePane(province.regionPopulation)
-  val popsTablePaneScala: Pane =  popsTablePane
+  val popsTablePane = new PopsTablePane(province.regionPopulation, province)
+  val popsTablePaneScala: Pane = popsTablePane
   val popDetailsPane: Pane = new PopDetailsPane(popsTablePane.selectedRow, province)
 
   popsTablePaneScala.layoutX = 0
@@ -35,76 +36,77 @@ class PopulationViewPane(province: Province) extends Pane {
   this.children.addAll(popsTablePane, popDetailsPane)
 }
 
-class PopsTablePane(regionPopulation: RegionPopulation) extends MigPane with WorldInterfaceJavaNode {
-  private val populationTable = new TableView[Population]()
+class PopsTablePane(regionPopulation: RegionPopulation, province: Province) extends MigPane with WorldInterfaceJavaNode {
+  private val populationTable = new TableView[PopulationInfo]()
   populationTable.style = s"-fx-font-size: ${Components.mediumFontSize}"
 
-  private val raceColumn = new TableColumn[Population, String] {
+  private val raceColumn = new TableColumn[PopulationInfo, String] {
     text = Localization("race")
-    cellValueFactory = p => StringProperty(Localization(p.value.culture.race.name))
+    cellValueFactory = p => StringProperty(p.value.race)
     editable = false
     prefWidth <== populationTable.width * 0.15
   }
 
-  private val cultureColumn = new TableColumn[Population, String] {
+  private val cultureColumn = new TableColumn[PopulationInfo, String] {
     text = Localization("culture")
-    cellValueFactory = p => StringProperty(Localization(p.value.culture.name))
+    cellValueFactory = p => StringProperty(p.value.culture)
     editable = false
     prefWidth <== populationTable.width * 0.15
   }
 
-  private val populationFormatter = new DecimalFormat()
-  populationFormatter.setGroupingSize(3)
-  populationFormatter.setGroupingUsed(true)
-  private val populationCountColumn = new TableColumn[Population, String] {
+  private val populationCountColumn = new TableColumn[PopulationInfo, String] {
     text = Localization("population")
-    cellValueFactory = p => StringProperty(populationFormatter.format(p.value.populationCount))
+    cellValueFactory = p => StringProperty(p.value.populationCount)
     editable = false
     prefWidth <== populationTable.width * 0.20
   }
 
-  private val populationTypeColumn = new TableColumn[Population, String] {
+  private val populationTypeColumn = new TableColumn[PopulationInfo, String] {
     text = Localization("type")
-    cellValueFactory = p => StringProperty(p.value.populationType.name)
+    cellValueFactory = p => StringProperty(p.value.populationType)
     editable = false
     prefWidth <== populationTable.width * 0.25
   }
 
-  private val populationClassColumn = new TableColumn[Population, String] {
+  private val populationClassColumn = new TableColumn[PopulationInfo, String] {
     text = Localization("class")
-    cellValueFactory = p => StringProperty(p.value.populationType.populationClass.name)
+    cellValueFactory = p => StringProperty(p.value.populationClass)
     editable = false
     prefWidth <== populationTable.width * 0.10
   }
 
-  private val hapinessFormatter = new DecimalFormat("#00.00")
-  private val hapinessColumn = new TableColumn[Population, String] {
+  private val happinessColumn = new TableColumn[PopulationInfo, String] {
     text = Localization("happiness")
-    cellValueFactory = p => StringProperty(hapinessFormatter.format(p.value.happiness * 100) + "%")
+    cellValueFactory = p => StringProperty(p.value.happiness)
     editable = false
     prefWidth <== populationTable.width * 0.144
   }
 
   populationTable.columns ++= List(populationClassColumn, populationTypeColumn,
-    raceColumn, cultureColumn, populationCountColumn, hapinessColumn)
+    raceColumn, cultureColumn, populationCountColumn, happinessColumn)
 
-  private val buffer = new ObservableBuffer[Population]()
-  buffer.addAll(regionPopulation.pops.sortBy(p => (p.populationType, p.populationCount)).reverse.asJava)
+  private val buffer = new ObservableBuffer[PopulationInfo]()
+
+  private val info = regionPopulation.pops.sortBy(p => (p.populationType, p.populationCount)).map(p => new PopulationInfo(List(p), province))
+
+  buffer.add(new PopulationInfo(regionPopulation.pops, province))
+  buffer.add(new PopulationInfo(regionPopulation.pops.filter(_.populationType.populationClass == Upper), province))
+  buffer.add(new PopulationInfo(regionPopulation.pops.filter(_.populationType.populationClass == Middle), province))
+  buffer.add(new PopulationInfo(regionPopulation.pops.filter(_.populationType.populationClass == Lower), province))
+  buffer.addAll(info.reverse.asJava)
   populationTable.items = buffer
 
   populationTable.delegate.getSelectionModel.setSelectionMode(SelectionMode.SINGLE)
-  val selectedRow:ReadOnlyObjectProperty[Population] = populationTable.delegate.getSelectionModel.selectedItemProperty
+  val selectedRow:ReadOnlyObjectProperty[PopulationInfo] = populationTable.delegate.getSelectionModel.selectedItemProperty
   populationTable.delegate.getSelectionModel.clearAndSelect(0)
   add(populationTable, "growx,growy,pushx,pushy")
 }
 
-class PopDetailsPane(populationProperty: ReadOnlyObjectProperty[Population], province: Province) extends MigPane with WorldInterfaceJavaNode {
+class PopDetailsPane(populationProperty: ReadOnlyObjectProperty[PopulationInfo], province: Province) extends MigPane with WorldInterfaceJavaNode {
   import mr.merc.util.MercUtils.PropertyBindingMap
 
   add(new BigText{
-    text <== populationProperty.map { p =>
-      Localization("population.title", p.culture.race.name, p.culture.name, p.populationType.name, province.name)
-    }
+    text <== populationProperty.map (p => p.pageTitle)
   }.delegate, "span,center")
 
   private val generalInfoPane = new TitledPane() {
@@ -113,40 +115,32 @@ class PopDetailsPane(populationProperty: ReadOnlyObjectProperty[Population], pro
     content = new MigPane() {
       add(MediumText(Localization("population.populationCount")),"")
       add(new MediumText{
-        private val formatter = new DecimalFormat()
-        formatter.setGroupingSize(3)
-        formatter.setGroupingUsed(true)
-        text <== populationProperty.map(p => formatter.format(p.populationCount))
+        text <== populationProperty.map(p => p.populationCount)
       }.delegate, "wrap")
 
       add(MediumText(Localization("population.literacy")),"")
       add(new MediumText{
-        private val formatter = new DecimalFormat("#0.00")
-        text <== populationProperty.map(p => formatter.format(p.literacy * 100) + "%")
+        text <== populationProperty.map(p => p.literacy)
       }.delegate, "wrap")
 
-      add(MediumText(Localization("population.hapiness")))
+      add(MediumText(Localization("population.happiness")))
       add(new MediumText{
-        private val formatter = new DecimalFormat("#00.00")
-        text <== populationProperty.map(p => formatter.format(p.happiness * 100) + "%")
+        text <== populationProperty.map(p => p.happiness)
       }.delegate, "wrap")
 
-      private val moneyFormatter = new DecimalFormat("0.00")
       add(MediumText(Localization("population.moneyReserves")),"")
       add(new MediumText{
-        text <== populationProperty.map(p => moneyFormatter.format(p.moneyReserves))
+        text <== populationProperty.map(p => p.moneyReserves)
       }.delegate, "wrap")
 
       add(MediumText(Localization("population.netSalary")))
       add(new MediumText{
-        text <== populationProperty.map(p => p.salary(0).headOption.
-          map(h => moneyFormatter.format(h.receivedMoney)).getOrElse(""))
+        text <== populationProperty.map(p => p.netSalary)
       }.delegate, "wrap")
 
       add(MediumText(Localization("population.taxes")))
       add(new MediumText{
-        text <== populationProperty.map(p => p.salary(0).headOption.
-          map(h => moneyFormatter.format(h.taxes)).getOrElse(""))
+        text <== populationProperty.map(p => p.taxes)
       }.delegate, "wrap")
     }
   }
@@ -194,4 +188,88 @@ class PopDetailsPane(populationProperty: ReadOnlyObjectProperty[Population], pro
     chart
   }
 
+}
+
+class PopulationInfo(population:List[Population], province: Province) {
+  private val formatter = new DecimalFormat("#0.00")
+  private val populationFormatter = new DecimalFormat()
+  populationFormatter.setGroupingSize(3)
+  populationFormatter.setGroupingUsed(true)
+
+  def race: String = {
+    val possibleRace = population.head.culture.race
+    if (population.forall(_.culture.race == possibleRace)) {
+      Localization(possibleRace.name)
+    } else Localization("population.all")
+  }
+
+  def culture: String = {
+    val possibleCulture = population.head.culture
+    if (population.forall(_.culture == possibleCulture)) {
+      Localization(possibleCulture.name)
+    } else Localization("population.all")
+  }
+
+  def populationCount: String = {
+    populationFormatter.format(population.map(_.populationCount).sum)
+  }
+
+  def populationType: String = {
+    val possibleType = population.head.populationType
+    if (population.forall(_.populationType == possibleType)) {
+      Localization(possibleType.name)
+    } else Localization("population.all")
+  }
+
+  def populationClass: String = {
+    val possibleClass = population.head.populationType.populationClass
+    if (population.forall(_.populationType.populationClass == possibleClass)) {
+      Localization(possibleClass.name)
+    } else Localization("population.all")
+  }
+
+  def happiness: String = {
+    formatter.format(population.map(p => (p.populationCount, p.happiness)).reduce[(Int, Double)] {
+      case ((c1, h1),(c2, h2)) => (c1 + c2, (c1 * h1 + c2 * h2) / (c1 + c2))
+    }._2 * 100)  + "%"
+  }
+
+  def literacy: String = {
+    val lit = population.map(_.literateCount).sum
+    val all = population.map(_.populationCount).sum
+    formatter.format(lit * 100 / all.toDouble) + "%"
+  }
+
+  def moneyReserves: String = {
+    val t = population.map(_.moneyReserves).sum
+    formatter.format(t)
+  }
+
+  def netSalary: String = {
+    val t = population.flatMap(_.salary.headOption.map(_.receivedMoney)).sum
+    formatter.format(t)
+  }
+
+  def taxes: String = {
+    val t = population.flatMap(_.salary.headOption.map(_.taxes)).sum
+    formatter.format(t)
+  }
+
+  def politicalViews: PoliticalViews = {
+    val sum = population.map(p => (p.populationCount, p.politicalViews)).reduce[(Int, PoliticalViews)] {
+      case ((c1, v1), (c2, v2)) => (c1 + c2, PoliticalViews.sumViews(c1, v1, c2, v2))
+    }
+
+    sum._2
+  }
+
+  def pageTitle: String = {
+    population match {
+      case List(p) => Localization("population.title", p.culture.race.name, p.culture.name, p.populationType.name, province.name)
+      case x :: _ if population.forall(_.populationType.populationClass == Upper) => Localization("population.title.upper", x.culture.race.name, x.culture.name, province.name)
+      case x :: _ if population.forall(_.populationType.populationClass == Middle) => Localization("population.title.middle", x.culture.race.name, x.culture.name, province.name)
+      case x :: _ if population.forall(_.populationType.populationClass == Lower) => Localization("population.title.lower", x.culture.race.name, x.culture.name, province.name)
+      case _ => Localization("population.title.all", province.name)
+    }
+  }
 }

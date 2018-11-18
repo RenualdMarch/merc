@@ -3,7 +3,7 @@ package mr.merc.politics
 import scalafx.scene.paint.Color
 import mr.merc.economics.MapUtil.FloatOperations._
 import mr.merc.economics.Population
-import mr.merc.economics.Population.{Aristocrats, Bureaucrats, Capitalists, Clergy, Craftsmen, Culture, Farmers, Labourers, LatinHuman, Mages, MagicalAristocrats, Middle, PopulationType, Traders, Upper}
+import mr.merc.economics.Population._
 import mr.merc.politics.IssuePosition._
 
 import scala.util.Random
@@ -227,7 +227,7 @@ object VotersPolicy extends Issue[VotersPolictyPosition] {
   case object NoVoting extends VotersPolictyPosition {
     override def color: Color = Color.Gray
 
-    override def populationModifier(pop: Population): Double = 2 * (1 - pop.literacy)
+    override def populationModifier(pop: Population): Double = 3 * (1 - pop.literacy)
 
     override def positionNumber: Int = 0
 
@@ -246,7 +246,7 @@ object VotersPolicy extends Issue[VotersPolictyPosition] {
     override def color: Color = Color.Blue
 
     override def populationModifier(pop: Population): Double = {
-      if (pop.populationType.populationClass == Upper || pop.populationType.populationClass == Middle) 5.0
+      if (pop.populationType.populationClass == Upper || pop.populationType.populationClass == Middle) 2.0
       else 1.0
     }
 
@@ -264,7 +264,7 @@ object VotersPolicy extends Issue[VotersPolictyPosition] {
     override def color: Color = Color.Orange
 
     override def populationModifier(pop: Population): Double = {
-      if (Set(Mages, MagicalAristocrats).contains(pop.populationType)) 10.0
+      if (Set(Mages, MagicalAristocrats).contains(pop.populationType)) 7.0
       else 1 - pop.literacy
     }
 
@@ -274,7 +274,7 @@ object VotersPolicy extends Issue[VotersPolictyPosition] {
     override def color: Color = Color.Green
 
     override def populationModifier(pop: Population): Double = {
-      if (pop.populationType == Clergy) 10.0
+      if (pop.populationType == Clergy) 7.0
       else 1 - pop.literacy
     }
 

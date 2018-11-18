@@ -98,7 +98,7 @@ class PopulationTest extends FunSuite with Matchers {
     pop.receiveSalary(10000)
     assert(pop.moneyReserves === 11000)
     pop.newDay(SalaryTaxPolicy(Map(Middle -> 0)))
-    assert(pop.salary(1).head.totalMoney === 11000)
+    assert(pop.salary.head.totalMoney === 11000)
   }
 
   test("extraction of people") {

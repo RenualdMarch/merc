@@ -101,7 +101,7 @@ class Population(val culture: Culture, val populationType: PopulationType, priva
 
   private var salaryRecords = Vector[SalaryRecord]()
 
-  def salary(n: Int): Vector[SalaryRecord] = salaryRecords.take(n)
+  def salary: Vector[SalaryRecord] = salaryRecords
 
   private var currentMoney = startingMoney
 
