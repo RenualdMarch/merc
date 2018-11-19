@@ -12,15 +12,18 @@ object WoodenBridge extends MapObject("woodenBridge") {
 
   private val endsMap = Direction.list.map(dir => (dir, "end-" + dir.toString().toLowerCase())).toMap
 
-  private val possibleCenters:List[(Direction, Direction)] = for {
+  private val possibleTwoSides:List[TwoSides] = for {
     from <- Direction.list
-    to <- Direction.list if from != to && Option(getClass.getResource(imagePath(centerToPath(from, to)))).nonEmpty
-  } yield (from, to)
+    to <- Direction.list if Option(getClass.getResource(TwoSides(from, to).path)).nonEmpty
+  } yield TwoSides(from, to)
 
-  private def centerToPath(from: Direction, to: Direction): String =
-    from.toString().toLowerCase() + "-" + to.toString().toLowerCase()
+  private val possibleThreeSides:List[ThreeSides] = for {
+    dir1 <- Direction.list
+    dir2 <- Direction.list
+    dir3 <- Direction.list if Option(getClass.getResource(ThreeSides(dir1, dir2, dir3).path)).nonEmpty
+  } yield ThreeSides(dir1, dir2, dir3)
 
-  private def centerToPath(pair:(Direction, Direction)): String = centerToPath(pair._1, pair._2)
+  private val possibleCenters = possibleTwoSides ++ possibleThreeSides
 
   override def images(hex: TerrainHex, field: TerrainHexField): List[MImage] = {
     val neighbours = field.neighboursWithDirections(hex.x, hex.y)
@@ -31,28 +34,21 @@ object WoodenBridge extends MapObject("woodenBridge") {
   }
 
   private def imagesForWoodenBridge(neighbours: Map[Direction, TerrainHex]):MImage = {
-    val part = centerToPath(directionsForWoodenBridge(neighbours))
-    MImage(imagePath(part))
+    val variant = selectVariant(neighbours)
+    MImage(variant.path)
   }
 
-  private def directionsForWoodenBridge(neighbours: Map[Direction, TerrainHex]): (Direction, Direction) = {
-    val list = possibleCenters.map {
-      case (from, to) => (from, to) -> pointsForBridge(neighbours, from, to)
-    }
-    list.maxBy(_._2)._1
-  }
-
-  private def pointsForBridge(neighbours: Map[Direction, TerrainHex], from: Direction, to: Direction): Int = {
-    List(neighbours.get(from), neighbours.get(to)).flatten.map(pointsForNeighbour).sum
+  private def selectVariant(neighbours: Map[Direction, TerrainHex]): WoodenBridgeVariant = {
+    possibleCenters.maxBy(_.points(neighbours))
   }
 
   private def pointsForNeighbour(neig: TerrainHex): Int = {
     if (neig.mapObj.contains(WoodenBridge)) 20
     else if (neig.terrain.is(RoadKind) && neig.mapObj.nonEmpty) 4
     else if (neig.terrain.is(RoadKind)) 5
-    else if (neig.terrain.is(MountainKind)) 1
+    else if (neig.terrain.is(MountainKind)) -5
     else if (neig.terrain.is(WaterKind)) -2
-    else 2
+    else -1
   }
 
   private def imagesForWoodenBridgeNeighbour(hex: TerrainHex, field: TerrainHexField): List[MImage] = {
@@ -63,8 +59,8 @@ object WoodenBridge extends MapObject("woodenBridge") {
     val bridges = field.neighboursWithDirections(hex.x, hex.y).
       filter(pair => pair._2.mapObj.contains(WoodenBridge))
     val directions = bridges.flatMap { case (direction, neig) =>
-      val (from, to) = directionsForWoodenBridge(field.neighboursWithDirections(neig))
-      if (from == direction.opposite || to == direction.opposite) {
+      val variant = selectVariant(field.neighboursWithDirections(neig))
+      if (variant.contains(direction.opposite)) {
         Some(direction)
       } else {
         None
@@ -72,5 +68,26 @@ object WoodenBridge extends MapObject("woodenBridge") {
     }
 
     directions.flatMap(endsMap.get).map(n => MImage(imagePath(n))).toList
+  }
+
+  private sealed trait WoodenBridgeVariant {
+    def path: String
+    def points(neighbours: Map[Direction, TerrainHex]): Int
+    def contains(dir: Direction): Boolean
+  }
+
+  private case class TwoSides(from: Direction, to: Direction) extends WoodenBridgeVariant {
+    val path: String = imagePath(from.toString().toLowerCase() + "-" + to.toString().toLowerCase())
+    def points(neighbours: Map[Direction, TerrainHex]): Int =
+      List(neighbours.get(from), neighbours.get(to)).flatten.map(pointsForNeighbour).sum + bonusPoints
+    def contains(dir: Direction): Boolean = Set(from, to).contains(dir)
+
+    private def bonusPoints: Int = if(from == to.opposite) 1 else 0
+  }
+
+  private case class ThreeSides(dir1: Direction, dir2: Direction, dir3: Direction) extends WoodenBridgeVariant {
+    val path: String = imagePath(dir1.toString().toLowerCase() + "-" + dir2.toString().toLowerCase() + "-" + dir3.toString().toLowerCase())
+    def points(neighbours: Map[Direction, TerrainHex]): Int = List(neighbours.get(dir1),neighbours.get(dir2),neighbours.get(dir3)).flatten.map(pointsForNeighbour).sum
+    def contains(dir: Direction): Boolean = Set(dir1, dir2, dir3).contains(dir)
   }
 }

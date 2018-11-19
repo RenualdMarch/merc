@@ -14,8 +14,8 @@ For M6, interface will be a priority, basic politics, factory building
 +interface - Province population, hapiness, literacy, salary, moneyReserves
 +add factory test for output multiplier
 +interface - Province enterprises: resources, factories, avg
-++add aggregated pop types(all, upper, medium, lower) to pops list
-add wooden bridge with 3 ends
++add aggregated pop types(all, upper, medium, lower) to pops list
++add wooden bridge with 3 ends
 add menu with state politics and other things
 player controls one faction, enemy province view
 add minimap hide/show button
@@ -31,6 +31,7 @@ people have two sources of unhappiness - not fulfilled needs and political stuff
 projects - when capitalists or ruler want to expand factory, or hire a soldier, eventual price is unknown.
 if there is no supply but demand, price rises faster.
 taxes must go through buerocrats
+strange wooden bridges placement
 ability to hide map(from menu is ok) and move by moving cursor to the screen borders
 check  historical records - last for factories and first for population, is it correct? add aggregated records
 localization - add parameters order, like %1, %2, %3
