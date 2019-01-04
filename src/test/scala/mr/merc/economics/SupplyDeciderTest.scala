@@ -69,7 +69,7 @@ class SupplyDeciderTest extends FunSuite{
 
   test("yesterday correction for unsold") {
     val supplyDecider = new SupplyDecider()
-    supplyDecider.receiveSupplyResults(Map(region2 -> FulfilledSupplyRequest(100, EnterpriseSupplyRequest(null, Products.Coal, 150))))
+    supplyDecider.receiveSupplyResults(Map(region2 -> FulfilledSupplyRequest(100, 0, EnterpriseSupplyRequest(null, Products.Coal, 150))))
     val map1 = supplyDecider.decideSupply(200, demand)
     assert(map1 === Map(region2 -> 100, region1 -> 100))
     val map2 = supplyDecider.decideSupply(1000, demand)
@@ -78,7 +78,7 @@ class SupplyDeciderTest extends FunSuite{
 
   test("yesterday correction for sold") {
     val supplyDecider = new SupplyDecider()
-    supplyDecider.receiveSupplyResults(Map(region2 -> FulfilledSupplyRequest(100, EnterpriseSupplyRequest(null, Products.Coal, 100))))
+    supplyDecider.receiveSupplyResults(Map(region2 -> FulfilledSupplyRequest(100, 0, EnterpriseSupplyRequest(null, Products.Coal, 100))))
     val map1 = supplyDecider.decideSupply(200, demand)
     assert(map1 === Map(region2 -> 125, region1 -> 75))
     val map2 = supplyDecider.decideSupply(100, demand)

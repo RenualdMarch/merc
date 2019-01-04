@@ -82,10 +82,15 @@ class WorldMarketDay(regions: Set[EconomicRegion]) {
         e.payMoneyToPops()
         val money = e.payTaxes()
         r.owner.budget.receiveTaxes(Corporate, money)
+        e.endOfDay()
       }
+
       r.regionPopulation.pops.foreach { p =>
         r.owner.budget.receiveTaxes(Salary, p.payTaxes())
+        p.endOfDay()
       }
+
+      r.regionMarket.newMarketDay()
     }
   }
 
@@ -98,7 +103,7 @@ class WorldMarketDay(regions: Set[EconomicRegion]) {
 
       // TODO add economic alliances
       val tariffOpt = if (toOwner == fromOwner) None else Some(new StateTariffPart(toOwner))
-      val transitState = path.tail.init.filter(r => r.owner != from.owner).map { r =>
+      val transitState = path.drop(1).dropRight(1).filter(r => r.owner != from.owner).map { r =>
         new StateTransitPart(r.owner)
       }
       val transitTraders = path.init.map(r => new TradersTransitPart(r))
@@ -114,10 +119,9 @@ class WorldMarketDay(regions: Set[EconomicRegion]) {
   }
 
   private def buildSupplyProfitForRegion(region: EconomicRegion): Map[Products.Product, Map[EconomicRegion, EconomicRegionDemand]] = {
-    val otherRegions = regions - region
 
     Products.AllProducts.map { p =>
-      p -> otherRegions.flatMap { r =>
+      p -> regions.flatMap { r =>
         buildSupplyInfoForProductAndRegion(p, region, r).map { info =>
           r -> EconomicRegionDemand(region.regionMarket.markets(p).totalDemand,
             info.tradeProfit)
@@ -135,8 +139,6 @@ class WorldMarketDay(regions: Set[EconomicRegion]) {
 case class Price(finalPrice: Double, extractions:List[Extraction]) {
   val afterTaxesProfit: Double = {
     val taxes = extractions.map(_.extractionPart).sum
-    // profit*(1 + taxes) = finalPrice
-    // profit = finalPrice / (1 + taxes)
     val profit = finalPrice / (1 + taxes)
     extractions.foreach { ex =>
       ex.extractionMoney = profit * ex.extractionPart

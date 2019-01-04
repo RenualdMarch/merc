@@ -76,7 +76,7 @@ class ResourceGatheringTest extends FunSuite with BeforeAndAfter{
     assert(sell.mapValues(_.count) === Map(region1 -> 1000))
 
     val profit = FulfilledSupplyRequestProfit(
-      FulfilledSupplyRequest(1000, sell.head._2), 100)
+      FulfilledSupplyRequest(1000, 0, sell.head._2), 100)
     resourceGathering.receiveSellingResultAndMoney(region1, profit)
 
     assert(resourceGathering.unsoldProducts === 0)

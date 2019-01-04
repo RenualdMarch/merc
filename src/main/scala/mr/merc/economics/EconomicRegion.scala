@@ -96,8 +96,16 @@ class RegionPopulation(initialPops: List[Population]) {
 }
 
 class RegionMarket(initialPrices:Map[Product, Double]) {
+  private var historicalData = initialPrices.keys.map { p =>
+    p -> Vector[MarketDay]()
+  }.toMap
+
+  private val maxRecords = 30
+
+  def history:Map[Products.Product, Vector[MarketDay]] = historicalData
+
   private var marketDaysForProduct = initialPrices.map { case (product, price) =>
-    product -> new MarketDay(product, price)
+    product -> new MarketDay(product, price, 1)
   }
 
   def markets: Map[Product, MarketDay] = marketDaysForProduct
@@ -127,16 +135,20 @@ class RegionMarket(initialPrices:Map[Product, Double]) {
   }
 
   def doTrade(products:List[Product]): Unit = {
-    products.collect(marketDaysForProduct).foreach(_.calculateSupplyAndDemand())
+    products.map(marketDaysForProduct).foreach(_.calculateSupplyAndDemand())
   }
 
   def newMarketDay(): Unit = {
+    marketDaysForProduct.foreach { case (p, md) =>
+      historicalData += p -> (historicalData(p) :+ md).takeRight(maxRecords)
+    }
+
     marketDaysForProduct = marketDaysForProduct.map { case (p, m) =>
-      p -> new MarketDay(p, m.tomorrowPrice.getOrElse(sys.error(s"Market for $p was not closed!")))
+      p -> new MarketDay(p, m.tomorrowPrice.getOrElse(sys.error(s"Market for $p was not closed!")), m.turn + 1)
     }
   }
 
   def currentPrices: Map[Product, Double] = marketDaysForProduct.map { case (product, market) =>
     product -> market.price
-  }
+  }//.withDefaultValue(defaultPrice)
 }

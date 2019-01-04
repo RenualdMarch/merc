@@ -6,13 +6,16 @@ import mr.merc.economics.Population._
 import mr.merc.economics.MapUtil.FloatOperations._
 
 object Factory {
+
   case class FactoryStorage(unsoldProducts: Double, money: Double, unusedProducts: Map[Product, Double])
 
   case class FactoryRecord(produced: Double, moneySpentOnResources: Double, moneyOnWorkforceSalary: Double,
                            moneyOnOwnersPayment: Double, corporateTax: Double, moneyToFactoryBudget: Double,
-                           peopleResources:Map[Population, Double], sold: Map[EconomicRegion, FulfilledSupplyRequestProfit]) extends DayRecord {
+                           peopleResources: Map[Population, Double], bought: List[FulfilledDemandRequest],
+                           sold: Map[EconomicRegion, FulfilledSupplyRequestProfit]) extends DayRecord {
     def factoryBuySellProfit: Double = earnings - moneySpentOnResources
   }
+
 }
 
 abstract class Factory[Producible <: ProducibleProduct](val region: EconomicRegion, val product: Producible, startingMoney: Double,
@@ -26,29 +29,29 @@ abstract class Factory[Producible <: ProducibleProduct](val region: EconomicRegi
 
   private val noMaintenancePenalty = 0.3
 
-  private var currentTaxPolicy:CorporateTaxPolicy = _
+  private var currentTaxPolicy: CorporateTaxPolicy = _
 
   private var storage = FactoryStorage(unsoldProducts = startingProducts, money = startingMoney, unusedProducts = Map())
 
-  private var factoryRecords:Vector[FactoryRecord] = Vector()
+  private var factoryRecords: Vector[FactoryRecord] = Vector()
 
   def isResourceGathering: Boolean = false
 
-  def dayRecords:Vector[FactoryRecord] = factoryRecords
+  def dayRecords: Vector[FactoryRecord] = factoryRecords
 
   private var currentRecord = newFactoryRecord()
 
   private val supplyDecider = new SupplyDecider()
 
-  protected def requiredMaintenance:Map[Product, Double]
+  protected def requiredMaintenance: Map[Product, Double]
 
-  protected def maxPossibleInputToUse:Double
+  protected def maxPossibleInputToUse: Double
 
-  private def costOfOneOutput(prices:Map[Product, Double]): Double = product.components.map { case (p, count) => prices(p) * count }.sum
+  private def costOfOneOutput(prices: Map[Product, Double]): Double = product.components.map { case (p, count) => prices(p) * count }.sum
 
   def factoryStorage: FactoryStorage = storage
 
-  private [economics] def maxMoneyReserves: Double = {
+  private[economics] def maxMoneyReserves: Double = {
     val neededForProduction = product.components.mapValues(_ * maxPossibleInputToUse)
     val neededForMaintenance = requiredMaintenance
     val maxNeededForDay = neededForProduction |+| neededForMaintenance
@@ -57,7 +60,7 @@ abstract class Factory[Producible <: ProducibleProduct](val region: EconomicRegi
     }.sum
   }
 
-  private def capacity(prices:Map[Product, Double]): Double = {
+  private def capacity(prices: Map[Product, Double]): Double = {
     val maintenancePrice = requiredMaintenance.toList.map { case (p, count) =>
       count * prices(p)
     }.sum
@@ -65,21 +68,21 @@ abstract class Factory[Producible <: ProducibleProduct](val region: EconomicRegi
     scala.math.min(possibleToBuy, maxPossibleInputToUse)
   }
 
-  def componentDemandRequests(prices:Map[Product, Double]):Map[Product, DemandRequest] = {
+  def componentDemandRequests(prices: Map[Product, Double]): Map[Product, DemandRequest] = {
     val targetProduction = supplyDecider.decideProduction(capacity(prices))
     val requiredComponents = product.components.mapValues(_ * targetProduction)
     val demand = (requiredComponents |-| storage.unusedProducts).filter(_._2 > 0)
-    (demand |+| requiredMaintenance).transform{case (p, c) => EnterpriseDemandRequest(this, p, c)}
+    (demand |+| requiredMaintenance).transform { case (p, c) => EnterpriseDemandRequest(this, p, c) }
   }
 
-  def workforceEfficiencyDemand(prices:Map[Product, Double]):Double = {
+  def workforceEfficiencyDemand(prices: Map[Product, Double]): Double = {
     val targetProduction = supplyDecider.decideProduction(capacity(prices))
     val neededEfficiency = targetProduction / inputMultiplier
     val maxEfficiency = maxPossibleInputToUse / inputMultiplier
     scala.math.min(neededEfficiency, maxEfficiency)
   }
 
-  def receiveFulfilledDemandRequestsAndPayChecks(requests:Map[Product, FulfilledDemandRequest]): Unit = {
+  def receiveFulfilledDemandRequestsAndPayChecks(requests: Map[Product, FulfilledDemandRequest]): Unit = {
     var moneySpentOnResources = 0d
     requests.foreach { case (p, r) =>
       moneySpentOnResources = moneySpentOnResources + r.price * r.bought
@@ -87,7 +90,9 @@ abstract class Factory[Producible <: ProducibleProduct](val region: EconomicRegi
       storage = storage.copy(unusedProducts = storage.unusedProducts + (p -> components))
     }
     storage = storage.copy(money = storage.money - moneySpentOnResources)
-    currentRecord = currentRecord.copy(moneySpentOnResources = currentRecord.moneySpentOnResources + moneySpentOnResources)
+    currentRecord = currentRecord.copy(
+      moneySpentOnResources = currentRecord.moneySpentOnResources + moneySpentOnResources,
+      bought = requests.values.toList)
   }
 
   def receiveWorkforceRequest(result: Map[Population, Double]): Unit = {
@@ -100,13 +105,14 @@ abstract class Factory[Producible <: ProducibleProduct](val region: EconomicRegi
       storage.unusedProducts.getOrElse(p, 0d) / d
     }.min
 
-    val workforceCanProduce = currentRecord.peopleResources.map{case (pop, count) =>
+    val workforceCanProduce = currentRecord.peopleResources.map { case (pop, count) =>
       pop.efficiency * count
     }.sum
 
     val notEnoughMaintenance = (storage.unusedProducts |-| requiredMaintenance).filter(_._2 < 0)
     val notEnoughMaintenanceItems = notEnoughMaintenance.values.sum * (-1)
-    val notEnoughMaintenancePercentage = notEnoughMaintenanceItems / requiredMaintenance.values.sum
+    val notEnoughMaintenanceSum = requiredMaintenance.values.sum
+    val notEnoughMaintenancePercentage = if (notEnoughMaintenanceSum == 0) 0 else notEnoughMaintenanceItems / requiredMaintenance.values.sum
     val notEnoughMaintenancePenalty = notEnoughMaintenancePercentage * noMaintenancePenalty
 
     val fromPeople = scala.math.min(workforceCanProduce * inputMultiplier, maxPossibleInputToUse)
@@ -118,13 +124,13 @@ abstract class Factory[Producible <: ProducibleProduct](val region: EconomicRegi
     storage = storage.copy(unsoldProducts = storage.unsoldProducts + actualProduce)
   }
 
-  def sellProduct(demand:Map[EconomicRegion, EconomicRegionDemand]):Map[EconomicRegion, SupplyRequest] = {
+  def sellProduct(demand: Map[EconomicRegion, EconomicRegionDemand]): Map[EconomicRegion, SupplyRequest] = {
     supplyDecider.decideSupply(storage.unsoldProducts, demand).collect { case (r, supply) if supply > 0 =>
       r -> EnterpriseSupplyRequest(this, product, supply)
     }
   }
 
-  def receiveSellingResultAndMoney(region:EconomicRegion, profit:FulfilledSupplyRequestProfit): Unit = {
+  def receiveSellingResultAndMoney(region: EconomicRegion, profit: FulfilledSupplyRequestProfit): Unit = {
     supplyDecider.receiveSupplyResults(Map(region -> profit.request))
     currentRecord = currentRecord.copy(sold = currentRecord.sold + (region -> profit))
     storage = storage.copy(
@@ -133,7 +139,7 @@ abstract class Factory[Producible <: ProducibleProduct](val region: EconomicRegi
     )
   }
 
-  private def efficiency(pop:Population, workers: Double):Double = pop.efficiency * workers
+  private def efficiency(pop: Population, workers: Double): Double = pop.efficiency * workers
 
   private def calculateEarningsDistribution(): Unit = {
     val tax = currentRecord.factoryBuySellProfit * currentTaxPolicy.corporateTax
@@ -199,7 +205,7 @@ abstract class Factory[Producible <: ProducibleProduct](val region: EconomicRegi
     currentRecord.corporateTax
   }
 
-  def endOfDay():Unit = {
+  def endOfDay(): Unit = {
     factoryRecords :+= currentRecord
     if (factoryRecords.size > FactoryRecordsMax) {
       factoryRecords = factoryRecords.takeRight(FactoryRecordsMax)
@@ -213,19 +219,19 @@ abstract class Factory[Producible <: ProducibleProduct](val region: EconomicRegi
 
   val possibleWorkers: PopulationType
 
-  def currentMoneyBalance:Double = storage.money
+  def currentMoneyBalance: Double = storage.money
 
-  def unsoldProducts:Double = storage.unsoldProducts
+  def unsoldProducts: Double = storage.unsoldProducts
 
   def owners: List[Population]
 
-  private def newFactoryRecord() = FactoryRecord(0,0, 0, 0, 0, 0, Map(), Map())
+  private def newFactoryRecord() = FactoryRecord(0, 0, 0, 0, 0, 0, Map(), Nil, Map())
 
   override def expectedSalaryPerEfficiency: Double = {
     dayRecords.headOption match {
       case Some(c) =>
         val money = c.moneyOnWorkforceSalary
-        val workersEfficiency = c.peopleResources.map{
+        val workersEfficiency = c.peopleResources.map {
           case (p, count) => p.efficiency * count
         }.sum
         if (workersEfficiency != 0) {
@@ -243,25 +249,26 @@ class IndustrialFactory(region: EconomicRegion, product: IndustryProduct, var le
   Factory[IndustryProduct](region, product, startingMoney, startingProducts, inputMultiplier, outputMultiplier) {
   override val possibleWorkers: PopulationType = Craftsmen
 
-  private val maintenanceGoodsPerLevel:Map[Product, Double] = Map(MachineParts -> 500)
+  private val maintenanceGoodsPerLevel: Map[Product, Double] = Map(MachineParts -> 500)
 
-  override protected def requiredMaintenance:Map[Product, Double] = maintenanceGoodsPerLevel |*| level
+  override protected def requiredMaintenance: Map[Product, Double] = maintenanceGoodsPerLevel |*| level
 
-  override protected def maxPossibleInputToUse:Double = level * Products.PeoplePerOneFactoryLevel * inputMultiplier
+  override protected def maxPossibleInputToUse: Double = level * Products.PeoplePerOneFactoryLevel * inputMultiplier
 
   override def owners: List[Population] = region.regionPopulation.pops.filter(_.populationType == Capitalists)
 
 }
 
 // implement industrial factory as factory without level, limited only by worker presence
-class MagicGuildEnterprise(region: EconomicRegion, product: MagicProduct, startingMoney: Double, startingProducts: Double, inputMultiplier: Double, outputMultiplier: Double) extends
+class MagicGuildEnterprise(region: EconomicRegion, product: MagicProduct, startingMoney: Double,
+                           startingProducts: Double, inputMultiplier: Double, outputMultiplier: Double) extends
   Factory[MagicProduct](region, product, startingMoney, startingProducts, inputMultiplier, outputMultiplier) {
 
-  override protected def requiredMaintenance:Map[Product, Double] = Map()
+  override protected def requiredMaintenance: Map[Product, Double] = Map()
 
   override val possibleWorkers: PopulationType = Mages
 
-  override protected def maxPossibleInputToUse:Double = region.regionPopulation.getPopTotalEfficiency(Mages) * inputMultiplier
+  override protected def maxPossibleInputToUse: Double = region.regionPopulation.getPopTotalEfficiency(Mages) * inputMultiplier
 
   override def owners: List[Population] = region.regionPopulation.pops.filter(_.populationType == Mages)
 }

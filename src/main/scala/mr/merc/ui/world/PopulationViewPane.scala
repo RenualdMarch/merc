@@ -16,24 +16,15 @@ import scalafx.collections.ObservableBuffer
 import scalafx.scene.Node
 import scalafx.scene.control.{Accordion, TableColumn, TableView, TitledPane}
 
+import EconomicLocalization._
+
 import scala.collection.JavaConverters._
 
-class PopulationViewPane(province: Province) extends Pane {
+class PopulationViewPane(province: Province) extends PaneWithTwoEqualHorizontalChildren {
   val popsTablePane = new PopsTablePane(province.regionPopulation, province)
-  val popsTablePaneScala: Pane = popsTablePane
   val popDetailsPane: Pane = new PopDetailsPane(popsTablePane.selectedRow, province)
 
-  popsTablePaneScala.layoutX = 0
-  popsTablePaneScala.layoutY = 0
-  popsTablePaneScala.prefWidth <== this.width / 2
-  popsTablePaneScala.prefHeight <== this.height
-
-  popDetailsPane.layoutX <== this.width / 2
-  popDetailsPane.layoutY = 0
-  popDetailsPane.prefWidth <== this.width / 2
-  popDetailsPane.prefHeight <== this.height
-
-  this.children.addAll(popsTablePane, popDetailsPane)
+  setTwoChildren(popsTablePane, popDetailsPane)
 }
 
 class PopsTablePane(regionPopulation: RegionPopulation, province: Province) extends MigPane with WorldInterfaceJavaNode {
@@ -97,8 +88,8 @@ class PopsTablePane(regionPopulation: RegionPopulation, province: Province) exte
   populationTable.items = buffer
 
   populationTable.delegate.getSelectionModel.setSelectionMode(SelectionMode.SINGLE)
-  val selectedRow:ReadOnlyObjectProperty[PopulationInfo] = populationTable.delegate.getSelectionModel.selectedItemProperty
   populationTable.delegate.getSelectionModel.clearAndSelect(0)
+  val selectedRow:ReadOnlyObjectProperty[PopulationInfo] = populationTable.delegate.getSelectionModel.selectedItemProperty
   add(populationTable, "growx,growy,pushx,pushy")
 }
 
@@ -158,27 +149,26 @@ class PopDetailsPane(populationProperty: ReadOnlyObjectProperty[PopulationInfo],
     }
   }
 
+
+
   private val accordion = new Accordion()
 
-  accordion.panes = List(generalInfoPane, politicalViewsPane)
+  accordion.panes = List(generalInfoPane, politicalViewsPane, populationNeedsPane())
   accordion.expandedPane = generalInfoPane
 
   add(accordion, "growx,growy,pushx,pushy")
 
-  private def popToPie[T <: IssuePosition](f:PoliticalViews => IssuePositionPopularity[T], issue:Issue[T]):Pane = {
-    val pane = new BorderPane()
+  private def populationNeedsPane():TitledPane = new TitledPane() {
+    content = new PropertyDependentPane[PopulationInfo](populationProperty,
+      p => SupplyDemandTables.buildPopulationDemandTable(p.population.flatMap(_.needsFulfillment(1).headOption)))
 
-    def reload(): Unit = {
-      pane.center = politicalPointsToPie(f(populationProperty.value.politicalViews), issue)
-    }
-
-    populationProperty.onChange {
-      reload()
-    }
-    reload()
-
-    pane
+    text = Localization("needs")
+    style = s"-fx-font-size: ${Components.largeFontSize}"
   }
+
+  private def popToPie[T <: IssuePosition](f:PoliticalViews => IssuePositionPopularity[T], issue:Issue[T]):Pane =
+    new PropertyDependentPane[PopulationInfo](populationProperty, p => politicalPointsToPie(f(p.politicalViews), issue))
+
 
   private def politicalPointsToPie[T <: IssuePosition](position: IssuePositionPopularity[T], issue:Issue[T]):Node = {
     val percentFormatter = new DecimalFormat("#0.00")
@@ -190,7 +180,7 @@ class PopDetailsPane(populationProperty: ReadOnlyObjectProperty[PopulationInfo],
 
 }
 
-class PopulationInfo(population:List[Population], province: Province) {
+class PopulationInfo(val population:List[Population], province: Province) {
   private val formatter = new DecimalFormat("#0.00")
   private val populationFormatter = new DecimalFormat()
   populationFormatter.setGroupingSize(3)
@@ -246,12 +236,12 @@ class PopulationInfo(population:List[Population], province: Province) {
   }
 
   def netSalary: String = {
-    val t = population.flatMap(_.salary.headOption.map(_.receivedMoney)).sum
+    val t = population.flatMap(_.salary.lastOption.map(_.receivedMoney)).sum
     formatter.format(t)
   }
 
   def taxes: String = {
-    val t = population.flatMap(_.salary.headOption.map(_.taxes)).sum
+    val t = population.flatMap(_.salary.lastOption.map(_.taxes)).sum
     formatter.format(t)
   }
 
@@ -265,7 +255,7 @@ class PopulationInfo(population:List[Population], province: Province) {
 
   def pageTitle: String = {
     population match {
-      case List(p) => Localization("population.title", p.culture.race.name, p.culture.name, p.populationType.name, province.name)
+      case List(p) => localizePopulation(p, province)
       case x :: _ if population.forall(_.populationType.populationClass == Upper) => Localization("population.title.upper", x.culture.race.name, x.culture.name, province.name)
       case x :: _ if population.forall(_.populationType.populationClass == Middle) => Localization("population.title.middle", x.culture.race.name, x.culture.name, province.name)
       case x :: _ if population.forall(_.populationType.populationClass == Lower) => Localization("population.title.lower", x.culture.race.name, x.culture.name, province.name)

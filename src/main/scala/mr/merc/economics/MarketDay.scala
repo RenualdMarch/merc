@@ -3,7 +3,7 @@ package mr.merc.economics
 import scala.collection.mutable
 import Products.Product
 
-class MarketDay(product: Product, val price: Double) {
+class MarketDay(product: Product, val price: Double, val turn: Int) {
   private val priceIncrease = 1.03
   private val priceDecrease = 0.97
 
@@ -22,8 +22,8 @@ class MarketDay(product: Product, val price: Double) {
   def fulfilledDemands: Option[List[FulfilledDemandRequest]] = _fulfilledDemands
   def fulfilledSupply: Option[List[FulfilledSupplyRequest]] = _fulfilledSupply
 
-  def totalSupply: Double = supply.foldLeft(0d)(_ + _.count)
-  def totalDemand: Double = demand.foldLeft(0d)(_ + _.count)
+  def totalSupply: Double = supply.map(_.count).sum
+  def totalDemand: Double = demand.map(_.count).sum
 
   def calculateSupplyAndDemand(): Unit = {
     require(_fulfilledSupply.isEmpty && _fulfilledDemands.isEmpty, "Resulting supply and demand already calculated")
@@ -42,7 +42,7 @@ class MarketDay(product: Product, val price: Double) {
 
       val fulfilledSupplyMap = supply map { s =>
         val sold = s.count * div
-        FulfilledSupplyRequest(sold, s)
+        FulfilledSupplyRequest(sold, price, s)
       } toList
 
       import scala.math.max
@@ -51,7 +51,7 @@ class MarketDay(product: Product, val price: Double) {
       _tomorrowPrice = Some(max(price * priceDecrease, lowestPossiblePrice))
     } else {
       _fulfilledSupply = Some(supply.map(s =>
-        FulfilledSupplyRequest(s.count, s)).toList)
+        FulfilledSupplyRequest(s.count, price, s)).toList)
 
       val div = totalSupply / totalDemand
 
@@ -98,10 +98,10 @@ class MarketDay(product: Product, val price: Double) {
 }
 
 sealed abstract class MarketRequest(val product: Product)
-abstract class DemandRequest(product: Product, val count: Double) extends MarketRequest(product) {
+sealed abstract class DemandRequest(product: Product, val count: Double) extends MarketRequest(product) {
   require(!count.isNaN, "Count can't be None")
 }
-abstract class SupplyRequest(product: Product, val count: Double) extends MarketRequest(product) {
+sealed abstract class SupplyRequest(product: Product, val count: Double) extends MarketRequest(product) {
   require(!count.isNaN, "Count can't be None")
 }
 case class PopulationDemandRequest(pop: Population, override val product: Product, override val count: Double) extends DemandRequest(product, count)
@@ -111,6 +111,6 @@ case class EnterpriseSupplyRequest(enterprise: Enterprise, override val product:
 case class FulfilledDemandRequest(bought: Double, price: Double, request: DemandRequest) {
   def shortage: Double = request.count - bought
 }
-case class FulfilledSupplyRequest(sold: Double, request: SupplyRequest) {
+case class FulfilledSupplyRequest(sold: Double, price: Double, request: SupplyRequest) {
   def excess: Double = request.count - sold
 }

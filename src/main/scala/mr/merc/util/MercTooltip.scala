@@ -1,11 +1,9 @@
 package mr.merc.util
 
-import javafx.event.EventHandler
 import mr.merc.ui.world.Components
 import scalafx.scene.Node
 import scalafx.scene.control.Label
 import scalafx.Includes._
-
 import javafx.scene.{input => jfxin}
 
 object MercTooltip {
@@ -23,6 +21,7 @@ object MercTooltip {
       label.text = text
       label.layoutX = bounds.getCenterX
       label.layoutY = bounds.getCenterY
+
       node.getScene.getChildren.add(label)
     })
 

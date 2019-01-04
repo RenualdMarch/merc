@@ -8,42 +8,23 @@ import mr.merc.local.Localization
 import mr.merc.politics.Province
 import org.tbee.javafx.scene.layout.MigPane
 import scalafx.beans.property.{ReadOnlyObjectProperty, StringProperty}
-import scalafx.scene.control.{TableColumn, TableView}
-import scalafx.scene.layout.Pane
+import scalafx.scene.control.{Accordion, TableColumn, TableView, TitledPane}
+import scalafx.scene.layout.{BorderPane, Pane, TilePane}
 import scalafx.Includes._
 import scalafx.collections.ObservableBuffer
+import EconomicLocalization._
 
 import scala.collection.JavaConverters._
 
-class EnterprisesViewPane(province: Province) extends Pane {
+class EnterprisesViewPane(province: Province) extends PaneWithTwoEqualHorizontalChildren {
 
   val enterpriseTablePane = new EnterprisesTablePane(province.enterprises)
-  val enterpriseTablePaneScala: Pane =  enterpriseTablePane
-  val enterpriseDetailsPane: Pane = new EnterpriseDetailsPane(enterpriseTablePane.selectedRow, province)
+  private def f(e:Enterprise) = new EnterpriseDetailsPane(e, province)
+  val enterpriseDetailsPane: Pane = new PropertyDependentPane(enterpriseTablePane.selectedRow, f)
 
-  enterpriseTablePaneScala.layoutX = 0
-  enterpriseTablePaneScala.layoutY = 0
-  enterpriseTablePaneScala.prefWidth <== this.width / 2
-  enterpriseTablePaneScala.prefHeight <== this.height
-
-  enterpriseDetailsPane.layoutX <== this.width / 2
-  enterpriseDetailsPane.layoutY = 0
-  enterpriseDetailsPane.prefWidth <== this.width / 2
-  enterpriseDetailsPane.prefHeight <== this.height
-
-  this.children.addAll(enterpriseTablePane, enterpriseDetailsPane)
-
+  setTwoChildren(enterpriseTablePane, enterpriseDetailsPane)
 }
 
-object EnterprisesViewPane {
-  def title(e: Enterprise): String = e match {
-    case _: IndustrialFactory => Localization("factory")
-    case _: Farm => Localization("farm")
-    case _: Mine => Localization("mine")
-    case _: Church => Localization("church")
-    case _: MagicGuildEnterprise => Localization("magesGuild")
-  }
-}
 
 class EnterprisesTablePane(enterprises: Seq[Enterprise]) extends MigPane with WorldInterfaceJavaNode {
   private val enterprisesTable = new TableView[Enterprise]()
@@ -58,7 +39,7 @@ class EnterprisesTablePane(enterprises: Seq[Enterprise]) extends MigPane with Wo
 
   private val enterpriseTypeColumn = new TableColumn[Enterprise, String] {
     text = Localization("type")
-    cellValueFactory = e => StringProperty(EnterprisesViewPane.title(e.value))
+    cellValueFactory = e => StringProperty(title(e.value))
     editable = false
     prefWidth <== enterprisesTable.width * 0.20
   }
@@ -93,7 +74,7 @@ class EnterprisesTablePane(enterprises: Seq[Enterprise]) extends MigPane with Wo
     prefWidth <== enterprisesTable.width * 0.20
   }
 
-  private def sortQ(e:Enterprise): (Int, Int, String) = {
+  private def sortQ(e: Enterprise): (Int, Int, String) = {
     e match {
       case f: IndustrialFactory => (5, -f.level, f.product.name)
       case f: Farm => (1, 0, f.product.name)
@@ -115,36 +96,70 @@ class EnterprisesTablePane(enterprises: Seq[Enterprise]) extends MigPane with Wo
   add(enterprisesTable, "growx,growy,pushx,pushy")
 }
 
-class EnterpriseDetailsPane(enterpriseProperty: ReadOnlyObjectProperty[Enterprise], province: Province) extends Pane with WorldInterfaceNode {
+class EnterpriseDetailsPane(enterprise: Enterprise, province: Province) extends BorderPane {
 
-  def reload(): Unit = {
-    val pane: Pane = enterpriseProperty.value match {
-      case e: Factory[_] => new FactoryPane(e, province)
-      case e: ResourceGathering[_] => new ResourceGatheringPane(e, province)
-    }
-    this.children.clear()
-    this.children.add(pane)
-    pane.prefWidth <== this.width
-    pane.prefHeight <== this.height
+  val accordion = new Accordion()
+
+  center = accordion
+
+  val mainPane: Pane = enterprise match {
+    case e: Factory[_] => new FactoryPane(e, province)
+    case e: ResourceGathering[_] => new ResourceGatheringPane(e, province)
   }
 
-  enterpriseProperty.onChange(reload())
+  val supplyAndDemand: Pane = enterprise match {
+    case e: Factory[_] =>
+      val pane = new MigPane()
 
-  reload()
+      val supplyTitle = BigText(Localization("supply"))
+      val demandTitle = BigText(Localization("demand"))
+      val supplyTable = SupplyDemandTables.buildEnterpriseSupplyTable(e.dayRecords.last)
+      val demandTable = SupplyDemandTables.buildFactoryDemandTable(e.dayRecords.last)
+
+      pane.add(supplyTitle, "span, center, wrap")
+      pane.add(supplyTable, "span, grow, push, wrap")
+      pane.add(demandTitle, "span, center, wrap")
+      pane.add(demandTable, "span, grow, push, wrap")
+
+      pane
+    case e: ResourceGathering[_] =>
+      val pane = new MigPane()
+      val supplyTitle = BigText(Localization("supply"))
+      val supplyTable = SupplyDemandTables.buildEnterpriseSupplyTable(e.dayRecords.last)
+
+      pane.add(supplyTitle, "span, center, wrap")
+      pane.add(supplyTable, "grow, push, span, wrap")
+
+      pane
+  }
+
+  val mainTitle = new TitledPane() {
+    content = mainPane
+    text = Localization("generalInfo")
+    style = s"-fx-font-size: ${Components.largeFontSize}"
+  }
+
+  val supplyAndDemandTitle = new TitledPane() {
+    text = Localization("production")
+    style = s"-fx-font-size: ${Components.largeFontSize}"
+    content = supplyAndDemand
+  }
 
 
+  accordion.panes = List(mainTitle, supplyAndDemandTitle)
+  accordion.expandedPane = mainTitle
 }
 
-abstract class EnterprisePane(e:Enterprise, province: Province) extends MigPane with WorldInterfaceJavaNode {
+abstract class EnterprisePane(e: Enterprise, province: Province) extends MigPane() with WorldInterfaceJavaNode {
   private val asIntFormat = new DecimalFormat("#0")
 
   add(new BigText {
-    text = Localization("enterprise.title", Localization(e.product.name), EnterprisesViewPane.title(e), province.name)
+    text = localizeEnterprise(e, province)
   }.delegate, "span,center")
 
   add(MediumText(Localization("enterprise.type")))
   add(new MediumText {
-    text = EnterprisesViewPane.title(e)
+    text = title(e)
   }.delegate, "wrap")
 
   add(MediumText(Localization("enterprise.product")))

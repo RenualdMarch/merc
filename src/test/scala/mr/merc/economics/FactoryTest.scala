@@ -93,7 +93,7 @@ class FactoryTest extends FunSuite with BeforeAndAfter with MockitoSugar {
 
     assert(factory.currentMoneyBalance === 1000000 - moneySpentOnResources)
     val moneyBalanceAfterDemand = factory.currentMoneyBalance
-    val profit = FulfilledSupplyRequestProfit(FulfilledSupplyRequest(40000, sell.head._2), 100)
+    val profit = FulfilledSupplyRequestProfit(FulfilledSupplyRequest(40000, 0, sell.head._2), 100)
     factory.receiveSellingResultAndMoney(region1, profit)
     assert(factory.factoryStorage.unsoldProducts === 0)
     assert(factory.currentMoneyBalance === moneyBalanceAfterDemand + moneyEarned)
@@ -133,7 +133,8 @@ class FactoryTest extends FunSuite with BeforeAndAfter with MockitoSugar {
       corporateTax = taxes,
       moneyToFactoryBudget = maxReserves,
       peopleResources = Map(workers -> 2000),
-      sold = Map(region1 -> profit)
+      sold = Map(region1 -> profit),
+      bought = fulfilledRequests.values.toList
     )))
   }
 
@@ -166,8 +167,8 @@ class FactoryTest extends FunSuite with BeforeAndAfter with MockitoSugar {
     val moneySpentOnResources = 1000
     val moneyEarned = 100
     assert(factory.factoryStorage.unsoldProducts === 40000)
-    val profit1 = FulfilledSupplyRequestProfit(FulfilledSupplyRequest(50, sell.head._2), 2)
-    val profit2 = FulfilledSupplyRequestProfit(FulfilledSupplyRequest(0, sell.head._2), 5)
+    val profit1 = FulfilledSupplyRequestProfit(FulfilledSupplyRequest(50, 0, sell.head._2), 2)
+    val profit2 = FulfilledSupplyRequestProfit(FulfilledSupplyRequest(0, 0, sell.head._2), 5)
     factory.receiveSellingResultAndMoney(region1, profit1)
     assert(factory.currentMoneyBalance === 2000 - moneySpentOnResources + moneyEarned)
     assert(factory.factoryStorage.unsoldProducts === 39950)
@@ -205,7 +206,8 @@ class FactoryTest extends FunSuite with BeforeAndAfter with MockitoSugar {
       corporateTax = taxes,
       moneyToFactoryBudget = 0,
       peopleResources = Map(workers -> 2.5),
-      sold = Map(region1 -> profit1, region2 -> profit2)
+      sold = Map(region1 -> profit1, region2 -> profit2),
+      bought = fulfilledRequests.values.toList
     )))
   }
 
@@ -242,7 +244,7 @@ class FactoryTest extends FunSuite with BeforeAndAfter with MockitoSugar {
 
     assert(factory.currentMoneyBalance === startingMoney - moneySpentOnResources)
     val moneyBalanceAfterDemand = factory.currentMoneyBalance
-    val profit = FulfilledSupplyRequestProfit(FulfilledSupplyRequest(40000, sell.head._2), 100)
+    val profit = FulfilledSupplyRequestProfit(FulfilledSupplyRequest(40000, 0, sell.head._2), 100)
     factory.receiveSellingResultAndMoney(region1, profit)
     assert(factory.factoryStorage.unsoldProducts === 0)
     assert(factory.currentMoneyBalance === moneyBalanceAfterDemand + moneyEarned)
@@ -272,7 +274,8 @@ class FactoryTest extends FunSuite with BeforeAndAfter with MockitoSugar {
       corporateTax = taxes,
       moneyToFactoryBudget = factory.maxMoneyReserves,
       peopleResources = Map(),
-      sold = Map(region1 -> profit)
+      sold = Map(region1 -> profit),
+      bought = fulfilledRequests.values.toList
     )))
   }
 
@@ -309,7 +312,7 @@ class FactoryTest extends FunSuite with BeforeAndAfter with MockitoSugar {
 
     assert(factory.currentMoneyBalance === 1000000 - moneySpentOnResources)
     val moneyBalanceAfterDemand = factory.currentMoneyBalance
-    val profit = FulfilledSupplyRequestProfit(FulfilledSupplyRequest(40000, sell.head._2), 100)
+    val profit = FulfilledSupplyRequestProfit(FulfilledSupplyRequest(40000, 0, sell.head._2), 100)
     factory.receiveSellingResultAndMoney(region1, profit)
     assert(factory.factoryStorage.unsoldProducts === 0)
     assert(factory.currentMoneyBalance === moneyBalanceAfterDemand + moneyEarned)
@@ -349,7 +352,8 @@ class FactoryTest extends FunSuite with BeforeAndAfter with MockitoSugar {
       corporateTax = taxes,
       moneyToFactoryBudget = maxReserves,
       peopleResources = Map(workers -> 2000),
-      sold = Map(region1 -> profit)
+      sold = Map(region1 -> profit),
+      bought = fulfilledRequests.values.toList
     )))
   }
 }

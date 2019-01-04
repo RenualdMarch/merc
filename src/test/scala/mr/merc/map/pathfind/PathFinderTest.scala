@@ -108,4 +108,17 @@ class PathFinderTest extends FunSuite {
     val pathSum = path.get.tail.map(h => costMap(h.terrain.kind)).sum
     assert(path.get === List(field.hex(4, 3), field.hex(3, 3), field.hex(2, 3), field.hex(1, 2)))
   }
+
+  test("from == to") {
+    val grid = new TestGrid(new HexField[Hex](5, 5, Hex.hexInit)) {
+      override def isBlocked(hex: Hex) = false
+    }
+
+    val from = grid.hex(1, 1)
+    val to = grid.hex(1, 1)
+
+    val result = finder.findPath(grid, from, to)
+    assert(result === Some(List(to)))
+  }
+
 }

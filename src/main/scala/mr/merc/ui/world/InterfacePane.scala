@@ -2,8 +2,10 @@ package mr.merc.ui.world
 
 import org.kordamp.ikonli.javafx.FontIcon
 import scalafx.scene.control.Button
-import scalafx.scene.layout.{Pane, Region}
+import scalafx.scene.layout.{BorderPane, Pane, Region}
 import scalafx.Includes._
+import scalafx.beans.property.ReadOnlyObjectProperty
+import scalafx.scene.Node
 
 class InterfacePane(content: Region, onClose: () => Unit) extends Pane with WorldInterfaceNode {
   private val iconSize = 32
@@ -41,4 +43,36 @@ trait WorldInterfaceJavaNode {
 
   getStyleClass.add("interfacePane")
   getStylesheets.add("/css/worldPane.css")
+}
+
+class PaneWithTwoEqualHorizontalChildren extends Pane {
+
+  def setTwoChildren(first: Region, second: Region): Unit = {
+    this.children.clear()
+
+    first.layoutX = 0
+    first.layoutY = 0
+    first.prefWidth <== this.width / 2
+    first.prefHeight <== this.height
+
+    second.layoutX <== this.width / 2
+    second.layoutY = 0
+    second.prefWidth <== this.width / 2
+    second.prefHeight <== this.height
+
+    this.children.addAll(first, second)
+  }
+}
+
+class PropertyDependentPane[T](property: ReadOnlyObjectProperty[T], f:T => Node) extends BorderPane {
+
+  def reload(): Unit = {
+    center = f(property.value)
+  }
+
+  property.onChange {
+    reload()
+  }
+
+  reload()
 }

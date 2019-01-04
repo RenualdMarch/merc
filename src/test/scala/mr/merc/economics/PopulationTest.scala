@@ -237,6 +237,7 @@ class PopulationTest extends FunSuite with Matchers {
     pop.buyDemandedProducts(List(FulfilledDemandRequest(6000, 1, PopulationDemandRequest(pop, Grain, 6000)),
       FulfilledDemandRequest(4000, 2, PopulationDemandRequest(pop, Fruit, 4000)), FulfilledDemandRequest(4000, 0.5,
         PopulationDemandRequest(pop, Coal, 4000))))
+    pop2.buyDemandedProducts(Nil)
 
 
     pop.fulfillNeedsUsingAlreadyReceivedProducts()
@@ -279,6 +280,7 @@ class PopulationTest extends FunSuite with Matchers {
     val regionPopulation = new RegionPopulation(List(pop, pop2))
 
 
+    pop.buyDemandedProducts(Nil)
     pop2.buyDemandedProducts(List(FulfilledDemandRequest(600, 1, PopulationDemandRequest(pop2, Grain, 600)),
       FulfilledDemandRequest(400, 2, PopulationDemandRequest(pop2, Fruit, 400)), FulfilledDemandRequest(400, 0.5,
         PopulationDemandRequest(pop2, Coal, 400))))

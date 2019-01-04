@@ -55,7 +55,9 @@ object Products {
   case object Sulphur extends ResourceProduct
 
   // churches
-  case class Ritual(culture: Culture) extends ResourceProduct
+  case class Ritual(culture: Culture) extends ResourceProduct {
+    override def name: String = culture.name + " " + super.name
+  }
 
   // factories
   // simple

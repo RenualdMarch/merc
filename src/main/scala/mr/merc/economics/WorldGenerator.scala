@@ -1,7 +1,7 @@
 package mr.merc.economics
 
 import com.typesafe.config.ConfigFactory
-import mr.merc.economics.Population.{Culture, Lower, Middle, Upper}
+import mr.merc.economics.Population.{Culture, LatinHuman, Lower, Middle, Upper}
 import mr.merc.economics.Products._
 import mr.merc.map.generator.WorldMapGenerator
 import mr.merc.map.hex.{TerrainHex, TerrainHexField}
@@ -299,11 +299,17 @@ object WorldGenerator {
   private val hexesPerProvince = 150
   private val provinces = (worldMapHeight * worldMapWidth * WorldMapGenerator.landPercentage / hexesPerProvince).toInt
 
-  def generateWorld(): (Map[State, List[Province]], TerrainHexField) = {
+  private val config = ConfigFactory.load("conf/worldGenerationEconomics")
+
+  def generateWorld(): WorldState = {
     val world = WorldMapGenerator.generateWorldMap(worldMapWidth, worldMapHeight, provinces)
     val generator = new WorldGenerator(world.terrain)
     val r = (generator.generateStateAndProvinces(world.provinces), world.terrain)
-    r
+    val playerState = r._1.keys.find(_.primeCulture == LatinHuman).get
+    val ws = new WorldState(r._1.values.flatten.toList, playerState, world.terrain)
+    val iterations = config.getInt("world.tradeDays")
+    0 until iterations foreach(_ => ws.nextTurn())
+    ws
   }
 
   def buildConnectivityMap(field:TerrainHexField, map:Map[TerrainHex, Set[TerrainHex]]):Map[TerrainHex, Set[TerrainHex]] = {

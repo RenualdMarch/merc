@@ -13,11 +13,9 @@ class WorldMarketDayTest extends FunSuite {
 
     // region1 produces grain and has liquor factory, region2 produces coal, region3 produces glass
 
-    val state1 = new State("", KnightHuman, new StateBudget(0), TaxPolicy(CorporateTaxPolicy(0.2),
+    val state1 = State("", KnightHuman, new StateBudget(0), TaxPolicy(CorporateTaxPolicy(0.2),
       SalaryTaxPolicy(Map[PopulationClass, Double](Lower -> 0.1, Middle -> 0.1, Upper -> 0.1)),
       SalesTaxPolicy(0), TariffTax(0.1), TransitTax(0.1)))
-
-    // sales tax bug
 
     /*val state2 = new State(new StateBudget(), TaxPolicy(CorporateTaxPolicy(0),
       SalaryTaxPolicy(Map[PopulationClass, Double](Lower -> 0, Middle -> 0, Upper -> 0)),
@@ -72,15 +70,41 @@ class WorldMarketDayTest extends FunSuite {
 
       enterprises = Vector(new IndustrialFactory(this, Glass, 1, 2000, 1000, 1, 1))
     }
+    val regions = List(region1, region2, region3)
 
-    val ws = new WorldState(List(region1, region2, region3))
+    val ws = new WorldStateMock(regions)
 
     assert(ws.totalMoney === 7000)
-    val day = new WorldMarketDay(Set(region1, region2, region3))
+    val day = new WorldMarketDay(regions.toSet)
     day.trade()
+    regions.foreach { r =>
+      r.enterprises.foreach { e =>
+        assert(e.dayRecords.size === 1)
+      }
+      r.regionPopulation.pops.foreach { p =>
+        assert(p.salary.size === 1)
+      }
+    }
 
     assert(ws.totalMoney === 7000)
 
+  }
+
+  private class WorldStateMock(val regions: List[EconomicRegion]) {
+
+    def totalMoney:Double = totalBudgetMoney + totalPopMoney + totalEnterpriseMoney
+
+    def totalBudgetMoney:Double = {
+      regions.map(_.owner).distinct.map(_.budget.moneyReserve).sum
+    }
+
+    def totalPopMoney: Double = {
+      regions.flatMap(_.regionPopulation.pops).map(_.moneyReserves).sum
+    }
+
+    def totalEnterpriseMoney: Double = {
+      regions.flatMap(_.enterprises).map(_.currentMoneyBalance).sum
+    }
   }
 
 }

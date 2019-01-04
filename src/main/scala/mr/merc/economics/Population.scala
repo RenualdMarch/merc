@@ -35,7 +35,7 @@ class Population(val culture: Culture, val populationType: PopulationType, priva
 
   private var needsFulfillmentRecords = Vector[ProductFulfillmentRecord]()
 
-  def needsFulfillment(n: Int):Vector[ProductFulfillmentRecord] = needsFulfillmentRecords.take(n)
+  def needsFulfillment(n: Int):Vector[ProductFulfillmentRecord] = needsFulfillmentRecords.takeRight(n)
 
   // last 5 turns
   def happiness: Double = {
@@ -103,6 +103,8 @@ class Population(val culture: Culture, val populationType: PopulationType, priva
 
   def salary: Vector[SalaryRecord] = salaryRecords
 
+  private var currentPrices:Map[Product, Double] = _
+
   private var currentMoney = startingMoney
 
   def moneyReserves: Double = currentMoney
@@ -145,21 +147,27 @@ class Population(val culture: Culture, val populationType: PopulationType, priva
 
   def newDay(tax: SalaryTaxPolicy): Unit = {
     this.tax = tax
-    salaryRecords +:= this.currentSalaryRecord
-    if (salaryRecords.size > salaryRecordsMaxSize) {
-      salaryRecords = salaryRecords.take(salaryRecordsMaxSize)
-    }
-
     this.currentSalaryRecord = SalaryRecord(populationCount, 0, 0, 0)
+  }
+
+  def endOfDay(): Unit = {
+    salaryRecords :+= currentSalaryRecord
+
+    if (salaryRecords.size > salaryRecordsMaxSize) {
+      salaryRecords = salaryRecords.takeRight(salaryRecordsMaxSize)
+    }
   }
 
   private case class DemandInfo(product: Product, count: Double, price: Double)
 
   private var alreadyReceivedProducts: List[FulfilledDemandRequest] = Nil
 
-  // returns spent money
   def buyDemandedProducts(requests: List[FulfilledDemandRequest]): Double = {
     assert(requests.forall(r => r.request.asInstanceOf[PopulationDemandRequest].pop == this))
+
+    currentPrices = requests.map { f =>
+      f.request.product -> f.price
+    }.toMap
 
     alreadyReceivedProducts ++= requests
 
@@ -176,8 +184,8 @@ class Population(val culture: Culture, val populationType: PopulationType, priva
       Map(r.request.product -> r.bought)
     }.fold(Map())(_ |+| _)
 
-    val productFulfillment = new ProductFulfillmentRecord(needs, receivedProductsMap)
-    needsFulfillmentRecords +:= productFulfillment
+    val productFulfillment = new ProductFulfillmentRecord(currentPrices, needs, receivedProductsMap)
+    needsFulfillmentRecords :+= productFulfillment
     if (needsFulfillmentRecords.size > needsFulfillmentRecordsMaxSize) {
       needsFulfillmentRecords = needsFulfillmentRecords.takeRight(needsFulfillmentRecordsMaxSize)
     }
@@ -199,7 +207,22 @@ class Population(val culture: Culture, val populationType: PopulationType, priva
 object Population extends EconomicConfig {
   val MaxLiteracyEfficiencyMultiplier = 10
 
-  sealed abstract class PopulationNeedsType(val needImportance:Int)
+  sealed abstract class PopulationNeedsType(val needImportance:Int) extends scala.Product with Serializable with Ordered[PopulationNeedsType] {
+    override def compare(that: PopulationNeedsType): Int = {
+      def toInt(pc: PopulationNeedsType): Int = {
+        pc match {
+          case LifeNeeds => 1
+          case RegularNeeds => 2
+          case LuxuryNeeds => 3
+        }
+      }
+
+      toInt(this) - toInt(that)
+    }
+
+    def name: String = this.productPrefix.toLowerCase
+  }
+
   case object LifeNeeds extends PopulationNeedsType(5)
   case object RegularNeeds extends PopulationNeedsType(3)
   case object LuxuryNeeds extends PopulationNeedsType(1)
@@ -385,7 +408,7 @@ object Population extends EconomicConfig {
 
   def cultures:List[Culture] = List(LatinHuman, KnightHuman, DarkHuman) //, HighElf, DarkElf, BarbarianOrc, RockDwarf, GreenSaurian, OldDrakes, Forsaken, RedDemons)
 
-  class ProductFulfillmentRecord(needs: Map[PopulationNeedsType, Map[Products.Product, Double]], products: Map[Product, Double]) {
+  class ProductFulfillmentRecord(prices: Map[Products.Product, Double], needs: Map[PopulationNeedsType, Map[Products.Product, Double]], products: Map[Product, Double]) {
 
     val needsFulfillmentInfo:Map[PopulationNeedsType, List[ProductFulfillment]] = {
 
@@ -420,10 +443,11 @@ object Population extends EconomicConfig {
     private def calculateProductFulfillment(needs: Map[Product, Double], afterFulfillment:Map[Product, Double]):List[ProductFulfillment] = {
       needs.toList.map { case (product, productNeed) =>
         val remainedProduct = afterFulfillment.getOrElse(product, -productNeed)
-        if (remainedProduct > 0) ProductFulfillment(product, productNeed, productNeed)
+        if (remainedProduct > 0)
+          ProductFulfillment(product, productNeed, productNeed, prices.get(product))
         else {
           val received = productNeed + remainedProduct
-          ProductFulfillment(product, productNeed, received)
+          ProductFulfillment(product, productNeed, received, prices.get(product))
         }
       }
     }
@@ -432,7 +456,7 @@ object Population extends EconomicConfig {
 
   }
 
-  case class ProductFulfillment(product:Product, demanded: Double, received: Double)
+  case class ProductFulfillment(product:Product, demanded: Double, received: Double, price: Option[Double])
   // TODO add money source
   case class SalaryRecord(populationCount: Int, receivedMoney: Double, totalMoney: Double, taxes: Double)
 }
