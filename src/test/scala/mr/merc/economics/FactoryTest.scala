@@ -67,7 +67,7 @@ class FactoryTest extends FunSuite with BeforeAndAfter with MockitoSugar {
 
     when(testRegionMarket.currentPrices).thenReturn(prices)
 
-    factory.newDay(CorporateTaxPolicy(0.1))
+    factory.newDay(CorporateTaxPolicy(0.1), 1)
     assert(factory.dayRecords === Vector())
     val requests = factory.componentDemandRequests(prices)
     assert(requests.mapValues(_.count) === Map(Glass -> 16000, Fruit -> 24000, MachineParts -> 1000))
@@ -134,7 +134,8 @@ class FactoryTest extends FunSuite with BeforeAndAfter with MockitoSugar {
       moneyToFactoryBudget = maxReserves,
       peopleResources = Map(workers -> 2000),
       sold = Map(region1 -> profit),
-      bought = fulfilledRequests.values.toList
+      bought = fulfilledRequests.values.toList,
+      turn = 1
     )))
   }
 
@@ -143,7 +144,7 @@ class FactoryTest extends FunSuite with BeforeAndAfter with MockitoSugar {
     val prices = Map[Product, Double](Glass -> 1, Fruit -> 1, MachineParts -> 1)
     when(testRegionMarket.currentPrices).thenReturn(prices)
 
-    factory.newDay(CorporateTaxPolicy(0.1))
+    factory.newDay(CorporateTaxPolicy(0.1), 1)
     assert(factory.dayRecords === Vector())
     val requests = factory.componentDemandRequests(prices)
     assert(requests.mapValues(_.count) === Map(Glass -> 400, Fruit -> 600, MachineParts -> 1000))
@@ -207,7 +208,8 @@ class FactoryTest extends FunSuite with BeforeAndAfter with MockitoSugar {
       moneyToFactoryBudget = 0,
       peopleResources = Map(workers -> 2.5),
       sold = Map(region1 -> profit1, region2 -> profit2),
-      bought = fulfilledRequests.values.toList
+      bought = fulfilledRequests.values.toList,
+      turn = 1
     )))
   }
 
@@ -218,7 +220,7 @@ class FactoryTest extends FunSuite with BeforeAndAfter with MockitoSugar {
     val prices = Map[Product, Double](Glass -> 10, Fruit -> 5, MachineParts -> 1)
     when(testRegionMarket.currentPrices).thenReturn(prices)
 
-    factory.newDay(CorporateTaxPolicy(0.1))
+    factory.newDay(CorporateTaxPolicy(0.1), 1)
     assert(factory.dayRecords === Vector())
     val requests = factory.componentDemandRequests(prices)
     assert(requests.mapValues(_.count) === Map(Glass -> 16000, Fruit -> 24000, MachineParts -> 1000))
@@ -275,7 +277,8 @@ class FactoryTest extends FunSuite with BeforeAndAfter with MockitoSugar {
       moneyToFactoryBudget = factory.maxMoneyReserves,
       peopleResources = Map(),
       sold = Map(region1 -> profit),
-      bought = fulfilledRequests.values.toList
+      bought = fulfilledRequests.values.toList,
+      turn = 1
     )))
   }
 
@@ -286,7 +289,7 @@ class FactoryTest extends FunSuite with BeforeAndAfter with MockitoSugar {
 
     when(testRegionMarket.currentPrices).thenReturn(prices)
 
-    factory.newDay(CorporateTaxPolicy(0.1))
+    factory.newDay(CorporateTaxPolicy(0.1), 1)
     assert(factory.dayRecords === Vector())
     val requests = factory.componentDemandRequests(prices)
     assert(requests.mapValues(_.count) === Map(Glass -> 16000, Fruit -> 24000, MachineParts -> 1000))
@@ -353,7 +356,8 @@ class FactoryTest extends FunSuite with BeforeAndAfter with MockitoSugar {
       moneyToFactoryBudget = maxReserves,
       peopleResources = Map(workers -> 2000),
       sold = Map(region1 -> profit),
-      bought = fulfilledRequests.values.toList
+      bought = fulfilledRequests.values.toList,
+      turn = 1
     )))
   }
 }

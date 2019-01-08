@@ -76,6 +76,10 @@ class RegionPopulation(initialPops: List[Population]) {
     }
   }
 
+  def orderPops(orders: Map[Enterprise, Double]): Map[Enterprise, Map[Population, Double]] = {
+    
+  }
+
   def pop(p: PopulationType, c: Culture): Population = {
     pops.find(pop => pop.populationType == p && pop.culture == c) match {
       case Some(x) => x
@@ -138,17 +142,17 @@ class RegionMarket(initialPrices:Map[Product, Double]) {
     products.map(marketDaysForProduct).foreach(_.calculateSupplyAndDemand())
   }
 
-  def newMarketDay(): Unit = {
+  def endOfMarketDay(turn:Int): Unit = {
     marketDaysForProduct.foreach { case (p, md) =>
       historicalData += p -> (historicalData(p) :+ md).takeRight(maxRecords)
     }
 
     marketDaysForProduct = marketDaysForProduct.map { case (p, m) =>
-      p -> new MarketDay(p, m.tomorrowPrice.getOrElse(sys.error(s"Market for $p was not closed!")), m.turn + 1)
+      p -> new MarketDay(p, m.tomorrowPrice.getOrElse(sys.error(s"Market for $p was not closed!")), turn + 1)
     }
   }
 
   def currentPrices: Map[Product, Double] = marketDaysForProduct.map { case (product, market) =>
     product -> market.price
-  }//.withDefaultValue(defaultPrice)
+  }
 }

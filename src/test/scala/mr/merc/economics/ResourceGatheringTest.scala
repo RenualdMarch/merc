@@ -65,7 +65,7 @@ class ResourceGatheringTest extends FunSuite with BeforeAndAfter{
 
     val prices = Map[Products.Product, Double](Grain -> 10)
 
-    resourceGathering.newDay(CorporateTaxPolicy(0.1))
+    resourceGathering.newDay(CorporateTaxPolicy(0.1), 1)
 
     assert(resourceGathering.componentDemandRequests(prices) === Map())
 

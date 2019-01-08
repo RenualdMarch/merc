@@ -195,9 +195,10 @@ class WorldGenerator(field:TerrainHexField) {
   }
 
   def generateStateAndProvinces(provincesHexes: Map[TerrainHex, Set[TerrainHex]]): Map[State, List[Province]] = {
-    val divisions = generateCultureStateDivisions(WorldGenerator.buildConnectivityMap(field, provincesHexes))
+    val connectivityMap = WorldGenerator.buildConnectivityMap(field, provincesHexes)
+    val divisions = generateCultureStateDivisions(connectivityMap)
 
-    divisions.map{case (state, capitals) =>
+    val result = divisions.map{case (state, capitals) =>
       state -> capitals.map {capital =>
         val name = namesGenerators(state.primeCulture).cityNames.extract()
         val p = Province(name, state, generateRegionMarket,generateRegionPops(state.primeCulture), provincesHexes(capital), capital)
@@ -206,6 +207,12 @@ class WorldGenerator(field:TerrainHexField) {
         p
       }
     } toMap
+    val provinces = result.values.flatten.toList
+    provinces.foreach { p =>
+      val neigs = connectivityMap(p.capital).map(c => provinces.find(_.capital == c).get)
+      p.initNeighbours(neigs)
+    }
+    result
   }
 
   private def extractContinuousPart(connectivityMap:ConnectivityMap, extractionSize:Int):Set[TerrainHex] = {

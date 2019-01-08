@@ -36,7 +36,7 @@ class ProductsTablePane(market: RegionMarket) extends MigPane with WorldInterfac
     text = Localization("productName")
     cellValueFactory = p => StringProperty(Localization(p.value.product.name))
     editable = false
-    prefWidth <== productsTable.width * 0.15
+    prefWidth <== productsTable.width * 0.30
   }
 
   private val priceColumn = new TableColumn[ProductsInfo, String] {
@@ -129,7 +129,7 @@ class ProductDetailPane(productsInfo: ProductsInfo, province: Province, stage: S
 
       lineChart.lookupAll(".chart-line-symbol").asScala.foreach { s =>
         val dataNumber = s.getStyleClass.find(_.startsWith("data")).get.replace("data", "").toInt + first.turn
-        s.onMouseClicked = _ => showSupplyDemandDialog(productsInfo.history(dataNumber - 1), province)
+        s.onMouseClicked = _ => showSupplyDemandDialog(productsInfo.history(dataNumber), province)
       }
 
       lineChart
@@ -166,7 +166,7 @@ class ProductDetailPane(productsInfo: ProductsInfo, province: Province, stage: S
 
       chart.lookupAll(".chart-area-symbol").asScala.foreach {s =>
         val dataNumber = s.getStyleClass.find(_.startsWith("data")).get.replace("data", "").toInt + first.turn
-        s.onMouseClicked = _ => showSupplyDemandDialog(productsInfo.history(dataNumber - 1), province)
+        s.onMouseClicked = _ => showSupplyDemandDialog(productsInfo.history(dataNumber), province)
       }
 
       chart
@@ -201,15 +201,15 @@ class ProductDetailPane(productsInfo: ProductsInfo, province: Province, stage: S
     val demandTable = SupplyDemandTables.buildDemandTable(day, province)
 
     pane.add(supplyTitle, "span, center, wrap")
-    pane.add(supplyTable, "span, growx, growx, pushx, pushy, wrap")
+    pane.add(supplyTable, "span, grow, push, wrap")
     pane.add(demandTitle, "span, center, wrap")
-    pane.add(demandTable, "span, growx, growx, pushx, pushy, wrap")
+    pane.add(demandTable, "span, grow, push, wrap")
 
     pane
   }
 
-  add(buildPriceChart().getOrElse(new Pane()), "growx,growy,pushx,pushy,wrap")
-  add(buildSupplyDemandChart().getOrElse(new Pane()), "growx,growy,pushx,pushy")
+  add(buildPriceChart().getOrElse(new Pane()), "grow,push,wrap")
+  add(buildSupplyDemandChart().getOrElse(new Pane()), "grow,push")
 }
 
 case class ProductsInfo(product: Products.Product, history: Vector[MarketDay]) {

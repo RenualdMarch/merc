@@ -21,7 +21,7 @@ class WorldMarketDayTest extends FunSuite {
       SalaryTaxPolicy(Map[PopulationClass, Double](Lower -> 0, Middle -> 0, Upper -> 0)),
       SalesTaxPolicy(0), TariffTax(0)))*/
 
-    val initialPrices = Map[Products.Product, Double](Grain -> 10, Coal -> 15, Glass -> 10, Liquor -> 100, MachineParts -> 20)
+    val initialPrices = Products.AllProducts.map(_ -> 1000d).toMap ++ Map[Products.Product, Double](Grain -> 10, Coal -> 15, Glass -> 10, Liquor -> 100, MachineParts -> 20)
 
     region1 = new EconomicRegion {
       override def owner: State = state1
@@ -75,7 +75,7 @@ class WorldMarketDayTest extends FunSuite {
     val ws = new WorldStateMock(regions)
 
     assert(ws.totalMoney === 7000)
-    val day = new WorldMarketDay(regions.toSet)
+    val day = new WorldMarketDay(regions.toSet, 1)
     day.trade()
     regions.foreach { r =>
       r.enterprises.foreach { e =>

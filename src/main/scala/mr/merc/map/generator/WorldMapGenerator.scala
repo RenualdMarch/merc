@@ -73,7 +73,7 @@ object WorldMapGenerator {
     val riversCount = (field.width + field.height) / 3
     val hexesPerCurve = 4
 
-    val initialRivers = (0 until riversCount).flatMap { _ =>
+    val initialRivers = (0 until riversCount).par.flatMap { _ =>
       val x = Random.nextInt(field.width)
       val y = Random.nextInt(field.height - 1)
       val from = field.hex(x, y)
@@ -87,7 +87,7 @@ object WorldMapGenerator {
       river.drop(hexesPerCurve - 1).grouped(hexesPerCurve).map(_.head)
     }.toSet
 
-    val initialRiversHexes = initialRivers.flatten.toSet -- blocks
+    val initialRiversHexes = initialRivers.flatten.toSet.seq -- blocks
 
     val pathGrid = new ShortestGrid[TerrainHex] {
       override def heuristic(from: TerrainHex, to: TerrainHex): Double = {
@@ -101,12 +101,14 @@ object WorldMapGenerator {
       override def neighbours(t: TerrainHex): List[TerrainHex] = field.neighbours(t)
     }
 
-    initialRivers.foreach { river =>
+    val riverHexes = initialRivers.par.flatMap { river =>
       val head = river.head
       val last = river.last
-      PathFinder.findPath(pathGrid, head, last).toList.flatten.foreach { h =>
-        h.terrain = ShallowWater
-      }
+      PathFinder.findPath(pathGrid, head, last).toList.flatten
+    }
+
+    riverHexes.foreach { h =>
+      h.terrain = ShallowWater
     }
   }
 

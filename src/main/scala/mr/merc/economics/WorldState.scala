@@ -3,7 +3,7 @@ package mr.merc.economics
 import mr.merc.map.hex.TerrainHexField
 import mr.merc.politics.{Province, State}
 
-class WorldState(val regions: List[Province], val playerState:State, val worldHexField: TerrainHexField) {
+class WorldState(val regions: List[Province], val playerState:State, val worldHexField: TerrainHexField, var turn: Int = 0) {
 
   def states:Map[State, List[Province]] = regions.groupBy(_.owner)
 
@@ -22,11 +22,13 @@ class WorldState(val regions: List[Province], val playerState:State, val worldHe
   }
 
   def nextTurn(): Unit = {
-    val day = new WorldMarketDay(regions.toSet)
+    turn = turn + 1
+    val day = new WorldMarketDay(regions.toSet, turn)
     day.trade()
     regions.foreach { r =>
       PopulationPromotionDemotion.promoteOrDemote(r.regionPopulation)
     }
+
     // TODO add migrations
   }
 }

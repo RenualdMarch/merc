@@ -57,7 +57,7 @@ class WorldFrame(sceneManager: SceneManager) extends Pane with Logging {
   }
 
   def showEnterprisesPane(province: Province): Unit = {
-    val pane = new EnterprisesViewPane(province)
+    val pane = new EnterprisesViewPane(province, sceneManager.stage)
     interfacePane.setFacePanel(new InterfacePane(pane, () => hideFacePane()))
   }
 

@@ -48,7 +48,7 @@ class WorkerDeciderTest extends FunSuite with BeforeAndAfter {
 
     def unsoldProducts: Double = ???
 
-    def newDay(taxPolicy: CorporateTaxPolicy): Unit = ???
+    def newDay(taxPolicy: CorporateTaxPolicy, turn: Int): Unit = ???
 
     def owners: List[Population] = ???
 

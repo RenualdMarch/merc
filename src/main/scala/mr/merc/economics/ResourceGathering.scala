@@ -36,9 +36,9 @@ abstract class ResourceGathering[Prod <: GatheredProduct](val product: Prod, val
     }
   }
 
-  override def newDay(taxPolicy: CorporateTaxPolicy): Unit = {
+  override def newDay(taxPolicy: CorporateTaxPolicy, turn: Int): Unit = {
     currentTax = taxPolicy
-    currentRecord = newRecord()
+    currentRecord = newRecord(turn)
   }
 
   override def produce(): Unit = {
@@ -105,7 +105,7 @@ abstract class ResourceGathering[Prod <: GatheredProduct](val product: Prod, val
     }
   }
 
-  private def newRecord() = ResourceGatheringRecord(Map(), 0, Map(), 0, 0, 0, 0)
+  private def newRecord(turn: Int) = ResourceGatheringRecord(Map(), 0, Map(), 0, 0, 0, 0, turn)
 
   def receiveFulfilledDemandRequestsAndPayChecks(requests:Map[Product, FulfilledDemandRequest]): Unit = {
     throw new IllegalStateException("This method shouldn't be called for resource gatherings since they don't have demands")
@@ -116,8 +116,10 @@ abstract class ResourceGathering[Prod <: GatheredProduct](val product: Prod, val
 }
 
 object ResourceGathering {
-  case class ResourceGatheringRecord(peopleResources: Map[Population, Double], produced: Double, sold: Map[EconomicRegion, FulfilledSupplyRequestProfit],
-                                     moneyOnWorkforceSalary: Double, moneyOnOwnersPayment: Double, unsoldInStorage: Double, corporateTax: Double) extends DayRecord
+  case class ResourceGatheringRecord(peopleResources: Map[Population, Double], produced: Double,
+                                     sold: Map[EconomicRegion, FulfilledSupplyRequestProfit],
+                                     moneyOnWorkforceSalary: Double, moneyOnOwnersPayment: Double,
+                                     unsoldInStorage: Double, corporateTax: Double, turn: Int) extends DayRecord
 }
 
 class Farm(product: FarmProduct, region: EconomicRegion, startingProducts: Double, gatheringEfficiencyMultiplier: Double) extends ResourceGathering(product, region, startingProducts, gatheringEfficiencyMultiplier) {

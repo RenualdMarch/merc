@@ -5,13 +5,13 @@ import mr.merc.economics.TaxPolicy._
 import mr.merc.map.pathfind.PathFinder
 import mr.merc.politics.State
 
-class WorldMarketDay(regions: Set[EconomicRegion]) {
+class WorldMarketDay(regions: Set[EconomicRegion], turn:Int) {
 
   def trade(): Unit = {
     // initialize factories and pops
     regions.foreach { r =>
       r.regionPopulation.pops.foreach(_.newDay(r.owner.taxPolicy.citizensTaxPolicy))
-      r.enterprises.foreach(_.newDay(r.owner.taxPolicy.corporateTaxPolicy))
+      r.enterprises.foreach(_.newDay(r.owner.taxPolicy.corporateTaxPolicy, turn))
     }
 
     regions.map(_.owner).foreach(_.budget.newDay())
@@ -72,6 +72,15 @@ class WorldMarketDay(regions: Set[EconomicRegion]) {
 
     // after all products are received, produce products and calculate pop needs fulfillment
     regions.foreach { r =>
+      val workforceOrders = r.enterprises.map { e =>
+        e -> e.workforceEfficiencyDemand(r.regionMarket.currentPrices)
+      }.toMap
+
+      val workforceDistribution = r.regionPopulation.orderPops(workforceOrders)
+      workforceDistribution.foreach { case (e, map) =>
+        e.receiveWorkforceRequest(map)
+      }
+
       r.enterprises.foreach(_.produce())
       r.regionPopulation.pops.foreach(_.fulfillNeedsUsingAlreadyReceivedProducts())
     }
@@ -90,7 +99,7 @@ class WorldMarketDay(regions: Set[EconomicRegion]) {
         p.endOfDay()
       }
 
-      r.regionMarket.newMarketDay()
+      r.regionMarket.endOfMarketDay(turn)
     }
   }
 
@@ -158,9 +167,9 @@ abstract class TradersExtraction(val tradersRegion: EconomicRegion, extractionPa
   }
 }
 
-class TradersSalesPart(tradersRegion: EconomicRegion) extends TradersExtraction(tradersRegion, 0)
+class TradersSalesPart(tradersRegion: EconomicRegion) extends TradersExtraction(tradersRegion, 0.1)
 
-class TradersTransitPart(tradersRegion: EconomicRegion) extends TradersExtraction(tradersRegion, 0)
+class TradersTransitPart(tradersRegion: EconomicRegion) extends TradersExtraction(tradersRegion, 0.05)
 
 
 class StateTransitPart(val owner: State) extends Extraction(owner.taxPolicy.transitTax.transitTax) {

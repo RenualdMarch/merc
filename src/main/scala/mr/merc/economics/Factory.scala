@@ -12,7 +12,7 @@ object Factory {
   case class FactoryRecord(produced: Double, moneySpentOnResources: Double, moneyOnWorkforceSalary: Double,
                            moneyOnOwnersPayment: Double, corporateTax: Double, moneyToFactoryBudget: Double,
                            peopleResources: Map[Population, Double], bought: List[FulfilledDemandRequest],
-                           sold: Map[EconomicRegion, FulfilledSupplyRequestProfit]) extends DayRecord {
+                           sold: Map[EconomicRegion, FulfilledSupplyRequestProfit], turn: Int) extends DayRecord {
     def factoryBuySellProfit: Double = earnings - moneySpentOnResources
   }
 
@@ -39,7 +39,7 @@ abstract class Factory[Producible <: ProducibleProduct](val region: EconomicRegi
 
   def dayRecords: Vector[FactoryRecord] = factoryRecords
 
-  private var currentRecord = newFactoryRecord()
+  private var currentRecord:FactoryRecord = _
 
   private val supplyDecider = new SupplyDecider()
 
@@ -212,9 +212,9 @@ abstract class Factory[Producible <: ProducibleProduct](val region: EconomicRegi
     }
   }
 
-  def newDay(taxPolicy: CorporateTaxPolicy): Unit = {
+  def newDay(taxPolicy: CorporateTaxPolicy, turn: Int): Unit = {
     currentTaxPolicy = taxPolicy
-    currentRecord = newFactoryRecord()
+    currentRecord = newFactoryRecord(turn)
   }
 
   val possibleWorkers: PopulationType
@@ -225,7 +225,7 @@ abstract class Factory[Producible <: ProducibleProduct](val region: EconomicRegi
 
   def owners: List[Population]
 
-  private def newFactoryRecord() = FactoryRecord(0, 0, 0, 0, 0, 0, Map(), Nil, Map())
+  private def newFactoryRecord(turn: Int) = FactoryRecord(0, 0, 0, 0, 0, 0, Map(), Nil, Map(), turn)
 
   override def expectedSalaryPerEfficiency: Double = {
     dayRecords.headOption match {

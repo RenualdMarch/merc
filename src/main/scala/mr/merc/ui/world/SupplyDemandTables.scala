@@ -40,7 +40,7 @@ object SupplyDemandTables {
     }
 
     val broughtColumn = new TableColumn[Supply, String] {
-      text = Localization("bought")
+      text = Localization("brought")
       cellValueFactory = e => StringProperty(format.format(e.value.brought))
       editable = false
       prefWidth <== table.width * 0.13
@@ -192,7 +192,7 @@ object SupplyDemandTables {
     case class Row(product: Products.Product, price: Double, demanded: Double, bought: Double)
 
     val boughtRows = record.bought.map {f =>
-      Row(f.request.product, f.price, f.bought, f.request.count)
+      Row(f.request.product, f.price, f.request.count, f.bought)
     }
 
     val table = new TableView[Row]()

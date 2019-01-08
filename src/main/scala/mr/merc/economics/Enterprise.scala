@@ -28,7 +28,7 @@ trait Enterprise {
 
   def expectedSalaryPerEfficiency: Double
 
-  def newDay(taxPolicy: CorporateTaxPolicy): Unit
+  def newDay(taxPolicy: CorporateTaxPolicy, turn: Int): Unit
 
   def possibleWorkers: PopulationType
 
@@ -70,4 +70,5 @@ trait DayRecord {
   def sold: Map[EconomicRegion, FulfilledSupplyRequestProfit]
   def earnings: Double = sold.values.map(p => p.profitPerItem * p.request.sold).sum
   def itemsSold: Double = sold.values.map(_.request.sold).sum
+  def turn: Int
 }
