@@ -3,6 +3,7 @@ package mr.merc.economics
 import com.typesafe.config.ConfigFactory
 import mr.merc.economics.Population.{Culture, LatinHuman, Lower, Middle, Upper}
 import mr.merc.economics.Products._
+import mr.merc.log.Logging
 import mr.merc.map.generator.WorldMapGenerator
 import mr.merc.map.hex.{TerrainHex, TerrainHexField}
 import mr.merc.map.terrain.WaterKind
@@ -43,8 +44,6 @@ class WorldGenerator(field:TerrainHexField) {
   private val maxResources = config.getInt("world.resources.resourcesPerRegion.max")
   private val minFactories = config.getInt("world.factories.factoriesPerRegion.min")
   private val maxFactories = config.getInt("world.factories.factoriesPerRegion.max")
-  private val startingFactoryResource = config.getInt("world.factories.startingResources.industrial")
-  private val startingMagicResource = config.getInt("world.factories.startingResources.magic")
   private val startingFactoryMoney = config.getInt("world.factories.startingMoney")
   private val startingFactoryLevel = config.getInt("world.factories.startingLevel")
 
@@ -104,7 +103,7 @@ class WorldGenerator(field:TerrainHexField) {
 
   private def generateProductsForFactories:List[IndustryProduct] = {
     val n = minFactories + Random.nextInt(maxFactories - minFactories + 1)
-    List.fill(n)(factoriesGenerator.nextRandomItem())
+    factoriesGenerator.uniqueRandomItems(n).toList
   }
 
   private def generateProductsForMageGuilds:List[MagicProduct] = {
@@ -300,7 +299,7 @@ class WorldGenerator(field:TerrainHexField) {
   }
 }
 
-object WorldGenerator {
+object WorldGenerator extends Logging {
   private val worldMapWidth = 50
   private val worldMapHeight = 50
   private val hexesPerProvince = 150
@@ -309,6 +308,7 @@ object WorldGenerator {
   private val config = ConfigFactory.load("conf/worldGenerationEconomics")
 
   def generateWorld(): WorldState = {
+    val timeBefore = System.currentTimeMillis()
     val world = WorldMapGenerator.generateWorldMap(worldMapWidth, worldMapHeight, provinces)
     val generator = new WorldGenerator(world.terrain)
     val r = (generator.generateStateAndProvinces(world.provinces), world.terrain)
@@ -316,6 +316,7 @@ object WorldGenerator {
     val ws = new WorldState(r._1.values.flatten.toList, playerState, world.terrain)
     val iterations = config.getInt("world.tradeDays")
     0 until iterations foreach(_ => ws.nextTurn())
+    info(s"World generation took ${(System.currentTimeMillis() - timeBefore) / 1000d} seconds")
     ws
   }
 

@@ -34,6 +34,13 @@ object PathFinder extends PathFindingBase {
     val result = calculatePossible(grid, from, maxPrice, alreadyMoved)
     result.get(to).map(_.path.map(_.t))
   }
+
+  def findPossiblePaths[T](grid: PossibleGrid[T], from: T, maxPrice: Int = Int.MaxValue, alreadyMoved: Boolean = false): Map[T, List[T]] = {
+    val result = calculatePossible(grid, from, maxPrice, alreadyMoved)
+    result.transform { case (_, node) =>
+      node.path.map(_.t)
+    }
+  }
 }
 	
 

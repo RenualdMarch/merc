@@ -14,7 +14,7 @@ import scalafx.Includes._
 import scalafx.collections.ObservableBuffer
 import EconomicLocalization._
 import scalafx.scene.Scene
-import scalafx.scene.chart.{LineChart, NumberAxis, XYChart}
+import scalafx.scene.chart.{AreaChart, LineChart, NumberAxis, XYChart}
 import scalafx.stage.{Modality, Stage}
 
 import scala.collection.JavaConverters._
@@ -293,9 +293,9 @@ class HistoricalEnterpriseRecords(e: Enterprise, p:Province, stage: Stage) exten
       xAxis.label = Localization("weeks")
       yAxis.label = Localization("units")
 
-      val lineChart = new LineChart[Number, Number](xAxis, yAxis)
-      lineChart.title = Localization("production")
-      lineChart.style = s"-fx-font-size: ${Components.mediumFontSize}"
+      val chart = new LineChart[Number, Number](xAxis, yAxis)
+      chart.title = Localization("production")
+      chart.style = s"-fx-font-size: ${Components.mediumFontSize}"
 
       val produced = new XYChart.Series[Number, Number]()
       produced.name = Localization("produced")
@@ -309,15 +309,15 @@ class HistoricalEnterpriseRecords(e: Enterprise, p:Province, stage: Stage) exten
         sold.getData.add(XYChart.Data[Number, Number](h.turn, h.itemsSold))
       }
 
-      lineChart.legendVisible = true
-      lineChart.getData.addAll(produced, sold)
+      chart.legendVisible = true
+      chart.getData.addAll(produced, sold)
 
-      lineChart.lookupAll(".chart-line-symbol").asScala.foreach { s =>
+      chart.lookupAll(".chart-line-symbol").asScala.foreach { s =>
         val dataNumber = s.getStyleClass.find(_.startsWith("data")).get.replace("data", "").toInt + first.turn
         s.onMouseClicked = _ => showProductionDialog(e, dataNumber)
       }
 
-      lineChart
+      chart
     }
   }
 

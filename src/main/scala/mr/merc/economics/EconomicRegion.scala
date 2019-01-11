@@ -3,6 +3,7 @@ package mr.merc.economics
 import mr.merc.map.{Grid, PossibleGrid}
 import Products.Product
 import mr.merc.economics.Population.{Culture, PopulationType}
+import mr.merc.economics.util.DistributionCalculator
 import mr.merc.politics.{PoliticalViews, State}
 
 trait EconomicRegion {
@@ -59,8 +60,12 @@ class RegionPopulation(initialPops: List[Population]) {
     }
   }
 
+  private def popsByTypeAndCulture(populationType: PopulationType, culture: Option[Culture]):List[Population] = {
+    pops.filter(_.populationType == populationType).filter(p => culture.forall(_ == p.culture))
+  }
+
   def orderPop(populationType: PopulationType, requiredEfficiency: Double, culture: Option[Culture]): Map[Population, Double] = {
-    val populations = pops.filter(_.populationType == populationType).filter(p => culture.forall(_ == p.culture))
+    val populations = popsByTypeAndCulture(populationType, culture)
     val totalEfficiency = populations.map(_.totalPopEfficiency).sum
     if (totalEfficiency == 0) {
       Map()
@@ -76,8 +81,15 @@ class RegionPopulation(initialPops: List[Population]) {
     }
   }
 
-  def orderPops(orders: Map[Enterprise, Double]): Map[Enterprise, Map[Population, Double]] = {
-    
+  def orderPops(populationType: PopulationType, culture: Option[Culture], orders: Map[Enterprise, Double]): Map[Enterprise, Map[Population, Double]] = {
+    val dc = new DistributionCalculator[Enterprise](0.5, 0.5,
+      e => e.dayRecords.lastOption.map(_.averageSalary).getOrElse(0d))
+
+    val totalEfficiency = popsByTypeAndCulture(populationType, culture).map(_.totalPopEfficiency).sum
+
+    dc.divide(totalEfficiency, orders).transform { case (_, eff) =>
+      orderPop(populationType, eff, culture)
+    }
   }
 
   def pop(p: PopulationType, c: Culture): Population = {

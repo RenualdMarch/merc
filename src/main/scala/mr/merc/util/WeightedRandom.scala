@@ -1,5 +1,6 @@
 package mr.merc.util
 
+import scala.collection.mutable
 import scala.util.Random
 
 class WeightedRandom[T](weights:Map[T, Double]){
@@ -18,5 +19,16 @@ class WeightedRandom[T](weights:Map[T, Double]){
     }
 
     weightsList.last._1
+  }
+
+  def uniqueRandomItems(n: Int): Set[T] = {
+    require(n <= weights.size, s"n $n can't be bigger than ${weights.size}")
+
+    val set = mutable.Set[T]()
+    while (set.size < n) {
+      set += nextRandomItem()
+    }
+
+    set.toSet
   }
 }

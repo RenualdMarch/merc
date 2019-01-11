@@ -20,8 +20,8 @@ For M6, interface will be a priority, basic politics, factory building
 +player controls one faction
 +add minimap hide/show button
 +next turn button must work
-fill markets pane
-add needs fulfillment to population pane
++fill markets pane
++add needs fulfillment to population pane
 pie chart legend must be removed and replaced with scroolable legend
 no more than percentage of people can be capitalists and aristocrats
 Budget interface

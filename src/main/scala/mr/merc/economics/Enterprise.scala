@@ -71,4 +71,13 @@ trait DayRecord {
   def earnings: Double = sold.values.map(p => p.profitPerItem * p.request.sold).sum
   def itemsSold: Double = sold.values.map(_.request.sold).sum
   def turn: Int
+
+  val averageSalary: Double = {
+    val resources = peopleResources.values.sum
+    if (resources != 0) {
+      moneyOnWorkforceSalary / resources
+    } else {
+      moneyOnWorkforceSalary
+    }
+  }
 }

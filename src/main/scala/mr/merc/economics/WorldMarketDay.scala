@@ -1,13 +1,27 @@
 package mr.merc.economics
 
-import mr.merc.economics.Population.Traders
+import mr.merc.economics.Population.{Clergy, Traders}
 import mr.merc.economics.TaxPolicy._
 import mr.merc.map.pathfind.PathFinder
 import mr.merc.politics.State
 
 class WorldMarketDay(regions: Set[EconomicRegion], turn:Int) {
+  type PathCache = Map[EconomicRegion, Map[EconomicRegion, List[EconomicRegion]]]
+
+  private var currentPathCache: PathCache = _
+
+  private def newPathCache():PathCache = {
+    regions.par.map { from =>
+      from -> {
+        val grid = new EconomicGrid(from)
+        PathFinder.findPossiblePaths(grid, from)
+      }
+    }.seq.toMap
+  }
 
   def trade(): Unit = {
+    currentPathCache = newPathCache()
+
     // initialize factories and pops
     regions.foreach { r =>
       r.regionPopulation.pops.foreach(_.newDay(r.owner.taxPolicy.citizensTaxPolicy))
@@ -74,11 +88,23 @@ class WorldMarketDay(regions: Set[EconomicRegion], turn:Int) {
     regions.foreach { r =>
       val workforceOrders = r.enterprises.map { e =>
         e -> e.workforceEfficiencyDemand(r.regionMarket.currentPrices)
-      }.toMap
+      }
 
-      val workforceDistribution = r.regionPopulation.orderPops(workforceOrders)
-      workforceDistribution.foreach { case (e, map) =>
-        e.receiveWorkforceRequest(map)
+      workforceOrders.groupBy(_._1.possibleWorkers).foreach { case (pt, orders) =>
+        if (pt == Clergy) {
+          orders.foreach { case (e, order) =>
+            val c = e.asInstanceOf[Church]
+            val culture = Some(c.product.culture)
+            val workforce = r.regionPopulation.orderPop(pt, order, culture)
+            e.receiveWorkforceRequest(workforce)
+          }
+
+        } else {
+          val workforceDistribution = r.regionPopulation.orderPops(pt, None, orders.toMap)
+          workforceDistribution.foreach { case (e, map) =>
+            e.receiveWorkforceRequest(map)
+          }
+        }
       }
 
       r.enterprises.foreach(_.produce())
@@ -104,9 +130,8 @@ class WorldMarketDay(regions: Set[EconomicRegion], turn:Int) {
   }
 
   private def buildSupplyInfoForProductAndRegion(product: Products.Product, from: EconomicRegion, to: EconomicRegion) : Option[SupplyInfo] = {
-    val grid = new EconomicGrid(from)
 
-    PathFinder.findOptimalPath(grid, from, to).flatMap { path =>
+    currentPathCache(from).get(to).flatMap { path =>
       val toOwner = to.owner
       val fromOwner = from.owner
 
