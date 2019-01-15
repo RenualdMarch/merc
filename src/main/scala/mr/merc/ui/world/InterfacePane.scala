@@ -45,6 +45,15 @@ trait WorldInterfaceJavaNode {
   getStylesheets.add("/css/worldPane.css")
 }
 
+object PaneWithTwoEqualHorizontalChildren {
+
+  def apply(first: Region, second: Region): PaneWithTwoEqualHorizontalChildren = {
+    val p = new PaneWithTwoEqualHorizontalChildren()
+    p.setTwoChildren(first, second)
+    p
+  }
+}
+
 class PaneWithTwoEqualHorizontalChildren extends Pane {
 
   def setTwoChildren(first: Region, second: Region): Unit = {
@@ -59,6 +68,34 @@ class PaneWithTwoEqualHorizontalChildren extends Pane {
     second.layoutY = 0
     second.prefWidth <== this.width / 2
     second.prefHeight <== this.height
+
+    this.children.addAll(first, second)
+  }
+}
+
+object PaneWithTwoEqualVerticalChildren {
+
+  def apply(first: Region, second: Region): PaneWithTwoEqualVerticalChildren = {
+    val p = new PaneWithTwoEqualVerticalChildren()
+    p.setTwoChildren(first, second)
+    p
+  }
+}
+
+class PaneWithTwoEqualVerticalChildren extends Pane {
+
+  def setTwoChildren(first: Region, second: Region): Unit = {
+    this.children.clear()
+
+    first.layoutX = 0
+    first.layoutY = 0
+    first.prefWidth <== this.width
+    first.prefHeight <== this.height / 2
+
+    second.layoutX = 0
+    second.layoutY <== this.height / 2
+    second.prefWidth <== this.width
+    second.prefHeight <== this.height / 2
 
     this.children.addAll(first, second)
   }

@@ -87,7 +87,7 @@ class ProductsTablePane(market: RegionMarket) extends MigPane with WorldInterfac
   productsTable.delegate.getSelectionModel.setSelectionMode(SelectionMode.SINGLE)
   productsTable.delegate.getSelectionModel.clearAndSelect(0)
   val selectedItem: ReadOnlyObjectProperty[ProductsInfo] = productsTable.delegate.getSelectionModel.selectedItemProperty
-  add(productsTable, "growx,growy,pushx,pushy")
+  add(productsTable, "grow,push")
 }
 
 class ProductPane(productProperty: ReadOnlyObjectProperty[ProductsInfo], province: Province, stage: Stage) extends Pane with WorldInterfaceNode {

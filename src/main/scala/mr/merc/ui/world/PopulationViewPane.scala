@@ -9,14 +9,14 @@ import mr.merc.local.Localization
 import mr.merc.politics._
 import mr.merc.ui.world.PieChartBuilder.PiePart
 import org.tbee.javafx.scene.layout.MigPane
-import scalafx.scene.layout.{BorderPane, Pane}
+import scalafx.scene.layout.Pane
 import scalafx.Includes._
 import scalafx.beans.property.{ReadOnlyObjectProperty, StringProperty}
 import scalafx.collections.ObservableBuffer
 import scalafx.scene.Node
 import scalafx.scene.control.{Accordion, TableColumn, TableView, TitledPane}
-
 import EconomicLocalization._
+import scalafx.geometry.Side
 
 import scala.collection.JavaConverters._
 
@@ -90,7 +90,7 @@ class PopsTablePane(regionPopulation: RegionPopulation, province: Province) exte
   populationTable.delegate.getSelectionModel.setSelectionMode(SelectionMode.SINGLE)
   populationTable.delegate.getSelectionModel.clearAndSelect(0)
   val selectedRow:ReadOnlyObjectProperty[PopulationInfo] = populationTable.delegate.getSelectionModel.selectedItemProperty
-  add(populationTable, "growx,growy,pushx,pushy")
+  add(populationTable, "grow,push")
 }
 
 class PopDetailsPane(populationProperty: ReadOnlyObjectProperty[PopulationInfo], province: Province) extends MigPane with WorldInterfaceJavaNode {
@@ -140,12 +140,12 @@ class PopDetailsPane(populationProperty: ReadOnlyObjectProperty[PopulationInfo],
     text = Localization("politicalViews")
     style = s"-fx-font-size: ${Components.largeFontSize}"
     content = new MigPane("fill") {
-      add(popToPie(_.foreignPolicy, ForeignPolicy), "span 1,growx,growy")
-      add(popToPie(_.votersPolicy, VotersPolicy), "span 1,growx,growy")
-      add(popToPie(_.economy, Economy), "span 1,wrap,growx,growy")
-      add(popToPie(_.socialPolicy, SocialPolicy), "span 1,growx,growy")
-      add(popToPie(_.migration, Migration), "span 1,growx,growy")
-      add(popToPie(_.regime, Regime), "span 1, wrap,growx,growy")
+      add(popToPie(_.foreignPolicy, ForeignPolicy), "span 1,grow,push")
+      add(popToPie(_.votersPolicy, VotersPolicy), "span 1,grow,push")
+      add(popToPie(_.economy, Economy), "span 1,wrap,grow,push")
+      add(popToPie(_.socialPolicy, SocialPolicy), "span 1,grow,push")
+      add(popToPie(_.migration, Migration), "span 1,grow,push")
+      add(popToPie(_.regime, Regime), "span 1, wrap,grow,push")
     }
   }
 
@@ -156,7 +156,7 @@ class PopDetailsPane(populationProperty: ReadOnlyObjectProperty[PopulationInfo],
   accordion.panes = List(generalInfoPane, politicalViewsPane, populationNeedsPane())
   accordion.expandedPane = generalInfoPane
 
-  add(accordion, "growx,growy,pushx,pushy")
+  add(accordion, "grow,push")
 
   private def populationNeedsPane():TitledPane = new TitledPane() {
     content = new PropertyDependentPane[PopulationInfo](populationProperty,
@@ -173,8 +173,7 @@ class PopDetailsPane(populationProperty: ReadOnlyObjectProperty[PopulationInfo],
   private def politicalPointsToPie[T <: IssuePosition](position: IssuePositionPopularity[T], issue:Issue[T]):Node = {
     val percentFormatter = new DecimalFormat("#0.00")
     val pies = position.popularity.map {case (k, v) => PiePart(k.color, k.name, v * 100, Some(k.name + " " + percentFormatter.format(v * 100) + "%"))}.toList
-    val chart = PieChartBuilder.build(pies)
-    chart.title = Localization(issue.name)
+    val chart = PieChartBuilder.buildPieWithScrollableLegend(pies, Side.Bottom, Some(Localization(issue.name)))
     chart
   }
 

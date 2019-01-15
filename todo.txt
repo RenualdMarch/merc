@@ -22,7 +22,7 @@ For M6, interface will be a priority, basic politics, factory building
 +next turn button must work
 +fill markets pane
 +add needs fulfillment to population pane
-pie chart legend must be removed and replaced with scroolable legend
++pie chart legend must be removed and replaced with scroolable legend
 no more than percentage of people can be capitalists and aristocrats
 Budget interface
 Market button on province with details
@@ -41,7 +41,7 @@ next turn button async
 More tasks??? - game must be working except for war(no revolutions) and diplomacy
 
 Polishing:
-issues - change multipliers to better reflect "reality"
+issues - balance production and needs multipliers
 
 For M7, soldiers and battles and wars
 For M8, save/load, game polishing and AI
