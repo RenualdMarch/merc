@@ -352,6 +352,13 @@ object Population extends EconomicConfig {
     )
   )
 
+  val maxPopulationTypeRatio:Map[PopulationType, Double] = {
+    val config = ConfigFactory.load("conf/economics.conf")
+    populationTypes.map { pt =>
+      pt -> config.getDouble(s"population.promotion.max${pt.name.capitalize}")
+    } toMap
+  }
+
 
   // removed sealed for test purposes only
   abstract class Race extends scala.Product with Serializable {
@@ -469,12 +476,19 @@ case class PopulationMovers(literateCount: Int, illiterateCount: Int) {
   def totalCount: Int = literateCount + illiterateCount
 }
 
-object PopulationPromotionDemotion extends EconomicConfig {
+class PopulationPromotionDemotion(population: RegionPopulation, random: Random = Random) extends EconomicConfig {
 
   private val happinessToDemote = config.getDouble("population.promotion.maxHappinessToDemote")
   private val happinessToPromote = config.getDouble("population.promotion.minHappinessToPromote")
 
   private case class PopulationMovement(from: Population, to: Population, count: Int)
+
+  private val maxPopulation:Map[Population, Boolean] = {
+    val totalPopulation = population.pops.map(_.populationCount).sum
+
+    ???
+
+  }
 
   private def whereToPromote(population: Population, regionPopulation: RegionPopulation): Option[Population] = {
     val possibleChanges = Population.PopulationPromotionDemotion(population.populationType)
@@ -495,7 +509,7 @@ object PopulationPromotionDemotion extends EconomicConfig {
     chances.headOption
   }
 
-  def promoteOrDemote(population: RegionPopulation, random: Random = Random): Unit = {
+  def promoteOrDemote(): Unit = {
     val movements = population.pops.flatMap { p =>
 
       val demotionOpt = if(p.happiness < happinessToDemote) {
