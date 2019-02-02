@@ -197,8 +197,8 @@ class PopulationTest extends FunSuite with Matchers {
     assert(pop.needsFulfillment(1).head.needsFulfillment === Map(LifeNeeds -> 1, RegularNeeds -> 1, LuxuryNeeds -> 1))
     assert(pop2.needsFulfillment(1).head.needsFulfillment === Map(LifeNeeds -> 1, RegularNeeds -> 1, LuxuryNeeds -> 1))
 
-
-    PopulationPromotionDemotion.promoteOrDemote(regionPopulation, random)
+    val ppd = new PopulationPromotionDemotion(regionPopulation, random, Map().withDefaultValue(1d))
+    ppd.promoteOrDemote()
     val traders = regionPopulation.pop(Traders, TestCulture)
     assert(traders.populationCount === 965)
     assert(traders.literateCount === 70)
@@ -247,7 +247,8 @@ class PopulationTest extends FunSuite with Matchers {
     assert(pop2.needsFulfillment(1).head.needsFulfillment === Map(LifeNeeds -> 0, RegularNeeds -> 0, LuxuryNeeds -> 0))
 
 
-    PopulationPromotionDemotion.promoteOrDemote(regionPopulation, random)
+    val ppd = new PopulationPromotionDemotion(regionPopulation, random, Map().withDefaultValue(1d))
+    ppd.promoteOrDemote()
     val traders = regionPopulation.pop(Traders, TestCulture)
     assert(traders.populationCount === 996)
     assert(traders.literateCount === 101)
@@ -293,7 +294,8 @@ class PopulationTest extends FunSuite with Matchers {
     assert(pop2.needsFulfillment(1).head.needsFulfillment === Map(LifeNeeds -> 1, RegularNeeds -> 1, LuxuryNeeds -> 1))
 
 
-    PopulationPromotionDemotion.promoteOrDemote(regionPopulation, random)
+    val ppd = new PopulationPromotionDemotion(regionPopulation, random, Map().withDefaultValue(1d))
+    ppd.promoteOrDemote()
     val traders = regionPopulation.pop(Traders, TestCulture)
     assert(traders.populationCount === 965)
     assert(traders.literateCount === 100)
@@ -313,4 +315,33 @@ class PopulationTest extends FunSuite with Matchers {
 
   }
 
+  test("no promotion when nowhere to promote") {
+    val random = new Random(0) {
+      override def nextInt(n: Int): Int = 0
+    }
+
+    val pop = new Population(TestCulture, Traders, 1000, 10000, 100, PoliticalViews.averagePoliticalViews)
+    pop.politicalViews = pop.politicalViews.copy(foreignPolicy = new IssuePositionPopularity(Map(Expansionism -> 1d, Pacifism -> 0d)))
+    val regionPopulation = new RegionPopulation(List(pop))
+
+
+    pop.buyDemandedProducts(List(FulfilledDemandRequest(6000, 1, PopulationDemandRequest(pop, Grain, 6000)),
+      FulfilledDemandRequest(4000, 2, PopulationDemandRequest(pop, Fruit, 4000)), FulfilledDemandRequest(4000, 0.5,
+        PopulationDemandRequest(pop, Coal, 4000))))
+
+
+
+    pop.fulfillNeedsUsingAlreadyReceivedProducts()
+
+    assert(pop.needsFulfillment(1).head.needsFulfillment === Map(LifeNeeds -> 1, RegularNeeds -> 1, LuxuryNeeds -> 1))
+
+    val ppd = new PopulationPromotionDemotion(regionPopulation, random, Map().withDefaultValue(0d))
+    ppd.promoteOrDemote()
+    val traders = regionPopulation.pop(Traders, TestCulture)
+    assert(traders.populationCount === 1000)
+  }
+
+  test("when max exceeded, then demotion is inevetable") {
+    ???
+  }
 }

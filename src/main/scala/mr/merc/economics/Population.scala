@@ -1,6 +1,6 @@
 package mr.merc.economics
 
-import com.typesafe.config.{Config, ConfigFactory}
+import com.typesafe.config.ConfigFactory
 import mr.merc.economics.Population._
 import mr.merc.economics.Products._
 import mr.merc.economics.MapUtil.FloatOperations._
@@ -28,14 +28,14 @@ class Population(val culture: Culture, val populationType: PopulationType, priva
   private var tax: SalaryTaxPolicy = _
   private var currentSalaryRecord: SalaryRecord = _
 
-  def populationCount:Int = count.toInt
+  def populationCount: Int = count.toInt
 
-  def needs:Map[PopulationNeedsType, Map[Products.Product, Double]] = culture.needs(populationType.populationClass).
-    map{ case (nt, m) => nt -> m.mapValues(_ * count * efficiency)}
+  def needs: Map[PopulationNeedsType, Map[Products.Product, Double]] = culture.needs(populationType.populationClass).
+    map { case (nt, m) => nt -> m.mapValues(_ * count * efficiency) }
 
   private var needsFulfillmentRecords = Vector[ProductFulfillmentRecord]()
 
-  def needsFulfillment(n: Int):Vector[ProductFulfillmentRecord] = needsFulfillmentRecords.takeRight(n)
+  def needsFulfillment(n: Int): Vector[ProductFulfillmentRecord] = needsFulfillmentRecords.takeRight(n)
 
   // last 5 turns
   def happiness: Double = {
@@ -55,7 +55,7 @@ class Population(val culture: Culture, val populationType: PopulationType, priva
     }
   }
 
-  def extractLiterateMovers(count: Int):PopulationMovers = {
+  def extractLiterateMovers(count: Int): PopulationMovers = {
     val change = if (count < literatePeople) count else literatePeople
     literatePeople -= change
     this.count -= change
@@ -103,7 +103,7 @@ class Population(val culture: Culture, val populationType: PopulationType, priva
 
   def salary: Vector[SalaryRecord] = salaryRecords
 
-  private var currentPrices:Map[Product, Double] = _
+  private var currentPrices: Map[Product, Double] = _
 
   private var currentMoney = startingMoney
 
@@ -116,7 +116,7 @@ class Population(val culture: Culture, val populationType: PopulationType, priva
     lifeNeeds |+| regularNeeds |+| luxNeeds
   }
 
-  private def buyAsMuchAsPossible(money: Double, prices: Map[Product, Double], demands:Map[Product, Double]):Map[Product, Double] = {
+  private def buyAsMuchAsPossible(money: Double, prices: Map[Product, Double], demands: Map[Product, Double]): Map[Product, Double] = {
     val demandsList = demands.toList.flatMap { case (product, productDemand) =>
       prices.get(product).map(price => DemandInfo(product, productDemand, price))
     }.sortBy(_.price)
@@ -134,12 +134,12 @@ class Population(val culture: Culture, val populationType: PopulationType, priva
   }
 
   private def moneyCost(prices: Map[Product, Double], bought: Map[Product, Double]): Double = {
-    bought.foldLeft(0d){case(sum, (product, boughtProduct)) =>
+    bought.foldLeft(0d) { case (sum, (product, boughtProduct)) =>
       sum + boughtProduct * prices(product)
     }
   }
 
-  def efficiency:Double = 1 + literacy * literacy * (MaxLiteracyEfficiencyMultiplier - 1)
+  def efficiency: Double = 1 + literacy * literacy * (MaxLiteracyEfficiencyMultiplier - 1)
 
   def totalPopEfficiency: Double = count * efficiency
 
@@ -172,7 +172,7 @@ class Population(val culture: Culture, val populationType: PopulationType, priva
     alreadyReceivedProducts ++= requests
 
     val spentMoney = requests.foldLeft(0d) { case (sum, request) =>
-        sum + request.bought * request.price
+      sum + request.bought * request.price
     }
 
     currentMoney = currentMoney - spentMoney
@@ -207,7 +207,7 @@ class Population(val culture: Culture, val populationType: PopulationType, priva
 object Population extends EconomicConfig {
   val MaxLiteracyEfficiencyMultiplier = 10
 
-  sealed abstract class PopulationNeedsType(val needImportance:Int) extends scala.Product with Serializable with Ordered[PopulationNeedsType] {
+  sealed abstract class PopulationNeedsType(val needImportance: Int) extends scala.Product with Serializable with Ordered[PopulationNeedsType] {
     override def compare(that: PopulationNeedsType): Int = {
       def toInt(pc: PopulationNeedsType): Int = {
         pc match {
@@ -224,7 +224,9 @@ object Population extends EconomicConfig {
   }
 
   case object LifeNeeds extends PopulationNeedsType(5)
+
   case object RegularNeeds extends PopulationNeedsType(3)
+
   case object LuxuryNeeds extends PopulationNeedsType(1)
 
   sealed trait PopulationClass extends scala.Product with Serializable with Ordered[PopulationClass] {
@@ -244,10 +246,12 @@ object Population extends EconomicConfig {
   }
 
   case object Lower extends PopulationClass
+
   case object Middle extends PopulationClass
+
   case object Upper extends PopulationClass
 
-  def populationClasses:List[PopulationClass] = List(Lower, Middle, Upper)
+  def populationClasses: List[PopulationClass] = List(Lower, Middle, Upper)
 
   sealed abstract class PopulationType(val populationClass: PopulationClass) extends scala.Product with Serializable with Ordered[PopulationType] {
     override def compare(that: PopulationType): Int = {
@@ -291,7 +295,7 @@ object Population extends EconomicConfig {
   // same as usual aristocrats
   case object MagicalAristocrats extends PopulationType(Upper)
 
-  val PopulationPromotionDemotion:Map[PopulationType, List[PopulationType]] = Map(
+  val PopulationPromotionDemotion: Map[PopulationType, List[PopulationType]] = Map(
     Craftsmen -> List(Farmers, Labourers, Bureaucrats, Traders, Clergy),
     Farmers -> List(Craftsmen, Labourers, Bureaucrats, Traders, Clergy),
     Labourers -> List(Craftsmen, Farmers, Bureaucrats, Traders, Clergy),
@@ -305,44 +309,44 @@ object Population extends EconomicConfig {
     MagicalAristocrats -> List(Mages)
   )
 
-  def populationTypes:List[PopulationType] =
+  def populationTypes: List[PopulationType] =
     List(Craftsmen, Farmers, Labourers, Bureaucrats, Clergy,
       Scholars, Traders, Mages, Capitalists, Aristocrats, MagicalAristocrats)
 
-  def populationTypesByClass:Map[PopulationClass, List[PopulationType]] =
+  def populationTypesByClass: Map[PopulationClass, List[PopulationType]] =
     populationTypes.groupBy(_.populationClass)
 
   type ProductBracket = Map[Products.Product, Double]
 
   type PopulationNeeds = Map[PopulationClass, Map[PopulationNeedsType, ProductBracket]]
 
-  private implicit class ScaleToConfig[T](map:Map[T, Double]) {
-    def scale(name: String):Map[T, Double] = {
+  private implicit class ScaleToConfig[T](map: Map[T, Double]) {
+    def scale(name: String): Map[T, Double] = {
       import com.github.andr83.scalaconfig._
       val s = config.asUnsafe[Double](name)
       map.scaleToSum(s)
     }
   }
 
-  private def need(scalingConfigName: String, needs: Tuple2[Products.Product, Double]*): Map[Products.Product, Double] = {
+  private def need(scalingConfigName: String, needs: (Products.Product, Double)*): Map[Products.Product, Double] = {
     needs.toMap.scale(s"population.needs.$scalingConfigName")
   }
 
-  private def defaultHumanNeeds(culture: Culture):PopulationNeeds = Map(
+  private def defaultHumanNeeds(culture: Culture): PopulationNeeds = Map(
     Lower -> Map(
-    LifeNeeds -> need("lower.life", Grain -> 3d, Fish -> 1d, Fruit -> 1d, Cattle -> 1d),
-    RegularNeeds -> need("lower.regular", Tea -> 1, Clothes -> 1, Liquor -> 2, Furniture -> 1, Coal -> 1,
-      Amulet -> 1, Medicine -> 1, Lumber -> 1, Ritual(culture) -> 1),
-    LuxuryNeeds -> need("lower.luxury", Furniture -> 2, Clothes -> 3, Paper -> 1, Coffee -> 1, Liquor -> 2,
-      Medicine -> 1, Amulet -> 1, Weapons -> 1, Coal -> 1, Ritual(culture) -> 2)
-  ),
+      LifeNeeds -> need("lower.life", Grain -> 3d, Fish -> 1d, Fruit -> 1d, Cattle -> 1d),
+      RegularNeeds -> need("lower.regular", Tea -> 1, Clothes -> 1, Liquor -> 2, Furniture -> 1, Coal -> 1,
+        Amulet -> 1, Medicine -> 1, Lumber -> 1, Ritual(culture) -> 1),
+      LuxuryNeeds -> need("lower.luxury", Furniture -> 2, Clothes -> 3, Paper -> 1, Coffee -> 1, Liquor -> 2,
+        Medicine -> 1, Amulet -> 1, Weapons -> 1, Coal -> 1, Ritual(culture) -> 2)
+    ),
     Middle -> Map(
-    LifeNeeds -> need("middle.life", Grain -> 4, Fish -> 2, Fruit -> 2, Cattle -> 2),
-    RegularNeeds -> need("middle.regular", Tea -> 2, Clothes -> 3, Liquor -> 2, Furniture -> 2, Coal -> 2, Ritual(culture) -> 1,
-      Glass -> 1, Wine -> 2, Amulet -> 2, Medicine -> 2, Paper -> 3, Weapons -> 1, Cement -> 1),
-    LuxuryNeeds -> need("middle.luxury", Clothes -> 3, Wine -> 3, Amulet -> 3, Medicine -> 3,
-      Furniture -> 3, Opium -> 3, Paper -> 3, Weapons -> 2, Cement -> 2, Ritual(culture) -> 2)
-  ),
+      LifeNeeds -> need("middle.life", Grain -> 4, Fish -> 2, Fruit -> 2, Cattle -> 2),
+      RegularNeeds -> need("middle.regular", Tea -> 2, Clothes -> 3, Liquor -> 2, Furniture -> 2, Coal -> 2, Ritual(culture) -> 1,
+        Glass -> 1, Wine -> 2, Amulet -> 2, Medicine -> 2, Paper -> 3, Weapons -> 1, Cement -> 1),
+      LuxuryNeeds -> need("middle.luxury", Clothes -> 3, Wine -> 3, Amulet -> 3, Medicine -> 3,
+        Furniture -> 3, Opium -> 3, Paper -> 3, Weapons -> 2, Cement -> 2, Ritual(culture) -> 2)
+    ),
     Upper -> Map(
       LifeNeeds -> need("upper.life", Grain -> 6, Fish -> 3, Fruit -> 3, Cattle -> 3),
       RegularNeeds -> need("upper.regular", Tea -> 5, Clothes -> 5, Liquor -> 5, Furniture -> 5, Coal -> 10, Cement -> 5,
@@ -352,7 +356,7 @@ object Population extends EconomicConfig {
     )
   )
 
-  val maxPopulationTypeRatio:Map[PopulationType, Double] = {
+  val maxPopulationTypeRatio: Map[PopulationType, Double] = {
     val config = ConfigFactory.load("conf/economics.conf")
     populationTypes.map { pt =>
       pt -> config.getDouble(s"population.promotion.max${pt.name.capitalize}")
@@ -371,32 +375,42 @@ object Population extends EconomicConfig {
   // DISABLED RACES
   //
   case object Elves extends Race
+
   case object Dwarfs extends Race
+
   case object Orcs extends Race
+
   case object Saurians extends Race
+
   case object Drakes extends Race
+
   case object Undead extends Race
+
   case object Demons extends Race
 
   object Culture {
+
     case class StateForm(monarchy: String, democracy: String)
+
     case class CultureInfo(stateForm: StateForm, cities: List[String], states: List[String])
 
     private val config = ConfigFactory.load("conf/cultures.conf")
-    val cultureConfig:Map[Culture, CultureInfo] = Population.cultures.map { c =>
-      import mr.merc.util.MercUtils.ConfigConvertProtocol._
+    val cultureConfig: Map[Culture, CultureInfo] = Population.cultures.map { c =>
       c -> loadConfigOrThrow[CultureInfo](config.getConfig(c.name))
     } toMap
   }
 
   // removed sealed for test purposes only
-  abstract class Culture(val name:String, val race:Race, val houseStyle: House, val color: Color) {
+  abstract class Culture(val name: String, val race: Race, val houseStyle: House, val color: Color) {
     def needs: PopulationNeeds = defaultHumanNeeds(this)
-    def cultureNameKey:String = "culture." + name
+
+    def cultureNameKey: String = "culture." + name
   }
 
   case object LatinHuman extends Culture("latin", Humans, HumanCityHouse, Color.Red)
+
   case object KnightHuman extends Culture("french", Humans, HumanVillageHouse, Color.Blue)
+
   case object DarkHuman extends Culture("german", Humans, HumanCottage, Color.Black)
 
   //
@@ -413,11 +427,11 @@ object Population extends EconomicConfig {
 */
   // good words: alliance, protectorate, tribe, army
 
-  def cultures:List[Culture] = List(LatinHuman, KnightHuman, DarkHuman) //, HighElf, DarkElf, BarbarianOrc, RockDwarf, GreenSaurian, OldDrakes, Forsaken, RedDemons)
+  def cultures: List[Culture] = List(LatinHuman, KnightHuman, DarkHuman) //, HighElf, DarkElf, BarbarianOrc, RockDwarf, GreenSaurian, OldDrakes, Forsaken, RedDemons)
 
   class ProductFulfillmentRecord(prices: Map[Products.Product, Double], needs: Map[PopulationNeedsType, Map[Products.Product, Double]], products: Map[Product, Double]) {
 
-    val needsFulfillmentInfo:Map[PopulationNeedsType, List[ProductFulfillment]] = {
+    val needsFulfillmentInfo: Map[PopulationNeedsType, List[ProductFulfillment]] = {
 
       val lifeNeeds = needs(LifeNeeds)
       val afterLifeNeeds = products |-| lifeNeeds
@@ -436,7 +450,7 @@ object Population extends EconomicConfig {
         LuxuryNeeds -> luxuryNeedsFulfillment)
     }
 
-    val needsFulfillment: Map[PopulationNeedsType, Double] = needsFulfillmentInfo.transform{
+    val needsFulfillment: Map[PopulationNeedsType, Double] = needsFulfillmentInfo.transform {
       case (_, list) =>
         val totalDemanded = list.map(_.demanded).sum
         val totalReceived = list.map(_.received).sum
@@ -447,7 +461,7 @@ object Population extends EconomicConfig {
         }
     }
 
-    private def calculateProductFulfillment(needs: Map[Product, Double], afterFulfillment:Map[Product, Double]):List[ProductFulfillment] = {
+    private def calculateProductFulfillment(needs: Map[Product, Double], afterFulfillment: Map[Product, Double]): List[ProductFulfillment] = {
       needs.toList.map { case (product, productNeed) =>
         val remainedProduct = afterFulfillment.getOrElse(product, -productNeed)
         if (remainedProduct > 0)
@@ -463,31 +477,33 @@ object Population extends EconomicConfig {
 
   }
 
-  case class ProductFulfillment(product:Product, demanded: Double, received: Double, price: Option[Double])
+  case class ProductFulfillment(product: Product, demanded: Double, received: Double, price: Option[Double])
+
   // TODO add money source
   case class SalaryRecord(populationCount: Int, receivedMoney: Double, totalMoney: Double, taxes: Double)
+
 }
 
 case class PopulationMovers(literateCount: Int, illiterateCount: Int) {
-  def +(movers: PopulationMovers):PopulationMovers = {
+  def +(movers: PopulationMovers): PopulationMovers = {
     PopulationMovers(this.literateCount + movers.literateCount, this.illiterateCount + movers.illiterateCount)
   }
 
   def totalCount: Int = literateCount + illiterateCount
 }
 
-class PopulationPromotionDemotion(population: RegionPopulation, random: Random = Random) extends EconomicConfig {
+class PopulationPromotionDemotion(population: RegionPopulation, random: Random = Random, maxRatio: Map[PopulationType, Double] = Population.maxPopulationTypeRatio) extends EconomicConfig {
 
   private val happinessToDemote = config.getDouble("population.promotion.maxHappinessToDemote")
   private val happinessToPromote = config.getDouble("population.promotion.minHappinessToPromote")
 
   private case class PopulationMovement(from: Population, to: Population, count: Int)
 
-  private val maxPopulation:Map[Population, Boolean] = {
+  private val maxPopulation: Map[PopulationType, Boolean] = {
     val totalPopulation = population.pops.map(_.populationCount).sum
-
-    ???
-
+    Population.populationTypes.map { pt =>
+      pt -> (population.pops.filter(_.populationType == pt).map(_.populationCount).sum >= totalPopulation * maxRatio(pt))
+    }.toMap
   }
 
   private def whereToPromote(population: Population, regionPopulation: RegionPopulation): Option[Population] = {
@@ -495,16 +511,20 @@ class PopulationPromotionDemotion(population: RegionPopulation, random: Random =
     val chances = possibleChanges.
       filter(pc => population.populationType <= pc).
       filter(pc => regionPopulation.pop(pc, population.culture).populationCount > 0).
+      filterNot(maxPopulation).
       filter(pc => regionPopulation.pop(pc, population.culture).happiness >= happinessToDemote).
       map(p => regionPopulation.pop(p, population.culture)).sortBy(-_.happiness)
     chances.headOption
   }
+
+  def possibleRandomMovement: Set[PopulationType] = maxPopulation.filter(!_._2).keys.toSet
 
   private def whereToDemote(population: Population, regionPopulation: RegionPopulation): Option[Population] = {
     val possibleChanges = Population.PopulationPromotionDemotion(population.populationType)
     val chances = possibleChanges.
       filter(pc => population.populationType >= pc).
       filter(pc => regionPopulation.pop(pc, population.culture).populationCount > 0).
+      filterNot(maxPopulation).
       map(p => regionPopulation.pop(p, population.culture)).sortBy(-_.happiness)
     chances.headOption
   }
@@ -512,27 +532,29 @@ class PopulationPromotionDemotion(population: RegionPopulation, random: Random =
   def promoteOrDemote(): Unit = {
     val movements = population.pops.flatMap { p =>
 
-      val demotionOpt = if(p.happiness < happinessToDemote) {
-        whereToDemote(p, population).map{target =>
+      val demotionOpt = if (p.happiness < happinessToDemote || maxPopulation(p.populationType)) {
+        whereToDemote(p, population).map { target =>
           val percentage = config.getDouble("population.promotion.optionalPart")
           PopulationMovement(p, target, (p.populationCount * percentage) toInt)
         }
       } else None
 
       val promotionOpt = if (p.happiness > happinessToPromote) {
-        whereToPromote(p, population).map{target =>
+        whereToPromote(p, population).map { target =>
           val percentage = config.getDouble("population.promotion.optionalPart")
           PopulationMovement(p, target, (p.populationCount * percentage) toInt)
         }
       } else None
 
-      val randomChangePossibilities = Population.PopulationPromotionDemotion(p.populationType)
-      val randomChange = randomChangePossibilities(random.nextInt(randomChangePossibilities.size))
-      val randomChangeCount = p.populationCount * config.getDouble("population.promotion.requiredPart")
+      val randomChangePossibilities = Population.PopulationPromotionDemotion(p.populationType).filter(possibleRandomMovement.contains)
+      val randomPop = if (randomChangePossibilities.nonEmpty) {
+        val randomChange = randomChangePossibilities(random.nextInt(randomChangePossibilities.size))
+        val randomChangeCount = p.populationCount * config.getDouble("population.promotion.requiredPart")
+        Some(PopulationMovement(p, population.pop(randomChange, p.culture), randomChangeCount.toInt))
+      } else None
 
-      val randomPop = PopulationMovement(p, population.pop(randomChange, p.culture), randomChangeCount.toInt)
 
-      promotionOpt ++ demotionOpt ++ List(randomPop)
+      promotionOpt ++ demotionOpt ++ randomPop
     }
 
     movements.foreach { movement =>
