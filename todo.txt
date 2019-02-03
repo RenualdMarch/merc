@@ -24,7 +24,7 @@ For M6, interface will be a priority, basic politics, factory building
 +fill markets pane
 +add needs fulfillment to population pane
 +pie chart legend must be removed and replaced with scroolable legend
-no more than percentage of people can be capitalists and aristocrats
++no more than percentage of people can be capitalists and aristocrats
 Budget interface and implementation, parties change
 gdp info per province
 migration(with churches creation and destruction)
