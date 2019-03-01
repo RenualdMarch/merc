@@ -2,7 +2,7 @@ package mr.merc.economics
 
 import mr.merc.economics.Population._
 import mr.merc.economics.Products.{Coal, Product, Ritual}
-import mr.merc.politics.{PoliticalViews, State}
+import mr.merc.politics.{Party, PoliticalViews, State}
 import org.scalatest.{BeforeAndAfter, FunSuite}
 
 class WorkerDeciderTest extends FunSuite with BeforeAndAfter {
@@ -15,7 +15,7 @@ class WorkerDeciderTest extends FunSuite with BeforeAndAfter {
 
   val populations = List(latinClergy, westFarmer, latinFarmer, westCraftsmen, latinCraftsmen)
 
-  val country: State = new State("", KnightHuman, new StateBudget(0), TaxPolicy.zeroTaxes)
+  val country: State = new State("", KnightHuman, 0, Party.absolute)
 
   val region = new EconomicRegion {
     override def economicNeighbours: Set[EconomicRegion] = ???
@@ -42,13 +42,13 @@ class WorkerDeciderTest extends FunSuite with BeforeAndAfter {
 
     def payMoneyToPops() = ???
 
-    def payTaxes(): Double = ???
+    def payTaxes(): TaxData = ???
 
     def endOfDay() = ???
 
     def unsoldProducts: Double = ???
 
-    def newDay(taxPolicy: CorporateTaxPolicy, turn: Int): Unit = ???
+    def newDay(taxPolicy: TaxPolicy, turn: Int): Unit = ???
 
     def owners: List[Population] = ???
 

@@ -2,7 +2,8 @@ package mr.merc.economics
 
 import mr.merc.economics.Population._
 import mr.merc.economics.Products.Grain
-import mr.merc.politics.{PoliticalViews, State}
+import mr.merc.economics.TaxPolicy.CorporateTax
+import mr.merc.politics.{Party, PoliticalViews, State}
 import org.scalatest.{BeforeAndAfter, FunSuite}
 
 class ResourceGatheringTest extends FunSuite with BeforeAndAfter{
@@ -15,7 +16,7 @@ class ResourceGatheringTest extends FunSuite with BeforeAndAfter{
   var region3:EconomicRegion = _
   var country: State = _
 
-  val zeroPolicy = SalaryTaxPolicy(Map(Upper -> 0, Middle -> 0, Lower -> 0))
+  val zeroPolicy = TaxPolicy.zeroTaxes
 
   before {
     aristocrats = new Population(LatinHuman, Aristocrats, 1000, 0, 0, PoliticalViews.averagePoliticalViews)
@@ -24,7 +25,9 @@ class ResourceGatheringTest extends FunSuite with BeforeAndAfter{
     magicalAristocrats.newDay(zeroPolicy)
     workers = new Population(LatinHuman, Farmers, 4000, 0, 0, PoliticalViews.averagePoliticalViews)
     workers.newDay(zeroPolicy)
-    country = new State("", KnightHuman, new StateBudget(0), TaxPolicy.zeroTaxes)
+    country = new State("", KnightHuman, 0, Party.absolute) {
+      override val taxPolicy: TaxPolicy = TaxPolicy.zeroTaxes
+    }
 
     region1 = new EconomicRegion {
       override def economicNeighbours: Set[EconomicRegion] = Set(region2, region1)
@@ -65,7 +68,7 @@ class ResourceGatheringTest extends FunSuite with BeforeAndAfter{
 
     val prices = Map[Products.Product, Double](Grain -> 10)
 
-    resourceGathering.newDay(CorporateTaxPolicy(0.1), 1)
+    resourceGathering.newDay(TaxPolicy(Map(CorporateTax -> 0.1)), 1)
 
     assert(resourceGathering.componentDemandRequests(prices) === Map())
 
@@ -90,7 +93,7 @@ class ResourceGatheringTest extends FunSuite with BeforeAndAfter{
     assert(aristocrats.moneyReserves === 28125)
     assert(workers.moneyReserves === 45000)
 
-    assert(resourceGathering.payTaxes() === 10*1000)
+    assert(resourceGathering.payTaxes() === TaxData(CorporateTax, 100000, 10*1000))
 
     resourceGathering.produce()
 

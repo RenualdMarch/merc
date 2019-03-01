@@ -8,7 +8,7 @@ import mr.merc.map.generator.WorldMapGenerator
 import mr.merc.map.hex.{TerrainHex, TerrainHexField}
 import mr.merc.map.terrain.WaterKind
 import mr.merc.players.{ColorGenerator, NamesGenerator}
-import mr.merc.politics.{PoliticalViews, Province, State}
+import mr.merc.politics.{Party, PoliticalViews, Province, State}
 import mr.merc.util.WeightedRandom
 
 import scala.util.Random
@@ -150,7 +150,7 @@ class WorldGenerator(field:TerrainHexField) {
   private def generateState(culture: Culture):State = {
     val color = colorGenerator.nextColor()
     val name = namesGenerators(culture).stateNames.extract()
-    State(name, culture, new StateBudget(config.getDouble("world.state.startingMoney")), TaxPolicy.zeroTaxes, color)
+    new State(name, culture, config.getDouble("world.state.startingMoney"), Party.absolute, color)
   }
 
   private def divideIntoContinuousParts(connectivityMap: ConnectivityMap, sizes:List[Int]):List[ConnectivityMap] = {

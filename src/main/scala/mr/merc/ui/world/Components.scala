@@ -1,9 +1,9 @@
 package mr.merc.ui.world
 
-import mr.merc.log.Logging
+import java.text.DecimalFormat
+
 import scalafx.beans.property.ReadOnlyStringProperty
 import scalafx.scene.control.Button
-import scalafx.scene.layout.{Pane, Region}
 import scalafx.scene.text.{Font, Text}
 
 object Components {
@@ -66,4 +66,22 @@ object MediumButton {
 
 class MediumButton extends Button {
   this.font = Font(Components.mediumFontSize)
+}
+
+object IntFormatter {
+  def apply():DecimalFormat = {
+    val asIntFormat = new DecimalFormat("#0")
+    asIntFormat.setGroupingSize(3)
+    asIntFormat.setGroupingUsed(true)
+    asIntFormat
+  }
+}
+
+object DoubleFormatter {
+  def apply():DecimalFormat = {
+    val asIntFormat = new DecimalFormat("#0.00")
+    asIntFormat.setGroupingSize(3)
+    asIntFormat.setGroupingUsed(true)
+    asIntFormat
+  }
 }

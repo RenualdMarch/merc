@@ -4,6 +4,7 @@ import com.typesafe.config.ConfigFactory
 import mr.merc.economics.Population._
 import mr.merc.economics.Products._
 import mr.merc.economics.MapUtil.FloatOperations._
+import mr.merc.economics.TaxPolicy.{LowSalaryTax, MiddleSalaryTax, UpperSalaryTax}
 import mr.merc.map.objects.{House, HumanCityHouse, HumanCottage, HumanVillageHouse}
 import mr.merc.politics.PoliticalViews
 import scalafx.scene.paint.Color
@@ -25,8 +26,8 @@ class Population(val culture: Culture, val populationType: PopulationType, priva
   private val needsFulfillmentRecordsMaxSize = 30
   private val salaryRecordsMaxSize = 30
 
-  private var tax: SalaryTaxPolicy = _
-  private var currentSalaryRecord: SalaryRecord = _
+  private var tax: Double = 0d
+  private var currentSalaryRecord: SalaryRecord = SalaryRecord(populationCount, 0, 0, 0)
 
   def populationCount: Int = count.toInt
 
@@ -103,7 +104,7 @@ class Population(val culture: Culture, val populationType: PopulationType, priva
 
   def salary: Vector[SalaryRecord] = salaryRecords
 
-  private var currentPrices: Map[Product, Double] = _
+  private var currentPrices: Map[Product, Double] = Map()
 
   private var currentMoney = startingMoney
 
@@ -145,8 +146,14 @@ class Population(val culture: Culture, val populationType: PopulationType, priva
 
   def literacy: Double = if (populationCount == 0) 0 else literatePeople.toDouble / populationCount
 
-  def newDay(tax: SalaryTaxPolicy): Unit = {
-    this.tax = tax
+  private val taxPolicy = this.populationType.populationClass match {
+    case Lower => LowSalaryTax
+    case Middle => MiddleSalaryTax
+    case Upper => UpperSalaryTax
+  }
+
+  def newDay(stateTaxPolicy: TaxPolicy): Unit = {
+    this.tax = stateTaxPolicy(taxPolicy)
     this.currentSalaryRecord = SalaryRecord(populationCount, 0, 0, 0)
   }
 
@@ -192,14 +199,18 @@ class Population(val culture: Culture, val populationType: PopulationType, priva
   }
 
   // TODO add info about salary sources
-  def receiveSalary(salary: Double): Unit = {
-    val taxPart = tax.salaryTax(this.populationType.populationClass) * salary
+  def receiveSalary(salary: Double, payTax: Boolean = true): Unit = {
+    val taxPart = if (payTax)
+      tax * salary
+    else 0
+
     currentMoney = salary + currentMoney - taxPart
     val r = this.currentSalaryRecord
     this.currentSalaryRecord = this.currentSalaryRecord.copy(populationCount, r.receivedMoney + salary, currentMoney, r.taxes + taxPart)
   }
 
-  def payTaxes(): Double = this.currentSalaryRecord.taxes
+  def payTaxes(): TaxData = TaxData(taxPolicy, this.currentSalaryRecord.totalMoney, this.currentSalaryRecord.taxes)
+
 
   override def toString: String = s"$culture $populationType"
 }
@@ -393,6 +404,9 @@ object Population extends EconomicConfig {
     case class StateForm(monarchy: String, democracy: String)
 
     case class CultureInfo(stateForm: StateForm, cities: List[String], states: List[String])
+
+    // do not remove
+    import mr.merc.util.MercUtils.ConfigConvertProtocol.camelCaseHint
 
     private val config = ConfigFactory.load("conf/cultures.conf")
     val cultureConfig: Map[Culture, CultureInfo] = Population.cultures.map { c =>

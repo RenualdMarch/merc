@@ -4,6 +4,7 @@ import Products._
 import mr.merc.economics.Factory.{FactoryRecord, FactoryStorage}
 import mr.merc.economics.Population._
 import mr.merc.economics.MapUtil.FloatOperations._
+import mr.merc.economics.TaxPolicy.CorporateTax
 
 object Factory {
 
@@ -29,7 +30,7 @@ abstract class Factory[Producible <: ProducibleProduct](val region: EconomicRegi
 
   private val noMaintenancePenalty = 0.3
 
-  private var currentTaxPolicy: CorporateTaxPolicy = _
+  private var currentTaxPolicy: Double = _
 
   private var storage = FactoryStorage(unsoldProducts = startingProducts, money = startingMoney, unusedProducts = Map())
 
@@ -142,7 +143,7 @@ abstract class Factory[Producible <: ProducibleProduct](val region: EconomicRegi
   private def efficiency(pop: Population, workers: Double): Double = pop.efficiency * workers
 
   private def calculateEarningsDistribution(): Unit = {
-    val tax = currentRecord.factoryBuySellProfit * currentTaxPolicy.corporateTax
+    val tax = currentRecord.factoryBuySellProfit * currentTaxPolicy
     if (tax < 0) {
       currentRecord = currentRecord.copy(
         corporateTax = 0,
@@ -169,7 +170,7 @@ abstract class Factory[Producible <: ProducibleProduct](val region: EconomicRegi
         )
       } else {
         currentRecord = currentRecord.copy(
-          corporateTax = currentRecord.factoryBuySellProfit * currentTaxPolicy.corporateTax,
+          corporateTax = currentRecord.factoryBuySellProfit * currentTaxPolicy,
           moneyOnWorkforceSalary = moneyToPeople * ProfitPartToWorkers,
           moneyOnOwnersPayment = moneyToPeople * ProfitPartToOwners,
           moneyToFactoryBudget = maxMoneyReserves
@@ -200,9 +201,10 @@ abstract class Factory[Producible <: ProducibleProduct](val region: EconomicRegi
     storage = storage.copy(money = storage.money - currentRecord.moneyOnOwnersPayment - currentRecord.moneyOnWorkforceSalary)
   }
 
-  def payTaxes(): Double = {
+  def payTaxes(): TaxData = {
     storage = storage.copy(money = storage.money - currentRecord.corporateTax)
-    currentRecord.corporateTax
+    val gross = if (currentRecord.factoryBuySellProfit > 0) currentRecord.factoryBuySellProfit else 0d
+    TaxData(CorporateTax, gross, currentRecord.corporateTax)
   }
 
   def endOfDay(): Unit = {
@@ -212,8 +214,8 @@ abstract class Factory[Producible <: ProducibleProduct](val region: EconomicRegi
     }
   }
 
-  def newDay(taxPolicy: CorporateTaxPolicy, turn: Int): Unit = {
-    currentTaxPolicy = taxPolicy
+  def newDay(taxPolicy: TaxPolicy, turn: Int): Unit = {
+    currentTaxPolicy = taxPolicy(CorporateTax)
     currentRecord = newFactoryRecord(turn)
   }
 

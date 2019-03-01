@@ -2,6 +2,7 @@ package mr.merc.economics
 
 import mr.merc.economics.Population._
 import mr.merc.economics.Products.{Coal, Fruit, Grain}
+import mr.merc.economics.TaxPolicy.MiddleSalaryTax
 import mr.merc.map.objects.HumanCityHouse
 import mr.merc.politics.ForeignPolicy.{Expansionism, Pacifism}
 import mr.merc.politics.{IssuePositionPopularity, PoliticalViews}
@@ -94,7 +95,7 @@ class PopulationTest extends FunSuite with Matchers {
 
   test("salary") {
     val pop = newPopulation(1000)
-    pop.newDay(SalaryTaxPolicy(Map(Middle -> 0.1)))
+    pop.newDay(TaxPolicy(Map(MiddleSalaryTax -> 0.1)))
     pop.receiveSalary(10000)
     assert(pop.moneyReserves === 10000)
     pop.endOfDay()

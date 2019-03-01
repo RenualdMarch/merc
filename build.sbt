@@ -58,6 +58,8 @@ libraryDependencies += "com.object-refinery" % "orsoncharts" % "1.7"
 
 libraryDependencies += "com.github.andr83" %% "scalaconfig" % "0.4"
 
+//libraryDependencies += "org.typelevel" %% "spire" % "0.16.0"
+
 scalacOptions ++= Seq("-feature", "-deprecation", "-language:postfixOps",
   "-language:implicitConversions", "-language:reflectiveCalls", "-Ypartial-unification")
 

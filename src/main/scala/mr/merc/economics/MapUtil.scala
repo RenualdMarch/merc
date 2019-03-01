@@ -29,6 +29,13 @@ object MapUtil {
           num.times(v, q)
         }
       }
+
+      def |*|(other: Map[K, V]): Map[K, V] = {
+        val intersectingKeys = this.map.keySet & other.keySet
+        intersectingKeys.map { k =>
+          k -> num.times(map(k), other(k))
+        }.toMap
+      }
     }
   }
 

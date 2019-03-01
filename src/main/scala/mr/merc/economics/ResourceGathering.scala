@@ -3,6 +3,7 @@ package mr.merc.economics
 import mr.merc.economics.Population._
 import mr.merc.economics.Products._
 import mr.merc.economics.ResourceGathering.ResourceGatheringRecord
+import mr.merc.economics.TaxPolicy.CorporateTax
 
 abstract class ResourceGathering[Prod <: GatheredProduct](val product: Prod, val region: EconomicRegion, startingProducts: Double, gatheringEfficiencyMultiplier: Double) extends Enterprise {
 
@@ -23,7 +24,7 @@ abstract class ResourceGathering[Prod <: GatheredProduct](val product: Prod, val
 
   private var currentRecord:ResourceGatheringRecord = _
 
-  private var currentTax: CorporateTaxPolicy = _
+  private var currentTax: Double = 0
 
   private val supplyDecider = new SupplyDecider()
 
@@ -36,8 +37,8 @@ abstract class ResourceGathering[Prod <: GatheredProduct](val product: Prod, val
     }
   }
 
-  override def newDay(taxPolicy: CorporateTaxPolicy, turn: Int): Unit = {
-    currentTax = taxPolicy
+  override def newDay(taxPolicy: TaxPolicy, turn: Int): Unit = {
+    currentTax = taxPolicy(CorporateTax)
     currentRecord = newRecord(turn)
   }
 
@@ -49,20 +50,20 @@ abstract class ResourceGathering[Prod <: GatheredProduct](val product: Prod, val
   }
 
   override def payMoneyToPops(): Unit = {
-    val earns = currentRecord.sold.values.map(f => f.profitPerItem * f.request.sold).sum
+    val earns = currentRecord.earnings
 
     currentRecord = currentRecord.copy(
-      corporateTax = earns * currentTax.corporateTax,
-      moneyOnWorkforceSalary = earns * (1 - currentTax.corporateTax) * profitPartToWorkers,
-      moneyOnOwnersPayment = earns * (1 - currentTax.corporateTax) * profitPartToOwners
+      corporateTax = earns * currentTax,
+      moneyOnWorkforceSalary = earns * (1 - currentTax) * profitPartToWorkers,
+      moneyOnOwnersPayment = earns * (1 - currentTax) * profitPartToOwners
     )
 
     paySalaryProportionallyToEfficiency(currentRecord.peopleResources, currentRecord.moneyOnWorkforceSalary)
     paySalaryProportionallyToEfficiency(owners.map(p => p -> p.populationCount.toDouble).toMap, currentRecord.moneyOnOwnersPayment)
   }
 
-  override def payTaxes(): Double = currentRecord.corporateTax
-
+  override def payTaxes(): TaxData =
+    TaxData(CorporateTax, currentRecord.earnings, currentRecord.corporateTax)
 
   override def receiveSellingResultAndMoney(region: EconomicRegion, profit:FulfilledSupplyRequestProfit): Unit = {
     currentRecord = currentRecord.copy(sold = currentRecord.sold + (region -> profit))

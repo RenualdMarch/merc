@@ -1,46 +1,27 @@
 package mr.merc.economics
 
-import mr.merc.economics.Population.PopulationClass
-
-
+import mr.merc.economics.TaxPolicy.Income
 
 object TaxPolicy {
-  def zeroTaxes: TaxPolicy = TaxPolicy(CorporateTaxPolicy(0), SalaryTaxPolicy(
-    Population.populationClasses.map(_ -> 0d).toMap), SalesTaxPolicy(0), TariffTax(0), TransitTax(0))
+  def zeroTaxes: TaxPolicy = TaxPolicy(Map())
 
-  sealed abstract class Tax
-  object Corporate extends Tax
-  object Salary extends Tax
-  object Sales extends Tax
-  object Tariff extends Tax
-  object Transit extends Tax
+  sealed abstract class Income
+  object CorporateTax extends Income
+  object LowSalaryTax extends Income
+  object MiddleSalaryTax extends Income
+  object UpperSalaryTax extends Income
+  object SalesTax extends Income
+  object TariffTax extends Income
+  object TransitTax extends Income
 
-  val allTaxes = List(Corporate, Salary, Sales, Tariff, Transit)
+  val allTaxes = List(CorporateTax, LowSalaryTax, MiddleSalaryTax, UpperSalaryTax, SalesTax, TariffTax, TransitTax)
 
 }
 
-case class TaxPolicy(corporateTaxPolicy: CorporateTaxPolicy, citizensTaxPolicy: SalaryTaxPolicy,
-                     salesTaxPolicy: SalesTaxPolicy, tariffTax: TariffTax, transitTax:TransitTax) {
-}
+case class TaxPolicy(private var taxes:Map[Income, Double]) {
+  def apply(income: Income): Double = taxes.getOrElse(income, 0d)
 
-case class CorporateTaxPolicy(corporateTax: Double) {
-  require(corporateTax >= 0 && corporateTax <= 1.0,
-    s"corporate tax must be in [0, 1] but it is $corporateTax")
-}
-
-case class SalaryTaxPolicy(salaryTax:Map[PopulationClass, Double]) {
-  require(salaryTax.values.forall(s => s >= 0 && s <= 1.0),
-    s"salary tax for all classes must be in [0, 1] but it is $salaryTax")
-}
-
-case class SalesTaxPolicy(salesTax: Double) {
-  require(salesTax >= 0, s"sales tax must be in [0, +inf] but it is $salesTax")
-}
-
-case class TariffTax(tariffTax: Double) {
-  require(tariffTax >= 0, s"tariff tax must be in [0, +inf] but it is $tariffTax")
-}
-
-case class TransitTax(transitTax: Double) {
-  require(transitTax >= 0, s"transit tax must be in [0, +inf] but it is $transitTax")
+  def set(income: Income, v: Double): Unit = {
+    taxes += income -> v
+  }
 }

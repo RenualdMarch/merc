@@ -5,6 +5,7 @@ import scalafx.scene.control.Button
 import scalafx.scene.layout.{BorderPane, Pane, Region}
 import scalafx.Includes._
 import scalafx.beans.property.ReadOnlyObjectProperty
+import scalafx.geometry.Pos
 import scalafx.scene.Node
 
 class InterfacePane(content: Region, onClose: () => Unit) extends Pane with WorldInterfaceNode {
@@ -112,4 +113,10 @@ class PropertyDependentPane[T](property: ReadOnlyObjectProperty[T], f:T => Node)
   }
 
   reload()
+}
+
+class TopTitledBorderPane extends BorderPane {
+  top.onChange {
+    BorderPane.setAlignment(top.value, Pos.TopCenter)
+  }
 }

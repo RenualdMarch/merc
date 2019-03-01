@@ -1,13 +1,15 @@
 package mr.merc.economics
 
 import mr.merc.economics.Population._
-import mr.merc.politics.{PoliticalViews, State}
+import mr.merc.economics.TaxPolicy.{SalesTax, TariffTax, TransitTax}
+import mr.merc.politics.{Party, PoliticalViews, State}
 import org.scalatest.{BeforeAndAfter, FunSuite, Matchers}
 
 class PriceExtractionTest extends FunSuite with BeforeAndAfter with Matchers {
 
-  val state = new State("", KnightHuman, new StateBudget(0),
-    TaxPolicy.zeroTaxes.copy(salesTaxPolicy = SalesTaxPolicy(0.5), transitTax = TransitTax(0.1), tariffTax = TariffTax(0.2)))
+  val state = new State("", KnightHuman, 0, Party.absolute) {
+    override val taxPolicy: TaxPolicy = TaxPolicy(Map(SalesTax -> 0.5, TransitTax -> 0.1, TariffTax -> 0.2))
+  }
   val traders = new Population(KnightHuman, Traders, 1000, 0, 0, PoliticalViews.averagePoliticalViews)
 
   val region = new EconomicRegion {

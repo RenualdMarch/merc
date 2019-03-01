@@ -1,7 +1,5 @@
 package mr.merc.ui.world
 
-import java.text.DecimalFormat
-
 import mr.merc.economics.Factory.FactoryRecord
 import mr.merc.economics._
 import mr.merc.economics.Population.{LifeNeeds, LuxuryNeeds, PopulationNeedsType, ProductFulfillmentRecord, RegularNeeds}
@@ -11,13 +9,11 @@ import scalafx.collections.ObservableBuffer
 import scalafx.scene.control.{TableColumn, TableView}
 import scalafx.scene.layout.Region
 import EconomicLocalization._
-import mr.merc.economics.ResourceGathering.ResourceGatheringRecord
 import mr.merc.politics.Province
 
 import scala.collection.JavaConverters._
 
 object SupplyDemandTables {
-  private val format = new DecimalFormat("#0.00")
 
   def buildSupplyTable(day: MarketDay): Region = {
     case class Supply(source: String, brought: Double, sold: Double, price: Double)
@@ -34,21 +30,21 @@ object SupplyDemandTables {
 
     val priceColumn = new TableColumn[Supply, String] {
       text = Localization("price")
-      cellValueFactory = e => StringProperty(format.format(e.value.price))
+      cellValueFactory = e => StringProperty(DoubleFormatter().format(e.value.price))
       editable = false
       prefWidth <== table.width * 0.13
     }
 
     val broughtColumn = new TableColumn[Supply, String] {
       text = Localization("brought")
-      cellValueFactory = e => StringProperty(format.format(e.value.brought))
+      cellValueFactory = e => StringProperty(DoubleFormatter().format(e.value.brought))
       editable = false
       prefWidth <== table.width * 0.13
     }
 
     val soldColumn = new TableColumn[Supply, String] {
       text = Localization("sold")
-      cellValueFactory = e => StringProperty(format.format(e.value.sold))
+      cellValueFactory = e => StringProperty(DoubleFormatter().format(e.value.sold))
       editable = false
       prefWidth <== table.width * 0.13
     }
@@ -87,21 +83,21 @@ object SupplyDemandTables {
 
     val priceColumn = new TableColumn[Demand, String] {
       text = Localization("price")
-      cellValueFactory = e => StringProperty(format.format(e.value.price))
+      cellValueFactory = e => StringProperty(DoubleFormatter().format(e.value.price))
       editable = false
       prefWidth <== table.width * 0.13
     }
 
     val neededColumn = new TableColumn[Demand, String] {
       text = Localization("needed")
-      cellValueFactory = e => StringProperty(format.format(e.value.needed))
+      cellValueFactory = e => StringProperty(DoubleFormatter().format(e.value.needed))
       editable = false
       prefWidth <== table.width * 0.13
     }
 
     val boughtColumn = new TableColumn[Demand, String] {
       text = Localization("bought")
-      cellValueFactory = e => StringProperty(format.format(e.value.bought))
+      cellValueFactory = e => StringProperty(DoubleFormatter().format(e.value.bought))
       editable = false
       prefWidth <== table.width * 0.13
     }
@@ -159,21 +155,21 @@ object SupplyDemandTables {
 
     val priceColumn = new TableColumn[PopDemand, String] {
       text = Localization("price")
-      cellValueFactory = e => StringProperty(e.value.price.map(format.format).getOrElse(""))
+      cellValueFactory = e => StringProperty(e.value.price.map(DoubleFormatter().format).getOrElse(""))
       editable = false
       prefWidth <== table.width * 0.15
     }
 
     val demandedColumn = new TableColumn[PopDemand, String] {
       text = Localization("demand")
-      cellValueFactory = e => StringProperty(format.format(e.value.demanded))
+      cellValueFactory = e => StringProperty(DoubleFormatter().format(e.value.demanded))
       editable = false
       prefWidth <== table.width * 0.15
     }
 
     val receivedColumn = new TableColumn[PopDemand, String] {
       text = Localization("received")
-      cellValueFactory = e => StringProperty(format.format(e.value.received))
+      cellValueFactory = e => StringProperty(DoubleFormatter().format(e.value.received))
       editable = false
       prefWidth <== table.width * 0.15
     }
@@ -207,21 +203,21 @@ object SupplyDemandTables {
 
     val priceColumn = new TableColumn[Row, String] {
       text = Localization("price")
-      cellValueFactory = e => StringProperty(format.format(e.value.price))
+      cellValueFactory = e => StringProperty(DoubleFormatter().format(e.value.price))
       editable = false
       prefWidth <== table.width * 0.25
     }
 
     val demandedColumn = new TableColumn[Row, String] {
       text = Localization("demand")
-      cellValueFactory = e => StringProperty(format.format(e.value.demanded))
+      cellValueFactory = e => StringProperty(DoubleFormatter().format(e.value.demanded))
       editable = false
       prefWidth <== table.width * 0.25
     }
 
     val boughtColumn = new TableColumn[Row, String] {
       text = Localization("received")
-      cellValueFactory = e => StringProperty(format.format(e.value.bought))
+      cellValueFactory = e => StringProperty(DoubleFormatter().format(e.value.bought))
       editable = false
       prefWidth <== table.width * 0.25
     }
@@ -263,7 +259,7 @@ object SupplyDemandTables {
 
     val priceColumn = new TableColumn[Row, String] {
       text = Localization("price")
-      cellValueFactory = e => StringProperty(format.format(e.value.price))
+      cellValueFactory = e => StringProperty(DoubleFormatter().format(e.value.price))
       editable = false
       prefWidth <== table.width * 0.16
     }
@@ -271,21 +267,21 @@ object SupplyDemandTables {
 
     val profitColumn = new TableColumn[Row, String] {
       text = Localization("profit")
-      cellValueFactory = e => StringProperty(format.format(e.value.profit))
+      cellValueFactory = e => StringProperty(DoubleFormatter().format(e.value.profit))
       editable = false
       prefWidth <== table.width * 0.16
     }
 
     val sentColumn = new TableColumn[Row, String] {
       text = Localization("sent")
-      cellValueFactory = e => StringProperty(format.format(e.value.sent))
+      cellValueFactory = e => StringProperty(DoubleFormatter().format(e.value.sent))
       editable = false
       prefWidth <== table.width * 0.16
     }
 
     val soldColumn = new TableColumn[Row, String] {
       text = Localization("sold")
-      cellValueFactory = e => StringProperty(format.format(e.value.sold))
+      cellValueFactory = e => StringProperty(DoubleFormatter().format(e.value.sold))
       editable = false
       prefWidth <== table.width * 0.16
     }

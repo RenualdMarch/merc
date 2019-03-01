@@ -1,7 +1,5 @@
 package mr.merc.ui.world
 
-import java.text.DecimalFormat
-
 import javafx.scene.control.SelectionMode
 import mr.merc.economics._
 import mr.merc.local.Localization
@@ -59,9 +57,8 @@ class EnterprisesTablePane(enterprises: Seq[Enterprise]) extends MigPane with Wo
 
   private val producedSoldColumn = new TableColumn[Enterprise, String] {
     text = Localization("producedAndSold")
-    private val format = new DecimalFormat("#0.00")
     cellValueFactory = e => StringProperty(e.value.dayRecords.lastOption.map { p =>
-      s"${format.format(p.produced)}/${format.format(p.itemsSold)}"
+      s"${DoubleFormatter().format(p.produced)}/${DoubleFormatter().format(p.itemsSold)}"
     }.getOrElse(""))
     editable = false
     prefWidth <== enterprisesTable.width * 0.20
@@ -69,9 +66,8 @@ class EnterprisesTablePane(enterprises: Seq[Enterprise]) extends MigPane with Wo
 
   private val workersColumn = new TableColumn[Enterprise, String] {
     text = Localization("workers")
-    private val format = new DecimalFormat("#0")
     cellValueFactory = e => StringProperty(e.value.dayRecords.lastOption.map { p =>
-      format.format(p.peopleResources.values.sum)
+      IntFormatter().format(p.peopleResources.values.sum)
     }.getOrElse(""))
     editable = false
     prefWidth <== enterprisesTable.width * 0.20
@@ -162,7 +158,7 @@ class EnterpriseDetailsPane(enterprise: Enterprise, province: Province, turn:Int
 }
 
 abstract class EnterprisePane(e: Enterprise, province: Province) extends MigPane() with WorldInterfaceJavaNode {
-  private val asIntFormat = new DecimalFormat("#0")
+
 
   add(MediumText(Localization("enterprise.type")))
   add(new MediumText {
@@ -177,49 +173,49 @@ abstract class EnterprisePane(e: Enterprise, province: Province) extends MigPane
   def produced() {
     add(MediumText(Localization("enterprise.produced")))
     add(new MediumText {
-      text = e.dayRecords.lastOption.map(d => asIntFormat.format(d.produced)).getOrElse("")
+      text = e.dayRecords.lastOption.map(d => IntFormatter().format(d.produced)).getOrElse("")
     }.delegate, "wrap")
   }
 
   def itemsSold() {
     add(MediumText(Localization("enterprise.itemsSold")))
     add(new MediumText {
-      text = e.dayRecords.lastOption.map(d => asIntFormat.format(d.itemsSold)).getOrElse("")
+      text = e.dayRecords.lastOption.map(d => IntFormatter().format(d.itemsSold)).getOrElse("")
     }.delegate, "wrap")
   }
 
   def inStorage() {
     add(MediumText(Localization("enterprise.inStorage")))
     add(new MediumText {
-      text = Localization(asIntFormat.format(e.unsoldProducts))
+      text = Localization(IntFormatter().format(e.unsoldProducts))
     }.delegate, "wrap")
   }
 
   def earnings() {
     add(MediumText(Localization("enterprise.earnings")))
     add(new MediumText {
-      text = e.dayRecords.lastOption.map(d => asIntFormat.format(d.earnings)).getOrElse("")
+      text = e.dayRecords.lastOption.map(d => IntFormatter().format(d.earnings)).getOrElse("")
     }.delegate, "wrap")
   }
 
   def corporateTax() {
     add(MediumText(Localization("enterprise.corporateTax")))
     add(new MediumText {
-      text = e.dayRecords.lastOption.map(d => asIntFormat.format(d.corporateTax)).getOrElse("")
+      text = e.dayRecords.lastOption.map(d => IntFormatter().format(d.corporateTax)).getOrElse("")
     }.delegate, "wrap")
   }
 
   def salary() {
     add(MediumText(Localization("enterprise.salary")))
     add(new MediumText {
-      text = e.dayRecords.lastOption.map(d => asIntFormat.format(d.moneyOnWorkforceSalary)).getOrElse("")
+      text = e.dayRecords.lastOption.map(d => IntFormatter().format(d.moneyOnWorkforceSalary)).getOrElse("")
     }.delegate, "wrap")
   }
 
   def ownersProfit() {
     add(MediumText(Localization("enterprise.ownersProfit")))
     add(new MediumText {
-      text = e.dayRecords.lastOption.map(d => asIntFormat.format(d.moneyOnOwnersPayment)).getOrElse("")
+      text = e.dayRecords.lastOption.map(d => IntFormatter().format(d.moneyOnOwnersPayment)).getOrElse("")
     }.delegate, "wrap")
   }
 
@@ -238,33 +234,32 @@ class ResourceGatheringPane(r: ResourceGathering[_], province: Province) extends
 }
 
 class FactoryPane(e: Factory[_], province: Province) extends EnterprisePane(e, province) {
-  private val asIntFormat = new DecimalFormat("#0")
 
   def spentOfResources() {
     add(MediumText(Localization("enterprise.spentOnResources")))
     add(new MediumText {
-      text = e.dayRecords.lastOption.map(d => asIntFormat.format(d.moneySpentOnResources)).getOrElse("")
+      text = e.dayRecords.lastOption.map(d => IntFormatter().format(d.moneySpentOnResources)).getOrElse("")
     }.delegate, "wrap")
   }
 
   def budget() {
     add(MediumText(Localization("enterprise.budget")))
     add(new MediumText {
-      text = asIntFormat.format(e.factoryStorage.money)
+      text = IntFormatter().format(e.factoryStorage.money)
     }.delegate, "wrap")
   }
 
   def moneyToBudget() {
     add(MediumText(Localization("enterprise.moneyToBudget")))
     add(new MediumText {
-      text = e.dayRecords.lastOption.map(d => asIntFormat.format(d.moneyToFactoryBudget)).getOrElse("")
+      text = e.dayRecords.lastOption.map(d => IntFormatter().format(d.moneyToFactoryBudget)).getOrElse("")
     }.delegate, "wrap")
   }
 
   def factoryProfit() {
     add(MediumText(Localization("enterprise.factoryProfit")))
     add(new MediumText {
-      text = e.dayRecords.lastOption.map(d => asIntFormat.format(d.factoryBuySellProfit)).getOrElse("")
+      text = e.dayRecords.lastOption.map(d => IntFormatter().format(d.factoryBuySellProfit)).getOrElse("")
     }.delegate, "wrap")
   }
 

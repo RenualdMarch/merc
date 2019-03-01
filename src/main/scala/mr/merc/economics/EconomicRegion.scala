@@ -2,9 +2,10 @@ package mr.merc.economics
 
 import mr.merc.map.{Grid, PossibleGrid}
 import Products.Product
-import mr.merc.economics.Population.{Culture, PopulationType}
+import mr.merc.economics.Population.{Culture, LifeNeeds, LuxuryNeeds, PopulationClass, PopulationNeedsType, PopulationType, RegularNeeds}
 import mr.merc.economics.util.DistributionCalculator
 import mr.merc.politics.{PoliticalViews, State}
+import mr.merc.economics.MapUtil.FloatOperations.MapWithFloatOperations
 
 trait EconomicRegion {
 
@@ -17,6 +18,22 @@ trait EconomicRegion {
   val regionPopulation: RegionPopulation
 
   var enterprises:Vector[Enterprise] = Vector()
+
+  def moneyToFulfillNeeds(population: Population): Map[PopulationNeedsType, Double] =
+    moneyToFulfillNeeds(population.populationType.populationClass, population.culture) |*| population.totalPopEfficiency
+
+  def moneyToFulfillNeeds(populationType: PopulationType): Map[PopulationNeedsType, Double] = {
+    regionPopulation.pops.filter(_.populationType == populationType).map(moneyToFulfillNeeds).
+      fold(Map(LifeNeeds -> 0d, RegularNeeds -> 0d, LuxuryNeeds -> 0d))(_ |+| _)
+  }
+
+  def moneyToFulfillNeeds(populationClass: PopulationClass, culture:Culture): Map[PopulationNeedsType, Double] = {
+    culture.needs(populationClass).transform { case (_, needs) =>
+      needs.map { case (p, v) =>
+        regionMarket.currentPrices(p) * v
+      }.sum
+    }
+  }
 }
 
 class EconomicGrid(region:EconomicRegion) extends PossibleGrid[EconomicRegion] {
@@ -60,7 +77,11 @@ class RegionPopulation(initialPops: List[Population]) {
     }
   }
 
-  private def popsByTypeAndCulture(populationType: PopulationType, culture: Option[Culture]):List[Population] = {
+  def popsByType(populationType: PopulationType): List[Population] = {
+    pops.filter(_.populationType == populationType)
+  }
+
+  def popsByTypeAndCulture(populationType: PopulationType, culture: Option[Culture]):List[Population] = {
     pops.filter(_.populationType == populationType).filter(p => culture.forall(_ == p.culture))
   }
 

@@ -1,7 +1,5 @@
 package mr.merc.ui.world
 
-import java.text.DecimalFormat
-
 import javafx.scene.control.{SelectionMode, TableCell}
 import mr.merc.economics._
 import mr.merc.local.Localization
@@ -27,7 +25,6 @@ class MarketViewPane(province: Province, stage: Stage) extends PaneWithTwoEqualH
 }
 
 class ProductsTablePane(market: RegionMarket) extends MigPane with WorldInterfaceJavaNode {
-  private val format = new DecimalFormat("#0.00")
 
   private val productsTable = new TableView[ProductsInfo]()
   productsTable.style = s"-fx-font-size: ${Components.mediumFontSize}"
@@ -41,7 +38,7 @@ class ProductsTablePane(market: RegionMarket) extends MigPane with WorldInterfac
 
   private val priceColumn = new TableColumn[ProductsInfo, String] {
     text = Localization("price")
-    cellValueFactory = p => StringProperty(p.value.currentPrice.map(format.format).getOrElse(""))
+    cellValueFactory = p => StringProperty(p.value.currentPrice.map(DoubleFormatter().format).getOrElse(""))
     editable = false
     prefWidth <== productsTable.width * 0.15
   }
@@ -65,14 +62,14 @@ class ProductsTablePane(market: RegionMarket) extends MigPane with WorldInterfac
 
   private val demandColumn = new TableColumn[ProductsInfo, String] {
     text = Localization("demand")
-    cellValueFactory = p => StringProperty(p.value.totalDemand.map(format.format).getOrElse(""))
+    cellValueFactory = p => StringProperty(p.value.totalDemand.map(DoubleFormatter().format).getOrElse(""))
     editable = false
     prefWidth <== productsTable.width * 0.15
   }
 
   private val supplyColumn = new TableColumn[ProductsInfo, String] {
     text = Localization("supply")
-    cellValueFactory = p => StringProperty(p.value.totalSupply.map(format.format).getOrElse(""))
+    cellValueFactory = p => StringProperty(p.value.totalSupply.map(DoubleFormatter().format).getOrElse(""))
     editable = false
     prefWidth <== productsTable.width * 0.15
   }

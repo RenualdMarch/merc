@@ -1,7 +1,5 @@
 package mr.merc.ui.world
 
-import java.text.DecimalFormat
-
 import mr.merc.local.Localization
 import mr.merc.log.Logging
 import mr.merc.politics.{Province, State}
@@ -36,10 +34,7 @@ class ProvinceDetailsPane(province: Province, parent: WorldFrame) extends MigPan
 
 
   private def populationCountText: Text = {
-    val format = new DecimalFormat()
-    format.setGroupingSize(3)
-    format.setGroupingUsed(true)
-    val str = format.format(province.totalPopulation)
+    val str = IntFormatter().format(province.totalPopulation)
     MediumText(str)
   }
 

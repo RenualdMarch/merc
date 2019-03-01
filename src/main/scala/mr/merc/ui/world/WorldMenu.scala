@@ -2,21 +2,29 @@ package mr.merc.ui.world
 
 import mr.merc.local.Localization
 import scalafx.scene.control.{Menu, MenuBar, MenuItem}
+import scala.collection.JavaConverters._
 
 class WorldMenu(parent: WorldFrame) extends MenuBar {
-  this.style = s"-fx-font-size: ${Components.mediumFontSize}"
+  this.stylesheets.add("/css/worldMenu.css")
 
   val politicsMenu = new Menu(Localization("menu.domesticPolicy"))
   val diplomacyMenu = new Menu(Localization("menu.foreignPolicy"))
-  val armyMenu = new Menu(Localization("menu.defence"))
   val gameMenu = new Menu(Localization("menu.game"))
   val viewMenu = new Menu(Localization("menu.view"))
 
-  this.menus.addAll(politicsMenu, diplomacyMenu, armyMenu, viewMenu, gameMenu)
+  this.menus.addAll(politicsMenu, diplomacyMenu, viewMenu, gameMenu)
+
+  val army = new MenuItem(Localization("menu.defence"))
+  val relations = new MenuItem(Localization("menu.relations"))
+  diplomacyMenu.items.addAll(relations, army)
 
   val budgetMenu = new MenuItem(Localization("menu.budget"))
+  budgetMenu.onAction = { _ =>
+    parent.showBudgetPane()
+  }
   val parliament = new MenuItem(Localization("menu.parliament"))
   politicsMenu.items.addAll(budgetMenu, parliament)
+
 
   val saveMenu = new MenuItem(Localization("menu.save"))
   val loadMenu = new MenuItem(Localization("menu.load"))
@@ -31,6 +39,13 @@ class WorldMenu(parent: WorldFrame) extends MenuBar {
   )
   viewMenu.items.addAll(hideMinimap)
 
+  this.lookupAll(".menu-item").asScala.foreach {n =>
+    n.setStyle(s"-fx-font-size: ${Components.largeFontSize};")
+  }
+
+  this.lookupAll(".menu-bar").asScala.foreach {n =>
+    n.setStyle(s"-fx-font-size: ${Components.largeFontSize};")
+  }
 }
 
 class ToggleMenuItem(f:Boolean => Unit, label: Boolean => String, initalState:Boolean) extends MenuItem {
@@ -38,7 +53,7 @@ class ToggleMenuItem(f:Boolean => Unit, label: Boolean => String, initalState:Bo
 
   this.text = label(initalState)
 
-  this.onAction = {e =>
+  this.onAction = {_ =>
     currentState = !currentState
     this.text = label(currentState)
     f(currentState)

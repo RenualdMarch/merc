@@ -1,7 +1,5 @@
 package mr.merc.ui.world
 
-import java.text.DecimalFormat
-
 import com.sun.javafx.charts.Legend
 import javafx.scene.Node
 import mr.merc.util.{MercTooltip, MercUtils}
@@ -80,13 +78,12 @@ object PieChartBuilder {
   }
 
   private def buildLegendRow(part: PiePart):Region = {
-    val percentFormatter = new DecimalFormat("#0.00")
     val borderPane = new BorderPane()
     val square = new Circle()
     square.radius <== borderPane.height / 2
     square.fill = part.color
     val text = MediumText(part.label)
-    val percentage = MediumText(percentFormatter.format(part.count) + "%")
+    val percentage = MediumText(DoubleFormatter().format(part.count) + "%")
 
     borderPane.left = square
     borderPane.center = text

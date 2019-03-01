@@ -16,11 +16,19 @@ trait IssuePosition extends Product {
 }
 
 object IssuePosition {
+  case class MinMax[T](min:T, max: T)
+
   trait MigrationPosition extends IssuePosition
 
   trait RegimePosition extends IssuePosition
 
-  trait EconomyPosition extends IssuePosition
+  trait EconomyPosition extends IssuePosition {
+    val tariff:MinMax[Double]
+    val corporateTax:MinMax[Double]
+    val salaryTax:MinMax[Double]
+    val salesTax:MinMax[Double]
+    val transit:MinMax[Double]
+  }
 
   trait ForeignPolicyPosition extends IssuePosition
 
@@ -131,6 +139,12 @@ object Economy extends Issue[EconomyPosition] {
     }
 
     override def positionNumber: Int = 0
+
+    val tariff = MinMax(0.3, 1)
+    val corporateTax = MinMax(0.3, 1)
+    val salaryTax = MinMax(0.3, 1)
+    val salesTax = MinMax(0.3, 1)
+    val transit = MinMax(0.1, 0.5)
   }
 
   case object Interventionism extends EconomyPosition {
@@ -139,6 +153,12 @@ object Economy extends Issue[EconomyPosition] {
     override def populationModifier(pop: Population): Double = 1.0
 
     override def positionNumber: Int = 1
+
+    val tariff = MinMax(0.1, 0.4)
+    val corporateTax = MinMax(0.1, 0.4)
+    val salaryTax = MinMax(0.1, 0.4)
+    val salesTax = MinMax(0.1, 0.4)
+    val transit = MinMax(0.05, 0.2)
   }
 
   case object FreeMarket extends EconomyPosition {
@@ -147,6 +167,12 @@ object Economy extends Issue[EconomyPosition] {
     override def populationModifier(pop: Population): Double = if (Set(Traders, Capitalists).contains(pop.populationType)) 5.0 else 1.0
 
     override def positionNumber: Int = 2
+
+    val tariff = MinMax(0, 0.2)
+    val corporateTax = MinMax(0, 0.2)
+    val salaryTax = MinMax(0, 0.2)
+    val salesTax = MinMax(0, 0.2)
+    val transit = MinMax(0, 0.1)
   }
 
   def popularity(state:Double, interventionism: Double, freeMarket: Double): Popularity = {

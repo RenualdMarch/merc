@@ -1,7 +1,5 @@
 package mr.merc.ui.world
 
-import java.text.DecimalFormat
-
 import javafx.scene.control.SelectionMode
 import mr.merc.economics.Population.{Lower, Middle, Upper}
 import mr.merc.economics.{Population, RegionPopulation}
@@ -171,8 +169,7 @@ class PopDetailsPane(populationProperty: ReadOnlyObjectProperty[PopulationInfo],
 
 
   private def politicalPointsToPie[T <: IssuePosition](position: IssuePositionPopularity[T], issue:Issue[T]):Node = {
-    val percentFormatter = new DecimalFormat("#0.00")
-    val pies = position.popularity.map {case (k, v) => PiePart(k.color, k.name, v * 100, Some(k.name + " " + percentFormatter.format(v * 100) + "%"))}.toList
+    val pies = position.popularity.map {case (k, v) => PiePart(k.color, k.name, v * 100, Some(k.name + " " + DoubleFormatter().format(v * 100) + "%"))}.toList
     val chart = PieChartBuilder.buildPieWithScrollableLegend(pies, Side.Bottom, Some(Localization(issue.name)))
     chart
   }
@@ -180,10 +177,6 @@ class PopDetailsPane(populationProperty: ReadOnlyObjectProperty[PopulationInfo],
 }
 
 class PopulationInfo(val population:List[Population], province: Province) {
-  private val formatter = new DecimalFormat("#0.00")
-  private val populationFormatter = new DecimalFormat()
-  populationFormatter.setGroupingSize(3)
-  populationFormatter.setGroupingUsed(true)
 
   def race: String = {
     val possibleRace = population.head.culture.race
@@ -200,7 +193,7 @@ class PopulationInfo(val population:List[Population], province: Province) {
   }
 
   def populationCount: String = {
-    populationFormatter.format(population.map(_.populationCount).sum)
+    DoubleFormatter().format(population.map(_.populationCount).sum)
   }
 
   def populationType: String = {
@@ -218,7 +211,7 @@ class PopulationInfo(val population:List[Population], province: Province) {
   }
 
   def happiness: String = {
-    formatter.format(population.map(p => (p.populationCount, p.happiness)).reduce[(Int, Double)] {
+    DoubleFormatter().format(population.map(p => (p.populationCount, p.happiness)).reduce[(Int, Double)] {
       case ((c1, h1),(c2, h2)) => (c1 + c2, (c1 * h1 + c2 * h2) / (c1 + c2))
     }._2 * 100)  + "%"
   }
@@ -226,22 +219,22 @@ class PopulationInfo(val population:List[Population], province: Province) {
   def literacy: String = {
     val lit = population.map(_.literateCount).sum
     val all = population.map(_.populationCount).sum
-    formatter.format(lit * 100 / all.toDouble) + "%"
+    DoubleFormatter().format(lit * 100 / all.toDouble) + "%"
   }
 
   def moneyReserves: String = {
     val t = population.map(_.moneyReserves).sum
-    formatter.format(t)
+    DoubleFormatter().format(t)
   }
 
   def netSalary: String = {
     val t = population.flatMap(_.salary.lastOption.map(_.receivedMoney)).sum
-    formatter.format(t)
+    DoubleFormatter().format(t)
   }
 
   def taxes: String = {
     val t = population.flatMap(_.salary.lastOption.map(_.taxes)).sum
-    formatter.format(t)
+    DoubleFormatter().format(t)
   }
 
   def politicalViews: PoliticalViews = {

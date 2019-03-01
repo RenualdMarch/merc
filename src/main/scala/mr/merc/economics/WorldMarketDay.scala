@@ -22,14 +22,14 @@ class WorldMarketDay(regions: Set[EconomicRegion], turn:Int) {
   def trade(): Unit = {
     currentPathCache = newPathCache()
 
+    val states = regions.map(_.owner)
+
     // initialize factories and pops
     regions.foreach { r =>
-      r.regionPopulation.pops.foreach(_.newDay(r.owner.taxPolicy.citizensTaxPolicy))
-      r.enterprises.foreach(_.newDay(r.owner.taxPolicy.corporateTaxPolicy, turn))
+      val taxPolicy = r.owner.taxPolicy
+      r.regionPopulation.pops.foreach(_.newDay(taxPolicy))
+      r.enterprises.foreach(_.newDay(taxPolicy, turn))
     }
-
-    regions.map(_.owner).foreach(_.budget.newDay())
-
 
     // 1 step - receive population demands, add them to markets
     // 2 step - receive factory demands, add them to markets
@@ -116,16 +116,22 @@ class WorldMarketDay(regions: Set[EconomicRegion], turn:Int) {
       r.enterprises.foreach{ e =>
         e.payMoneyToPops()
         val money = e.payTaxes()
-        r.owner.budget.receiveTaxes(Corporate, money)
+        r.owner.budget.receiveTaxes(money)
         e.endOfDay()
       }
 
       r.regionPopulation.pops.foreach { p =>
-        r.owner.budget.receiveTaxes(Salary, p.payTaxes())
+        val money = p.payTaxes()
+        r.owner.budget.receiveTaxes(money)
         p.endOfDay()
       }
 
       r.regionMarket.endOfMarketDay(turn)
+    }
+
+    states.foreach {s =>
+      s.budget.spendBudgetMoney(regions.filter(_.owner == s).toList, s.primeCulture)
+      s.budget.endDay()
     }
   }
 
@@ -197,20 +203,20 @@ class TradersSalesPart(tradersRegion: EconomicRegion) extends TradersExtraction(
 class TradersTransitPart(tradersRegion: EconomicRegion) extends TradersExtraction(tradersRegion, 0.05)
 
 
-class StateTransitPart(val owner: State) extends Extraction(owner.taxPolicy.transitTax.transitTax) {
+class StateTransitPart(val owner: State) extends Extraction(owner.taxPolicy(TransitTax)) {
   override def payMoney(count: Double): Unit = {
-    owner.budget.receiveTaxes(Transit, count * extractionMoney)
+    owner.budget.receiveTaxes(TaxData(TransitTax, count, count * extractionMoney))
   }
 }
 
-class StateTariffPart(val owner: State) extends Extraction(owner.taxPolicy.tariffTax.tariffTax) {
+class StateTariffPart(val owner: State) extends Extraction(owner.taxPolicy(TariffTax)) {
   override def payMoney(count: Double): Unit = {
-    owner.budget.receiveTaxes(Tariff, count * extractionMoney)
+    owner.budget.receiveTaxes(TaxData(TariffTax, count, count * extractionMoney))
   }
 }
 
-class StateSalesPart(val owner: State) extends Extraction(owner.taxPolicy.salesTaxPolicy.salesTax) {
+class StateSalesPart(val owner: State) extends Extraction(owner.taxPolicy(SalesTax)) {
   override def payMoney(count: Double): Unit = {
-    owner.budget.receiveTaxes(Sales, count * extractionMoney)
+    owner.budget.receiveTaxes(TaxData(SalesTax, count, count * extractionMoney))
   }
 }

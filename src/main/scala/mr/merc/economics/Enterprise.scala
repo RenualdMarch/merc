@@ -2,7 +2,6 @@ package mr.merc.economics
 
 import mr.merc.economics.Population.PopulationType
 import mr.merc.economics.Products.Product
-import mr.merc.economics.ResourceGathering.ResourceGatheringRecord
 
 trait Enterprise {
 
@@ -22,13 +21,13 @@ trait Enterprise {
 
   def payMoneyToPops()
 
-  def payTaxes(): Double
+  def payTaxes(): TaxData
 
   def endOfDay()
 
   def expectedSalaryPerEfficiency: Double
 
-  def newDay(taxPolicy: CorporateTaxPolicy, turn: Int): Unit
+  def newDay(taxPolicy: TaxPolicy, turn: Int): Unit
 
   def possibleWorkers: PopulationType
 
