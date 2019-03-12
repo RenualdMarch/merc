@@ -25,7 +25,8 @@ For M6, interface will be a priority, basic politics, factory building
 +add needs fulfillment to population pane
 +pie chart legend must be removed and replaced with scroolable legend
 +no more than percentage of people can be capitalists and aristocrats
-Budget interface and implementation, parties change
++Budget interface and implementation
+parties change
 migration(with churches creation and destruction)
 people have two sources of unhappiness - not fulfilled needs and political stuff
 projects - when capitalists or ruler want to expand factory, or hire a soldier, eventual price is unknown.

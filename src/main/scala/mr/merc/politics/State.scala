@@ -27,6 +27,7 @@ class State(initialName: String, val primeCulture:Culture, startingMoney: Double
   }
 
   val budget: StateBudget = new StateBudget(startingMoney, taxPolicy)
+  budget.spendingPolicyConfig = SpendingPolicyConfig(1d/3, 1d/3, 0)
 }
 
 case class Province(name: String, var owner: State, regionMarket: RegionMarket,

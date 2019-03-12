@@ -2,6 +2,7 @@ package mr.merc.ui.world
 
 import java.text.DecimalFormat
 
+import scalafx.beans.binding.{ObjectBinding, StringBinding}
 import scalafx.beans.property.ReadOnlyStringProperty
 import scalafx.scene.control.Button
 import scalafx.scene.text.{Font, Text}
@@ -31,7 +32,7 @@ object MediumText {
     this.text = t
   }
 
-  def apply(t:ReadOnlyStringProperty): MediumText = new MediumText {
+  def apply(t:StringBinding): MediumText = new MediumText {
     this.text <== t
   }
 }

@@ -48,6 +48,8 @@ class WorldInterfacePane(frame: WorldFrame, val worldCanvas: CanvasLayers, terra
 
   private var facePanel: Option[Pane] = None
 
+  private var fullPanel: Option[Pane] = None
+
   def setRightTopPanel(pane: Pane): Unit = {
     removeRightTopPanel()
     rightTopPanel = Some(pane)
@@ -73,6 +75,13 @@ class WorldInterfacePane(frame: WorldFrame, val worldCanvas: CanvasLayers, terra
     facePanel = None
   }
 
+  def removeFullPanel(): Unit = {
+    fullPanel.foreach { p =>
+      this.children.remove(p)
+    }
+    fullPanel = None
+  }
+
 
   def showMinimap(): Unit = {
     rebindMinimapAndEndTurn(false)
@@ -89,6 +98,17 @@ class WorldInterfacePane(frame: WorldFrame, val worldCanvas: CanvasLayers, terra
     pane.layoutX <== 0
     pane.layoutY = 0
     pane.prefWidth <== this.width * 4 / 5
+    pane.prefHeight <== this.height
+    pane.requestFocus()
+  }
+
+  def setFullPanel(pane: Pane): Unit = {
+    removeFullPanel()
+    fullPanel = Some(pane)
+    children.add(pane)
+    pane.layoutX = 0
+    pane.layoutY = 0
+    pane.prefWidth <== this.width
     pane.prefHeight <== this.height
     pane.requestFocus()
   }

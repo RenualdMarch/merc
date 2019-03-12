@@ -38,7 +38,7 @@ class SpendingReportPane(budget: StateBudget) extends TopTitledBorderPane with W
       IntFormatter().format(s)
     }
 
-    val pane = new MigPane()
+    val pane = new MigPane("center")
     pane.add(MediumText(Localization("budget.spending.scholars")))
     pane.add(MediumText(spending(ScholarsSalary)), "wrap")
     pane.add(MediumText(Localization("budget.spending.bureaucrats")))
@@ -50,6 +50,7 @@ class SpendingReportPane(budget: StateBudget) extends TopTitledBorderPane with W
     pane.add(MediumText(Localization("budget.spending.army")))
     pane.add(MediumText(spending(Army)), "wrap")
     val separator = new Separator {
+      style = s"-fx-border-width: ${Components.mediumFontSize / 10} 0 0 0; -fx-border-style: solid;"
       orientation = Orientation.Horizontal
     }
     pane.add(separator, "span 2, growx, wrap")
@@ -78,7 +79,7 @@ class SpendingConfiguration(state: State, regions: List[EconomicRegion]) extends
   }
 
   val pensionsSlider = new PopulationSpendingSlider(Localization("budget.spending.pensions"),
-    conf.bureaucratsNeeds, state.budget.pensionsSpendingFunction(regions))
+    conf.pensionsNeeds, state.budget.pensionsSpendingFunction(regions))
   pensionsSlider.sliderValue.onChange {
     val budget = state.budget
     budget.spendingPolicyConfig = budget.spendingPolicyConfig.copy(pensionsNeeds = pensionsSlider.sliderValue.value)
@@ -112,7 +113,7 @@ class IncomeReportPane(budget: StateBudget) extends TopTitledBorderPane with Wor
       IntFormatter().format(s)
     }
 
-    val pane = new MigPane()
+    val pane = new MigPane("center")
     pane.add(MediumText(Localization("budget.income.corporate")))
     pane.add(MediumText(income(CorporateTax)), "wrap")
     pane.add(MediumText(Localization("budget.income.sales")))
@@ -128,6 +129,7 @@ class IncomeReportPane(budget: StateBudget) extends TopTitledBorderPane with Wor
     pane.add(MediumText(Localization("budget.income.transit")))
     pane.add(MediumText(income(TransitTax)), "wrap")
     val separator = new Separator {
+      style = s"-fx-border-width: ${Components.mediumFontSize / 10} 0 0 0; -fx-border-style: solid;"
       orientation = Orientation.Horizontal
     }
     pane.add(separator, "span 2,growx,wrap")
@@ -192,20 +194,27 @@ class TaxesConfigurationPane(state: State) extends TopTitledBorderPane with Worl
     budget.taxPolicy.set(TransitTax, transitTax.sliderValue.value)
   }
 
-  val centerPane = new MigPane("", "10%[]10%") with WorldInterfaceJavaNode
-  centerPane.add(salaryLowTax, "push, grow, wrap")
-  centerPane.add(salaryMiddleTax, "push, grow, wrap")
-  centerPane.add(salaryUpperTax, "push, grow, wrap")
-  centerPane.add(corporateTax, "push, grow, wrap")
-  centerPane.add(salesTax, "push, grow, wrap")
-  centerPane.add(tariffTax, "push, grow, wrap")
-  centerPane.add(transitTax, "push, grow, wrap")
+  val centerPane = new MigPane("", "10%[][10%][50%][20%]5%") with WorldInterfaceWhiteJavaNode
 
-  center = new ScrollPane {
-    style = s"-fx-font-size: ${Components.mediumFontSize}"
-    content = centerPane
-    fitToWidth = true
+  def addPane(taxLevelSlider: TaxLevelSlider): Unit = {
+    centerPane.add(taxLevelSlider.titleLabel)
+    centerPane.add(taxLevelSlider.money)
+    centerPane.add(taxLevelSlider.slider, "grow")
+
+    val s = Bindings.createStringBinding(() => DoubleFormatter().format(taxLevelSlider.projectedIncome.value), taxLevelSlider.projectedIncome)
+
+    centerPane.add(MediumText(s), "wrap")
   }
+
+  addPane(salaryLowTax)
+  addPane(salaryMiddleTax)
+  addPane(salaryUpperTax)
+  addPane(corporateTax)
+  addPane(salesTax)
+  addPane(tariffTax)
+  addPane(transitTax)
+
+  center = centerPane
 
   val projectedIncome: DoubleProperty = new DoubleProperty()
   projectedIncome <== salaryLowTax.projectedIncome + salaryMiddleTax.projectedIncome + salaryUpperTax.projectedIncome +
@@ -240,8 +249,8 @@ class BudgetBottomProjectionPane(reserves: Double, income: DoubleProperty, expen
 }
 
 
-class TaxLevelSlider(title: String, initialValue: Double, minValue: Double, maxValue: Double, projectedValue: Double => Double) extends TopTitledBorderPane {
-  private val slider = new Slider(0, 1d, initialValue) {
+class TaxLevelSlider(title: String, initialValue: Double, minValue: Double, maxValue: Double, projectedValue: Double => Double) {
+  val slider = new Slider(0, 1d, initialValue) {
     style = s"-fx-font-size: ${Components.mediumFontSize}"
     value.onChange {
       if (this.value.value > maxValue) {
@@ -267,18 +276,8 @@ class TaxLevelSlider(title: String, initialValue: Double, minValue: Double, maxV
 
   val money = new MediumText()
   money.text <== Bindings.createStringBinding(() => IntFormatter().format(slider.value.value * 100) + "%", slider.value)
-  bottom = money
 
-  top = {
-    val pane = new MigPane()
-    pane.add(BigText(title))
-    pane.add(money)
-    pane
-  }
-
-  center = new BorderPane {
-    center = slider
-  }
+  val titleLabel = BigText(title)
 
   val projectedIncome: DoubleProperty = new DoubleProperty()
   projectedIncome <== Bindings.createDoubleBinding(() => projectedValue(sliderValue.value), sliderValue)
@@ -322,14 +321,10 @@ class PopulationSpendingSlider(title: String, initialPositionPerc: Double, percT
 
   val spendingValue: DoubleProperty = new DoubleProperty()
   spendingValue <== Bindings.createDoubleBinding(() => percToSpending(sliderValue.value), sliderValue)
+  private val titleWithMoney = BigText("")
+  titleWithMoney.text <== Bindings.createStringBinding(() => title + " " + DoubleFormatter().format(percToSpending(slider.value.value)), slider.value)
 
-  top = BigText(title)
-  center = new BorderPane {
-    val money = new MediumText()
+  top = titleWithMoney
+  center = slider
 
-    money.text <== Bindings.createStringBinding(() => DoubleFormatter().format(percToSpending(slider.value.value)), slider.value)
-
-    center = slider
-    bottom = money
-  }
 }

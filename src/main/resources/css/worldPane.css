@@ -3,3 +3,7 @@
   -fx-border-color: black;
   -fx-border-width: 1;
 }
+
+.whitePane {
+  -fx-background-color: white;
+}

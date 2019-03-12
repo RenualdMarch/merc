@@ -69,11 +69,15 @@ class WorldFrame(sceneManager: SceneManager) extends Pane with Logging {
   def showBudgetPane(): Unit = {
     val pane = new BudgetPane(worldState.playerState,
       worldState.regions.filter(_.owner == worldState.playerState))
-    interfacePane.setFacePanel(new InterfacePane(pane, () => hideFacePane()))
+    interfacePane.setFullPanel(new InterfacePane(pane, () => hideFullPane()))
   }
 
   def hideFacePane(): Unit = {
     interfacePane.removeFacePanel()
+  }
+
+  def hideFullPane(): Unit = {
+    interfacePane.removeFullPanel()
   }
 
   def showMinimap(): Unit = {
