@@ -22,8 +22,12 @@ class WorldMenu(parent: WorldFrame) extends MenuBar {
   budgetMenu.onAction = { _ =>
     parent.showBudgetPane()
   }
-  val parliament = new MenuItem(Localization("menu.parliament"))
-  politicsMenu.items.addAll(budgetMenu, parliament)
+  val parliamentMenu = new MenuItem(Localization("menu.parliament"))
+  parliamentMenu.onAction = {_ =>
+    parent.showParliamentPane()
+  }
+
+  politicsMenu.items.addAll(budgetMenu, parliamentMenu)
 
 
   val saveMenu = new MenuItem(Localization("menu.save"))

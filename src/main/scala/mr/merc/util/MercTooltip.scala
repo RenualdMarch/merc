@@ -11,7 +11,7 @@ object MercTooltip {
   private val label = new Label()
   label.stylesheets.add("/css/tooltip.css")
   label.styleClass.add("tooltip")
-  label.style = s"-fx-font-size: ${Components.mediumFontSize}"
+  label.style = Components.mediumFontStyle
   label.setMouseTransparent(true)
 
   def applyTooltip(node: Node, text: String): Unit = {

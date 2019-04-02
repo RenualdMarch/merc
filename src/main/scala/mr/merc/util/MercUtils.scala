@@ -3,7 +3,7 @@ package mr.merc.util
 import pureconfig.{BasicReaders, CamelCase, ConfigFieldMapping}
 import pureconfig.generic.ProductHint
 import scalafx.beans.binding.{Bindings, ObjectBinding, StringBinding}
-import scalafx.beans.property.ReadOnlyObjectProperty
+import scalafx.beans.property.{ObjectProperty, ReadOnlyObjectProperty}
 import scalafx.beans.value.ObservableValue
 import scalafx.scene.paint.Color
 
@@ -50,11 +50,4 @@ object MercUtils {
     implicit def camelCaseHint[T]: ProductHint[T] = ProductHint[T](ConfigFieldMapping(CamelCase, CamelCase))
   }
 
-  implicit class PropertyBindingMap[T](property: ObservableValue[T, T]) {
-    def map[K](f: T => K, default:K = null):ObjectBinding[K] = {
-      Bindings.createObjectBinding(() => {
-        Option(property.value).map(f).getOrElse(default)
-      }, property)
-    }
-  }
 }

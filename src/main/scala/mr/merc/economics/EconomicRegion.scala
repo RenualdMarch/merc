@@ -117,7 +117,7 @@ class RegionPopulation(initialPops: List[Population]) {
     pops.find(pop => pop.populationType == p && pop.culture == c) match {
       case Some(x) => x
       case None =>
-        val views = PoliticalViews.initPoliticalViews(p, 0)
+        val views = PoliticalViews.initPoliticalViews(p)
         val pop = new Population(c, p, 0, 0, 0, views)
         currentPops = pop :: currentPops
         pop

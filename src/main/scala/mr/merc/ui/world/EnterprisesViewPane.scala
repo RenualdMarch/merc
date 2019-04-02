@@ -29,7 +29,7 @@ class EnterprisesViewPane(province: Province, stage: Stage) extends PaneWithTwoE
 
 class EnterprisesTablePane(enterprises: Seq[Enterprise]) extends MigPane with WorldInterfaceJavaNode {
   private val enterprisesTable = new TableView[Enterprise]()
-  enterprisesTable.style = s"-fx-font-size: ${Components.mediumFontSize}"
+  enterprisesTable.style = Components.mediumFontStyle
 
   private val productColumn = new TableColumn[Enterprise, String] {
     text = Localization("product")
@@ -290,7 +290,7 @@ class HistoricalEnterpriseRecords(e: Enterprise, p:Province, stage: Stage) exten
 
       val chart = new LineChart[Number, Number](xAxis, yAxis)
       chart.title = Localization("production")
-      chart.style = s"-fx-font-size: ${Components.mediumFontSize}"
+      chart.style = Components.mediumFontStyle
 
       val produced = new XYChart.Series[Number, Number]()
       produced.name = Localization("produced")

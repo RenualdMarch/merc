@@ -581,8 +581,6 @@ class PopulationPromotionDemotion(population: RegionPopulation, random: Random =
         } else {
           movement.from.extractRandomMovers(count)
         }
-        movement.to.politicalViews = PoliticalViews.sumViews(movement.to.populationCount, movement.to.politicalViews,
-          count, movement.from.politicalViews)
         movement.to.applyMovers(move)
       }
     }

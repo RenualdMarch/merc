@@ -38,7 +38,7 @@ class StateBudgetTest extends FunSuite {
     val farmers = new Population(culture, Farmers, 10000, 0, 0, PoliticalViews.averagePoliticalViews)
 
     val region = new EconomicRegion {
-      override def owner: State = new State("testState", culture, 0, Party.absolute) {
+      override def owner: State = new State("testState", culture, 0, new PoliticalSystem(Party.absolute)) {
         override val taxPolicy: TaxPolicy = TaxPolicy.zeroTaxes
       }
 
@@ -103,7 +103,7 @@ class StateBudgetTest extends FunSuite {
     val farmers = new Population(culture, Farmers, 10000, 0, 0, PoliticalViews.averagePoliticalViews)
 
     val region = new EconomicRegion {
-      override def owner: State = new State("testState", culture, 0, Party.absolute) {
+      override def owner: State = new State("testState", culture, 0, new PoliticalSystem(Party.absolute)) {
         override val taxPolicy: TaxPolicy = TaxPolicy.zeroTaxes
       }
 
@@ -167,7 +167,7 @@ class StateBudgetTest extends FunSuite {
     val farmers = new Population(culture, Farmers, 10000, 0, 0, PoliticalViews.averagePoliticalViews)
 
     val region = new EconomicRegion {
-      override def owner: State = new State("testState", culture, 0, Party.absolute) {
+      override def owner: State = new State("testState", culture, 0, new PoliticalSystem(Party.absolute)) {
         override val taxPolicy: TaxPolicy = TaxPolicy.zeroTaxes
       }
 

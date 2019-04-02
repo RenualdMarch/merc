@@ -14,7 +14,7 @@ class WorldMarketDayTest extends FunSuite {
 
     // region1 produces grain and has liquor factory, region2 produces coal, region3 produces glass
 
-    val state1 = new State("", KnightHuman, 0, Party.absolute) {
+    val state1 = new State("", KnightHuman, 0, new PoliticalSystem(Party.absolute)) {
       override val taxPolicy: TaxPolicy = TaxPolicy(Map(CorporateTax -> 0.2, LowSalaryTax -> 0.1, MiddleSalaryTax -> 0.1,
         UpperSalaryTax -> 0.1,TariffTax -> 0.1, TransitTax -> 0.1))
     }

@@ -130,7 +130,7 @@ class WorldGenerator(field:TerrainHexField) {
         }
 
         val count = countMultiplier * pq / 2 + Random.nextInt(countMultiplier * pq / 2)
-        val views = PoliticalViews.initPoliticalViews(tp, literacy)
+        val views = PoliticalViews.initPoliticalViews(tp)
         new Population(culture, tp, count, count * moneyPerPerson, (count * literacy).toInt, views)
       }
     }
@@ -150,7 +150,7 @@ class WorldGenerator(field:TerrainHexField) {
   private def generateState(culture: Culture):State = {
     val color = colorGenerator.nextColor()
     val name = namesGenerators(culture).stateNames.extract()
-    new State(name, culture, config.getDouble("world.state.startingMoney"), Party.absolute, color)
+    new State(name, culture, config.getDouble("world.state.startingMoney"), new PoliticalSystem(Party.aristocratic), color)
   }
 
   private def divideIntoContinuousParts(connectivityMap: ConnectivityMap, sizes:List[Int]):List[ConnectivityMap] = {

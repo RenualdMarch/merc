@@ -48,4 +48,8 @@ object Localization {
     }).toMap
   }
 
+  implicit class LocalizationToMethod(key: String) {
+    def localize: String = Localization(key)
+  }
+
 }

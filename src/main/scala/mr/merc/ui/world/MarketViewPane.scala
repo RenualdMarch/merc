@@ -27,7 +27,7 @@ class MarketViewPane(province: Province, stage: Stage) extends PaneWithTwoEqualH
 class ProductsTablePane(market: RegionMarket) extends MigPane with WorldInterfaceJavaNode {
 
   private val productsTable = new TableView[ProductsInfo]()
-  productsTable.style = s"-fx-font-size: ${Components.mediumFontSize}"
+  productsTable.style = Components.mediumFontStyle
 
   private val productNameColumn = new TableColumn[ProductsInfo, String] {
     text = Localization("productName")
@@ -114,7 +114,7 @@ class ProductDetailPane(productsInfo: ProductsInfo, province: Province, stage: S
 
       val lineChart = new LineChart[Number, Number](xAxis, yAxis)
       lineChart.title = Localization("priceChange")
-      lineChart.style = s"-fx-font-size: ${Components.mediumFontSize}"
+      lineChart.style = Components.mediumFontStyle
 
       val series = new XYChart.Series[Number, Number]()
       productsInfo.history.foreach { h =>
@@ -143,7 +143,7 @@ class ProductDetailPane(productsInfo: ProductsInfo, province: Province, stage: S
 
       val chart = new AreaChart[Number, Number](xAxis, yAxis)
       chart.title = Localization("supplyDemandChart")
-      chart.style = s"-fx-font-size: ${Components.mediumFontSize}"
+      chart.style = Components.mediumFontStyle
 
       val demandSeries = productsInfo.history.foldLeft(new XYChart.Series[Number, Number]()) {
         case (series, day) =>

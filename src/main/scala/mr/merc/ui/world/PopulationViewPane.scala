@@ -12,9 +12,11 @@ import scalafx.Includes._
 import scalafx.beans.property.{ReadOnlyObjectProperty, StringProperty}
 import scalafx.collections.ObservableBuffer
 import scalafx.scene.Node
-import scalafx.scene.control.{Accordion, TableColumn, TableView, TitledPane}
+import scalafx.scene.control._
 import EconomicLocalization._
 import scalafx.geometry.Side
+import mr.merc.util.FxPropertyUtils._
+import scalafx.scene.control.TabPane.TabClosingPolicy
 
 import scala.collection.JavaConverters._
 
@@ -27,7 +29,7 @@ class PopulationViewPane(province: Province) extends PaneWithTwoEqualHorizontalC
 
 class PopsTablePane(regionPopulation: RegionPopulation, province: Province) extends MigPane with WorldInterfaceJavaNode {
   private val populationTable = new TableView[PopulationInfo]()
-  populationTable.style = s"-fx-font-size: ${Components.mediumFontSize}"
+  populationTable.style = Components.mediumFontStyle
 
   private val raceColumn = new TableColumn[PopulationInfo, String] {
     text = Localization("race")
@@ -92,13 +94,12 @@ class PopsTablePane(regionPopulation: RegionPopulation, province: Province) exte
 }
 
 class PopDetailsPane(populationProperty: ReadOnlyObjectProperty[PopulationInfo], province: Province) extends MigPane with WorldInterfaceJavaNode {
-  import mr.merc.util.MercUtils.PropertyBindingMap
 
   add(new BigText{
     text <== populationProperty.map (p => p.pageTitle)
   }.delegate, "span,center")
 
-  private val generalInfoPane = new TitledPane() {
+  private val generalInfoPane = new Tab() {
     text = Localization("generalInfo")
     style = s"-fx-font-size: ${Components.largeFontSize}"
     content = new MigPane() {
@@ -134,29 +135,31 @@ class PopDetailsPane(populationProperty: ReadOnlyObjectProperty[PopulationInfo],
     }
   }
 
-  private val politicalViewsPane = new TitledPane() {
+  private val politicalViewsPane = new Tab() {
     text = Localization("politicalViews")
     style = s"-fx-font-size: ${Components.largeFontSize}"
     content = new MigPane("fill") {
-      add(popToPie(_.foreignPolicy, ForeignPolicy), "span 1,grow,push")
-      add(popToPie(_.votersPolicy, VotersPolicy), "span 1,grow,push")
-      add(popToPie(_.economy, Economy), "span 1,wrap,grow,push")
-      add(popToPie(_.socialPolicy, SocialPolicy), "span 1,grow,push")
-      add(popToPie(_.migration, Migration), "span 1,grow,push")
-      add(popToPie(_.regime, Regime), "span 1, wrap,grow,push")
+      add(popToPie(_.sumViews.foreignPolicy, ForeignPolicy), "span 1,grow,push")
+      add(popToPie(_.sumViews.votersPolicy, VotersPolicy), "span 1,grow,push")
+      add(popToPie(_.sumViews.economy, Economy), "span 1,wrap,grow,push")
+      add(popToPie(_.sumViews.socialPolicy, SocialPolicy), "span 1,grow,push")
+      add(popToPie(_.sumViews.migration, Migration), "span 1,grow,push")
+      add(popToPie(_.sumViews.regime, Regime), "span 1, wrap,grow,push")
     }
   }
 
 
 
-  private val accordion = new Accordion()
+  private val tabPane = new TabPane() {
+    style = Components.mediumFontStyle
+    tabClosingPolicy = TabClosingPolicy.Unavailable
+  }
 
-  accordion.panes = List(generalInfoPane, politicalViewsPane, populationNeedsPane())
-  accordion.expandedPane = generalInfoPane
+  tabPane.tabs = List(generalInfoPane, politicalViewsPane, populationNeedsPane())
 
-  add(accordion, "grow,push")
+  add(tabPane, "grow,push")
 
-  private def populationNeedsPane():TitledPane = new TitledPane() {
+  private def populationNeedsPane():Tab = new Tab() {
     content = new PropertyDependentPane[PopulationInfo](populationProperty,
       p => SupplyDemandTables.buildPopulationDemandTable(p.population.flatMap(_.needsFulfillment(1).headOption)))
 
@@ -164,12 +167,12 @@ class PopDetailsPane(populationProperty: ReadOnlyObjectProperty[PopulationInfo],
     style = s"-fx-font-size: ${Components.largeFontSize}"
   }
 
-  private def popToPie[T <: IssuePosition](f:PoliticalViews => IssuePositionPopularity[T], issue:Issue[T]):Pane =
-    new PropertyDependentPane[PopulationInfo](populationProperty, p => politicalPointsToPie(f(p.politicalViews), issue))
+  private def popToPie[T <: IssuePosition](f:PopulationInfo => Map[T, Double], issue:Issue[T]):Pane =
+    new PropertyDependentPane[PopulationInfo](populationProperty, p => politicalPointsToPie(f(p), issue))
 
 
-  private def politicalPointsToPie[T <: IssuePosition](position: IssuePositionPopularity[T], issue:Issue[T]):Node = {
-    val pies = position.popularity.map {case (k, v) => PiePart(k.color, k.name, v * 100, Some(k.name + " " + DoubleFormatter().format(v * 100) + "%"))}.toList
+  private def politicalPointsToPie[T <: IssuePosition](position: Map[T, Double], issue:Issue[T]):Node = {
+    val pies = position.map {case (k, v) => PiePart(k.color, k.name, v * 100, Some(k.name + " " + DoubleFormatter().format(v * 100) + "%"))}.toList
     val chart = PieChartBuilder.buildPieWithScrollableLegend(pies, Side.Bottom, Some(Localization(issue.name)))
     chart
   }
@@ -237,12 +240,20 @@ class PopulationInfo(val population:List[Population], province: Province) {
     DoubleFormatter().format(t)
   }
 
-  def politicalViews: PoliticalViews = {
-    val sum = population.map(p => (p.populationCount, p.politicalViews)).reduce[(Int, PoliticalViews)] {
-      case ((c1, v1), (c2, v2)) => (c1 + c2, PoliticalViews.sumViews(c1, v1, c2, v2))
-    }
-
-    sum._2
+  val sumViews: CurrentPoliticalViews = {
+    import mr.merc.economics.MapUtil.FloatOperations._
+    population.map { p =>
+      p.populationCount -> p.politicalViews.currentViews(p.literacy)
+    }.reduce[(Int, CurrentPoliticalViews)] { case ((c1, pv1), (c2, pv2)) =>
+      (c1 + c2) -> CurrentPoliticalViews(
+        ((pv1.migration |*| c1) |+| (pv2.migration |*| c2)).scaleToSum(1d),
+        ((pv1.regime |*| c1) |+| (pv2.regime |*| c2)).scaleToSum(1d),
+        ((pv1.foreignPolicy |*| c1) |+| (pv2.foreignPolicy |*| c2)).scaleToSum(1d),
+        ((pv1.economy |*| c1) |+| (pv2.economy |*| c2)).scaleToSum(1d),
+        ((pv1.socialPolicy |*| c1) |+| (pv2.socialPolicy |*| c2)).scaleToSum(1d),
+        ((pv1.votersPolicy |*| c1) |+| (pv2.votersPolicy |*| c2)).scaleToSum(1d)
+      )
+    }._2
   }
 
   def pageTitle: String = {

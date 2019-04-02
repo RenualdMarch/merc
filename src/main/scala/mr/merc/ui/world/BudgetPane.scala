@@ -14,18 +14,20 @@ import scalafx.util.StringConverter
 import scalafx.Includes._
 import scalafx.geometry.{Orientation, Pos}
 
-class BudgetPane(state: State, regions: List[EconomicRegion]) extends TopTitledBorderPane with WorldInterfaceNode {
+class BudgetPane(worldState: WorldStateBudgetActions) extends TopTitledBorderPane with WorldInterfaceNode {
+  private val state = worldState.playerState
+
   top = BigText(Localization("budget.title", state.name))
-  private val income = new IncomePane(state, regions)
-  private val spending = new SpendingPane(state, regions)
+  private val income = new IncomePane(worldState)
+  private val spending = new SpendingPane(worldState)
   center = PaneWithTwoEqualHorizontalChildren(income, spending)
   bottom = new BudgetBottomProjectionPane(state.budget.moneyReserve, income.projectedIncome, spending.projectedSpending)
 }
 
-class SpendingPane(state: State, regions: List[EconomicRegion]) extends TopTitledBorderPane with WorldInterfaceNode {
+class SpendingPane(worldState: WorldStateBudgetActions) extends TopTitledBorderPane with WorldInterfaceNode {
   top = BigText(Localization("budget.spending"))
-  private val config = new SpendingConfiguration(state, regions)
-  center = PaneWithTwoEqualVerticalChildren(config, new SpendingReportPane(state.budget))
+  private val config = new SpendingConfiguration(worldState)
+  center = PaneWithTwoEqualVerticalChildren(config, new SpendingReportPane(worldState.playerState.budget))
 
   def projectedSpending: DoubleProperty = config.projectedExpenses
 }
@@ -60,29 +62,32 @@ class SpendingReportPane(budget: StateBudget) extends TopTitledBorderPane with W
   }
 }
 
-class SpendingConfiguration(state: State, regions: List[EconomicRegion]) extends TopTitledBorderPane with WorldInterfaceNode {
+class SpendingConfiguration(worldState: WorldStateBudgetActions) extends TopTitledBorderPane with WorldInterfaceNode {
   top = MediumText(Localization("budget.spendingConfig"))
-  val conf = state.budget.spendingPolicyConfig
+  val conf = worldState.playerState.budget.spendingPolicyConfig
+
+  private val state = worldState.playerState
+  private val regions = worldState.playerRegions
 
   val scholarsSlider = new PopulationSpendingSlider(Localization("budget.spending.scholars"),
     conf.scholarsNeeds, state.budget.scholarsSpendingFunction(regions))
   scholarsSlider.sliderValue.onChange {
     val budget = state.budget
-    budget.spendingPolicyConfig = budget.spendingPolicyConfig.copy(scholarsNeeds = scholarsSlider.sliderValue.value)
+    worldState.setStateSpending(state, budget.spendingPolicyConfig.copy(scholarsNeeds = scholarsSlider.sliderValue.value))
   }
 
   val bureaucratsSlider = new PopulationSpendingSlider(Localization("budget.spending.bureaucrats"),
     conf.bureaucratsNeeds, state.budget.bureaucratsSpendingFunction(regions))
   bureaucratsSlider.sliderValue.onChange {
     val budget = state.budget
-    budget.spendingPolicyConfig = budget.spendingPolicyConfig.copy(bureaucratsNeeds = bureaucratsSlider.sliderValue.value)
+    worldState.setStateSpending(state, budget.spendingPolicyConfig.copy(bureaucratsNeeds = bureaucratsSlider.sliderValue.value))
   }
 
   val pensionsSlider = new PopulationSpendingSlider(Localization("budget.spending.pensions"),
     conf.pensionsNeeds, state.budget.pensionsSpendingFunction(regions))
   pensionsSlider.sliderValue.onChange {
     val budget = state.budget
-    budget.spendingPolicyConfig = budget.spendingPolicyConfig.copy(pensionsNeeds = pensionsSlider.sliderValue.value)
+    worldState.setStateSpending(state,budget.spendingPolicyConfig.copy(pensionsNeeds = pensionsSlider.sliderValue.value))
   }
 
   val centerPane = new MigPane("", "10%[]10%")
@@ -97,10 +102,10 @@ class SpendingConfiguration(state: State, regions: List[EconomicRegion]) extends
 
 }
 
-class IncomePane(state: State, regions: List[EconomicRegion]) extends TopTitledBorderPane with WorldInterfaceNode {
+class IncomePane(worldState: WorldStateBudgetActions) extends TopTitledBorderPane with WorldInterfaceNode {
   top = BigText(Localization("budget.income"))
-  private val conf = new TaxesConfigurationPane(state)
-  center = PaneWithTwoEqualVerticalChildren(conf, new IncomeReportPane(state.budget))
+  private val conf = new TaxesConfigurationPane(worldState)
+  center = PaneWithTwoEqualVerticalChildren(conf, new IncomeReportPane(worldState.playerState.budget))
 
   def projectedIncome: DoubleProperty = conf.projectedIncome
 }
@@ -139,8 +144,10 @@ class IncomeReportPane(budget: StateBudget) extends TopTitledBorderPane with Wor
   }
 }
 
-class TaxesConfigurationPane(state: State) extends TopTitledBorderPane with WorldInterfaceNode {
+class TaxesConfigurationPane(worldState: WorldStateBudgetActions) extends TopTitledBorderPane with WorldInterfaceNode {
   top = MediumText(Localization("budget.incomeConfig"))
+
+  private val state = worldState.playerState
 
   private val budget = state.budget
 
@@ -148,35 +155,35 @@ class TaxesConfigurationPane(state: State) extends TopTitledBorderPane with Worl
     budget.taxPolicy(LowSalaryTax), state.rulingParty.economy.salaryTax.min,
     state.rulingParty.economy.salaryTax.max, budget.projectIncomeFunction(LowSalaryTax))
   salaryLowTax.sliderValue.onChange {
-    budget.taxPolicy.set(LowSalaryTax, salaryLowTax.sliderValue.value)
+    worldState.setStateTax(state, LowSalaryTax, salaryLowTax.sliderValue.value)
   }
 
   val salaryMiddleTax = new TaxLevelSlider(Localization("budget.income.salary.middle"),
     state.budget.taxPolicy(MiddleSalaryTax),state.rulingParty.economy.salaryTax.min,
     state.rulingParty.economy.salaryTax.max, budget.projectIncomeFunction(MiddleSalaryTax))
   salaryMiddleTax.sliderValue.onChange {
-    budget.taxPolicy.set(MiddleSalaryTax, salaryMiddleTax.sliderValue.value)
+    worldState.setStateTax(state, MiddleSalaryTax, salaryMiddleTax.sliderValue.value)
   }
 
   val salaryUpperTax = new TaxLevelSlider(Localization("budget.income.salary.upper"),
     state.budget.taxPolicy(UpperSalaryTax), state.rulingParty.economy.salaryTax.min,
     state.rulingParty.economy.salaryTax.max, budget.projectIncomeFunction(UpperSalaryTax))
   salaryUpperTax.sliderValue.onChange {
-    budget.taxPolicy.set(UpperSalaryTax, salaryUpperTax.sliderValue.value)
+    worldState.setStateTax(state, UpperSalaryTax, salaryUpperTax.sliderValue.value)
   }
 
   val corporateTax = new TaxLevelSlider(Localization("budget.income.corporate"),
     state.budget.taxPolicy(CorporateTax), state.rulingParty.economy.corporateTax.min,
     state.rulingParty.economy.corporateTax.max, budget.projectIncomeFunction(CorporateTax))
   corporateTax.sliderValue.onChange {
-    budget.taxPolicy.set(CorporateTax, corporateTax.sliderValue.value)
+    worldState.setStateTax(state, CorporateTax, corporateTax.sliderValue.value)
   }
 
   val salesTax = new TaxLevelSlider(Localization("budget.income.sales"),
     state.budget.taxPolicy(SalesTax), state.rulingParty.economy.salesTax.min,
     state.rulingParty.economy.salesTax.max, budget.projectIncomeFunction(SalesTax))
   salesTax.sliderValue.onChange {
-    budget.taxPolicy.set(SalesTax, salesTax.sliderValue.value)
+    worldState.setStateTax(state, SalesTax, salesTax.sliderValue.value)
   }
 
 
@@ -184,14 +191,14 @@ class TaxesConfigurationPane(state: State) extends TopTitledBorderPane with Worl
     state.budget.taxPolicy(TariffTax), state.rulingParty.economy.tariff.min,
     state.rulingParty.economy.tariff.max, budget.projectIncomeFunction(TariffTax))
   tariffTax.sliderValue.onChange {
-    budget.taxPolicy.set(TariffTax, tariffTax.sliderValue.value)
+    worldState.setStateTax(state, TariffTax, tariffTax.sliderValue.value)
   }
 
   val transitTax = new TaxLevelSlider(Localization("budget.income.transit"),
     state.budget.taxPolicy(TransitTax), state.rulingParty.economy.transit.min,
     state.rulingParty.economy.transit.max, budget.projectIncomeFunction(TransitTax))
   transitTax.sliderValue.onChange {
-    budget.taxPolicy.set(TransitTax, transitTax.sliderValue.value)
+    worldState.setStateTax(state, TransitTax, transitTax.sliderValue.value)
   }
 
   val centerPane = new MigPane("", "10%[][10%][50%][20%]5%") with WorldInterfaceWhiteJavaNode
@@ -251,7 +258,7 @@ class BudgetBottomProjectionPane(reserves: Double, income: DoubleProperty, expen
 
 class TaxLevelSlider(title: String, initialValue: Double, minValue: Double, maxValue: Double, projectedValue: Double => Double) {
   val slider = new Slider(0, 1d, initialValue) {
-    style = s"-fx-font-size: ${Components.mediumFontSize}"
+    style = Components.mediumFontStyle
     value.onChange {
       if (this.value.value > maxValue) {
         this.value = maxValue
@@ -286,7 +293,7 @@ class TaxLevelSlider(title: String, initialValue: Double, minValue: Double, maxV
 
 class PopulationSpendingSlider(title: String, initialPositionPerc: Double, percToSpending: Double => Double) extends TopTitledBorderPane {
   private val slider = new Slider(0d, 1d, initialPositionPerc) {
-    style = s"-fx-font-size: ${Components.mediumFontSize}"
+    style = Components.mediumFontStyle
     showTickLabels = true
     showTickMarks = true
     majorTickUnit = 1d / 3

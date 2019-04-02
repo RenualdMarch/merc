@@ -25,7 +25,7 @@ class ResourceGatheringTest extends FunSuite with BeforeAndAfter{
     magicalAristocrats.newDay(zeroPolicy)
     workers = new Population(LatinHuman, Farmers, 4000, 0, 0, PoliticalViews.averagePoliticalViews)
     workers.newDay(zeroPolicy)
-    country = new State("", KnightHuman, 0, Party.absolute) {
+    country = new State("", KnightHuman, 0, new PoliticalSystem(Party.absolute)) {
       override val taxPolicy: TaxPolicy = TaxPolicy.zeroTaxes
     }
 

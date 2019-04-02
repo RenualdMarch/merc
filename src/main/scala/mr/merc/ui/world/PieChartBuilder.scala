@@ -23,8 +23,10 @@ object PieChartBuilder {
     }
 
     val chart = PieChart(ObservableBuffer(piesForChart))
+    chart.startAngle = 90
     chart.labelsVisible = false
     chart.legendSide = Side.Bottom
+
 
     pies.zipWithIndex.foreach { case (p, i) =>
       chart.lookupAll(s".data$i").asScala.foreach { node: Node =>
@@ -65,7 +67,7 @@ object PieChartBuilder {
     }
   }
 
-  def buildLegend(pies: List[PiePart]): Region = {
+  private def buildLegend(pies: List[PiePart]): Region = {
 
     val scrollPane = new ScrollPane()
     val innerPane = new MigPane()

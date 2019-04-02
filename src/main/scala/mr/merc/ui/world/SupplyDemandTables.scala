@@ -19,7 +19,7 @@ object SupplyDemandTables {
     case class Supply(source: String, brought: Double, sold: Double, price: Double)
 
     val table = new TableView[Supply]()
-    table.style = s"-fx-font-size: ${Components.mediumFontSize}"
+    table.style = Components.mediumFontStyle
 
     val sourceColumn = new TableColumn[Supply, String] {
       text = Localization("source")
@@ -72,7 +72,7 @@ object SupplyDemandTables {
 
 
     val table = new TableView[Demand]()
-    table.style = s"-fx-font-size: ${Components.mediumFontSize}"
+    table.style = Components.mediumFontStyle
 
     val sourceColumn = new TableColumn[Demand, String] {
       text = Localization("source")
@@ -125,7 +125,7 @@ object SupplyDemandTables {
     case class PopDemand(product: Products.Product, needsType: PopulationNeedsType, demanded: Double, received: Double, price: Option[Double])
 
     val table = new TableView[PopDemand]()
-    table.style = s"-fx-font-size: ${Components.mediumFontSize}"
+    table.style = Components.mediumFontStyle
 
     def extractDemands(needsType: PopulationNeedsType):List[PopDemand] = {
       records.flatMap { record =>
@@ -192,7 +192,7 @@ object SupplyDemandTables {
     }
 
     val table = new TableView[Row]()
-    table.style = s"-fx-font-size: ${Components.mediumFontSize}"
+    table.style = Components.mediumFontStyle
 
     val productColumn = new TableColumn[Row, String] {
       text = Localization("product")
@@ -241,7 +241,7 @@ object SupplyDemandTables {
 
 
     val table = new TableView[Row]()
-    table.style = s"-fx-font-size: ${Components.mediumFontSize}"
+    table.style = Components.mediumFontStyle
 
     val productColumn = new TableColumn[Row, String] {
       text = Localization("product")

@@ -3,7 +3,7 @@ package mr.merc.ui.world
 import java.text.DecimalFormat
 
 import scalafx.beans.binding.{ObjectBinding, StringBinding}
-import scalafx.beans.property.ReadOnlyStringProperty
+import scalafx.beans.property.{ObjectProperty, ReadOnlyStringProperty}
 import scalafx.scene.control.Button
 import scalafx.scene.text.{Font, Text}
 
@@ -11,6 +11,10 @@ object Components {
   val largeFontSize = 24
   val mediumFontSize = 20
   val smallFontSize = 16
+
+  val smallFontStyle = s"-fx-font-size: ${Components.smallFontSize}"
+  val mediumFontStyle = s"-fx-font-size: ${Components.mediumFontSize}"
+  val largeFontStyle = s"-fx-font-size: ${Components.largeFontSize}"
 }
 
 object BigText {
@@ -18,7 +22,7 @@ object BigText {
     this.text = t
   }
 
-  def apply(t:ReadOnlyStringProperty): BigText = new BigText {
+  def apply(t:ObjectProperty[String]): BigText = new BigText {
     this.text <== t
   }
 }
@@ -33,6 +37,10 @@ object MediumText {
   }
 
   def apply(t:StringBinding): MediumText = new MediumText {
+    this.text <== t
+  }
+
+  def apply(t:ObjectProperty[String]): MediumText = new MediumText {
     this.text <== t
   }
 }

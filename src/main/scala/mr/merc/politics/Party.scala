@@ -16,42 +16,47 @@ case class Party(name: String,
                  economy: IssuePosition.EconomyPosition,
                  socialPolicy: IssuePosition.SocialPolicyPosition,
                  votersPolicy: IssuePosition.VotersPolictyPosition) {
+
+  def politicalPosition:PoliticalPosition = {
+    PoliticalPosition(migration, regime, foreignPolicy, economy, socialPolicy, votersPolicy)
+  }
+
 }
 
 
 object Party {
-  val absolute = Party("Monarchistic", Color.White, ClosedBorders, Absolute, Expansionism, StateEconomy, NoSocialSecurity, NoVoting)
+  val absolute = Party("party.monarchistic", Color.White, ClosedBorders, Absolute, Expansionism, StateEconomy, NoSocialSecurity, NoVoting)
 
-  val benevolent = Party("Enlightened Monarchistic", Color.LightGray, OpenBorders, Absolute, Expansionism, StateEconomy, LifeNeedsSocialSecurity, NoVoting)
+  val benevolent = Party("party.enlightenedMonarchistic", Color.LightGray, OpenBorders, Absolute, Expansionism, StateEconomy, LifeNeedsSocialSecurity, NoVoting)
 
-  val magocratic = Party("Magocratic", Color.Brown, ClosedBorders, Constitutional, Expansionism, StateEconomy, NoSocialSecurity, MagesOnly)
+  val magocratic = Party("party.magocratic", Color.Brown, ClosedBorders, Constitutional, Expansionism, StateEconomy, NoSocialSecurity, MagesOnly)
 
-  val theocratic = Party("Theocratic", Color.Purple, ClosedBorders, Constitutional, Expansionism, StateEconomy, NoSocialSecurity, ClericsOnly)
+  val theocratic = Party("party.theocratic", Color.Purple, ClosedBorders, Constitutional, Expansionism, StateEconomy, NoSocialSecurity, ClericsOnly)
 
-  val aristocratic = Party("Aristocratic", Color.LightBlue, ClosedBorders, Constitutional, Expansionism, StateEconomy, NoSocialSecurity, PrimaryUpperClass)
+  val aristocratic = Party("party.aristocratic", Color.LightBlue, ClosedBorders, Constitutional, Expansionism, StateEconomy, NoSocialSecurity, PrimaryUpperClass)
 
-  val capitalistic = Party("Capitalistic", Color.LightYellow, OpenBorders, Constitutional, Expansionism, Interventionism, NoSocialSecurity, PrimaryUpperClass)
+  val capitalistic = Party("party.capitalistic", Color.LightYellow, OpenBorders, Constitutional, Expansionism, Interventionism, NoSocialSecurity, PrimaryUpperClass)
 
-  val manufactorers = Party("Manufactorers", Color.LightGoldrenrodYellow, OpenBorders, Constitutional, Expansionism, Interventionism, NoSocialSecurity, PrimaryUpperAndMiddleClass)
+  val manufactorers = Party("party.manufactorers", Color.LightGoldrenrodYellow, OpenBorders, Constitutional, Expansionism, Interventionism, NoSocialSecurity, PrimaryUpperAndMiddleClass)
 
-  val responsibleManufactorers = Party("Responsible Manufactorers", Color.YellowGreen, OpenBorders, Constitutional, Expansionism, Interventionism, LifeNeedsSocialSecurity, PrimaryUpperAndMiddleClass)
+  val responsibleManufactorers = Party("party.responsibleManufactorers", Color.YellowGreen, OpenBorders, Constitutional, Expansionism, Interventionism, LifeNeedsSocialSecurity, PrimaryUpperAndMiddleClass)
 
-  val paternalistic = Party("Paternalistic", Color.IndianRed, OpenBorders, Constitutional, Expansionism, StateEconomy, LifeNeedsSocialSecurity, PrimaryUpperAndMiddleClass)
+  val paternalistic = Party("party.paternalistic", Color.IndianRed, OpenBorders, Constitutional, Expansionism, StateEconomy, LifeNeedsSocialSecurity, PrimaryUpperAndMiddleClass)
 
-  val oligarchic = Party("Oligarchic", Color.CornflowerBlue, OpenBorders, Constitutional, Expansionism, StateEconomy, NoSocialSecurity, PrimaryUpperAndMiddleClass)
+  val oligarchic = Party("party.oligarchic", Color.CornflowerBlue, OpenBorders, Constitutional, Expansionism, StateEconomy, NoSocialSecurity, PrimaryUpperAndMiddleClass)
 
-  val conservative = Party("Conservative", Color.Blue, OpenBorders, Democracy, Expansionism, FreeMarket, LifeNeedsSocialSecurity, Everyone)
+  val conservative = Party("party.conservative", Color.Blue, OpenBorders, Democracy, Expansionism, FreeMarket, LifeNeedsSocialSecurity, Everyone)
 
-  val patriot = Party("Patriotic", Color.DarkBlue, OpenBorders, Democracy, Expansionism, Interventionism, LifeNeedsSocialSecurity, Everyone)
+  val patriot = Party("party.patriotic", Color.DarkBlue, OpenBorders, Democracy, Expansionism, Interventionism, LifeNeedsSocialSecurity, Everyone)
 
-  val liberal = Party("Liberal", Color.Yellow, OpenBorders, Democracy, Pacifism, FreeMarket, LifeNeedsSocialSecurity, Everyone)
+  val liberal = Party("party.liberal", Color.Yellow, OpenBorders, Democracy, Pacifism, FreeMarket, LifeNeedsSocialSecurity, Everyone)
 
   // dark yellow
-  val libertarian = Party("Libertarian", Color.rgb(153,153,0), OpenBorders, Democracy, Pacifism, FreeMarket, NoSocialSecurity, Everyone)
+  val libertarian = Party("party.libertarian", Color.rgb(153,153,0), OpenBorders, Democracy, Pacifism, FreeMarket, NoSocialSecurity, Everyone)
 
-  val socialist = Party("Socialist", Color.Red, OpenBorders, Democracy, Pacifism, StateEconomy, RegularNeedsSocialSecurity, Everyone)
+  val socialist = Party("party.socialist", Color.Red, OpenBorders, Democracy, Pacifism, StateEconomy, RegularNeedsSocialSecurity, Everyone)
 
-  val socialDemocratic = Party("Social Democratic", Color.Pink, OpenBorders, Democracy, Pacifism, Interventionism, RegularNeedsSocialSecurity, Everyone)
+  val socialDemocratic = Party("party.socialDemocratic", Color.Pink, OpenBorders, Democracy, Pacifism, Interventionism, RegularNeedsSocialSecurity, Everyone)
 
   val allParties:List[Party] = List(absolute, benevolent, magocratic, theocratic, aristocratic, capitalistic, manufactorers, responsibleManufactorers,
     paternalistic, oligarchic, conservative, liberal, libertarian, socialist, socialDemocratic, patriot)

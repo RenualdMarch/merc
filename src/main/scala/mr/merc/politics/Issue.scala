@@ -9,49 +9,57 @@ import mr.merc.politics.IssuePosition._
 import scala.util.Random
 
 trait IssuePosition extends Product {
-  def color:Color
+  def color: Color
+
   def name: String = productPrefix
-  def populationModifier(pop: Population):Double
+
   def positionNumber: Int
 }
 
 object IssuePosition {
-  case class MinMax[T](min:T, max: T)
+
+  case class MinMax[T](min: T, max: T)
 
   trait MigrationPosition extends IssuePosition
 
-  trait RegimePosition extends IssuePosition
+  trait RegimePosition extends IssuePosition {
+    def unfreerRegime:Option[RegimePosition]
+    def freerRegime:Option[RegimePosition]
+  }
 
   trait EconomyPosition extends IssuePosition {
-    val tariff:MinMax[Double]
-    val corporateTax:MinMax[Double]
-    val salaryTax:MinMax[Double]
-    val salesTax:MinMax[Double]
-    val transit:MinMax[Double]
+    val tariff: MinMax[Double]
+    val corporateTax: MinMax[Double]
+    val salaryTax: MinMax[Double]
+    val salesTax: MinMax[Double]
+    val transit: MinMax[Double]
   }
 
   trait ForeignPolicyPosition extends IssuePosition
 
-  trait VotersPolictyPosition extends IssuePosition
+  trait VotersPolictyPosition extends IssuePosition {
+    def canVote(populationType: PopulationType, primaryCulture: Boolean): Boolean
+  }
 
   trait SocialPolicyPosition extends IssuePosition
+
 }
 
-class IssuePositionPopularity[T <: IssuePosition](initialPositions:Map[T, Double]) {
-  private var positions = initialPositions.scaleToSum(1d)
+class IssuePositionPopularity[T <: IssuePosition](illiterateViews: Map[T, Double], literateViews: Map[T, Double]) {
+  private val illit = illiterateViews.scaleToSum(1d)
+  private val lit = literateViews.scaleToSum(1d)
 
-  def popularity:Map[T, Double] = positions
-
-  def increasePositionPopularity(pop: Population, add: Double, position: T): Unit = {
-    positions += position -> (add + position.populationModifier(pop)*positions(position))
-    positions = positions.scaleToSum(1d)
+  def popularity(literacy: Double): Map[T, Double] = {
+    require(literacy <= 1 && literacy >= 0, s"literacy is $literacy")
+    (lit |*| literacy) |+| (illit |*| (1 - literacy))
   }
+
 }
 
 trait Issue[T <: IssuePosition] {
   type Popularity = IssuePositionPopularity[T]
 
-  val possiblePositions:Vector[T]
+  val possiblePositions: Vector[T]
 
   def distanceBetweenPositions(first: T, second: T): Int = {
     math.abs(first.positionNumber - second.positionNumber)
@@ -65,25 +73,19 @@ object Migration extends Issue[MigrationPosition] {
   case object OpenBorders extends MigrationPosition {
     override def color: Color = Color.Yellow
 
-    override def populationModifier(pop: Population): Double = {
-      0.5 + pop.literacy
-    }
-
     override def positionNumber: Int = 0
   }
 
   case object ClosedBorders extends MigrationPosition {
     override def color: Color = Color.Black
 
-    override def populationModifier(pop: Population): Double = {
-      1.5 - pop.literacy
-    }
-
     override def positionNumber: Int = 1
   }
 
-  def popularity(openBorders: Double, closedBorders: Double): Popularity = {
-    new IssuePositionPopularity(Map(OpenBorders -> openBorders, ClosedBorders -> closedBorders))
+  def popularity(openBordersStart: Double, closedBordersStart: Double,
+                 openBordersEnd: Double, closedBordersEnd: Double): Popularity = {
+    new IssuePositionPopularity(Map(OpenBorders -> openBordersStart, ClosedBorders -> closedBordersStart),
+      Map(OpenBorders -> openBordersEnd, ClosedBorders -> closedBordersEnd))
   }
 
   override def name: String = "migration"
@@ -96,36 +98,43 @@ object Regime extends Issue[RegimePosition] {
   case object Absolute extends RegimePosition {
     override def color: Color = Color.Gray
 
-    override def populationModifier(pop: Population): Double = {
-      val x = 1 - pop.literacy
-      2 * x * x
-    }
-
     override def positionNumber: Int = 0
+
+    override def unfreerRegime: Option[RegimePosition] = None
+
+    override def freerRegime: Option[RegimePosition] = Some(Constitutional)
+
   }
 
   case object Constitutional extends RegimePosition {
     override def color: Color = Color.Blue
 
-    override def populationModifier(pop: Population): Double = 0.5 + pop.literacy
-
     override def positionNumber: Int = 1
+
+    override def unfreerRegime: Option[RegimePosition] = Some(Absolute)
+
+    override def freerRegime: Option[RegimePosition] = Some(Democracy)
   }
 
   case object Democracy extends RegimePosition {
     override def color: Color = Color.Yellow
 
-    override def populationModifier(pop: Population): Double = 2 * pop.literacy * pop.literacy
-
     override def positionNumber: Int = 2
+
+    override def unfreerRegime: Option[RegimePosition] = Some(Constitutional)
+
+    override def freerRegime: Option[RegimePosition] = None
   }
 
   override val possiblePositions: Vector[RegimePosition] = Vector(Absolute, Constitutional, Democracy)
 
   override def name: String = "regime"
 
-  def popularity(absoulute: Double, constitutional: Double, democracy: Double): Popularity = {
-    new IssuePositionPopularity(Map(Absolute -> absoulute, Constitutional -> constitutional, Democracy -> democracy))
+  def popularity(absouluteStart: Double, constitutionalStart: Double, democracyStart: Double,
+                 absouluteEnd: Double, constitutionalEnd: Double, democracyEnd: Double): Popularity = {
+    new IssuePositionPopularity(
+      Map(Absolute -> absouluteStart, Constitutional -> constitutionalStart, Democracy -> democracyStart),
+      Map(Absolute -> absouluteEnd, Constitutional -> constitutionalEnd, Democracy -> democracyEnd))
   }
 }
 
@@ -133,10 +142,6 @@ object Economy extends Issue[EconomyPosition] {
 
   case object StateEconomy extends EconomyPosition {
     override def color: Color = Color.Red
-
-    override def populationModifier(pop: Population): Double = {
-      if (pop.populationType == Bureaucrats) 5.0 else 1.0
-    }
 
     override def positionNumber: Int = 0
 
@@ -150,8 +155,6 @@ object Economy extends Issue[EconomyPosition] {
   case object Interventionism extends EconomyPosition {
     override def color: Color = Color.Blue
 
-    override def populationModifier(pop: Population): Double = 1.0
-
     override def positionNumber: Int = 1
 
     val tariff = MinMax(0.1, 0.4)
@@ -164,8 +167,6 @@ object Economy extends Issue[EconomyPosition] {
   case object FreeMarket extends EconomyPosition {
     override def color: Color = Color.Yellow
 
-    override def populationModifier(pop: Population): Double = if (Set(Traders, Capitalists).contains(pop.populationType)) 5.0 else 1.0
-
     override def positionNumber: Int = 2
 
     val tariff = MinMax(0, 0.2)
@@ -175,8 +176,11 @@ object Economy extends Issue[EconomyPosition] {
     val transit = MinMax(0, 0.1)
   }
 
-  def popularity(state:Double, interventionism: Double, freeMarket: Double): Popularity = {
-    new IssuePositionPopularity(Map(StateEconomy -> state, Interventionism -> interventionism, FreeMarket -> freeMarket))
+  def popularity(stateStart: Double, interventionismStart: Double, freeMarketStart: Double,
+                 stateEnd: Double, interventionismEnd: Double, freeMarketEnd: Double): Popularity = {
+    new IssuePositionPopularity(
+      Map(StateEconomy -> stateStart, Interventionism -> interventionismStart, FreeMarket -> freeMarketStart),
+      Map(StateEconomy -> stateEnd, Interventionism -> interventionismEnd, FreeMarket -> freeMarketEnd))
   }
 
   override def name: String = "economy"
@@ -189,23 +193,20 @@ object ForeignPolicy extends Issue[ForeignPolicyPosition] {
   case object Expansionism extends ForeignPolicyPosition {
     override def color: Color = Color.Red
 
-    override def populationModifier(pop: Population): Double =
-      if(pop.populationType == Aristocrats) 5.0 else 1.0
-
     override def positionNumber: Int = 0
   }
 
   case object Pacifism extends ForeignPolicyPosition {
     override def color: Color = Color.Green
 
-    override def populationModifier(pop: Population): Double =
-      if (pop.populationType == Traders) 5.0 else 1.0
-
     override def positionNumber: Int = 1
   }
 
-  def popularity(expansionism:Double, pacifism: Double): Popularity = {
-    new IssuePositionPopularity(Map(Expansionism -> expansionism, Pacifism -> pacifism))
+  def popularity(expansionismStart: Double, pacifismStart: Double,
+                 expansionismEnd: Double, pacifismEnd: Double): Popularity = {
+    new IssuePositionPopularity(
+      Map(Expansionism -> expansionismStart, Pacifism -> pacifismStart),
+      Map(Expansionism -> expansionismEnd, Pacifism -> pacifismEnd))
   }
 
   override def name: String = "foreignPolicy"
@@ -218,29 +219,28 @@ object SocialPolicy extends Issue[SocialPolicyPosition] {
   case object NoSocialSecurity extends SocialPolicyPosition {
     override def color: Color = Color.Gray
 
-    override def populationModifier(pop: Population): Double =
-      if (Set(Capitalists, Aristocrats, MagicalAristocrats).contains(pop.populationType)) 5.0 else 1.0
-
     override def positionNumber: Int = 0
   }
+
   case object LifeNeedsSocialSecurity extends SocialPolicyPosition {
     override def color: Color = Color.Yellow
 
-    override def populationModifier(pop: Population): Double = 1.0
-
     override def positionNumber: Int = 1
   }
+
   case object RegularNeedsSocialSecurity extends SocialPolicyPosition {
     override def color: Color = Color.Red
-
-    override def populationModifier(pop: Population): Double = 1.0
 
     override def positionNumber: Int = 2
   }
 
-  def popularity(no:Double, lifeNeeds: Double, regularNeeds: Double): Popularity = {
-    new IssuePositionPopularity(Map(NoSocialSecurity -> no, LifeNeedsSocialSecurity -> lifeNeeds,
-      RegularNeedsSocialSecurity -> regularNeeds))
+  def popularity(noStart: Double, lifeNeedsStart: Double, regularNeedsStart: Double,
+                 noEnd: Double, lifeNeedsEnd: Double, regularNeedsEnd: Double): Popularity = {
+    new IssuePositionPopularity(
+      Map(NoSocialSecurity -> noStart, LifeNeedsSocialSecurity -> lifeNeedsStart,
+        RegularNeedsSocialSecurity -> regularNeedsStart),
+      Map(NoSocialSecurity -> noEnd, LifeNeedsSocialSecurity -> lifeNeedsEnd,
+        RegularNeedsSocialSecurity -> regularNeedsEnd))
   }
 
   override def name: String = "socialPolicy"
@@ -253,63 +253,74 @@ object VotersPolicy extends Issue[VotersPolictyPosition] {
   case object NoVoting extends VotersPolictyPosition {
     override def color: Color = Color.Gray
 
-    override def populationModifier(pop: Population): Double = 3 * (1 - pop.literacy)
-
     override def positionNumber: Int = 0
 
+    override def canVote(populationType: PopulationType, primaryCulture: Boolean): Boolean = false
+
   }
+
   case object PrimaryUpperClass extends VotersPolictyPosition {
     override def color: Color = Color.Purple
 
-    override def populationModifier(pop: Population): Double = {
-      if (pop.populationType.populationClass == Upper) 5.0
-      else 1.0
-    }
-
     override def positionNumber: Int = 1
+
+    override def canVote(populationType: PopulationType, primaryCulture: Boolean): Boolean = primaryCulture && populationType.populationClass == Upper
   }
+
   case object PrimaryUpperAndMiddleClass extends VotersPolictyPosition {
     override def color: Color = Color.Blue
 
-    override def populationModifier(pop: Population): Double = {
-      if (pop.populationType.populationClass == Upper || pop.populationType.populationClass == Middle) 2.0
-      else 1.0
-    }
-
     override def positionNumber: Int = 2
+
+    override def canVote(populationType: PopulationType, primaryCulture: Boolean): Boolean = primaryCulture && Set(Upper, Middle).contains(populationType.populationClass)
   }
+
   case object Everyone extends VotersPolictyPosition {
     override def color: Color = Color.Yellow
 
-    override def populationModifier(pop: Population): Double = 5 * pop.literacy
-
     override def positionNumber: Int = 3
 
+    override def canVote(populationType: PopulationType, primaryCulture: Boolean): Boolean = true
+
   }
+
   case object MagesOnly extends VotersPolictyPosition {
     override def color: Color = Color.Orange
 
-    override def populationModifier(pop: Population): Double = {
-      if (Set(Mages, MagicalAristocrats).contains(pop.populationType)) 7.0
-      else 1 - pop.literacy
-    }
-
     override def positionNumber: Int = 1
+
+    override def canVote(populationType: PopulationType, primaryCulture: Boolean): Boolean = Set(Mages, MagicalAristocrats).contains(populationType)
   }
+
   case object ClericsOnly extends VotersPolictyPosition {
     override def color: Color = Color.Green
 
-    override def populationModifier(pop: Population): Double = {
-      if (pop.populationType == Clergy) 7.0
-      else 1 - pop.literacy
-    }
-
     override def positionNumber: Int = 1
+
+    override def canVote(populationType: PopulationType, primaryCulture: Boolean): Boolean = primaryCulture && populationType == Clergy
   }
 
-  def popularity(no: Double, upperClass:Double, upperMiddle: Double, everyone: Double, mages: Double, clerics: Double): Popularity = {
-    new IssuePositionPopularity(Map(NoVoting -> no, PrimaryUpperClass -> upperClass,
-      PrimaryUpperAndMiddleClass -> upperMiddle, Everyone -> everyone, MagesOnly -> mages, ClericsOnly -> clerics))
+  def popularity(noStart: Double,
+                 upperClassStart: Double,
+                 upperMiddleStart: Double,
+                 everyoneStart: Double,
+                 magesStart: Double,
+                 clericsStart: Double,
+                 noEnd: Double,
+                 upperClassEnd: Double,
+                 upperMiddleEnd: Double,
+                 everyoneEnd: Double,
+                 magesEnd: Double,
+                 clericsEnd: Double
+                ): Popularity = {
+    new IssuePositionPopularity(
+      Map(NoVoting -> noStart, PrimaryUpperClass -> upperClassStart,
+        PrimaryUpperAndMiddleClass -> upperMiddleStart,
+        Everyone -> everyoneStart, MagesOnly -> magesStart, ClericsOnly -> clericsStart),
+      Map(NoVoting -> noEnd, PrimaryUpperClass -> upperClassEnd,
+        PrimaryUpperAndMiddleClass -> upperMiddleEnd,
+        Everyone -> everyoneEnd, MagesOnly -> magesEnd, ClericsOnly -> clericsEnd),
+    )
   }
 
   override def distanceBetweenPositions(first: VotersPolictyPosition, second: VotersPolictyPosition): Int = {
@@ -333,58 +344,108 @@ case class PoliticalViews(migration: Migration.Popularity,
                           economy: Economy.Popularity,
                           socialPolicy: SocialPolicy.Popularity,
                           votersPolicy: VotersPolicy.Popularity) {
+
+  def currentViews(literacy: Double): CurrentPoliticalViews = {
+    CurrentPoliticalViews(
+      migration.popularity(literacy),
+      regime.popularity(literacy),
+      foreignPolicy.popularity(literacy),
+      economy.popularity(literacy),
+      socialPolicy.popularity(literacy),
+      votersPolicy.popularity(literacy))
+  }
 }
 
+case class CurrentPoliticalViews(migration: Map[MigrationPosition, Double],
+                                 regime: Map[RegimePosition, Double],
+                                 foreignPolicy: Map[ForeignPolicyPosition, Double],
+                                 economy: Map[EconomyPosition, Double],
+                                 socialPolicy: Map[SocialPolicyPosition, Double],
+                                 votersPolicy: Map[VotersPolictyPosition, Double])
+
+case class PoliticalPosition(migration: MigrationPosition,
+                             regime: RegimePosition,
+                             foreignPolicy: ForeignPolicyPosition,
+                             economy: EconomyPosition,
+                             socialPolicy: SocialPolicyPosition,
+                             votersPolicy: VotersPolictyPosition) {
+
+  def diffWithPosition(other: PoliticalPosition): Int = {
+    Migration.distanceBetweenPositions(other.migration, migration) +
+      Regime.distanceBetweenPositions(other.regime, regime) +
+      ForeignPolicy.distanceBetweenPositions(other.foreignPolicy, foreignPolicy) +
+      Economy.distanceBetweenPositions(other.economy, economy) +
+      SocialPolicy.distanceBetweenPositions(other.socialPolicy, socialPolicy) +
+      VotersPolicy.distanceBetweenPositions(other.votersPolicy, votersPolicy)
+  }
+
+}
+
+
 object PoliticalViews {
-  def initPoliticalViews(populationType: PopulationType, literacy:Double): PoliticalViews = {
-    val fakePopulation = new Population(LatinHuman, populationType, 10000, 0, literacy * 10000 toInt, averagePoliticalViews)
-    val newViews = averagePoliticalViews
-    val shiftStrength = 0.1
-    val shiftsCount = 10
-    applyShifts(fakePopulation, newViews, shiftStrength, shiftsCount, Migration, x => x.migration)
-    applyShifts(fakePopulation, newViews, shiftStrength, shiftsCount, Regime, x => x.regime)
-    applyShifts(fakePopulation, newViews, shiftStrength, shiftsCount, ForeignPolicy, x => x.foreignPolicy)
-    applyShifts(fakePopulation, newViews, shiftStrength, shiftsCount, Economy, x => x.economy)
-    applyShifts(fakePopulation, newViews, shiftStrength, shiftsCount, SocialPolicy, x => x.socialPolicy)
-    applyShifts(fakePopulation, newViews, shiftStrength, shiftsCount, VotersPolicy, x => x.votersPolicy)
+  def initPoliticalViews(populationType: PopulationType, random: Random = Random): PoliticalViews = {
+    implicit class variation(d:Double) {
+      def r: Double = d + random.nextDouble() * 1
+    }
+    def migration = Migration.popularity(0.r, 1.r, 1.r, 0.r)
+    def regime = Regime.popularity(1.r, 0.5.r, 0.r, 0.r, 0.5.r, 1.r)
+    def foreignPolicy = ForeignPolicy.popularity(0.7.r, 0.3.r, 0.3.r, 0.7.r)
+    def aristocraticPolicy = ForeignPolicy.popularity(1.r, 0.r, 0.8.r, 0.2.r)
+    def poorEconomy = Economy.popularity(1.r, 0.5.r, 0.5.r, 0.5.r, 0.5.r, 0.5.r)
+    def middleEconomy = Economy.popularity(0.5.r, 1.r, 0.5.r, 0.5.r, 0.5.r, 0.5.r)
+    def aristorcraticEconomy = Economy.popularity(1.r, 0.5.r, 0.r, 0.r, 0.5.r, 1.r)
+    def capitalistEconomy = Economy.popularity(0.r, 0.5.r, 0.5.r, 0.r, 0.r, 1.r)
+    def poorSocial = SocialPolicy.popularity(0.2.r, 0.3.r, 0.4.r, 0.2.r, 0.5.r, 0.8.r)
+    def mediumSocial = SocialPolicy.popularity(0.5.r, 0.3.r, 0.2.r, 1.r, 0.5.r, 0.r)
+    def upperSocial = SocialPolicy.popularity(1.r, 0.r, 0.r, 1.r, 0.2.r, 0.r)
+    def poorVoters = VotersPolicy.popularity(1.r, 0.5.r, 0.3.r, 0.r, 0.2.r, 0.2.r,
+      0.r,0.3.r,0.4.r,1.r,0.1.r,0.1.r)
+    def middleVoters = VotersPolicy.popularity(1.r, 0.2.r, 0.5.r, 0.r, 0.2.r, 0.2.r,
+      0.r,0.4.r,1.r,0.5.r,0.1.r,0.1.r)
+    def upperVoters = VotersPolicy.popularity(1.r, 0.7.r, 0.3.r, 0.r, 0.2.r, 0.2.r,
+      0.r,0.8.r,0.6.r,0.2.r,0.1.r,0.1.r)
 
-    newViews
-  }
-
-  def averagePoliticalViews:PoliticalViews = {
-    PoliticalViews(Migration.popularity(1, 1),
-      Regime.popularity(1, 1, 1),
-      ForeignPolicy.popularity(1, 1),
-      Economy.popularity(1, 1, 1),
-      SocialPolicy.popularity(1, 1, 1),
-      VotersPolicy.popularity(1 ,1 , 1, 1, 1, 1))
-  }
-
-  def applyShifts[T <: IssuePosition](population: Population, views: PoliticalViews, shiftStrength: Double, shiftsCount: Int, issue: Issue[T], extractor:PoliticalViews => IssuePositionPopularity[T]): Unit = {
-    randomPopularityShifts(issue).take(shiftsCount).foreach { shift =>
-      extractor(views).increasePositionPopularity(population, shiftStrength, shift)
+    populationType match {
+      case Craftsmen =>
+        PoliticalViews(migration, regime,foreignPolicy, poorEconomy, poorSocial, poorVoters)
+      case Farmers =>
+        PoliticalViews(migration, regime, foreignPolicy, poorEconomy, poorSocial, poorVoters)
+      case Labourers =>
+        PoliticalViews(migration, regime, foreignPolicy, poorEconomy, poorSocial, poorVoters)
+      case Bureaucrats =>
+        PoliticalViews(migration, regime, foreignPolicy,
+          Economy.popularity(1.r, 0.5.r, 0.r, 0.5.r, 0.5.r, 0.r),
+          mediumSocial, middleVoters)
+      case Scholars =>
+        PoliticalViews(migration, regime, foreignPolicy, middleEconomy, mediumSocial, middleVoters)
+      case Clergy =>
+        PoliticalViews(migration, regime, foreignPolicy, middleEconomy, mediumSocial,
+          VotersPolicy.popularity(1.r, 0.5.r, 0.3.r, 0.r, 0.r, 1.r,
+            1.r, 0.5.r, 0.3.r, 0.r, 0.r, 1.r))
+      case Mages =>
+        PoliticalViews(migration, regime, foreignPolicy, middleEconomy, mediumSocial,
+          VotersPolicy.popularity(1.r, 0.5.r, 0.3.r, 0.r, 1.r, 0.r,
+            1.r, 0.5.r, 0.3.r, 0.r, 1.r, 0.r))
+      case Traders =>
+        PoliticalViews(migration, regime, foreignPolicy,
+          Economy.popularity(0.r, 1.r, 0.5.r, 0.r, 0.5.r, 1.r),
+          mediumSocial, middleVoters)
+      case Capitalists =>
+        PoliticalViews(migration, regime, aristocraticPolicy, capitalistEconomy, upperSocial, upperVoters)
+      case Aristocrats =>
+        PoliticalViews(migration, regime, aristocraticPolicy, aristorcraticEconomy, upperSocial, upperVoters)
+      case MagicalAristocrats =>
+        PoliticalViews(migration, regime, aristocraticPolicy, aristorcraticEconomy, upperSocial, upperVoters)
     }
   }
 
-  private def randomPopularityShifts[T <: IssuePosition](issue:Issue[T]):Stream[T] = {
-    Stream.continually {
-      val i = Random.nextInt(issue.possiblePositions.size)
-      issue.possiblePositions(i)
-    }
+  def averagePoliticalViews: PoliticalViews = {
+    PoliticalViews(Migration.popularity(1, 1, 1, 1),
+      Regime.popularity(1, 1, 1, 1, 1, 1),
+      ForeignPolicy.popularity(1, 1, 1, 1),
+      Economy.popularity(1, 1, 1, 1, 1, 1),
+      SocialPolicy.popularity(1, 1, 1, 1, 1, 1),
+      VotersPolicy.popularity(1, 1, 1, 1, 1, 1,1,1,1,1,1,1))
   }
 
-  def sumViews(firstCount: Int, firstViews: PoliticalViews, secondCount: Int, secondViews:PoliticalViews):PoliticalViews = {
-    def combine[T](map1:Map[T, Double], map2:Map[T, Double]):Map[T, Double] = {
-      (map1 |*| firstCount) |+| (map2 |*| secondCount)
-    }
-
-    PoliticalViews(
-      new IssuePositionPopularity(combine(firstViews.migration.popularity, secondViews.migration.popularity)),
-      new IssuePositionPopularity(combine(firstViews.regime.popularity, secondViews.regime.popularity)),
-      new IssuePositionPopularity(combine(firstViews.foreignPolicy.popularity, secondViews.foreignPolicy.popularity)),
-      new IssuePositionPopularity(combine(firstViews.economy.popularity, secondViews.economy.popularity)),
-      new IssuePositionPopularity(combine(firstViews.socialPolicy.popularity, secondViews.socialPolicy.popularity)),
-      new IssuePositionPopularity(combine(firstViews.votersPolicy.popularity, secondViews.votersPolicy.popularity))
-    )
-  }
 }
