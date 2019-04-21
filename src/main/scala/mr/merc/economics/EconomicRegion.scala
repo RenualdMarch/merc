@@ -1,7 +1,7 @@
 package mr.merc.economics
 
-import mr.merc.map.{Grid, PossibleGrid}
-import Products.Product
+import mr.merc.map.PossibleGrid
+import Products.{IndustryProduct, Product}
 import mr.merc.economics.Population.{Culture, LifeNeeds, LuxuryNeeds, PopulationClass, PopulationNeedsType, PopulationType, RegularNeeds}
 import mr.merc.economics.util.DistributionCalculator
 import mr.merc.politics.{PoliticalViews, State}
@@ -19,6 +19,16 @@ trait EconomicRegion {
 
   var enterprises:Vector[Enterprise] = Vector()
 
+  def factories:Map[IndustryProduct, IndustrialFactory] = enterprises.collect {
+    case f:IndustrialFactory => f.product -> f
+  }.toMap
+
+  def presentFactoriesAndProjects:Set[IndustryProduct] = {
+    factories.keySet ++ projects.collect {
+      case p:BuildFactoryProject => p.product
+    }
+  }
+
   def moneyToFulfillNeeds(population: Population): Map[PopulationNeedsType, Double] =
     moneyToFulfillNeeds(population.populationType.populationClass, population.culture) |*| population.totalPopEfficiency
 
@@ -34,6 +44,20 @@ trait EconomicRegion {
       }.sum
     }
   }
+
+  var projects:List[BusinessProject] = Nil
+
+  def removeCompletedProjectsAndAddInvestments(): Unit = {
+    val (finished, notFinished) = projects.partition(_.isComplete)
+    this.projects = notFinished
+    finished.foreach { p =>
+      p.returnNotSpentMoneyToInvestor()
+    }
+    notFinished.foreach { p =>
+      p.takeMoreMoneyFromInvestorIfNeeded(regionMarket.currentPrices)
+    }
+  }
+
 }
 
 class EconomicGrid(region:EconomicRegion) extends PossibleGrid[EconomicRegion] {

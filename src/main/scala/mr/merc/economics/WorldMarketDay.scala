@@ -2,11 +2,14 @@ package mr.merc.economics
 
 import mr.merc.economics.Population.{Clergy, Traders}
 import mr.merc.economics.TaxPolicy._
+import mr.merc.economics.ai.FactoryBuildingAI
 import mr.merc.map.pathfind.PathFinder
 import mr.merc.politics.State
 
-class WorldMarketDay(regions: Set[EconomicRegion], turn:Int) {
+class WorldMarketDay(worldState: WorldStateEnterpriseActions, turn:Int) {
   type PathCache = Map[EconomicRegion, Map[EconomicRegion, List[EconomicRegion]]]
+
+  private val regions:List[EconomicRegion] = worldState.regions
 
   private var currentPathCache: PathCache = _
 
@@ -33,14 +36,19 @@ class WorldMarketDay(regions: Set[EconomicRegion], turn:Int) {
 
     // 1 step - receive population demands, add them to markets
     // 2 step - receive factory demands, add them to markets
+    // 3 step - project demands
     regions.foreach { r =>
       val popDemands = r.regionPopulation.generatePopDemands(r.regionMarket.currentPrices)
       r.regionMarket.acceptDemands(popDemands)
       val enterpriseDemands = r.enterprises.map(f => f -> f.componentDemandRequests(r.regionMarket.currentPrices)).toMap
       enterpriseDemands.foreach { case (_, productsMap) =>
-        productsMap.foreach { case (p, demand) =>
+        productsMap.foreach { case (_, demand) =>
           r.regionMarket.acceptDemands(List(demand))
         }
+      }
+      val projectDemands = r.projects.flatMap(_.demandRequests(r.regionMarket.currentPrices))
+      projectDemands.foreach { p =>
+        r.regionMarket.acceptDemands(List(p))
       }
     }
 
@@ -60,12 +68,14 @@ class WorldMarketDay(regions: Set[EconomicRegion], turn:Int) {
     // no taxes for demand
     regions.foreach { r =>
       r.regionMarket.doTrade(Products.AllProducts)
-      r.regionMarket.fulfilledDemands.foreach { case (product, demands) =>
+      r.regionMarket.fulfilledDemands.values.foreach { demands =>
         demands.foreach { demand => demand.request match {
             case p:PopulationDemandRequest =>
               p.pop.buyDemandedProducts(List(demand))
             case e:EnterpriseDemandRequest =>
-              e.enterprise.receiveFulfilledDemandRequestsAndPayChecks(Map(product -> demand))
+              e.enterprise.buyDemandedProducts(List(demand))
+            case p:BusinessDemandRequest =>
+              p.project.buyDemandedProducts(List(demand))
           }
         }
       }
@@ -113,6 +123,8 @@ class WorldMarketDay(regions: Set[EconomicRegion], turn:Int) {
 
     // let all pop receive salaries + taxes to budget
     regions.foreach { r =>
+      val factoryCommands = FactoryBuildingAI().factoryCommands(r, worldState)
+
       r.enterprises.foreach{ e =>
         e.payMoneyToPops()
         val money = e.payTaxes()
@@ -127,6 +139,8 @@ class WorldMarketDay(regions: Set[EconomicRegion], turn:Int) {
       }
 
       r.regionMarket.endOfMarketDay(turn)
+      r.removeCompletedProjectsAndAddInvestments()
+      factoryCommands.foreach {c => worldState.applyCommand(c)}
     }
 
     states.foreach {s =>

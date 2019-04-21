@@ -36,6 +36,8 @@ object MapUtil {
           k -> num.times(map(k), other(k))
         }.toMap
       }
+
+      def sumValues:V = map.values.sum
     }
   }
 

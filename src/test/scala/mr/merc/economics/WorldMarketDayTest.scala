@@ -3,12 +3,18 @@ package mr.merc.economics
 import mr.merc.economics.Population._
 import mr.merc.economics.Products._
 import mr.merc.economics.TaxPolicy._
-import mr.merc.politics.{Party, PoliticalViews, State}
+import mr.merc.politics.{Party, PoliticalViews, Province, State}
 import org.scalatest.FunSuite
 
 class WorldMarketDayTest extends FunSuite {
 
   var region1, region2, region3: EconomicRegion = _
+
+  var worldStateEnterpriseActions = new WorldStateEnterpriseActions {
+    override def playerState: State = ???
+
+    override def regions: List[EconomicRegion] = List(region1, region2, region3)
+  }
 
   test("flow in one country") {
 
@@ -23,7 +29,7 @@ class WorldMarketDayTest extends FunSuite {
       SalaryTaxPolicy(Map[PopulationClass, Double](Lower -> 0, Middle -> 0, Upper -> 0)),
       SalesTaxPolicy(0), TariffTax(0)))*/
 
-    val initialPrices = Products.AllProducts.map(_ -> 1000d).toMap ++ Map[Products.Product, Double](Grain -> 10, Coal -> 15, Glass -> 10, Liquor -> 100, MachineParts -> 20)
+    val initialPrices = Products.AllProducts.map(_ -> 1000d).toMap ++ Map[Products.Product, Double](Grain -> 10, Coal -> 15, Glass -> 10, Liquor -> 100)
 
     region1 = new EconomicRegion {
       override def owner: State = state1
@@ -77,7 +83,7 @@ class WorldMarketDayTest extends FunSuite {
     val ws = new WorldStateMock(regions)
 
     assert(ws.totalMoney === 7000)
-    val day = new WorldMarketDay(regions.toSet, 1)
+    val day = new WorldMarketDay(worldStateEnterpriseActions, 1)
     day.trade()
     regions.foreach { r =>
       r.enterprises.foreach { e =>

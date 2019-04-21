@@ -21,6 +21,10 @@ class WeightedRandom[T](weights:Map[T, Double]){
     weightsList.last._1
   }
 
+  def nextRandomItems(n:Int):List[T] = {
+    (0 until n).map(_ => nextRandomItem()).toList
+  }
+
   def uniqueRandomItems(n: Int): Set[T] = {
     require(n <= weights.size, s"n $n can't be bigger than ${weights.size}")
 

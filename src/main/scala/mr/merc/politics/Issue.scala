@@ -2,9 +2,10 @@ package mr.merc.politics
 
 import scalafx.scene.paint.Color
 import mr.merc.economics.MapUtil.FloatOperations._
-import mr.merc.economics.Population
 import mr.merc.economics.Population._
 import mr.merc.politics.IssuePosition._
+
+import mr.merc.economics.WorldEconomicConstants.Enterprises._
 
 import scala.util.Random
 
@@ -33,6 +34,14 @@ object IssuePosition {
     val salaryTax: MinMax[Double]
     val salesTax: MinMax[Double]
     val transit: MinMax[Double]
+
+    val stateCanBuildFactory: Boolean
+    val stateCanExpandFactory: Boolean
+    val capitalistsCanBuildFactory: Boolean
+    val capitalistsCanExpandFactory: Boolean
+    val stateCanDestroyFactory: Boolean
+
+    val investmentCostMultiplier: Double
   }
 
   trait ForeignPolicyPosition extends IssuePosition
@@ -150,6 +159,14 @@ object Economy extends Issue[EconomyPosition] {
     val salaryTax = MinMax(0.3, 1)
     val salesTax = MinMax(0.3, 1)
     val transit = MinMax(0.1, 0.5)
+
+    val stateCanBuildFactory: Boolean = true
+    val stateCanExpandFactory: Boolean = true
+    val capitalistsCanBuildFactory: Boolean = false
+    val capitalistsCanExpandFactory: Boolean = true
+    val stateCanDestroyFactory: Boolean = true
+
+    val investmentCostMultiplier:Double = StateEconomicsInvestmentMultiplier
   }
 
   case object Interventionism extends EconomyPosition {
@@ -162,6 +179,14 @@ object Economy extends Issue[EconomyPosition] {
     val salaryTax = MinMax(0.1, 0.4)
     val salesTax = MinMax(0.1, 0.4)
     val transit = MinMax(0.05, 0.2)
+
+    val stateCanBuildFactory: Boolean = true
+    val stateCanExpandFactory: Boolean = false
+    val capitalistsCanBuildFactory: Boolean = true
+    val capitalistsCanExpandFactory: Boolean = true
+    val stateCanDestroyFactory: Boolean = true
+
+    val investmentCostMultiplier:Double = InterventionismInvestmentMultiplier
   }
 
   case object FreeMarket extends EconomyPosition {
@@ -174,6 +199,14 @@ object Economy extends Issue[EconomyPosition] {
     val salaryTax = MinMax(0, 0.2)
     val salesTax = MinMax(0, 0.2)
     val transit = MinMax(0, 0.1)
+
+    val stateCanBuildFactory: Boolean = false
+    val stateCanExpandFactory: Boolean = false
+    val capitalistsCanBuildFactory: Boolean = true
+    val capitalistsCanExpandFactory: Boolean = true
+    val stateCanDestroyFactory: Boolean = false
+
+    val investmentCostMultiplier:Double = FreeMarketInvestmentMultiplier
   }
 
   def popularity(stateStart: Double, interventionismStart: Double, freeMarketStart: Double,

@@ -5,37 +5,94 @@ import mr.merc.economics._
 import mr.merc.local.Localization
 import mr.merc.politics.Province
 import org.tbee.javafx.scene.layout.MigPane
-import scalafx.beans.property.{ReadOnlyObjectProperty, StringProperty}
-import scalafx.scene.control.{Accordion, TableColumn, TableView, TitledPane}
-import scalafx.scene.layout.{BorderPane, Pane, TilePane}
+import scalafx.beans.property.{ObjectProperty, ReadOnlyObjectProperty, StringProperty}
+import scalafx.scene.control._
+import javafx.scene.control.TableCell
+import scalafx.scene.layout.Pane
 import scalafx.Includes._
-import scalafx.collections.ObservableBuffer
 import EconomicLocalization._
+import mr.merc.economics.Products.IndustryProduct
 import scalafx.scene.Scene
-import scalafx.scene.chart.{AreaChart, LineChart, NumberAxis, XYChart}
-import scalafx.stage.{Modality, Stage}
+import scalafx.scene.chart.{LineChart, NumberAxis, XYChart}
+import scalafx.scene.control.TabPane.TabClosingPolicy.Unavailable
+import scalafx.stage.Stage
+import mr.merc.ui.dialog.ModalDialog._
+import mr.merc.util.FxPropertyUtils._
+import mr.merc.economics.WorldStateEnterpriseActions.{StateBuildFactoryCommand, StateExpandFactoryCommand}
+import scalafx.beans.binding.Bindings
+import scalafx.collections.ObservableBuffer
+import scalafx.util.StringConverter
 
 import scala.collection.JavaConverters._
 
-class EnterprisesViewPane(province: Province, stage: Stage) extends PaneWithTwoEqualHorizontalChildren {
+class EnterprisesViewPane(province: Province, stage: Stage, enterpriseActions: WorldStateEnterpriseActions) extends PaneWithTwoHorizontalChildren {
 
-  val enterpriseTablePane = new EnterprisesTablePane(province.enterprises)
-  private def f(e:Enterprise) = new EnterpriseDetailsPane(e, province, e.dayRecords.last.turn, stage)
-  val enterpriseDetailsPane: Pane = new PropertyDependentPane(enterpriseTablePane.selectedRow, f)
+  private val controller = new EnterprisePaneController(province, enterpriseActions)
 
-  setTwoChildren(enterpriseTablePane, enterpriseDetailsPane)
+  private val enterprisesPane = new PaneWithTwoVerticalChildren(0.55)
+  private val projectsPane = new RegionProjectsPane(controller.projects)
+  private val enterpriseTablePane = new EnterprisesTablePane(province.enterprises, controller)
+  private def f(either:Either[Enterprise, BusinessProject]) = {
+    Option(either) match {
+      case Some(Left(e)) =>
+        projectsPane.projectsTable.delegate.getSelectionModel.clearSelection()
+        new EnterpriseDetailsPane(e, province, e.dayRecords.last.turn, stage)
+      case Some(Right(p)) =>
+        enterpriseTablePane.enterprisesTable.delegate.getSelectionModel.clearSelection()
+        new ProjectPane(p)
+      case None => new MigPane() with WorldInterfaceJavaNode
+    }
+  }
+  private val biProperty = bindTwoProperties(enterpriseTablePane.selectedRow, projectsPane.selectedRow)
+  private val enterpriseDetailsPane: Pane = new PropertyDependentPane(biProperty, f)
+
+  enterprisesPane.setTwoChildren(enterpriseTablePane, projectsPane)
+  setTwoChildren(enterprisesPane, enterpriseDetailsPane)
 }
 
+class EnterprisePaneController(province: Province, worldState:WorldStateEnterpriseActions) {
 
-class EnterprisesTablePane(enterprises: Seq[Enterprise]) extends MigPane with WorldInterfaceJavaNode {
-  private val enterprisesTable = new TableView[Enterprise]()
+  val enterprises:Vector[Enterprise] = province.enterprises
+
+  val projects:ObservableBuffer[BusinessProject] = new ObservableBuffer[BusinessProject]()
+  projects.addAll(province.projects.asJava)
+
+  def expandDisabled(f:IndustrialFactory):Boolean = !worldState.stateCanExpandFactory(f) || f.region.owner != worldState.playerState
+
+  def expandFactory(f:IndustrialFactory): Unit = {
+    worldState.applyCommand(StateExpandFactoryCommand(worldState.playerState, f))
+    projects.clear()
+    projects.addAll(province.projects.asJava)
+  }
+
+  def buildFactory(product: IndustryProduct): Unit = {
+    worldState.applyCommand(StateBuildFactoryCommand(province.owner, product, province))
+    projects.clear()
+    projects.addAll(province.projects.asJava)
+    possibleFactories.clear()
+    possibleFactories.addAll(possibleFactoriesToBuild.asJava)
+  }
+
+  val possibleFactories:ObservableBuffer[IndustryProduct] = new ObservableBuffer[IndustryProduct]
+  possibleFactories.clear()
+  possibleFactories.addAll(possibleFactoriesToBuild.asJava)
+
+  private def possibleFactoriesToBuild:List[IndustryProduct] = {
+    if (worldState.stateCanBuildFactory(province.owner) && worldState.playerState == province.owner) {
+      Products.IndustryProducts.filterNot(province.presentFactoriesAndProjects.contains)
+    } else Nil
+  }
+}
+
+class EnterprisesTablePane(enterprises: Vector[Enterprise], controller:EnterprisePaneController) extends MigPane() with WorldInterfaceJavaNode {
+  val enterprisesTable = new TableView[Enterprise]()
   enterprisesTable.style = Components.mediumFontStyle
 
   private val productColumn = new TableColumn[Enterprise, String] {
     text = Localization("product")
-    cellValueFactory = e => StringProperty(Localization(e.value.product.name))
+    cellValueFactory = e => StringProperty(localizeProduct(e.value.product))
     editable = false
-    prefWidth <== enterprisesTable.width * 0.20
+    prefWidth <== enterprisesTable.width * 0.15
   }
 
   private val enterpriseTypeColumn = new TableColumn[Enterprise, String] {
@@ -52,7 +109,7 @@ class EnterprisesTablePane(enterprises: Seq[Enterprise]) extends MigPane with Wo
       case _ => ""
     })
     editable = false
-    prefWidth <== enterprisesTable.width * 0.19
+    prefWidth <== enterprisesTable.width * 0.09
   }
 
   private val producedSoldColumn = new TableColumn[Enterprise, String] {
@@ -70,7 +127,36 @@ class EnterprisesTablePane(enterprises: Seq[Enterprise]) extends MigPane with Wo
       IntFormatter().format(p.peopleResources.values.sum)
     }.getOrElse(""))
     editable = false
-    prefWidth <== enterprisesTable.width * 0.20
+    prefWidth <== enterprisesTable.width * 0.15
+  }
+
+  private val expandButtonColumn = new TableColumn[Enterprise, Button] {
+    text = Localization("expand")
+    cellFactory = p => new TableCell[Enterprise, Button] {
+
+      def button:Button = getTableView.getItems.get(getIndex) match {
+        case f:IndustrialFactory =>
+          new MediumButton() {
+            text = Localization("expandFactory", localizeProduct(f.product))
+            disable = controller.expandDisabled(f)
+            onAction = {_ =>
+              controller.expandFactory(f)
+            }
+          }
+        case _ => null
+      }
+
+      override def updateItem(t: Button, b: Boolean): Unit = {
+        super.updateItem(t, b)
+        if (b) {
+          setGraphic(null)
+        } else {
+          setGraphic(button)
+        }
+      }
+    }
+    editable = false
+    prefWidth <== enterprisesTable.width * 0.15
   }
 
   private def sortQ(e: Enterprise): (Int, Int, String) = {
@@ -79,20 +165,49 @@ class EnterprisesTablePane(enterprises: Seq[Enterprise]) extends MigPane with Wo
       case f: Farm => (1, 0, f.product.name)
       case m: Mine => (2, 0, m.product.name)
       case c: Church => (3, 0, c.product.name)
-      case mg: MagicGuildEnterprise => (4, 0, mg.product.name)
+      case mg: MagicGuild => (4, 0, mg.product.name)
     }
   }
 
-  private val buffer = new ObservableBuffer[Enterprise]()
-  buffer.addAll(enterprises.sortBy(sortQ).reverse.asJava)
-  enterprisesTable.items = buffer
+  private val enterprisesItems = new ObservableBuffer[Enterprise]()
+  enterprisesItems.addAll(enterprises.sortBy(sortQ).reverse.asJava)
+  enterprisesTable.items = enterprisesItems
 
-  enterprisesTable.columns ++= List(enterpriseTypeColumn, productColumn, levelColumn, producedSoldColumn, workersColumn)
+  enterprisesTable.columns ++= List(enterpriseTypeColumn, productColumn, levelColumn, producedSoldColumn, workersColumn, expandButtonColumn)
   enterprisesTable.delegate.getSelectionModel.setSelectionMode(SelectionMode.SINGLE)
   val selectedRow: ReadOnlyObjectProperty[Enterprise] = enterprisesTable.delegate.getSelectionModel.selectedItemProperty
   enterprisesTable.delegate.getSelectionModel.clearAndSelect(0)
 
-  add(enterprisesTable, "growx,growy,pushx,pushy")
+  add(enterprisesTable, "growx,growy,pushx,pushy,wrap")
+  private val productSelection = new ComboBox[IndustryProduct] {
+    style = Components.mediumFontStyle
+    converter = new StringConverter[IndustryProduct] {
+      override def fromString(string: String): IndustryProduct = null
+
+      override def toString(t: IndustryProduct): String =
+        Option(t).map(localizeProduct).getOrElse("")
+    }
+    items = controller.possibleFactories
+    disable <== Bindings.createBooleanBinding(() => controller.possibleFactories.isEmpty, controller.possibleFactories)
+  }
+
+  private val bottomPane = new MigPane() {
+    add(new MediumButton {
+      text = Localization("buildFactory")
+      disable <== Bindings.createBooleanBinding(() => productSelection.selectionModel.value.getSelectedItem == null, productSelection.selectionModel.value.selectedItemProperty())
+      onAction = { _ =>
+        val p = productSelection.selectionModel.value.getSelectedItem
+        controller.buildFactory(p)
+      }
+    }.delegate, "")
+    add(new MediumText {
+      text = Localization("buildFactoryForProduct")
+    }.delegate, "")
+    add(productSelection.delegate, "wrap")
+  }
+
+  add(bottomPane, "center")
+
 }
 
 class SupplyAndDemandPane(enterprise: Enterprise, turn: Int) extends MigPane {
@@ -122,43 +237,40 @@ class SupplyAndDemandPane(enterprise: Enterprise, turn: Int) extends MigPane {
 
 class EnterpriseDetailsPane(enterprise: Enterprise, province: Province, turn:Int, stage: Stage) extends MigPane {
 
-  val accordion = new Accordion()
+  private val tabPane = new TabPane() {
+    style = Components.mediumFontStyle
+    tabClosingPolicy = Unavailable
+  }
 
   add(BigText(localizeEnterprise(enterprise, province)), "center, wrap")
-  add(accordion, "grow,push,wrap")
+  add(tabPane, "grow,push,wrap")
 
-  val mainPane: Pane = enterprise match {
-    case e: Factory[_] => new FactoryPane(e, province)
-    case e: ResourceGathering[_] => new ResourceGatheringPane(e, province)
-  }
-
-  val supplyAndDemand: Pane = new SupplyAndDemandPane(enterprise, turn)
-
-  val mainTitle = new TitledPane() {
-    content = mainPane
+  private val mainTitle = new Tab() {
+    content = enterprise match {
+      case e: Factory[_] => new FactoryPane(e, province)
+      case e: ResourceGathering[_] => new ResourceGatheringPane(e, province)
+    }
     text = Localization("generalInfo")
-    style = s"-fx-font-size: ${Components.largeFontSize}"
+    style = Components.largeFontStyle
   }
 
-  val supplyAndDemandTitle = new TitledPane() {
+  private val supplyAndDemandTitle = new Tab() {
     text = Localization("production")
-    style = s"-fx-font-size: ${Components.largeFontSize}"
-    content = supplyAndDemand
+    style = Components.largeFontStyle
+    content = new SupplyAndDemandPane(enterprise, turn)
   }
 
-  val historical = new TitledPane() {
+  private val historical = new Tab() {
     text = Localization("history")
-    style = s"-fx-font-size: ${Components.largeFontSize}"
+    style = Components.largeFontStyle
     content = new HistoricalEnterpriseRecords(enterprise, province, stage)
   }
 
+  tabPane.tabs = List(mainTitle, supplyAndDemandTitle, historical)
 
-  accordion.panes = List(mainTitle, supplyAndDemandTitle, historical)
-  accordion.expandedPane = mainTitle
 }
 
 abstract class EnterprisePane(e: Enterprise, province: Province) extends MigPane() with WorldInterfaceJavaNode {
-
 
   add(MediumText(Localization("enterprise.type")))
   add(new MediumText {
@@ -329,13 +441,83 @@ class HistoricalEnterpriseRecords(e: Enterprise, p:Province, stage: Stage) exten
       }
     }
 
-    dialog.initModality(Modality.WindowModal)
-    dialog.initOwner(stage)
-    dialog.centerOnScreen()
-    dialog.show()
+    dialog.showDialog(stage)
   }
 
   buildProductionChart().foreach { chart =>
     add(chart, "push, grow")
   }
+}
+
+class RegionProjectsPane(buffer:ObservableBuffer[BusinessProject]) extends MigPane with WorldInterfaceJavaNode {
+  val projectsTable = new TableView[BusinessProject]()
+  projectsTable.style = Components.mediumFontStyle
+
+  private val projectColumn = new TableColumn[BusinessProject, String] {
+    text = Localization("project.project")
+    cellValueFactory = e => StringProperty(localizeProjectShort(e.value))
+    editable = false
+    prefWidth <== projectsTable.width * 0.45
+  }
+
+  private val moneyColumn = new TableColumn[BusinessProject, String] {
+    text = Localization("project.remainingMoney")
+    cellValueFactory = e => StringProperty(DoubleFormatter().format(e.value.remainingMoney))
+    editable = false
+    prefWidth <== projectsTable.width * 0.25
+  }
+
+  private val progressColumn = new TableColumn[BusinessProject, ProgressBar]() {
+    text = Localization("project.progress")
+    cellFactory = p => new TableCell[BusinessProject, ProgressBar] {
+      override def updateItem(t: ProgressBar, b: Boolean): Unit = {
+        super.updateItem(t, b)
+        Option(t).foreach { t =>
+          t.prefWidth <== this.widthProperty()
+        }
+        setGraphic(t)
+      }
+    }
+    cellValueFactory = p => ObjectProperty[ProgressBar]{
+      new ProgressBar() {
+        progress = p.value.progress
+      }
+    }
+    editable = false
+    prefWidth <== projectsTable.width * 0.25
+  }
+
+  val selectedRow: ReadOnlyObjectProperty[BusinessProject] = projectsTable.delegate.getSelectionModel.selectedItemProperty
+
+  projectsTable.columns ++= List(projectColumn, moneyColumn, progressColumn)
+  projectsTable.items = buffer
+  projectsTable.style = Components.mediumFontStyle
+
+  add(projectsTable, "grow, push")
+}
+
+class ProjectPane(project: BusinessProject) extends MigPane with WorldInterfaceJavaNode {
+  add(new BigText {
+    text = localizeProjectShort(project)
+  }.delegate, "center,span 2, wrap")
+
+  add(MediumText(Localization("project")))
+  add(new MediumText {
+    text = localizeProject(project)
+  }.delegate, "wrap")
+
+  add(MediumText(Localization("project.remainingMoney")))
+  add(new MediumText {
+    text = DoubleFormatter().format(project.remainingMoney)
+  }.delegate, "wrap")
+
+  add(MediumText(Localization("project.remainingResources")))
+  add(new MediumText {
+    text = localizeProductsBucket(project.remainingProducts)
+  }.delegate, "wrap")
+
+  add(MediumText(Localization("project.alreadyBoughtProducts")))
+  add(new MediumText {
+    text = localizeProductsBucket(project.alreadyBoughtProducts)
+  }.delegate, "wrap")
 }

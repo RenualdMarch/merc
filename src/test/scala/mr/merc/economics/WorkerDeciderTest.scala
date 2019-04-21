@@ -64,7 +64,7 @@ class WorkerDeciderTest extends FunSuite with BeforeAndAfter {
 
     override def toString: String = name
 
-    def receiveFulfilledDemandRequestsAndPayChecks(requests:Map[Product, FulfilledDemandRequest]) = ???
+    def buyDemandedProducts(requests:List[FulfilledDemandRequest]) = ???
   }
 
   test("general case when demands are bigger then workers") {

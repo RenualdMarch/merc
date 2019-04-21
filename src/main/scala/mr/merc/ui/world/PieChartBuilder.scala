@@ -44,7 +44,7 @@ object PieChartBuilder {
       }
     }
 
-    chart.style = s"-fx-font-size: ${Components.smallFontSize}"
+    chart.style = s"-fx-font-size: ${Components.mediumFontSize}"
     chart
   }
 
@@ -57,13 +57,13 @@ object PieChartBuilder {
     }
     legendSide match {
       case Side.Bottom =>
-        PaneWithTwoEqualVerticalChildren(chart, legend)
+        PaneWithTwoVerticalChildren(chart, legend)
       case Side.Top =>
-        PaneWithTwoEqualVerticalChildren(legend, chart)
+        PaneWithTwoVerticalChildren(legend, chart)
       case Side.Left =>
-        PaneWithTwoEqualHorizontalChildren(legend, chart)
+        PaneWithTwoHorizontalChildren(legend, chart)
       case Side.Right =>
-        PaneWithTwoEqualHorizontalChildren(chart, legend)
+        PaneWithTwoHorizontalChildren(chart, legend)
     }
   }
 

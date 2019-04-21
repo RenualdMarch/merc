@@ -17,7 +17,7 @@ import scalafx.stage.{Modality, Stage}
 
 import scala.collection.JavaConverters._
 
-class MarketViewPane(province: Province, stage: Stage) extends PaneWithTwoEqualHorizontalChildren {
+class MarketViewPane(province: Province, stage: Stage) extends PaneWithTwoHorizontalChildren {
   val productsTablePane = new ProductsTablePane(province.regionMarket)
   val productPane = new ProductPane(productsTablePane.selectedItem, province, stage)
 
@@ -49,7 +49,7 @@ class ProductsTablePane(market: RegionMarket) extends MigPane with WorldInterfac
       override def updateItem(t: FontIcon, b: Boolean): Unit = {
         super.updateItem(t, b)
         Option(t).foreach { opt =>
-          opt.setIconSize(30)
+          opt.setIconSize(Components.smallFontSize * 2)
         }
 
         setGraphic(t)

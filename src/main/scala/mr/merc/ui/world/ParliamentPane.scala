@@ -5,6 +5,7 @@ import mr.merc.local.Localization._
 import mr.merc.local.Localization
 import mr.merc.politics._
 import mr.merc.ui.common.SceneManager
+import mr.merc.ui.dialog.ModalDialog
 import mr.merc.ui.world.PieChartBuilder.PiePart
 import org.tbee.javafx.scene.layout.MigPane
 import scalafx.scene.layout.{BorderPane, Pane}
@@ -17,7 +18,8 @@ import scalafx.scene.control.TabPane.TabClosingPolicy
 import scalafx.scene.{Node, Scene}
 import scalafx.scene.control.{Separator, Tab, TabPane}
 import scalafx.scene.paint.Color
-import scalafx.stage.{Modality, Stage}
+import scalafx.stage.Stage
+import ModalDialog._
 
 class ParliamentPane(sceneManager: SceneManager, worldState: WorldStateParliamentActions) extends BorderPane {
   left = new RulingPartyParliamentPane(sceneManager, worldState)
@@ -80,14 +82,9 @@ class ParliamentActionsPane(sceneManager: SceneManager, worldState: WorldStatePa
   add(usurpPower, "grow,wrap")
   add(giveUpPower, "grow,wrap")
 
-  def choosePartiesDialog(possibleParties: List[Party]): Option[Party] = {
-    val dialog = new SelectPartyPane(possibleParties)
-    dialog.initModality(Modality.WindowModal)
-    dialog.initOwner(sceneManager.stage.delegate)
-    dialog.centerOnScreen()
-    dialog.showAndWait()
-    dialog.selectedParty
-  }
+  def choosePartiesDialog(possibleParties: List[Party]): Option[Party] =
+    new SelectPartyPane(possibleParties).showDialog(sceneManager.stage).selected
+
 }
 
 // TODO in future add tooltips
@@ -134,7 +131,7 @@ class ParliamentPie(worldState: WorldStateParliamentActions) extends TabPane {
     val percentage = votes.scaleToSum(1d)
     val pies = votes.toList.sortBy(-_._2).map { case (p, count) =>
       val name = Localization(p.name)
-      val tooltip = s"$name\n${IntFormatter().format(count)}\n${DoubleFormatter().format(percentage(p) * 100)}%"
+      val tooltip = s"$name\n${DoubleFormatter().format(percentage(p) * 100)}%"
       PiePart(p.color, name, count, Some(tooltip))
     }
     PieChartBuilder.build(pies)
@@ -161,7 +158,7 @@ class ParliamentPie(worldState: WorldStateParliamentActions) extends TabPane {
 }
 
 class SelectPartyPane(possibleParties: List[Party]) extends Stage {
-  var selectedParty: Option[Party] = None
+  var selected: Option[Party] = None
 
   class ParentPartyPane(val child: Party) extends BorderPane {
     center = new PartyViewPane(child)
@@ -169,7 +166,7 @@ class SelectPartyPane(possibleParties: List[Party]) extends Stage {
 
     this.onMouseClicked = { _ =>
       this.requestFocus()
-      selectedParty = Some(child)
+      selected = Some(child)
     }
   }
 
@@ -188,7 +185,7 @@ class SelectPartyPane(possibleParties: List[Party]) extends Stage {
       pane.children.addAll(parentMigPane)
 
       cancelButton.onAction = { _ =>
-        selectedParty = None
+        selected = None
         SelectPartyPane.this.close()
       }
 
@@ -216,7 +213,7 @@ class SelectPartyPane(possibleParties: List[Party]) extends Stage {
   }
 
   this.onCloseRequest = { _ =>
-    this.selectedParty = None
+    this.selected = None
   }
 }
 

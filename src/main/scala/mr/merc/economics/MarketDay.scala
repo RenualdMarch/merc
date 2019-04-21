@@ -25,6 +25,23 @@ class MarketDay(product: Product, val price: Double, val turn: Int) {
   def totalSupply: Double = supply.map(_.count).sum
   def totalDemand: Double = demand.map(_.count).sum
 
+  def priorityDemandSize:Double = priorityDemands.map(_.count).sum
+
+  def noPriorityDemandSize:Double = noPriorityDemands.map(_.count).sum
+
+  private def priorityDemands:List[BusinessDemandRequest] = {
+    demand.collect {
+      case bd:BusinessDemandRequest => bd
+    } toList
+  }
+
+  private def noPriorityDemands: List[DemandRequest] = {
+    demand.collect {
+      case bd:BusinessDemandRequest => None
+      case x => Some(x)
+    }.flatten.toList
+  }
+
   def calculateSupplyAndDemand(): Unit = {
     require(_fulfilledSupply.isEmpty && _fulfilledDemands.isEmpty, "Resulting supply and demand already calculated")
 
@@ -36,7 +53,7 @@ class MarketDay(product: Product, val price: Double, val turn: Int) {
     }
 
     if (totalSupply > totalDemand) {
-      _fulfilledDemands = Some(demand.map(d =>  FulfilledDemandRequest(d.count, price, d)).toList)
+      _fulfilledDemands = Some(demand.map(d => FulfilledDemandRequest(d.count, price, d)).toList)
 
       val div = totalDemand / totalSupply
 
@@ -53,14 +70,22 @@ class MarketDay(product: Product, val price: Double, val turn: Int) {
       _fulfilledSupply = Some(supply.map(s =>
         FulfilledSupplyRequest(s.count, price, s)).toList)
 
-      val div = totalSupply / totalDemand
+      val priorityDiv = if (priorityDemandSize != 0) {
+        if (totalSupply / priorityDemandSize > 1) 1
+        else totalSupply / priorityDemandSize
+      } else 0
 
-      val fulfilledDemandMap = demand map { s  =>
-        val bought = s.count * div
-        FulfilledDemandRequest(bought, price, s)
-      } toList
+      val noPriorityDiv = if (totalSupply > priorityDemandSize && noPriorityDemandSize != 0) {
+        (totalSupply - priorityDemandSize) / noPriorityDemandSize
+      } else 0
 
-      _fulfilledDemands = Some(fulfilledDemandMap)
+      val fulfilledDemands = priorityDemands.map { s  =>
+        FulfilledDemandRequest(s.count * priorityDiv, price, s)
+      } ::: noPriorityDemands.map { s  =>
+        FulfilledDemandRequest(s.count * noPriorityDiv, price, s)
+      }
+
+      _fulfilledDemands = Some(fulfilledDemands)
 
       if (totalSupply == totalDemand) {
         _tomorrowPrice = Some(price)
@@ -98,6 +123,7 @@ class MarketDay(product: Product, val price: Double, val turn: Int) {
 }
 
 sealed abstract class MarketRequest(val product: Product)
+
 sealed abstract class DemandRequest(product: Product, val count: Double) extends MarketRequest(product) {
   require(!count.isNaN, "Count can't be None")
 }
@@ -106,11 +132,14 @@ sealed abstract class SupplyRequest(product: Product, val count: Double) extends
 }
 case class PopulationDemandRequest(pop: Population, override val product: Product, override val count: Double) extends DemandRequest(product, count)
 case class EnterpriseDemandRequest(enterprise: Enterprise, override val product: Product, override val count: Double) extends DemandRequest(product, count)
+case class BusinessDemandRequest(project: BusinessProject, override val product: Product, override val count:Double) extends DemandRequest(product, count)
 case class EnterpriseSupplyRequest(enterprise: Enterprise, override val product: Product, override val count: Double) extends SupplyRequest(product, count)
 
 case class FulfilledDemandRequest(bought: Double, price: Double, request: DemandRequest) {
   def shortage: Double = request.count - bought
+  def spentMoney:Double = price * bought
 }
 case class FulfilledSupplyRequest(sold: Double, price: Double, request: SupplyRequest) {
   def excess: Double = request.count - sold
+  def receivedMoney:Double = sold * price
 }

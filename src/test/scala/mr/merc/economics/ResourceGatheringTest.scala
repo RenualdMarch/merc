@@ -89,8 +89,8 @@ class ResourceGatheringTest extends FunSuite with BeforeAndAfter{
     resourceGathering.receiveWorkforceRequest(Map(workers -> 10000))
 
     resourceGathering.payMoneyToPops()
-    assert(magicalAristocrats.moneyReserves === 16875)
-    assert(aristocrats.moneyReserves === 28125)
+    assert(aristocrats.moneyReserves === 45000)
+    assert(magicalAristocrats.moneyReserves === 0)
     assert(workers.moneyReserves === 45000)
 
     assert(resourceGathering.payTaxes() === TaxData(CorporateTax, 100000, 10*1000))

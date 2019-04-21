@@ -20,7 +20,7 @@ import scalafx.scene.control.TabPane.TabClosingPolicy
 
 import scala.collection.JavaConverters._
 
-class PopulationViewPane(province: Province) extends PaneWithTwoEqualHorizontalChildren {
+class PopulationViewPane(province: Province) extends PaneWithTwoHorizontalChildren {
   val popsTablePane = new PopsTablePane(province.regionPopulation, province)
   val popDetailsPane: Pane = new PopDetailsPane(popsTablePane.selectedRow, province)
 

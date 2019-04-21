@@ -26,25 +26,33 @@ For M6, interface will be a priority, basic politics, factory building
 +pie chart legend must be removed and replaced with scroolable legend
 +no more than percentage of people can be capitalists and aristocrats
 +Budget interface and implementation
-parties change
-migration(with churches creation and destruction)
-people have two sources of unhappiness - not fulfilled needs and political stuff
-projects - when capitalists or ruler want to expand factory, or hire a soldier, eventual price is unknown.
++parties change
++projects - when capitalists or ruler want to expand factory, or hire a soldier, eventual price is unknown.
++projects to have priority in market
++move economics.conf to scala code
++move world creation configs to scala code - hate when there is too many configuration places
++projects creation by capitalists
++projects help by state
++add localization to products
++projects ui
 if there is no supply but demand, price rises faster.
-taxes must go through buerocrats with corruption
-strange wooden bridges placement during map creation(MapObject placement)
-add icons to menus
+taxes must go through buerocrats
+bankrupt factories destruction
+people have two sources of unhappiness - not fulfilled needs and political stuff
+population growth or decline, literacy from scholars
 gdp info per province
-population growth or decline
-move economics.conf to scala code
-move world creation configs to scala code - hate when there is too many configuration places
-ability to hide map(from menu is ok) and move by moving cursor to the screen borders
-localization - add parameters order, like %1, %2, %3
+technologies
+migration(with churches and mage guilds creation and destruction)
+smarter capitalists when creating and expanding factories
+strange wooden bridges placement during map creation(MapObject placement)
+ability to move map by moving cursor to the screen borders
 next turn button async
+less products - refactor needs
 More tasks??? - game must be working except for war(no revolutions) and diplomacy
 
 Polishing:
 issues - balance production and needs multipliers
+localization - add parameters order, like %1, %2, %3
 
 For M7, soldiers and battles and wars
 For M8, save/load, game polishing and AI

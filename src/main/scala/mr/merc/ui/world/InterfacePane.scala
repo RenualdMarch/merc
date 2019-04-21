@@ -61,44 +61,44 @@ trait WorldInterfaceWhiteJavaNode {
   getStylesheets.add("/css/worldPane.css")
 }
 
-object PaneWithTwoEqualHorizontalChildren {
+object PaneWithTwoHorizontalChildren {
 
-  def apply(first: Region, second: Region): PaneWithTwoEqualHorizontalChildren = {
-    val p = new PaneWithTwoEqualHorizontalChildren()
+  def apply(first: Region, second: Region, left:Double = 0.5): PaneWithTwoHorizontalChildren = {
+    val p = new PaneWithTwoHorizontalChildren(left)
     p.setTwoChildren(first, second)
     p
   }
 }
 
-class PaneWithTwoEqualHorizontalChildren extends Pane {
+class PaneWithTwoHorizontalChildren(left:Double = 0.5) extends Pane {
 
   def setTwoChildren(first: Region, second: Region): Unit = {
     this.children.clear()
 
     first.layoutX = 0
     first.layoutY = 0
-    first.prefWidth <== this.width / 2
+    first.prefWidth <== this.width * left
     first.prefHeight <== this.height
 
-    second.layoutX <== this.width / 2
+    second.layoutX <== this.width * left
     second.layoutY = 0
-    second.prefWidth <== this.width / 2
+    second.prefWidth <== this.width * (1 - left)
     second.prefHeight <== this.height
 
     this.children.addAll(first, second)
   }
 }
 
-object PaneWithTwoEqualVerticalChildren {
+object PaneWithTwoVerticalChildren {
 
-  def apply(first: Region, second: Region): PaneWithTwoEqualVerticalChildren = {
-    val p = new PaneWithTwoEqualVerticalChildren()
+  def apply(first: Region, second: Region, upper:Double = 0.5): PaneWithTwoVerticalChildren = {
+    val p = new PaneWithTwoVerticalChildren(upper)
     p.setTwoChildren(first, second)
     p
   }
 }
 
-class PaneWithTwoEqualVerticalChildren extends Pane {
+class PaneWithTwoVerticalChildren(upper:Double = 0.5) extends Pane {
 
   def setTwoChildren(first: Region, second: Region): Unit = {
     this.children.clear()
@@ -106,12 +106,12 @@ class PaneWithTwoEqualVerticalChildren extends Pane {
     first.layoutX = 0
     first.layoutY = 0
     first.prefWidth <== this.width
-    first.prefHeight <== this.height / 2
+    first.prefHeight <== this.height * upper
 
     second.layoutX = 0
-    second.layoutY <== this.height / 2
+    second.layoutY <== this.height * upper
     second.prefWidth <== this.width
-    second.prefHeight <== this.height / 2
+    second.prefHeight <== this.height * (1 - upper)
 
     this.children.addAll(first, second)
   }

@@ -68,7 +68,7 @@ class PopulationTest extends FunSuite with Matchers {
     assert(pop1.moneyReserves === 2500)
 
     pop1.fulfillNeedsUsingAlreadyReceivedProducts()
-    assert(pop1.needsFulfillment(1).head.needsFulfillment === Map(LifeNeeds -> 1, RegularNeeds -> 1, LuxuryNeeds -> 1))
+    assert(pop1.currentDayRecord.productFulfillment.needsFulfillment === Map(LifeNeeds -> 1, RegularNeeds -> 1, LuxuryNeeds -> 1))
 
     val pop2 = newPopulation(1000)
     val price2 = pop2.buyDemandedProducts(List(FulfilledDemandRequest(0, 1, PopulationDemandRequest(pop2, Grain, 1000)),
@@ -78,7 +78,7 @@ class PopulationTest extends FunSuite with Matchers {
     assert(price2 === 0)
     assert(pop2.moneyReserves === 1000)
     pop2.fulfillNeedsUsingAlreadyReceivedProducts()
-    assert(pop2.needsFulfillment(1).head.needsFulfillment === Map(LifeNeeds -> 0, RegularNeeds -> 0, LuxuryNeeds -> 0))
+    assert(pop2.currentDayRecord.productFulfillment.needsFulfillment === Map(LifeNeeds -> 0, RegularNeeds -> 0, LuxuryNeeds -> 0))
 
 
     val pop3 = newPopulation(15000)
@@ -90,7 +90,7 @@ class PopulationTest extends FunSuite with Matchers {
 
     assert(pop3.moneyReserves === 10500)
     pop3.fulfillNeedsUsingAlreadyReceivedProducts()
-    assert(pop3.needsFulfillment(1).head.needsFulfillment === Map(LifeNeeds -> 0.5, RegularNeeds -> 0.2, LuxuryNeeds -> 0.5))
+    assert(pop3.currentDayRecord.productFulfillment.needsFulfillment === Map(LifeNeeds -> 0.5, RegularNeeds -> 0.2, LuxuryNeeds -> 0.5))
   }
 
   test("salary") {
@@ -193,8 +193,11 @@ class PopulationTest extends FunSuite with Matchers {
     pop.fulfillNeedsUsingAlreadyReceivedProducts()
     pop2.fulfillNeedsUsingAlreadyReceivedProducts()
 
-    assert(pop.needsFulfillment(1).head.needsFulfillment === Map(LifeNeeds -> 1, RegularNeeds -> 1, LuxuryNeeds -> 1))
-    assert(pop2.needsFulfillment(1).head.needsFulfillment === Map(LifeNeeds -> 1, RegularNeeds -> 1, LuxuryNeeds -> 1))
+    assert(pop.currentDayRecord.productFulfillment.needsFulfillment === Map(LifeNeeds -> 1, RegularNeeds -> 1, LuxuryNeeds -> 1))
+    assert(pop2.currentDayRecord.productFulfillment.needsFulfillment === Map(LifeNeeds -> 1, RegularNeeds -> 1, LuxuryNeeds -> 1))
+    assert(pop.happiness === 1d)
+    assert(pop2.happiness === 1d)
+
 
     val ppd = new PopulationPromotionDemotion(regionPopulation, random, Map().withDefaultValue(1d))
     ppd.promoteOrDemote()
@@ -239,9 +242,11 @@ class PopulationTest extends FunSuite with Matchers {
 
     pop.fulfillNeedsUsingAlreadyReceivedProducts()
     pop2.fulfillNeedsUsingAlreadyReceivedProducts()
-    assert(pop.needsFulfillment(1).head.needsFulfillment === Map(LifeNeeds -> 1, RegularNeeds -> 1, LuxuryNeeds -> 1))
-    assert(pop2.needsFulfillment(1).head.needsFulfillment === Map(LifeNeeds -> 0, RegularNeeds -> 0, LuxuryNeeds -> 0))
-
+    regionPopulation.pops.foreach(_.endOfDay())
+    assert(pop.currentDayRecord.productFulfillment.needsFulfillment === Map(LifeNeeds -> 1, RegularNeeds -> 1, LuxuryNeeds -> 1))
+    assert(pop2.currentDayRecord.productFulfillment.needsFulfillment === Map(LifeNeeds -> 0, RegularNeeds -> 0, LuxuryNeeds -> 0))
+    assert(pop.happiness === 1d)
+    assert(pop2.happiness === 0d)
 
     val ppd = new PopulationPromotionDemotion(regionPopulation, random, Map().withDefaultValue(1d))
     ppd.promoteOrDemote()
@@ -284,9 +289,11 @@ class PopulationTest extends FunSuite with Matchers {
 
     pop.fulfillNeedsUsingAlreadyReceivedProducts()
     pop2.fulfillNeedsUsingAlreadyReceivedProducts()
-    assert(pop.needsFulfillment(1).head.needsFulfillment === Map(LifeNeeds -> 0, RegularNeeds -> 0, LuxuryNeeds -> 0))
-    assert(pop2.needsFulfillment(1).head.needsFulfillment === Map(LifeNeeds -> 1, RegularNeeds -> 1, LuxuryNeeds -> 1))
-
+    regionPopulation.pops.foreach(_.endOfDay())
+    assert(pop.currentDayRecord.productFulfillment.needsFulfillment === Map(LifeNeeds -> 0, RegularNeeds -> 0, LuxuryNeeds -> 0))
+    assert(pop2.currentDayRecord.productFulfillment.needsFulfillment === Map(LifeNeeds -> 1, RegularNeeds -> 1, LuxuryNeeds -> 1))
+    assert(pop.happiness === 0d)
+    assert(pop2.happiness === 1d)
 
     val ppd = new PopulationPromotionDemotion(regionPopulation, random, Map().withDefaultValue(1d))
     ppd.promoteOrDemote()
@@ -320,8 +327,8 @@ class PopulationTest extends FunSuite with Matchers {
 
 
     pop.fulfillNeedsUsingAlreadyReceivedProducts()
-
-    assert(pop.needsFulfillment(1).head.needsFulfillment === Map(LifeNeeds -> 1, RegularNeeds -> 1, LuxuryNeeds -> 1))
+    regionPopulation.pops.foreach(_.endOfDay())
+    assert(pop.currentDayRecord.productFulfillment.needsFulfillment === Map(LifeNeeds -> 1, RegularNeeds -> 1, LuxuryNeeds -> 1))
 
     val ppd = new PopulationPromotionDemotion(regionPopulation, random, Map().withDefaultValue(0d))
     ppd.promoteOrDemote()
@@ -349,8 +356,12 @@ class PopulationTest extends FunSuite with Matchers {
 
     pop.fulfillNeedsUsingAlreadyReceivedProducts()
     pop2.fulfillNeedsUsingAlreadyReceivedProducts()
-    assert(pop.needsFulfillment(1).head.needsFulfillment === Map(LifeNeeds -> 1, RegularNeeds -> 1, LuxuryNeeds -> 1))
-    assert(pop2.needsFulfillment(1).head.needsFulfillment === Map(LifeNeeds -> 1, RegularNeeds -> 1, LuxuryNeeds -> 1))
+    regionPopulation.pops.foreach(_.endOfDay())
+    assert(pop.currentDayRecord.productFulfillment.needsFulfillment === Map(LifeNeeds -> 1, RegularNeeds -> 1, LuxuryNeeds -> 1))
+    assert(pop2.currentDayRecord.productFulfillment.needsFulfillment === Map(LifeNeeds -> 1, RegularNeeds -> 1, LuxuryNeeds -> 1))
+    assert(pop.happiness === 1d)
+    assert(pop2.happiness === 1d)
+
 
     val ppd = new PopulationPromotionDemotion(regionPopulation, random, Map(Traders -> 0.1, Farmers -> 0.9).withDefaultValue(1d))
     ppd.promoteOrDemote()

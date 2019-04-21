@@ -89,7 +89,7 @@ abstract class ResourceGathering[Prod <: GatheredProduct](val product: Prod, val
     addCurrentRecord()
   }
 
-  override def owners: List[Population] = region.regionPopulation.pops.filter(s => s.populationType == Aristocrats || s.populationType == MagicalAristocrats)
+  override def owners: List[Population] = region.regionPopulation.pops.filter(_.populationType == Aristocrats)
 
   override def componentDemandRequests(prices: Map[Products.Product, Double]): Map[Products.Product, DemandRequest] = Map()
 
@@ -108,7 +108,7 @@ abstract class ResourceGathering[Prod <: GatheredProduct](val product: Prod, val
 
   private def newRecord(turn: Int) = ResourceGatheringRecord(Map(), 0, Map(), 0, 0, 0, 0, turn)
 
-  def receiveFulfilledDemandRequestsAndPayChecks(requests:Map[Product, FulfilledDemandRequest]): Unit = {
+  def buyDemandedProducts(requests:List[FulfilledDemandRequest]): Unit = {
     throw new IllegalStateException("This method shouldn't be called for resource gatherings since they don't have demands")
   }
 
@@ -131,7 +131,16 @@ class Mine(product: ResourceProduct, region: EconomicRegion, startingProducts: D
   override def possibleWorkers: Population.PopulationType = Labourers
 }
 
-class Church(product: Ritual, region: EconomicRegion, startingProducts: Double, gatheringEfficiencyMultiplier: Double) extends ResourceGathering(product, region, startingProducts, gatheringEfficiencyMultiplier) {
+class Church(product: Ritual, region: EconomicRegion, startingProducts: Double, gatheringEfficiencyMultiplier: Double)
+  extends ResourceGathering(product, region, startingProducts, gatheringEfficiencyMultiplier) {
   override def possibleWorkers: Population.PopulationType = Clergy
   override def owners: List[Population] = region.regionPopulation.pops.filter(_.populationType == Clergy)
+}
+
+class MagicGuild(region: EconomicRegion, startingMoney: Double,  startingProducts: Double, gatheringEfficiencyMultiplier: Double)
+  extends ResourceGathering(Magic, region, startingProducts, gatheringEfficiencyMultiplier) {
+
+  override val possibleWorkers: PopulationType = Mages
+
+  override def owners: List[Population] = region.regionPopulation.pops.filter(_.populationType == MagicalAristocrats)
 }

@@ -4,6 +4,7 @@ import mr.merc.economics.Factory.FactoryRecord
 import mr.merc.economics._
 import mr.merc.economics.Population.{LifeNeeds, LuxuryNeeds, PopulationNeedsType, ProductFulfillmentRecord, RegularNeeds}
 import mr.merc.local.Localization
+import mr.merc.local.Localization._
 import scalafx.beans.property.StringProperty
 import scalafx.collections.ObservableBuffer
 import scalafx.scene.control.{TableColumn, TableView}
@@ -110,6 +111,8 @@ object SupplyDemandTables {
           Demand(localizeEnterprise(enterprise, province), count, r.bought, r.price)
         case PopulationDemandRequest(pop, _, count) =>
           Demand(localizePopulation(pop, province), count, r.bought, r.price)
+        case BusinessDemandRequest(project, _, count) =>
+          Demand(localizeProject(project), count, r.bought, r.price)
       }
     }
 

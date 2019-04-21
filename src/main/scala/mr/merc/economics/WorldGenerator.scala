@@ -1,6 +1,5 @@
 package mr.merc.economics
 
-import com.typesafe.config.ConfigFactory
 import mr.merc.economics.Population.{Culture, LatinHuman, Lower, Middle, Upper}
 import mr.merc.economics.Products._
 import mr.merc.log.Logging
@@ -10,6 +9,9 @@ import mr.merc.map.terrain.WaterKind
 import mr.merc.players.{ColorGenerator, NamesGenerator}
 import mr.merc.politics.{Party, PoliticalViews, Province, State}
 import mr.merc.util.WeightedRandom
+
+import WorldEconomicConstants.Enterprises._
+import WorldGenerationConstants._
 
 import scala.util.Random
 
@@ -31,83 +33,43 @@ class WorldGenerator(field:TerrainHexField) {
     }
   }
 
-
-  import scala.collection.JavaConverters._
-  private val config = ConfigFactory.load("conf/worldGenerationEconomics")
-  private val economicConfig = ConfigFactory.load("conf/economics.conf")
   private val colorGenerator = new ColorGenerator()
   private val namesGenerators:Map[Culture, NamesGenerator] = Population.cultures.map { c =>
     c -> new NamesGenerator(Culture.cultureConfig(c))
   } toMap
 
-  private val minResources = config.getInt("world.resources.resourcesPerRegion.min")
-  private val maxResources = config.getInt("world.resources.resourcesPerRegion.max")
-  private val minFactories = config.getInt("world.factories.factoriesPerRegion.min")
-  private val maxFactories = config.getInt("world.factories.factoriesPerRegion.max")
-  private val startingFactoryMoney = config.getInt("world.factories.startingMoney")
-  private val startingFactoryLevel = config.getInt("world.factories.startingLevel")
-
-  private val farmStartingResource = config.getInt("world.resources.startingResources.farm")
-  private val mineStartingResource = config.getInt("world.resources.startingResources.mine")
-  private val churchStartingResource = config.getInt("world.resources.startingResources.church")
-  private val factoryStartingResource = config.getInt("world.factories.startingResources.industrial")
-  private val magicStartingResource = config.getInt("world.factories.startingResources.magic")
-
-  private val resourceGenerator = new WeightedRandom(resourceRarity)
-  private val factoriesGenerator = new WeightedRandom(factoriesRarity)
+  private val resourceGenerator = new WeightedRandom(ResourcesRarity)
+  private val factoriesGenerator = new WeightedRandom(FactoriesRarity)
 
   private def generateEnterprises(province: Province):List[Enterprise] = {
-    val resourceEff = economicConfig.getInt("enterprise.resourceEfficiency")
     val resources = generateResources.map {
-      case f:FarmProduct => new Farm(f, province, farmStartingResource, resourceEff)
-      case m:ResourceProduct => new Mine(m, province, mineStartingResource, resourceEff)
+      case f:FarmProduct => new Farm(f, province, FarmStartingResources, ResourceExtractionEfficiency)
+      case m:ResourceProduct => new Mine(m, province, MineStartingResources, ResourceExtractionEfficiency)
     }
 
     val churches = generateProductsForChurches(province.regionPopulation.cultureMembers.keys.toList).map {
-      r => new Church(r, province, churchStartingResource, economicConfig.getInt("enterprise.churchEfficiency")  )
+      r => new Church(r, province, ChurchStartingResources, ChurchRitualEfficiency)
     }
 
-    val factoryInputEff = economicConfig.getInt("enterprise.factoryInputEfficiency")
-    val factoryOutputEff = economicConfig.getInt("enterprise.factoryOutputEfficiency")
     val factories = generateProductsForFactories.map { f =>
-      new IndustrialFactory(province, f, startingFactoryLevel, startingFactoryMoney,
-        factoryStartingResource, factoryInputEff, factoryOutputEff)
+      new IndustrialFactory(province, f, FactoryStartingLevel, FactoryStartingMoney,
+        FactoryStartingResources, FactoryInputMultiplier, FactoryOutputMultiplier)
     }
 
-    val guildInputEff = economicConfig.getInt("enterprise.magicInputEfficiency")
-    val guildOutputEff = economicConfig.getInt("enterprise.magicOutputEfficiency")
+    val mages = new MagicGuild(province, FactoryStartingMoney, MagicGuildStartingResources,
+      MagicGuildEfficiency)
 
-    val mages = generateProductsForMageGuilds.map { m =>
-      new MagicGuildEnterprise(province, m, startingFactoryMoney, magicStartingResource, guildInputEff, guildOutputEff)
-    }
-
-    resources ++ churches ++ factories ++ mages
-  }
-
-  private def resourceRarity: Map[GatheredProduct, Double] = {
-    config.getConfig("world.resources.rarity").entrySet().asScala.map { entry =>
-      Products.productByName(entry.getKey) -> entry.getValue.unwrapped().asInstanceOf[Number].doubleValue()
-    }.collect{case (p: GatheredProduct, d) => p -> d}.toMap
+    resources ++ churches ++ factories ++ List(mages)
   }
 
   private def generateResources:List[GatheredProduct] = {
-    val n = minResources + Random.nextInt(maxResources - minResources + 1)
+    val n = MinResourcesPerRegion + Random.nextInt(MaxResourcesPerRegion - MinResourcesPerRegion + 1)
     List.fill(n)(resourceGenerator.nextRandomItem())
   }
 
-  private def factoriesRarity: Map[IndustryProduct, Double] = {
-    config.getConfig("world.factories.rarity").entrySet().asScala.map { entry =>
-      Products.productByName(entry.getKey) -> entry.getValue.unwrapped().asInstanceOf[Number].doubleValue()
-    }.collect{case (p: IndustryProduct, d) => p -> d}.toMap
-  }
-
   private def generateProductsForFactories:List[IndustryProduct] = {
-    val n = minFactories + Random.nextInt(maxFactories - minFactories + 1)
+    val n = MinFactoriesPerRegion + Random.nextInt(MaxFactoriesPerRegion - MinFactoriesPerRegion + 1)
     factoriesGenerator.uniqueRandomItems(n).toList
-  }
-
-  private def generateProductsForMageGuilds:List[MagicProduct] = {
-    if (Random.nextBoolean()) List(Amulet) else List(Medicine)
   }
 
   private def generateProductsForChurches(cultures:List[Culture]):List[Ritual] = {
@@ -115,18 +77,15 @@ class WorldGenerator(field:TerrainHexField) {
   }
 
   private def generateRegionPops(culture: Culture): RegionPopulation = {
-    val conf = config.getConfig("world.population")
 
-    val minProvinceSize = conf.getInt("minProvinceSize")
-    val maxProvinceSize = conf.getInt("maxProvinceSize")
-    val pq = minProvinceSize + Random.nextInt(maxProvinceSize - minProvinceSize)
+    val pq = MinProvinceSize + Random.nextInt(MaxProvinceSize - MinProvinceSize)
 
     val pops = Population.populationTypesByClass.flatMap { case (cls, tps) =>
       tps.map { tp =>
         val (moneyPerPerson, countMultiplier, literacy) = cls match {
-          case Lower => (conf.getDouble("poorMoneyPerPerson"), conf.getInt("poorMultiplier"), conf.getDouble("poorLiteracy"))
-          case Middle => (conf.getDouble("middleMoneyPerPerson"), conf.getInt("middleMultiplier"), conf.getDouble("middleLiteracy"))
-          case Upper => (conf.getDouble("richMoneyPerPerson"), conf.getInt("richMultiplier"), conf.getDouble("richLiteracy"))
+          case Lower => (PoorMoneyPerPerson, PoorMultiplier, PoorLiteracy)
+          case Middle => (MiddleMoneyPerPerson, MiddleMultiplier, MiddleLiteracy)
+          case Upper => (RichMoneyPerPerson, RichMultiplier, RichLiteracy)
         }
 
         val count = countMultiplier * pq / 2 + Random.nextInt(countMultiplier * pq / 2)
@@ -142,7 +101,6 @@ class WorldGenerator(field:TerrainHexField) {
     val prices = Products.AllProducts.map {
       case p:GatheredProduct => p -> 1d
       case p:IndustryProduct => p -> 2d
-      case p:MagicProduct => p -> 2d
     }.toMap
     new RegionMarket(prices)
   }
@@ -150,7 +108,7 @@ class WorldGenerator(field:TerrainHexField) {
   private def generateState(culture: Culture):State = {
     val color = colorGenerator.nextColor()
     val name = namesGenerators(culture).stateNames.extract()
-    new State(name, culture, config.getDouble("world.state.startingMoney"), new PoliticalSystem(Party.aristocratic), color)
+    new State(name, culture, StateStartingMoney, new PoliticalSystem(Party.aristocratic), color)
   }
 
   private def divideIntoContinuousParts(connectivityMap: ConnectivityMap, sizes:List[Int]):List[ConnectivityMap] = {
@@ -178,12 +136,11 @@ class WorldGenerator(field:TerrainHexField) {
       val cultureZipMaps = cultures zip divideIntoContinuousParts(raceMap, cultureSizes)
       cultureZipMaps.flatMap { case (culture, cultureMap) =>
         val provincesPerCulture = cultureMap.size
-        val avgProvinces = config.getInt("world.state.avgProvinces")
-        val avgStatesSize = if (provincesPerCulture < avgProvinces) 1
-          else provincesPerCulture / avgProvinces
+        val avgStatesSize = if (provincesPerCulture < StateAvgProvinces) 1
+          else provincesPerCulture / StateAvgProvinces
         val states = provincesPerCulture divList avgStatesSize
         import mr.merc.util.MercUtils._
-        val shuffled = states.shuffle(config.getInt("world.state.shuffles")).toList
+        val shuffled = states.shuffle(StateShuffles).toList
         val statesMapParts = divideIntoContinuousParts(cultureMap, shuffled)
 
         statesMapParts.map { hexes =>
@@ -305,17 +262,14 @@ object WorldGenerator extends Logging {
   private val hexesPerProvince = 150
   private val provinces = (worldMapHeight * worldMapWidth * WorldMapGenerator.landPercentage / hexesPerProvince).toInt
 
-  private val config = ConfigFactory.load("conf/worldGenerationEconomics")
-
-  def generateWorld(): WorldState = {
+    def generateWorld(): WorldState = {
     val timeBefore = System.currentTimeMillis()
     val world = WorldMapGenerator.generateWorldMap(worldMapWidth, worldMapHeight, provinces)
     val generator = new WorldGenerator(world.terrain)
     val r = (generator.generateStateAndProvinces(world.provinces), world.terrain)
     val playerState = r._1.keys.find(_.primeCulture == LatinHuman).get
     val ws = new WorldState(r._1.values.flatten.toList, playerState, world.terrain)
-    val iterations = config.getInt("world.tradeDays")
-    0 until iterations foreach(_ => ws.nextTurn())
+    0 until TradeDaysBeforeStart foreach(_ => ws.nextTurn())
     info(s"World generation took ${(System.currentTimeMillis() - timeBefore) / 1000d} seconds")
     ws
   }

@@ -1,12 +1,8 @@
 package mr.merc.ui.common
 
 import mr.merc.unit.Soldier
-import scalafx.beans.property.IntegerProperty
 import scalafx.beans.property.StringProperty
 import scalafx.beans.property.ObjectProperty
-import scalafx.scene.image.Image
-import mr.merc.unit.SoldierType
-import mr.merc.unit.view.SoldierTypeViewInfo
 import mr.merc.unit.view.SoldierView
 import mr.merc.unit.view.StandState
 import mr.merc.image.MImage

@@ -2,8 +2,8 @@ package mr.merc.economics
 
 import mr.merc.economics.TaxPolicy.Income
 import mr.merc.economics.MapUtil.FloatOperations._
-import mr.merc.economics.Population.{Bureaucrats, Culture, Farmers, LifeNeeds, Lower, LuxuryNeeds, PopulationNeedsType, PopulationType, RegularNeeds, Scholars}
-import mr.merc.economics.SpendingPolicy.{BureaucratsSalary, Pensions, ScholarsSalary, Spending}
+import mr.merc.economics.Population._
+import mr.merc.economics.SpendingPolicy._
 
 class StateBudget(startingMoney: Double, val taxPolicy: TaxPolicy) {
 
@@ -38,6 +38,11 @@ class StateBudget(startingMoney: Double, val taxPolicy: TaxPolicy) {
       income = currentReport.income |+| Map(taxData.tax -> taxData.taxed),
       grossIncome = currentReport.grossIncome |+| Map(taxData.tax -> taxData.gross))
     currentMoney += taxData.taxed
+  }
+
+  def receiveInvestmentsBack(money: Double): Unit = {
+    this.currentMoney += money
+    this.currentReport = currentReport.copy(expenses = currentReport.expenses |+| Map(Construction -> -money))
   }
 
   def spendBudgetMoney(regions: List[EconomicRegion], primaryCulture: Culture): Unit = {
@@ -161,6 +166,13 @@ class StateBudget(startingMoney: Double, val taxPolicy: TaxPolicy) {
         p.receiveSalary(moneyPerEff * p.totalPopEfficiency, payTax = false)
       }
     }
+  }
+
+  def investMoney(neededMoney: Double): Double = {
+    val investment = if (currentMoney > neededMoney) neededMoney else if (currentMoney > 0) currentMoney else 0
+    this.currentMoney -= investment
+    this.currentReport = currentReport.copy(expenses = currentReport.expenses |+| Map(Construction -> investment))
+    investment
   }
 }
 

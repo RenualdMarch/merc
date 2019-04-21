@@ -17,7 +17,7 @@ trait Enterprise {
 
   def receiveSellingResultAndMoney(economicRegion: EconomicRegion, profit:FulfilledSupplyRequestProfit)
 
-  def receiveFulfilledDemandRequestsAndPayChecks(requests:Map[Product, FulfilledDemandRequest])
+  def buyDemandedProducts(requests:List[FulfilledDemandRequest])
 
   def payMoneyToPops()
 

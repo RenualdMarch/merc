@@ -20,14 +20,14 @@ class BudgetPane(worldState: WorldStateBudgetActions) extends TopTitledBorderPan
   top = BigText(Localization("budget.title", state.name))
   private val income = new IncomePane(worldState)
   private val spending = new SpendingPane(worldState)
-  center = PaneWithTwoEqualHorizontalChildren(income, spending)
+  center = PaneWithTwoHorizontalChildren(income, spending)
   bottom = new BudgetBottomProjectionPane(state.budget.moneyReserve, income.projectedIncome, spending.projectedSpending)
 }
 
 class SpendingPane(worldState: WorldStateBudgetActions) extends TopTitledBorderPane with WorldInterfaceNode {
   top = BigText(Localization("budget.spending"))
   private val config = new SpendingConfiguration(worldState)
-  center = PaneWithTwoEqualVerticalChildren(config, new SpendingReportPane(worldState.playerState.budget))
+  center = PaneWithTwoVerticalChildren(config, new SpendingReportPane(worldState.playerState.budget))
 
   def projectedSpending: DoubleProperty = config.projectedExpenses
 }
@@ -105,7 +105,7 @@ class SpendingConfiguration(worldState: WorldStateBudgetActions) extends TopTitl
 class IncomePane(worldState: WorldStateBudgetActions) extends TopTitledBorderPane with WorldInterfaceNode {
   top = BigText(Localization("budget.income"))
   private val conf = new TaxesConfigurationPane(worldState)
-  center = PaneWithTwoEqualVerticalChildren(conf, new IncomeReportPane(worldState.playerState.budget))
+  center = PaneWithTwoVerticalChildren(conf, new IncomeReportPane(worldState.playerState.budget))
 
   def projectedIncome: DoubleProperty = conf.projectedIncome
 }

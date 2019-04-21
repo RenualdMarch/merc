@@ -1,12 +1,15 @@
 package mr.merc.util
 
-import javafx.beans.property.{ObjectPropertyBase, SimpleObjectProperty}
+import javafx.beans.property.{ObjectPropertyBase, ReadOnlyObjectPropertyBase, SimpleObjectProperty}
 import javafx.beans.property.adapter.JavaBeanObjectProperty
 import scalafx.beans.binding.Bindings
-import scalafx.beans.property.{BooleanProperty, ObjectProperty}
+import scalafx.beans.property.{BooleanProperty, ObjectProperty, ReadOnlyObjectProperty}
 import scalafx.beans.value.ObservableValue
+import scalafx.collections.ObservableBuffer
 
-import scala.collection.immutable
+import scala.language.higherKinds
+import scala.collection.JavaConverters._
+import scala.collection.{GenTraversable, immutable}
 
 
 object FxPropertyUtils {
@@ -61,9 +64,52 @@ object FxPropertyUtils {
           val method = classOf[ObjectPropertyBase[_]].getDeclaredMethod("markInvalid")
           method.setAccessible(true)
           method.invoke(simple)
+        case readOnly: javafx.beans.property.ReadOnlyObjectProperty[_] =>
+          val method = classOf[ReadOnlyObjectPropertyBase[_]].getDeclaredMethod("fireValueChangedEvent")
+          method.setAccessible(true)
+          method.invoke(readOnly)
       }
+    }
+
+    def toObservableBuffer[K](f:T => GenTraversable[K]):ObservableBuffer[K] = {
+      val buffer = new ObservableBuffer[K]()
+      Option(property.value).foreach { p =>
+        buffer.addAll(f(p).toList.asJava)
+      }
+
+      property.onChange {
+        Option(property.value).foreach { p =>
+          buffer.clear()
+          buffer.addAll(f(p).toList.asJava)
+        }
+      }
+
+      buffer
     }
   }
 
+  def bindTwoProperties[T, K](p1:ReadOnlyObjectProperty[T], p2:ReadOnlyObjectProperty[K]):ObjectProperty[Either[T, K]] = {
+    val objectProperty = new ObjectProperty[Either[T, K]]()
+
+    p1.onChange {
+      Option(p1.value).foreach { v =>
+        objectProperty.value = Left(v)
+      }
+    }
+
+    p2.onChange {
+      Option(p2.value).foreach { v =>
+        objectProperty.value = Right(v)
+      }
+    }
+
+    if (p1.value != null) {
+      objectProperty.value = Left(p1.value)
+    } else if (p2.value != null) {
+      objectProperty.value = Right(p2.value)
+    }
+
+    objectProperty
+  }
 
 }

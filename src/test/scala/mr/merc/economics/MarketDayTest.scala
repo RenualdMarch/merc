@@ -78,4 +78,49 @@ class MarketDayTest extends FunSuite {
     assert(marketDay.fulfilledSupply === None)
     assert(marketDay.fulfilledDemands === None)
   }
+
+  test("priority demand when undersupply") {
+    val marketDay = new MarketDay(Products.Coal, 10, 1)
+    val supplyRequest1 = EnterpriseSupplyRequest(null, Products.Coal, 100)
+    val supplyRequest2 = EnterpriseSupplyRequest(null, Products.Coal, 200)
+    val demandRequest1 = EnterpriseDemandRequest(null, Products.Coal, 300)
+    val demandRequest2 = BusinessDemandRequest(null, Products.Coal, 200)
+    marketDay.acceptRequests(supplyRequest1, supplyRequest2, demandRequest1, demandRequest2)
+    marketDay.calculateSupplyAndDemand()
+    assert(marketDay.fulfilledDemands.get.toSet === Set(FulfilledDemandRequest(100, 10, demandRequest1),
+      FulfilledDemandRequest(200, 10, demandRequest2)))
+    assert(marketDay.fulfilledSupply.get.toSet === Set(FulfilledSupplyRequest(100, 10, supplyRequest1),
+      FulfilledSupplyRequest(200, 10, supplyRequest2)))
+    assert(marketDay.tomorrowPrice.get > 10)
+  }
+
+  test("priority demand when huge undersupply") {
+    val marketDay = new MarketDay(Products.Coal, 10, 1)
+    val supplyRequest1 = EnterpriseSupplyRequest(null, Products.Coal, 100)
+    val supplyRequest2 = EnterpriseSupplyRequest(null, Products.Coal, 200)
+    val demandRequest1 = EnterpriseDemandRequest(null, Products.Coal, 300)
+    val demandRequest2 = BusinessDemandRequest(null, Products.Coal, 600)
+    marketDay.acceptRequests(supplyRequest1, supplyRequest2, demandRequest1, demandRequest2)
+    marketDay.calculateSupplyAndDemand()
+    assert(marketDay.fulfilledDemands.get.toSet === Set(FulfilledDemandRequest(0, 10, demandRequest1),
+      FulfilledDemandRequest(300, 10, demandRequest2)))
+    assert(marketDay.fulfilledSupply.get.toSet === Set(FulfilledSupplyRequest(100, 10, supplyRequest1),
+      FulfilledSupplyRequest(200, 10, supplyRequest2)))
+    assert(marketDay.tomorrowPrice.get > 10)
+  }
+
+  test("priority demand when oversupply") {
+    val marketDay = new MarketDay(Products.Coal, 10, 1)
+    val supplyRequest1 = EnterpriseSupplyRequest(null, Products.Coal, 800)
+    val supplyRequest2 = EnterpriseSupplyRequest(null, Products.Coal, 200)
+    val demandRequest1 = EnterpriseDemandRequest(null, Products.Coal, 250)
+    val demandRequest2 = BusinessDemandRequest(null, Products.Coal, 200)
+    marketDay.acceptRequests(supplyRequest1, supplyRequest2, demandRequest1, demandRequest2)
+    marketDay.calculateSupplyAndDemand()
+    assert(marketDay.fulfilledDemands.get.toSet === Set(FulfilledDemandRequest(250, 10, demandRequest1),
+      FulfilledDemandRequest(200, 10, demandRequest2)))
+    assert(marketDay.fulfilledSupply.get.toSet === Set(FulfilledSupplyRequest(360, 10, supplyRequest1),
+      FulfilledSupplyRequest(90, 10, supplyRequest2)))
+    assert(marketDay.tomorrowPrice.get < 10)
+  }
 }
