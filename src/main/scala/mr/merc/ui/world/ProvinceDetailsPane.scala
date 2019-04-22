@@ -16,6 +16,8 @@ class ProvinceDetailsPane(province: Province, parent: WorldFrame) extends MigPan
     add(new StatePropertyNode(province.owner), "wrap")
     add(MediumText(Localization("populationCount")))
     add(populationCountText, "wrap")
+    add(MediumText(Localization("bureaucratsPercentage")), "")
+    add(MediumText(DoubleFormatter().format(province.bureaucratsPercentageFromMax)), "wrap")
     add(MediumText(Localization("cultures")), "span,center,wrap")
     add(culturesDiagram, "span,wrap")
     add(new MigPane("", "") {

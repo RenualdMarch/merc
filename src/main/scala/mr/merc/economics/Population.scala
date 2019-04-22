@@ -150,8 +150,8 @@ class Population(val culture: Culture, val populationType: PopulationType, priva
     case Upper => UpperSalaryTax
   }
 
-  def newDay(stateTaxPolicy: TaxPolicy): Unit = {
-    this.tax = stateTaxPolicy(taxPolicy)
+  def newDay(stateTaxPolicy: TaxPolicy, bureaucratsPercentage: Double): Unit = {
+    this.tax = stateTaxPolicy.tax(taxPolicy, bureaucratsPercentage)
     this.currentPopulationDayRecord = PopulationDayRecord(populationCount, 0, 0, 0, 0,
       new ProductFulfillmentRecord(Map(), needs, Map()))
   }

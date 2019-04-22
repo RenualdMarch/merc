@@ -2,7 +2,7 @@ package mr.merc.economics
 
 import mr.merc.map.PossibleGrid
 import Products.{IndustryProduct, Product}
-import mr.merc.economics.Population.{Culture, LifeNeeds, LuxuryNeeds, PopulationClass, PopulationNeedsType, PopulationType, RegularNeeds}
+import mr.merc.economics.Population._
 import mr.merc.economics.util.DistributionCalculator
 import mr.merc.politics.{PoliticalViews, State}
 import mr.merc.economics.MapUtil.FloatOperations.MapWithFloatOperations
@@ -58,6 +58,17 @@ trait EconomicRegion {
     }
   }
 
+  def bureaucratsPercentageFromMax:Double = {
+    val totalPopulation = regionPopulation.pops.map(_.populationCount).sum
+    val bureaucrats = regionPopulation.popsByType(Bureaucrats).map(_.populationCount).sum
+    if (totalPopulation == 0) 0
+    else {
+      val div = bureaucrats.toDouble / totalPopulation
+      val max = totalPopulation * WorldEconomicConstants.Population.maxPop(Bureaucrats)
+      div / max
+    }
+  }
+
 }
 
 class EconomicGrid(region:EconomicRegion) extends PossibleGrid[EconomicRegion] {
@@ -69,7 +80,7 @@ class EconomicGrid(region:EconomicRegion) extends PossibleGrid[EconomicRegion] {
 
   // currently we think that movement from one province to another takes same time
   override def price(from: EconomicRegion, to: EconomicRegion): Double = {
-    val stateTransit = if (region.owner == from.owner) 0 else new StateTransitPart(from.owner).extractionPart
+    val stateTransit = if (region.owner == from.owner) 0 else new StateTransitPart(from.owner, from).extractionPart
     1 + new TradersTransitPart(from).extractionPart + stateTransit
   }
 

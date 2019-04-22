@@ -2,12 +2,9 @@ package mr.merc.economics
 
 import scala.collection.mutable
 import Products.Product
+import WorldEconomicConstants.Market._
 
 class MarketDay(product: Product, val price: Double, val turn: Int) {
-  private val priceIncrease = 1.03
-  private val priceDecrease = 0.97
-
-  private val lowestPossiblePrice = 0.001
 
   private var _tomorrowPrice:Option[Double] = None
 
@@ -65,7 +62,11 @@ class MarketDay(product: Product, val price: Double, val turn: Int) {
       import scala.math.max
 
       _fulfilledSupply = Some(fulfilledSupplyMap)
-      _tomorrowPrice = Some(max(price * priceDecrease, lowestPossiblePrice))
+      if (totalDemand > 0) {
+        _tomorrowPrice = Some(max(price * PriceDecrease, LowestPossiblePrice))
+      } else {
+        _tomorrowPrice = Some(max(price * EmptyDemandPriceDecrease, LowestPossiblePrice))
+      }
     } else {
       _fulfilledSupply = Some(supply.map(s =>
         FulfilledSupplyRequest(s.count, price, s)).toList)
@@ -89,8 +90,10 @@ class MarketDay(product: Product, val price: Double, val turn: Int) {
 
       if (totalSupply == totalDemand) {
         _tomorrowPrice = Some(price)
+      } else if (totalSupply > 0) {
+        _tomorrowPrice = Some(price * PriceIncrease)
       } else {
-        _tomorrowPrice = Some(price * priceIncrease)
+        _tomorrowPrice = Some(price * EmptySupplyPriceIncrease)
       }
 
     }

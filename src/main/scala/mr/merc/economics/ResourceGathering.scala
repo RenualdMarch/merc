@@ -37,8 +37,8 @@ abstract class ResourceGathering[Prod <: GatheredProduct](val product: Prod, val
     }
   }
 
-  override def newDay(taxPolicy: TaxPolicy, turn: Int): Unit = {
-    currentTax = taxPolicy(CorporateTax)
+  override def newDay(taxPolicy: TaxPolicy, bureaucratsPercentage:Double, turn: Int): Unit = {
+    currentTax = taxPolicy.tax(CorporateTax, bureaucratsPercentage)
     currentRecord = newRecord(turn)
   }
 

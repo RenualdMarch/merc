@@ -210,8 +210,8 @@ abstract class Factory[Producible <: IndustryProduct](val region: EconomicRegion
     }
   }
 
-  def newDay(taxPolicy: TaxPolicy, turn: Int): Unit = {
-    currentTaxPolicy = taxPolicy(CorporateTax)
+  def newDay(taxPolicy: TaxPolicy, bureaucratsPercentage: Double, turn: Int): Unit = {
+    currentTaxPolicy = taxPolicy.tax(CorporateTax, bureaucratsPercentage)
     currentRecord = newFactoryRecord(turn)
   }
 

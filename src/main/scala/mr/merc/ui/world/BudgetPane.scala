@@ -152,35 +152,35 @@ class TaxesConfigurationPane(worldState: WorldStateBudgetActions) extends TopTit
   private val budget = state.budget
 
   val salaryLowTax = new TaxLevelSlider(Localization("budget.income.salary.low"),
-    budget.taxPolicy(LowSalaryTax), state.rulingParty.economy.salaryTax.min,
+    budget.taxPolicy.taxPolicyValue(LowSalaryTax), state.rulingParty.economy.salaryTax.min,
     state.rulingParty.economy.salaryTax.max, budget.projectIncomeFunction(LowSalaryTax))
   salaryLowTax.sliderValue.onChange {
     worldState.setStateTax(state, LowSalaryTax, salaryLowTax.sliderValue.value)
   }
 
   val salaryMiddleTax = new TaxLevelSlider(Localization("budget.income.salary.middle"),
-    state.budget.taxPolicy(MiddleSalaryTax),state.rulingParty.economy.salaryTax.min,
+    state.budget.taxPolicy.taxPolicyValue(MiddleSalaryTax),state.rulingParty.economy.salaryTax.min,
     state.rulingParty.economy.salaryTax.max, budget.projectIncomeFunction(MiddleSalaryTax))
   salaryMiddleTax.sliderValue.onChange {
     worldState.setStateTax(state, MiddleSalaryTax, salaryMiddleTax.sliderValue.value)
   }
 
   val salaryUpperTax = new TaxLevelSlider(Localization("budget.income.salary.upper"),
-    state.budget.taxPolicy(UpperSalaryTax), state.rulingParty.economy.salaryTax.min,
+    state.budget.taxPolicy.taxPolicyValue(UpperSalaryTax), state.rulingParty.economy.salaryTax.min,
     state.rulingParty.economy.salaryTax.max, budget.projectIncomeFunction(UpperSalaryTax))
   salaryUpperTax.sliderValue.onChange {
     worldState.setStateTax(state, UpperSalaryTax, salaryUpperTax.sliderValue.value)
   }
 
   val corporateTax = new TaxLevelSlider(Localization("budget.income.corporate"),
-    state.budget.taxPolicy(CorporateTax), state.rulingParty.economy.corporateTax.min,
+    state.budget.taxPolicy.taxPolicyValue(CorporateTax), state.rulingParty.economy.corporateTax.min,
     state.rulingParty.economy.corporateTax.max, budget.projectIncomeFunction(CorporateTax))
   corporateTax.sliderValue.onChange {
     worldState.setStateTax(state, CorporateTax, corporateTax.sliderValue.value)
   }
 
   val salesTax = new TaxLevelSlider(Localization("budget.income.sales"),
-    state.budget.taxPolicy(SalesTax), state.rulingParty.economy.salesTax.min,
+    state.budget.taxPolicy.taxPolicyValue(SalesTax), state.rulingParty.economy.salesTax.min,
     state.rulingParty.economy.salesTax.max, budget.projectIncomeFunction(SalesTax))
   salesTax.sliderValue.onChange {
     worldState.setStateTax(state, SalesTax, salesTax.sliderValue.value)
@@ -188,14 +188,14 @@ class TaxesConfigurationPane(worldState: WorldStateBudgetActions) extends TopTit
 
 
   val tariffTax = new TaxLevelSlider(Localization("budget.income.tariff"),
-    state.budget.taxPolicy(TariffTax), state.rulingParty.economy.tariff.min,
+    state.budget.taxPolicy.taxPolicyValue(TariffTax), state.rulingParty.economy.tariff.min,
     state.rulingParty.economy.tariff.max, budget.projectIncomeFunction(TariffTax))
   tariffTax.sliderValue.onChange {
     worldState.setStateTax(state, TariffTax, tariffTax.sliderValue.value)
   }
 
   val transitTax = new TaxLevelSlider(Localization("budget.income.transit"),
-    state.budget.taxPolicy(TransitTax), state.rulingParty.economy.transit.min,
+    state.budget.taxPolicy.taxPolicyValue(TransitTax), state.rulingParty.economy.transit.min,
     state.rulingParty.economy.transit.max, budget.projectIncomeFunction(TransitTax))
   transitTax.sliderValue.onChange {
     worldState.setStateTax(state, TransitTax, transitTax.sliderValue.value)

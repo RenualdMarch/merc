@@ -3,7 +3,7 @@ package mr.merc.economics
 import mr.merc.economics.TaxPolicy.Income
 
 object TaxPolicy {
-  def zeroTaxes: TaxPolicy = TaxPolicy(Map())
+  def zeroTaxes: TaxPolicy = new TaxPolicy(Map())
 
   sealed abstract class Income
   object CorporateTax extends Income
@@ -18,8 +18,11 @@ object TaxPolicy {
 
 }
 
-case class TaxPolicy(private var taxes:Map[Income, Double]) {
-  def apply(income: Income): Double = taxes.getOrElse(income, 0d)
+class TaxPolicy(private var taxes:Map[Income, Double]) {
+  def tax(income: Income, bureaucratsPercentage:Double): Double = taxes.getOrElse(income, 0d) *
+    WorldEconomicConstants.Taxes.taxCollectionPart(bureaucratsPercentage)
+
+  def taxPolicyValue(income: Income):Double = taxes(income)
 
   def set(income: Income, v: Double): Unit = {
     taxes += income -> v

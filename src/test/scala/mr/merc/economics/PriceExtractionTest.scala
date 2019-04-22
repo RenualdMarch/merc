@@ -8,7 +8,7 @@ import org.scalatest.{BeforeAndAfter, FunSuite, Matchers}
 class PriceExtractionTest extends FunSuite with BeforeAndAfter with Matchers {
 
   val state = new State("", KnightHuman, 0, new PoliticalSystem(Party.absolute)) {
-    override val taxPolicy: TaxPolicy = TaxPolicy(Map(SalesTax -> 0.5, TransitTax -> 0.1, TariffTax -> 0.2))
+    override val taxPolicy: TaxPolicy = new TaxPolicy(Map(SalesTax -> 0.5, TransitTax -> 0.1, TariffTax -> 0.2))
   }
   val traders = new Population(KnightHuman, Traders, 1000, 0, 0, PoliticalViews.averagePoliticalViews)
 
@@ -18,6 +18,8 @@ class PriceExtractionTest extends FunSuite with BeforeAndAfter with Matchers {
     override def economicNeighbours: Set[EconomicRegion] = Set()
 
     override val regionMarket: RegionMarket = null
+
+    override def bureaucratsPercentageFromMax: Double = 1d
 
     override val regionPopulation: RegionPopulation = new RegionPopulation(List(traders))
   }
@@ -31,9 +33,9 @@ class PriceExtractionTest extends FunSuite with BeforeAndAfter with Matchers {
   before {
     tradersSales = new TradersSalesPart(region)
     tradersTransit = new TradersTransitPart(region)
-    stateTransit = new StateTransitPart(state)
-    stateSales = new StateSalesPart(state)
-    stateTariff = new StateTariffPart(state)
+    stateTransit = new StateTransitPart(state, region)
+    stateSales = new StateSalesPart(state, region)
+    stateTariff = new StateTariffPart(state, region)
   }
 
   test("no extractions") {
@@ -43,15 +45,15 @@ class PriceExtractionTest extends FunSuite with BeforeAndAfter with Matchers {
 
   test("one extraction") {
     val price = Price(110, List(stateTransit))
-    price.afterTaxesProfit should equal(100d +- 0.001)
-    assert(stateTransit.extractionMoney === 10)
+    price.afterTaxesProfit shouldBe 100d +- 0.001
+    stateTransit.extractionMoney shouldBe 10d +- 0.0001
   }
 
   test("many extractions") {
     val price = Price(180, List(stateTransit, stateSales, stateTariff))
-    price.afterTaxesProfit should equal(100d +- 0.001)
-    assert(stateTransit.extractionMoney === 10)
-    assert(stateSales.extractionMoney === 50)
-    assert(stateTariff.extractionMoney === 20)
+    price.afterTaxesProfit shouldBe 100d +- 0.001
+    stateTransit.extractionMoney shouldBe 10d +- 0.0001
+    stateSales.extractionMoney shouldBe 50d +- 0.0001
+    stateTariff.extractionMoney shouldBe 20d +- 0.0001
   }
 }

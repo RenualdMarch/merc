@@ -4,9 +4,9 @@ import mr.merc.economics.Population._
 import mr.merc.economics.Products._
 import mr.merc.economics.TaxPolicy._
 import mr.merc.politics.{Party, PoliticalViews, Province, State}
-import org.scalatest.FunSuite
+import org.scalatest.{FunSuite, Matchers}
 
-class WorldMarketDayTest extends FunSuite {
+class WorldMarketDayTest extends FunSuite with Matchers {
 
   var region1, region2, region3: EconomicRegion = _
 
@@ -21,7 +21,7 @@ class WorldMarketDayTest extends FunSuite {
     // region1 produces grain and has liquor factory, region2 produces coal, region3 produces glass
 
     val state1 = new State("", KnightHuman, 0, new PoliticalSystem(Party.absolute)) {
-      override val taxPolicy: TaxPolicy = TaxPolicy(Map(CorporateTax -> 0.2, LowSalaryTax -> 0.1, MiddleSalaryTax -> 0.1,
+      override val taxPolicy: TaxPolicy = new TaxPolicy(Map(CorporateTax -> 0.2, LowSalaryTax -> 0.1, MiddleSalaryTax -> 0.1,
         UpperSalaryTax -> 0.1,TariffTax -> 0.1, TransitTax -> 0.1))
     }
 
@@ -94,7 +94,7 @@ class WorldMarketDayTest extends FunSuite {
       }
     }
 
-    assert(ws.totalMoney === 7000)
+    ws.totalMoney shouldBe 7000d +- 0.001
 
   }
 

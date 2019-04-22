@@ -17,7 +17,7 @@ class State(initialName: String, val primeCulture:Culture, startingMoney: Double
 
   val taxPolicy: TaxPolicy = {
     val policy = rulingParty.economy
-    TaxPolicy(Map(
+    new TaxPolicy(Map(
       LowSalaryTax -> policy.salaryTax.min,
       MiddleSalaryTax -> policy.salaryTax.min,
       UpperSalaryTax -> policy.salaryTax.min,

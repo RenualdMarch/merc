@@ -27,7 +27,7 @@ trait Enterprise {
 
   def expectedSalaryPerEfficiency: Double
 
-  def newDay(taxPolicy: TaxPolicy, turn: Int): Unit
+  def newDay(taxPolicy: TaxPolicy, bureaucratsPercentage: Double, turn: Int): Unit
 
   def possibleWorkers: PopulationType
 

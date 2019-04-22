@@ -95,12 +95,12 @@ class PopulationTest extends FunSuite with Matchers {
 
   test("salary") {
     val pop = newPopulation(1000)
-    pop.newDay(TaxPolicy(Map(MiddleSalaryTax -> 0.1)))
+    pop.newDay(new TaxPolicy(Map(MiddleSalaryTax -> 0.1)), 1)
     pop.receiveSalary(10000)
     assert(pop.moneyReserves === 10000)
     pop.endOfDay()
     assert(pop.salary.head.totalMoney === 10000)
-    assert(pop.salary.head.taxes === 1000)
+    pop.salary.head.taxes shouldBe 1000d +- 0.00001
   }
 
   test("extraction of people") {

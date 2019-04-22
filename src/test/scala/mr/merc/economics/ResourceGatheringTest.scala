@@ -4,9 +4,9 @@ import mr.merc.economics.Population._
 import mr.merc.economics.Products.Grain
 import mr.merc.economics.TaxPolicy.CorporateTax
 import mr.merc.politics.{Party, PoliticalViews, State}
-import org.scalatest.{BeforeAndAfter, FunSuite}
+import org.scalatest.{BeforeAndAfter, FunSuite, Matchers}
 
-class ResourceGatheringTest extends FunSuite with BeforeAndAfter{
+class ResourceGatheringTest extends FunSuite with BeforeAndAfter with Matchers {
 
   var aristocrats: Population = _
   var magicalAristocrats: Population = _
@@ -20,11 +20,11 @@ class ResourceGatheringTest extends FunSuite with BeforeAndAfter{
 
   before {
     aristocrats = new Population(LatinHuman, Aristocrats, 1000, 0, 0, PoliticalViews.averagePoliticalViews)
-    aristocrats.newDay(zeroPolicy)
+    aristocrats.newDay(zeroPolicy, 1)
     magicalAristocrats = new Population(LatinHuman, MagicalAristocrats, 600, 0, 0, PoliticalViews.averagePoliticalViews)
-    magicalAristocrats.newDay(zeroPolicy)
+    magicalAristocrats.newDay(zeroPolicy, 1)
     workers = new Population(LatinHuman, Farmers, 4000, 0, 0, PoliticalViews.averagePoliticalViews)
-    workers.newDay(zeroPolicy)
+    workers.newDay(zeroPolicy,1)
     country = new State("", KnightHuman, 0, new PoliticalSystem(Party.absolute)) {
       override val taxPolicy: TaxPolicy = TaxPolicy.zeroTaxes
     }
@@ -68,7 +68,7 @@ class ResourceGatheringTest extends FunSuite with BeforeAndAfter{
 
     val prices = Map[Products.Product, Double](Grain -> 10)
 
-    resourceGathering.newDay(TaxPolicy(Map(CorporateTax -> 0.1)), 1)
+    resourceGathering.newDay(new TaxPolicy(Map(CorporateTax -> 0.1)), 1,1)
 
     assert(resourceGathering.componentDemandRequests(prices) === Map())
 
@@ -89,11 +89,14 @@ class ResourceGatheringTest extends FunSuite with BeforeAndAfter{
     resourceGathering.receiveWorkforceRequest(Map(workers -> 10000))
 
     resourceGathering.payMoneyToPops()
-    assert(aristocrats.moneyReserves === 45000)
+    aristocrats.moneyReserves shouldBe 45000d +- 000.1
     assert(magicalAristocrats.moneyReserves === 0)
-    assert(workers.moneyReserves === 45000)
+    workers.moneyReserves shouldBe 45000d +- 000.1
 
-    assert(resourceGathering.payTaxes() === TaxData(CorporateTax, 100000, 10*1000))
+    val payTaxes = resourceGathering.payTaxes()
+    payTaxes.tax shouldBe CorporateTax
+    payTaxes.taxed shouldBe 10*1000d +- 0.0001
+    payTaxes.gross shouldBe 100000d +- 0.0001
 
     resourceGathering.produce()
 

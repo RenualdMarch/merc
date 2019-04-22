@@ -49,7 +49,7 @@ class StateBudgetTest extends FunSuite {
     }
 
     region.regionPopulation.pops.foreach { p =>
-      p.newDay(TaxPolicy.zeroTaxes)
+      p.newDay(TaxPolicy.zeroTaxes, 1)
     }
 
     val budget = region.owner.budget
@@ -116,7 +116,7 @@ class StateBudgetTest extends FunSuite {
     val budget = region.owner.budget
 
     region.regionPopulation.pops.foreach { p =>
-      p.newDay(TaxPolicy.zeroTaxes)
+      p.newDay(TaxPolicy.zeroTaxes, 1)
     }
 
     budget.receiveTaxes(TaxData(LowSalaryTax, 100000, 10000))
@@ -178,7 +178,7 @@ class StateBudgetTest extends FunSuite {
     }
 
     region.regionPopulation.pops.foreach { p =>
-      p.newDay(TaxPolicy.zeroTaxes)
+      p.newDay(TaxPolicy.zeroTaxes, 1)
     }
 
     val budget = region.owner.budget

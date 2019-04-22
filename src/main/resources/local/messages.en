@@ -49,6 +49,7 @@ generalInfo=General Info
 expandFactory=Expand
 buildFactory=Build factory
 buildFactoryForProduct=for product
+bureaucratsPercentage=Bureaucrats
 population.title=%s %s %s in %s
 population.title.upper=%s %s upper class in %s
 population.title.middle=%s %s middle class in %s

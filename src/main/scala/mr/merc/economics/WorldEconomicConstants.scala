@@ -78,6 +78,27 @@ object WorldEconomicConstants {
     val HappinessLuxuryNeedsMultiplier = 1
   }
 
+  object Market {
+    val PriceIncrease = 1.03
+    val EmptySupplyPriceIncrease = 1.5
+    val PriceDecrease = 0.97
+    val EmptyDemandPriceDecrease = 0.67
+
+    val LowestPossiblePrice = 0.001
+  }
+
+  object Taxes {
+    val ZeroBureaucracyTaxCollection = 0.1
+    val HalfBureaucracyTaxCollection = 0.8
+
+    def taxCollectionPart(bureacracyPercentageFromMax:Double):Double = {
+      val a = 2 + 2 * ZeroBureaucracyTaxCollection - 4 * HalfBureaucracyTaxCollection
+      val b = 4 * HalfBureaucracyTaxCollection - 3 * ZeroBureaucracyTaxCollection - 1
+      val c = ZeroBureaucracyTaxCollection
+      val x = bureacracyPercentageFromMax
+      a*x*x+b*x+c
+    }
+  }
 }
 
 object WorldGenerationConstants {
