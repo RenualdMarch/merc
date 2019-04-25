@@ -3,7 +3,7 @@ package mr.merc.ui.world
 import java.text.DecimalFormat
 
 import scalafx.beans.binding.{ObjectBinding, StringBinding}
-import scalafx.beans.property.{ObjectProperty, ReadOnlyStringProperty}
+import scalafx.beans.property.{ObjectProperty, ReadOnlyObjectProperty, ReadOnlyStringProperty}
 import scalafx.scene.control.Button
 import scalafx.scene.text.{Font, Text}
 
@@ -22,7 +22,7 @@ object BigText {
     this.text = t
   }
 
-  def apply(t:ObjectProperty[String]): BigText = new BigText {
+  def apply(t:ReadOnlyObjectProperty[String]): BigText = new BigText {
     this.text <== t
   }
 }

@@ -1,10 +1,11 @@
 package mr.merc.ui.common
 
-import scalafx.beans.property.DoubleProperty
+import scalafx.beans.property.{DoubleProperty, ObjectProperty, ReadOnlyDoubleProperty, ReadOnlyObjectProperty}
 import scalafx.scene.layout.Pane
 import scalafx.scene.canvas.GraphicsContext
 import scalafx.scene.canvas.Canvas
 import scalafx.geometry.Rectangle2D
+import mr.merc.util.FxPropertyUtils._
 
 // TODO handle case when CanvasLayer is resized - image shouldn't change position
 class CanvasLayers(layers: List[CanvasLayer], fullMapSize: Rectangle2D) extends Pane with ScrollPaneLike {
@@ -44,10 +45,6 @@ class CanvasLayers(layers: List[CanvasLayer], fullMapSize: Rectangle2D) extends 
         }
     }
   }
-
-  private val canvasAreaWidth = this.width
-  private val canvasAreaHeight = this.height
-
 
   def positionComponents() {
     canvasList.map(_._2).foreach { c =>

@@ -47,6 +47,10 @@ abstract class Factory[Producible <: IndustryProduct](val region: EconomicRegion
 
   def factoryStorage: FactoryStorage = storage
 
+  def isBankrupt:Boolean = {
+    storage.unsoldProducts <= BankruptStorage && storage.money <= BankruptMoney
+  }
+
   private[economics] def maxMoneyReserves: Double = {
     val neededForProduction = product.components.mapValues(_ * maxPossibleInputToUse)
     val neededForMaintenance = requiredMaintenance

@@ -6,6 +6,7 @@ import mr.merc.economics.Population._
 import mr.merc.economics.util.DistributionCalculator
 import mr.merc.politics.{PoliticalViews, State}
 import mr.merc.economics.MapUtil.FloatOperations.MapWithFloatOperations
+import WorldEconomicConstants.Population._
 
 trait EconomicRegion {
 
@@ -58,6 +59,13 @@ trait EconomicRegion {
     }
   }
 
+  def removeBankruptFactories(): Unit = {
+    enterprises = enterprises.collect {
+      case f:IndustrialFactory if !f.isBankrupt => f
+      case x => x
+    }
+  }
+
   def bureaucratsPercentageFromMax:Double = {
     val totalPopulation = regionPopulation.pops.map(_.populationCount).sum
     val bureaucrats = regionPopulation.popsByType(Bureaucrats).map(_.populationCount).sum
@@ -69,6 +77,17 @@ trait EconomicRegion {
     }
   }
 
+  def goodsProducedLastTurn:Map[Product, Double] = {
+    enterprises.map { e =>
+      e.dayRecords.lastOption.map { day =>
+        Map(e.product -> day.produced)
+      }.getOrElse(Map())
+    }.reduceOption(_ |+| _).getOrElse(Map())
+  }
+
+  def gpd:Double = {
+    goodsProducedLastTurn dot regionMarket.currentPrices
+  }
 }
 
 class EconomicGrid(region:EconomicRegion) extends PossibleGrid[EconomicRegion] {
@@ -165,6 +184,16 @@ class RegionPopulation(initialPops: List[Population]) {
   def pops:List[Population] = currentPops
 
   def cultureMembers:Map[Culture, Int] = pops.groupBy(_.culture).mapValues(_.map(_.populationCount).sum)
+
+  def learnLiteracy(): Unit = {
+    val scholars = popsByType(Scholars).map(_.populationCount).sum.toDouble
+    val literacyIncrease = scholars * ScholarsLiteracyLearningIncreaseMultiplier
+    val totalCount = currentPops.map(_.populationCount).sum.toDouble
+    currentPops.foreach { p =>
+      val perc = literacyIncrease * p.populationCount / totalCount
+      p.learnLiteracy(perc)
+    }
+  }
 }
 
 class RegionMarket(initialPrices:Map[Product, Double]) {

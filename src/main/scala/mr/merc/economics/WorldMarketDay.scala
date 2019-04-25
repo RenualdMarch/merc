@@ -122,7 +122,7 @@ class WorldMarketDay(worldState: WorldStateEnterpriseActions, turn:Int) {
       r.regionPopulation.pops.foreach(_.fulfillNeedsUsingAlreadyReceivedProducts())
     }
 
-    // let all pop receive salaries + taxes to budget
+    // let all pop receive salaries + taxes to budget and do end of day tasks
     regions.foreach { r =>
       val factoryCommands = FactoryBuildingAI().factoryCommands(r, worldState)
 
@@ -142,10 +142,13 @@ class WorldMarketDay(worldState: WorldStateEnterpriseActions, turn:Int) {
       r.regionMarket.endOfMarketDay(turn)
       r.removeCompletedProjectsAndAddInvestments()
       factoryCommands.foreach {c => worldState.applyCommand(c)}
+      r.removeBankruptFactories()
+      r.regionPopulation.learnLiteracy()
+      r.regionPopulation.pops.foreach(_.grow())
     }
 
     states.foreach {s =>
-      s.budget.spendBudgetMoney(regions.filter(_.owner == s).toList, s.primeCulture)
+      s.budget.spendBudgetMoney(regions.filter(_.owner == s), s.primeCulture)
       s.budget.endDay()
     }
   }

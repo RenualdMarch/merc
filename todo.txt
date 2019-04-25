@@ -37,19 +37,15 @@ For M6, interface will be a priority, basic politics, factory building
 +projects ui
 +if there is no supply but demand, price rises faster.
 +taxes must go through bureaucrats
-bankrupt factories destruction
-people have two sources of unhappiness - not fulfilled needs and political stuff
-population growth or decline, literacy from scholars
-gdp info per province
-world state testing
-technologies
-migration(with churches and mage guilds creation and destruction)
-smarter capitalists when creating and expanding factories
-strange wooden bridges placement during map creation(MapObject placement)
-ability to move map by arrow buttons or moving cursor to the screen borders
-next turn button async
-less products - refactor needs
-More tasks??? - game must be working except for war(no revolutions) and diplomacy
++bankrupt factories destruction
++literacy from scholars
++people have two sources of unhappiness - not fulfilled needs and political stuff
++population growth or decline
++gdp info per province
++ability to move map by arrow buttons
+next turn button async, messages framework
+1 season per turn, 4 turns per year
+elections
 
 Polishing:
 issues - balance production and needs multipliers
@@ -62,9 +58,18 @@ For M9
 
 Consider following:
 
+less products - refactor needs
+technologies
+migration(with churches and mage guilds creation and destruction)
+smarter capitalists when creating and expanding factories
 terrain additives specifically for given terrain types
 add winter weather on maps
+corruption and tax evasion
+world state unit testing
+
+Dreams:
+
+strange wooden bridges placement during map creation(MapObject placement)
 water animation
 windmill animation
 Let map reflect actual province factories and resources
-corruption and tax evasion

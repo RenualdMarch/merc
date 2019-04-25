@@ -30,6 +30,10 @@ object MapUtil {
         }
       }
 
+      def dot (other: Map[K, V]): V = {
+        (this |*| other).values.sum
+      }
+
       def |*|(other: Map[K, V]): Map[K, V] = {
         val intersectingKeys = this.map.keySet & other.keySet
         intersectingKeys.map { k =>

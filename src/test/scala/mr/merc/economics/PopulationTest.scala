@@ -5,7 +5,7 @@ import mr.merc.economics.Products.{Coal, Fruit, Grain}
 import mr.merc.economics.TaxPolicy.MiddleSalaryTax
 import mr.merc.map.objects.HumanCityHouse
 import mr.merc.politics.ForeignPolicy.{Expansionism, Pacifism}
-import mr.merc.politics.{ForeignPolicy, IssuePositionPopularity, PoliticalViews}
+import mr.merc.politics._
 import org.scalatest.{FunSuite, Matchers}
 import scalafx.scene.paint.Color
 
@@ -195,8 +195,8 @@ class PopulationTest extends FunSuite with Matchers {
 
     assert(pop.currentDayRecord.productFulfillment.needsFulfillment === Map(LifeNeeds -> 1, RegularNeeds -> 1, LuxuryNeeds -> 1))
     assert(pop2.currentDayRecord.productFulfillment.needsFulfillment === Map(LifeNeeds -> 1, RegularNeeds -> 1, LuxuryNeeds -> 1))
-    assert(pop.happiness === 1d)
-    assert(pop2.happiness === 1d)
+    assert(pop.consumptionHappiness === 1d)
+    assert(pop2.consumptionHappiness === 1d)
 
 
     val ppd = new PopulationPromotionDemotion(regionPopulation, random, Map().withDefaultValue(1d))
@@ -245,8 +245,8 @@ class PopulationTest extends FunSuite with Matchers {
     regionPopulation.pops.foreach(_.endOfDay())
     assert(pop.currentDayRecord.productFulfillment.needsFulfillment === Map(LifeNeeds -> 1, RegularNeeds -> 1, LuxuryNeeds -> 1))
     assert(pop2.currentDayRecord.productFulfillment.needsFulfillment === Map(LifeNeeds -> 0, RegularNeeds -> 0, LuxuryNeeds -> 0))
-    assert(pop.happiness === 1d)
-    assert(pop2.happiness === 0d)
+    assert(pop.consumptionHappiness === 1d)
+    assert(pop2.consumptionHappiness === 0d)
 
     val ppd = new PopulationPromotionDemotion(regionPopulation, random, Map().withDefaultValue(1d))
     ppd.promoteOrDemote()
@@ -292,8 +292,8 @@ class PopulationTest extends FunSuite with Matchers {
     regionPopulation.pops.foreach(_.endOfDay())
     assert(pop.currentDayRecord.productFulfillment.needsFulfillment === Map(LifeNeeds -> 0, RegularNeeds -> 0, LuxuryNeeds -> 0))
     assert(pop2.currentDayRecord.productFulfillment.needsFulfillment === Map(LifeNeeds -> 1, RegularNeeds -> 1, LuxuryNeeds -> 1))
-    assert(pop.happiness === 0d)
-    assert(pop2.happiness === 1d)
+    assert(pop.consumptionHappiness === 0d)
+    assert(pop2.consumptionHappiness === 1d)
 
     val ppd = new PopulationPromotionDemotion(regionPopulation, random, Map().withDefaultValue(1d))
     ppd.promoteOrDemote()
@@ -359,8 +359,8 @@ class PopulationTest extends FunSuite with Matchers {
     regionPopulation.pops.foreach(_.endOfDay())
     assert(pop.currentDayRecord.productFulfillment.needsFulfillment === Map(LifeNeeds -> 1, RegularNeeds -> 1, LuxuryNeeds -> 1))
     assert(pop2.currentDayRecord.productFulfillment.needsFulfillment === Map(LifeNeeds -> 1, RegularNeeds -> 1, LuxuryNeeds -> 1))
-    assert(pop.happiness === 1d)
-    assert(pop2.happiness === 1d)
+    assert(pop.consumptionHappiness === 1d)
+    assert(pop2.consumptionHappiness === 1d)
 
 
     val ppd = new PopulationPromotionDemotion(regionPopulation, random, Map(Traders -> 0.1, Farmers -> 0.9).withDefaultValue(1d))
@@ -373,6 +373,79 @@ class PopulationTest extends FunSuite with Matchers {
     val farmers = regionPopulation.pop(Farmers, TestCulture)
     assert(farmers.populationCount === 1025)
     assert(farmers.literateCount === 0)
+
+  }
+
+  test("literacy learning") {
+    val pop = new Population(TestCulture, Traders, 2000, 100000, 0, PoliticalViews.averagePoliticalViews)
+    val pop2 = new Population(TestCulture, Farmers, 1000, 100000, 0, PoliticalViews.averagePoliticalViews)
+    val pop3 = new Population(TestCulture, Scholars, 1000, 100000, 0, PoliticalViews.averagePoliticalViews)
+
+    val regionPop = new RegionPopulation(List(pop, pop2, pop3))
+    regionPop.learnLiteracy()
+
+    List(pop, pop2, pop3).foreach {p =>
+      p.literateCount should be > 0
+    }
+
+    pop2.literateCount shouldBe pop3.literateCount
+    pop.literateCount should be >= pop2.literateCount * 2
+  }
+
+  test("political happiness test") {
+    val absoluteRadical = PoliticalViews(Migration.popularity(0, 1, 1, 1),
+      Regime.popularity(1, 0, 0, 1, 1, 1),
+      ForeignPolicy.popularity(1, 0, 1, 1),
+      Economy.popularity(1, 0, 0, 1, 1, 1),
+      SocialPolicy.popularity(1, 0, 0, 1, 1, 1),
+      VotersPolicy.popularity(1, 0, 0, 0, 0, 0,1,1,1,1,1,1))
+
+    val pop = new Population(TestCulture, Traders, 2000, 100000, 0, absoluteRadical)
+    val pop2 = new Population(LatinHuman, Traders, 2000, 100000, 0, absoluteRadical)
+
+    val absoluteRadicalParty = new Party("", Color.White,
+      Migration.ClosedBorders, Regime.Absolute, ForeignPolicy.Expansionism,
+      Economy.StateEconomy, SocialPolicy.NoSocialSecurity, VotersPolicy.NoVoting)
+    val state = new State("", TestCulture, 0, new PoliticalSystem(absoluteRadicalParty))
+
+    pop.politicalHappiness(state) shouldBe 1d
+    pop2.politicalHappiness(state) shouldBe (1d - WorldEconomicConstants.Population.DifferentCulturePoliticalHappinessPenalty)
+
+    val radicallyDifferentParty = new Party("", Color.Black,
+      Migration.OpenBorders, Regime.Democracy, ForeignPolicy.Pacifism,
+      Economy.FreeMarket, SocialPolicy.RegularNeedsSocialSecurity, VotersPolicy.Everyone)
+    val differentState = new State("", TestCulture, 0, new PoliticalSystem(radicallyDifferentParty))
+
+    pop.politicalHappiness(differentState) shouldBe 0d
+    pop2.politicalHappiness(differentState) shouldBe 0d
+  }
+
+  test("growth test") {
+    val pop1 = new Population(TestCulture, Traders, 1000, 15000, 0, PoliticalViews.averagePoliticalViews)
+
+    pop1.buyDemandedProducts(List(FulfilledDemandRequest(5000, 1, PopulationDemandRequest(pop1, Grain, 5000)),
+      FulfilledDemandRequest(3000, 2, PopulationDemandRequest(pop1, Fruit, 3000)), FulfilledDemandRequest(3000, 0.5,
+        PopulationDemandRequest(pop1, Coal, 3000))))
+
+    pop1.fulfillNeedsUsingAlreadyReceivedProducts()
+    assert(pop1.currentDayRecord.productFulfillment.needsFulfillment === Map(LifeNeeds -> 1, RegularNeeds -> 1, LuxuryNeeds -> 1))
+
+    val pop2 = new Population(TestCulture, Traders, 1000, 1000, 100, PoliticalViews.averagePoliticalViews)
+    pop2.buyDemandedProducts(List(FulfilledDemandRequest(0, 1, PopulationDemandRequest(pop2, Grain, 1000)),
+      FulfilledDemandRequest(0, 2, PopulationDemandRequest(pop2, Fruit, 1000)),
+      FulfilledDemandRequest(0, 0.5, PopulationDemandRequest(pop2, Coal, 1000))))
+    pop2.fulfillNeedsUsingAlreadyReceivedProducts()
+    assert(pop2.currentDayRecord.productFulfillment.needsFulfillment === Map(LifeNeeds -> 0, RegularNeeds -> 0, LuxuryNeeds -> 0))
+
+    pop1.endOfDay()
+    pop2.endOfDay()
+    pop1.grow()
+    pop2.grow()
+
+    pop1.populationCount should be > 1000
+    pop2.populationCount should be > 1000
+    pop2.literateCount shouldBe 100
+    pop1.populationCount should be > pop2.populationCount
 
   }
 }

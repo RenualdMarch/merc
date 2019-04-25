@@ -68,7 +68,7 @@ class PopsTablePane(regionPopulation: RegionPopulation, province: Province) exte
 
   private val happinessColumn = new TableColumn[PopulationInfo, String] {
     text = Localization("happiness")
-    cellValueFactory = p => StringProperty(p.value.happiness)
+    cellValueFactory = p => StringProperty(p.value.consumptionHappiness)
     editable = false
     prefWidth <== populationTable.width * 0.144
   }
@@ -105,32 +105,42 @@ class PopDetailsPane(populationProperty: ReadOnlyObjectProperty[PopulationInfo],
     content = new MigPane() {
       add(MediumText(Localization("population.populationCount")),"")
       add(new MediumText{
-        text <== populationProperty.map(p => p.populationCount)
+        text <== populationProperty.map(_.populationCount)
       }.delegate, "wrap")
 
       add(MediumText(Localization("population.literacy")),"")
       add(new MediumText{
-        text <== populationProperty.map(p => p.literacy)
+        text <== populationProperty.map(_.literacy)
       }.delegate, "wrap")
 
-      add(MediumText(Localization("population.happiness")))
+      add(MediumText(Localization("population.consumptionHappiness")))
       add(new MediumText{
-        text <== populationProperty.map(p => p.happiness)
+        text <== populationProperty.map(_.consumptionHappiness)
+      }.delegate, "wrap")
+
+      add(MediumText(Localization("population.politicalHappiness")))
+      add(new MediumText{
+        text <== populationProperty.map(_.politicalHappiness)
+      }.delegate, "wrap")
+
+      add(MediumText(Localization("population.growth")))
+      add(new MediumText{
+        text <== populationProperty.map(_.growth)
       }.delegate, "wrap")
 
       add(MediumText(Localization("population.moneyReserves")),"")
       add(new MediumText{
-        text <== populationProperty.map(p => p.moneyReserves)
+        text <== populationProperty.map(_.moneyReserves)
       }.delegate, "wrap")
 
       add(MediumText(Localization("population.netSalary")))
       add(new MediumText{
-        text <== populationProperty.map(p => p.netSalary)
+        text <== populationProperty.map(_.netSalary)
       }.delegate, "wrap")
 
       add(MediumText(Localization("population.taxes")))
       add(new MediumText{
-        text <== populationProperty.map(p => p.taxes)
+        text <== populationProperty.map(_.taxes)
       }.delegate, "wrap")
     }
   }
@@ -196,7 +206,7 @@ class PopulationInfo(val population:List[Population], province: Province) {
   }
 
   def populationCount: String = {
-    DoubleFormatter().format(population.map(_.populationCount).sum)
+    IntFormatter().format(population.map(_.populationCount).sum)
   }
 
   def populationType: String = {
@@ -213,10 +223,23 @@ class PopulationInfo(val population:List[Population], province: Province) {
     } else Localization("population.all")
   }
 
-  def happiness: String = {
-    DoubleFormatter().format(population.map(p => (p.populationCount, p.happiness)).reduce[(Int, Double)] {
+  def consumptionHappiness: String = {
+    IntFormatter().format(population.map(p => (p.populationCount, p.consumptionHappiness)).reduce[(Int, Double)] {
       case ((c1, h1),(c2, h2)) => (c1 + c2, (c1 * h1 + c2 * h2) / (c1 + c2))
     }._2 * 100)  + "%"
+  }
+
+  def politicalHappiness: String = {
+    IntFormatter().format(population.map(p => (p.populationCount, p.politicalHappiness(province.owner))).reduce[(Int, Double)] {
+      case ((c1, h1),(c2, h2)) => (c1 + c2, (c1 * h1 + c2 * h2) / (c1 + c2))
+    }._2 * 100)  + "%"
+  }
+
+  def growth:String = {
+    val grown = population.map(p => p.populationCount * (1 + p.growthRate)).sum
+    val notGrown = population.map(_.populationCount).sum
+    val r = (grown / notGrown - 1) * 100
+    DoubleFormatter().format(r) + "%"
   }
 
   def literacy: String = {

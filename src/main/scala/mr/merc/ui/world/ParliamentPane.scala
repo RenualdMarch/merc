@@ -10,7 +10,7 @@ import mr.merc.ui.world.PieChartBuilder.PiePart
 import org.tbee.javafx.scene.layout.MigPane
 import scalafx.scene.layout.{BorderPane, Pane}
 import scalafx.Includes._
-import scalafx.beans.property.ObjectProperty
+import scalafx.beans.property.{ObjectProperty, ReadOnlyObjectProperty}
 import scalafx.geometry.{Orientation, Pos}
 import scalafx.scene.shape.Circle
 import mr.merc.util.FxPropertyUtils._
@@ -35,7 +35,7 @@ class RulingPartyParliamentPane(sceneManager: SceneManager, worldState: WorldSta
 
   private val actionsPane = new ParliamentActionsPane(sceneManager, worldState)
 
-  private val coalitionPaneProp:ObjectProperty[javafx.scene.Node] = worldState.playerPoliticalSystemProperty.map { ps =>
+  private val coalitionPaneProp:ReadOnlyObjectProperty[javafx.scene.Node] = worldState.playerPoliticalSystemProperty.map { ps =>
     ps.parliament.map { p =>
       val coalition = p.coalition.map(party => party -> p.parties(party)).toMap
       val pane: Pane = new ParliamentCoalitionPane(coalition)
@@ -88,7 +88,7 @@ class ParliamentActionsPane(sceneManager: SceneManager, worldState: WorldStatePa
 }
 
 // TODO in future add tooltips
-class PartyViewPane(party: ObjectProperty[Party]) extends BorderPane with WorldInterfaceWhiteNode {
+class PartyViewPane(party: ReadOnlyObjectProperty[Party]) extends BorderPane with WorldInterfaceWhiteNode {
   private val titlePane = {
     val pane = new MigPane("center")
     val square = new Circle()

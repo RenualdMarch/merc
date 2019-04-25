@@ -1,7 +1,6 @@
 package mr.merc.ui.common
 
-import scalafx.beans.property.DoubleProperty
-import scalafx.beans.property.ReadOnlyDoubleProperty
+import scalafx.beans.property.{DoubleProperty, ObjectProperty, ReadOnlyDoubleProperty, ReadOnlyObjectProperty}
 
 trait ScrollPaneLike {
   val vvalue: DoubleProperty

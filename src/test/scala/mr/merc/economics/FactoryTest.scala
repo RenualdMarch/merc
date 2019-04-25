@@ -395,4 +395,17 @@ class FactoryTest extends FunSuite with BeforeAndAfter with MockitoSugar with Ma
       turn shouldBe 1
     }
   }
+
+  test("bankrupt factory") {
+    val factory1 = new IndustrialFactory(region1, Wine, 2, 1000000, 40000, 20, 10) {
+      override val requiredMaintenance: Map[Product, Double] = Map(Coal -> 1000)
+    }
+
+    val factory2 = new IndustrialFactory(region1, Wine, 2, 0, 0, 20, 10) {
+      override val requiredMaintenance: Map[Product, Double] = Map(Coal -> 1000)
+    }
+
+    assert(factory1.isBankrupt === false)
+    assert(factory2.isBankrupt === true)
+  }
 }

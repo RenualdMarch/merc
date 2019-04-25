@@ -394,7 +394,23 @@ case class CurrentPoliticalViews(migration: Map[MigrationPosition, Double],
                                  foreignPolicy: Map[ForeignPolicyPosition, Double],
                                  economy: Map[EconomyPosition, Double],
                                  socialPolicy: Map[SocialPolicyPosition, Double],
-                                 votersPolicy: Map[VotersPolictyPosition, Double])
+                                 votersPolicy: Map[VotersPolictyPosition, Double]) {
+  def pointsOfView:Map[PoliticalPosition, Double] = {
+    val positions = for {
+      m <- Migration.possiblePositions
+      r <- Regime.possiblePositions
+      fp <- ForeignPolicy.possiblePositions
+      e <- Economy.possiblePositions
+      sp <- SocialPolicy.possiblePositions
+      vp <- VotersPolicy.possiblePositions
+    } yield {
+      PoliticalPosition(m, r, fp, e, sp, vp) ->
+        (migration(m) * regime(r) * foreignPolicy(fp) *
+        economy(e) * socialPolicy(sp) * votersPolicy(vp))
+    }
+    positions.filter(_._2 > 0).toMap
+  }
+}
 
 case class PoliticalPosition(migration: MigrationPosition,
                              regime: RegimePosition,

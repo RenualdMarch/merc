@@ -24,8 +24,8 @@ class RandomFactoryBuildingAI extends FactoryBuildingAI {
     val investors = currentRegion.regionPopulation.popsByType(Capitalists)
     val totalMoney = investors.map(_.moneyReserves).sum
     val prices = currentRegion.regionMarket.currentPrices
-    val factoryBuildCost = (state.factoryBuildCost(currentRegion.owner) |*| prices).sumValues
-    val factoryExpandCost = (state.factoryExpandCost(currentRegion.owner) |*| prices).sumValues
+    val factoryBuildCost = state.factoryBuildCost(currentRegion.owner) dot prices
+    val factoryExpandCost = state.factoryExpandCost(currentRegion.owner) dot prices
     val maxTask = Math.max(factoryBuildCost, factoryExpandCost)
     val productsSize = (totalMoney / maxTask).toInt
     val random = new WeightedRandom(Products.IndustryProducts.map(p => p -> 1d).toMap)

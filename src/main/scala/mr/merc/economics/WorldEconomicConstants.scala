@@ -32,6 +32,9 @@ object WorldEconomicConstants {
     val FactoryMaintenancePerLevel: Map[Product, Double] = Map()
 
     val EfficiencyPerOneFactoryLevel = 1000
+
+    val BankruptStorage = 0.1
+    val BankruptMoney = 0.1
   }
 
   object Population {
@@ -76,6 +79,16 @@ object WorldEconomicConstants {
     val HappinessLifeNeedsMultiplier = 1
     val HappinessRegularNeedsMultiplier = 1
     val HappinessLuxuryNeedsMultiplier = 1
+    val PoliticalHappinessDisagreementMultiplier = 0.1
+    val DifferentCulturePoliticalHappinessPenalty = 0.2
+
+    val ScholarsLiteracyLearningIncreaseMultiplier = 0.1
+    val MaxLiteracyEfficiencyMultiplier = 10
+
+    // 1% pop growth per year, to 2% per year max
+    val BasePopGrowth:Double = 0.01 / 4
+    val GrowthRatePerLifeNeed:Double = 0.005 / 4
+    val GrowthRatePerRegularNeed:Double = 0.005 / 4
   }
 
   object Market {
@@ -91,12 +104,16 @@ object WorldEconomicConstants {
     val ZeroBureaucracyTaxCollection = 0.1
     val HalfBureaucracyTaxCollection = 0.8
 
-    def taxCollectionPart(bureacracyPercentageFromMax:Double):Double = {
-      val a = 2 + 2 * ZeroBureaucracyTaxCollection - 4 * HalfBureaucracyTaxCollection
-      val b = 4 * HalfBureaucracyTaxCollection - 3 * ZeroBureaucracyTaxCollection - 1
-      val c = ZeroBureaucracyTaxCollection
-      val x = bureacracyPercentageFromMax
-      a*x*x+b*x+c
+    def taxCollectionPart(bureaucracyPercentageFromMax:Double):Double = {
+      val z = ZeroBureaucracyTaxCollection
+      val h = HalfBureaucracyTaxCollection
+      val s = math.sqrt(0.5)
+
+      val a = 1 - z - (2*h - 1 - z) / (2 * s - 1)
+      val b = (2*h - 1 - z) / (2 * s - 1)
+      val c = z
+      val x = bureaucracyPercentageFromMax
+      a*x+b*math.sqrt(x)+c
     }
   }
 }

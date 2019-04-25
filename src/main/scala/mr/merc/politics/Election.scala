@@ -24,26 +24,7 @@ object Election {
   implicit class PopulationElection(population: Population) {
 
     def choose(parties: List[Party]): PopulationElectionReport = {
-      val positions = for {
-        m <- Migration.possiblePositions
-        r <- Regime.possiblePositions
-        fp <- ForeignPolicy.possiblePositions
-        e <- Economy.possiblePositions
-        sp <- SocialPolicy.possiblePositions
-        vp <- VotersPolicy.possiblePositions
-      } yield PoliticalPosition(m, r, fp, e, sp, vp)
-      val groups = positions.map { p =>
-        val lit = population.literacy
-        val pv = population.politicalViews
-        val groupCount = population.populationCount *
-          pv.migration.popularity(lit)(p.migration) *
-          pv.regime.popularity(lit)(p.regime) *
-          pv.foreignPolicy.popularity(lit)(p.foreignPolicy) *
-          pv.economy.popularity(lit)(p.economy) *
-          pv.socialPolicy.popularity(lit)(p.socialPolicy) *
-          pv.votersPolicy.popularity(lit)(p.votersPolicy)
-        (p, groupCount)
-      }
+      val groups = population.politicalViews.currentViews(population.literacy).pointsOfView |*| population.populationCount
       val votesByGroups = groups.flatMap {case (position, count) =>
         val diff = parties.groupBy(p => position.diffWithPosition(p.politicalPosition))
         val minKey = diff.keySet.min
@@ -52,9 +33,10 @@ object Election {
         mostPopularParties.map(_ -> countPerParty)
       }
       val votes = votesByGroups.groupBy(_._1).map { case (p, list) =>
-          p -> list.map(_._2).sum
+          p -> list.values.sum
       }
-      PopulationElectionReport(population, votes)
+      val zeros = (parties.toSet -- votes.keySet).map(_ -> 0d).toMap
+      PopulationElectionReport(population, votes ++ zeros)
     }
   }
 

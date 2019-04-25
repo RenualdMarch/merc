@@ -16,7 +16,7 @@ abstract class BusinessProject(productsToBuy: Map[Product, Double]) {
   def remainingProducts: Map[Product, Double] = productsToBuy |-| alreadyBought
 
   def moneyRequired(prices: Map[Product, Double]): Double = {
-    (prices |*| remainingProducts).values.sum - notSpentMoney
+    (prices dot remainingProducts) - notSpentMoney
   }
 
   def investMoney(money: Double): Unit = {
@@ -30,7 +30,7 @@ abstract class BusinessProject(productsToBuy: Map[Product, Double]) {
   }
 
   def demandRequests(prices: Map[Product, Double]): List[BusinessDemandRequest] = {
-    val priceToBuyEverythingNeeded = (remainingProducts |*| prices).values.sum
+    val priceToBuyEverythingNeeded = remainingProducts dot prices
 
     val q = if (priceToBuyEverythingNeeded > remainingMoney)
       remainingMoney / priceToBuyEverythingNeeded

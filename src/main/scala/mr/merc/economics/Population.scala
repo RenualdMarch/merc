@@ -6,7 +6,7 @@ import mr.merc.economics.Products.{Medicine, _}
 import mr.merc.economics.MapUtil.FloatOperations._
 import mr.merc.economics.TaxPolicy.{LowSalaryTax, MiddleSalaryTax, UpperSalaryTax}
 import mr.merc.map.objects.{House, HumanCityHouse, HumanCottage, HumanVillageHouse}
-import mr.merc.politics.PoliticalViews
+import mr.merc.politics.{PoliticalViews, State}
 import scalafx.scene.paint.Color
 import pureconfig.loadConfigOrThrow
 import pureconfig.generic.auto._
@@ -15,12 +15,12 @@ import WorldEconomicConstants.Population._
 import scala.util.Random
 
 class Population(val culture: Culture, val populationType: PopulationType, private var count: Double,
-                 startingMoney: Double, private val startingliterateCount: Int, var politicalViews: PoliticalViews) {
+                 startingMoney: Double, private val startingliterateCount: Int, val politicalViews: PoliticalViews) {
   require(needs.nonEmpty, s"Needs for culture $culture for type $populationType are empty!")
 
-  private var literatePeople = startingliterateCount
+  private var literatePeople = startingliterateCount.toDouble
 
-  def literateCount: Int = literatePeople
+  def literateCount: Int = literatePeople.toInt
 
   private val salaryRecordsMaxSize = 30
 
@@ -37,8 +37,8 @@ class Population(val culture: Culture, val populationType: PopulationType, priva
 
   def needsFulfillment(i: Int):Vector[ProductFulfillmentRecord] = populationDayRecords.takeRight(i).map(_.productFulfillment)
 
-  // last 5 turns
-  def happiness: Double = {
+  // last $HappinessDayCount turns
+  def consumptionHappiness: Double = {
     val n = needsFulfillment(HappinessDayCount)
     val sum = HappinessLifeNeedsMultiplier + HappinessRegularNeedsMultiplier + HappinessLuxuryNeedsMultiplier
 
@@ -54,15 +54,40 @@ class Population(val culture: Culture, val populationType: PopulationType, priva
     }
   }
 
+  def politicalHappiness(state:State):Double = {
+    val popPositions = politicalViews.currentViews(this.literacy).pointsOfView
+    val partyPos = state.rulingParty.politicalPosition
+    val notAgreeingValue = popPositions.map { case (popPos, v) =>
+      partyPos.diffWithPosition(popPos) * v
+    }.sum * PoliticalHappinessDisagreementMultiplier
+
+    val noCulturePenalty = if (notAgreeingValue > 1) 0 else 1 - notAgreeingValue
+    if (state.primeCulture == culture) noCulturePenalty
+    else if (noCulturePenalty > DifferentCulturePoliticalHappinessPenalty) {
+      noCulturePenalty - DifferentCulturePoliticalHappinessPenalty
+    } else 0
+  }
+
+  def growthRate:Double = {
+    populationDayRecords.lastOption.map { last =>
+      val f = last.productFulfillment.needsFulfillment
+      BasePopGrowth + f(LifeNeeds) * GrowthRatePerLifeNeed + f(RegularNeeds) * GrowthRatePerRegularNeed
+    }.getOrElse(BasePopGrowth)
+  }
+
+  def grow(): Unit = {
+    count *= (1 + growthRate)
+  }
+
   def extractLiterateMovers(count: Int): PopulationMovers = {
-    val change = if (count < literatePeople) count else literatePeople
+    val change = if (count < literateCount) count else literateCount
     literatePeople -= change
     this.count -= change
     PopulationMovers(change, 0)
   }
 
   def extractIlliterateMovers(count: Int): PopulationMovers = {
-    val change = if (count < populationCount - literatePeople) count else populationCount - literatePeople
+    val change = if (count < populationCount - literateCount) count else populationCount - literateCount
     this.count -= change
     PopulationMovers(0, change)
   }
@@ -142,7 +167,7 @@ class Population(val culture: Culture, val populationType: PopulationType, priva
 
   def totalPopEfficiency: Double = count * efficiency
 
-  def literacy: Double = if (populationCount == 0) 0 else literatePeople.toDouble / populationCount
+  def literacy: Double = if (populationCount == 0) 0 else literatePeople / count
 
   private val taxPolicy = this.populationType.populationClass match {
     case Lower => LowSalaryTax
@@ -176,6 +201,14 @@ class Population(val culture: Culture, val populationType: PopulationType, priva
       this.currentPopulationDayRecord = currentPopulationDayRecord.copy(
         investments = currentPopulationDayRecord.investments + existingSum)
       existingSum
+    }
+  }
+
+  def learnLiteracy(students: Double): Unit = {
+    if (count - literatePeople > students) {
+      literatePeople += students
+    } else {
+      literatePeople = count
     }
   }
 
@@ -225,7 +258,6 @@ class Population(val culture: Culture, val populationType: PopulationType, priva
 }
 
 object Population {
-  val MaxLiteracyEfficiencyMultiplier = 10
 
   sealed abstract class PopulationNeedsType(val needImportance: Int) extends scala.Product with Serializable with Ordered[PopulationNeedsType] {
     override def compare(that: PopulationNeedsType): Int = {
@@ -521,8 +553,8 @@ class PopulationPromotionDemotion(population: RegionPopulation, random: Random =
       filter(pc => population.populationType <= pc).
       filter(pc => regionPopulation.pop(pc, population.culture).populationCount > 0).
       filterNot(maxPopulation).
-      filter(pc => regionPopulation.pop(pc, population.culture).happiness >= MaxHappinessToDemote).
-      map(p => regionPopulation.pop(p, population.culture)).sortBy(-_.happiness)
+      filter(pc => regionPopulation.pop(pc, population.culture).consumptionHappiness >= MaxHappinessToDemote).
+      map(p => regionPopulation.pop(p, population.culture)).sortBy(-_.consumptionHappiness)
     chances.headOption
   }
 
@@ -534,21 +566,21 @@ class PopulationPromotionDemotion(population: RegionPopulation, random: Random =
       filter(pc => population.populationType >= pc).
       filter(pc => regionPopulation.pop(pc, population.culture).populationCount > 0).
       filterNot(maxPopulation).
-      map(p => regionPopulation.pop(p, population.culture)).sortBy(-_.happiness)
+      map(p => regionPopulation.pop(p, population.culture)).sortBy(-_.consumptionHappiness)
     chances.headOption
   }
 
   def promoteOrDemote(): Unit = {
     val movements = population.pops.flatMap { p =>
 
-      val demotionOpt = if (p.happiness < MaxHappinessToDemote || maxPopulation(p.populationType)) {
+      val demotionOpt = if (p.consumptionHappiness < MaxHappinessToDemote || maxPopulation(p.populationType)) {
         whereToDemote(p, population).map { target =>
           val percentage = PromotionOptionalPart
           PopulationMovement(p, target, (p.populationCount * percentage) toInt)
         }
       } else None
 
-      val promotionOpt = if (p.happiness > MinHappinessToPromote) {
+      val promotionOpt = if (p.consumptionHappiness > MinHappinessToPromote) {
         whereToPromote(p, population).map { target =>
           val percentage = PromotionOptionalPart
           PopulationMovement(p, target, (p.populationCount * percentage) toInt)

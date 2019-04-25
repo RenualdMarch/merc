@@ -71,7 +71,7 @@ class StateBudget(startingMoney: Double, val taxPolicy: TaxPolicy) {
   }
 
   def scholarsSpendingFunction(regions: List[EconomicRegion])(d:Double): Double = {
-    (scholarsMoneyPerNeeds(regions) |*| SpendingPolicyConfig.needsSize(d)).values.sum
+    scholarsMoneyPerNeeds(regions) dot SpendingPolicyConfig.needsSize(d)
   }
 
   private def bureaucratsMoneyPerNeeds(regions: List[EconomicRegion]):Map[PopulationNeedsType, Double] = {
@@ -81,7 +81,7 @@ class StateBudget(startingMoney: Double, val taxPolicy: TaxPolicy) {
   }
 
   def bureaucratsSpendingFunction(regions: List[EconomicRegion])(d:Double): Double = {
-    (bureaucratsMoneyPerNeeds(regions) |*| SpendingPolicyConfig.needsSize(d)).values.sum
+    bureaucratsMoneyPerNeeds(regions) dot SpendingPolicyConfig.needsSize(d)
   }
 
   private def pensionsMoneyPerNeeds(regions: List[EconomicRegion]):Map[PopulationNeedsType, Double] = {
@@ -91,7 +91,7 @@ class StateBudget(startingMoney: Double, val taxPolicy: TaxPolicy) {
   }
 
   def pensionsSpendingFunction(regions: List[EconomicRegion])(d: Double): Double = {
-    (pensionsMoneyPerNeeds(regions) |*| SpendingPolicyConfig.needsSize(d)).values.sum
+    pensionsMoneyPerNeeds(regions) dot SpendingPolicyConfig.needsSize(d)
   }
 
   def spendingToPercent(needsMap:Map[PopulationNeedsType, Double])(spending: Double): Double = {
