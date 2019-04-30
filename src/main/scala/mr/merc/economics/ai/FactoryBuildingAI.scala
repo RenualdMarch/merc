@@ -2,7 +2,7 @@ package mr.merc.economics.ai
 
 import mr.merc.economics.Population.{Capitalists, Craftsmen}
 import mr.merc.economics._
-import mr.merc.economics.WorldEconomicConstants.Enterprises._
+import mr.merc.economics.WorldConstants.Enterprises._
 import mr.merc.economics.MapUtil.FloatOperations._
 import mr.merc.economics.Products.IndustryProduct
 import mr.merc.economics.WorldStateEnterpriseActions.{FactoryCommand, PopBuildFactoryCommand, PopExpandFactoryCommand}

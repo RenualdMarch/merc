@@ -32,6 +32,7 @@ class WorldFrame(sceneManager: SceneManager) extends Pane with Logging {
     }
   }
   provinceViews.foreach(_.refreshCity())
+  provinceViews.foreach(_.refreshSoldiers())
   mapView.terrainView.refreshTerrainDirt()
   private val worldCanvas = new CanvasLayers(mapView.canvasBattleLayers, new Rectangle2D(0, 0, mapView.pixelWidth, mapView.pixelHeight))
 

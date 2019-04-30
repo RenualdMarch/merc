@@ -5,7 +5,7 @@ import mr.merc.economics.MapUtil.FloatOperations._
 import mr.merc.economics.Population._
 import mr.merc.politics.IssuePosition._
 
-import mr.merc.economics.WorldEconomicConstants.Enterprises._
+import mr.merc.economics.WorldConstants.Enterprises._
 
 import scala.util.Random
 

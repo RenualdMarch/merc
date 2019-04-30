@@ -14,10 +14,11 @@ import mr.merc.log.Logging
 import mr.merc.map.hex.view.TerrainHexFieldView.{BattleFieldViewMode, FieldViewMode, WorldMapViewMode}
 import mr.merc.map.objects.Walls
 import mr.merc.map.objects.view.{WallImage, WallView}
+import mr.merc.unit.view.SoldierView
 
 import scala.collection.mutable
 
-class TerrainHexFieldView(field: TerrainHexField, soldiersDrawer: SoldiersDrawer[_], factor: Double, mode: FieldViewMode = BattleFieldViewMode) extends Logging {
+class TerrainHexFieldView(field: TerrainHexField, val soldiersDrawer: SoldiersDrawer[SoldierView], factor: Double, mode: FieldViewMode = BattleFieldViewMode) extends Logging {
   private val infiniteField = new InfiniteHexField((x, y) => new TerrainHex(x, y, Empty))
 
   val realHexes = field.hexes.map(new TerrainHexView(_, field, this, factor))

@@ -6,8 +6,8 @@ import mr.merc.players.Player
 import mr.merc.battle.BattleModel
 
 class AiDuel(val first: BattleAI, val second: BattleAI) {
-  private val player1 = new Player("1", ai = Some(first))
-  private val player2 = new Player("2", ai = Some(second))
+  private val player1 = Player("1", ai = Some(first))
+  private val player2 = Player("2", ai = Some(second))
   val game = new QuickGameGenerator(player1, player2).generateGame
   val model = new BattleModel(game)
   var winner: Option[Player] = None

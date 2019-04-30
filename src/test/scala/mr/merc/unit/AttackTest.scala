@@ -12,11 +12,11 @@ class AttackTest extends FunSuite with BeforeAndAfter {
   val player2 = Player("2")
   val firstType = new SoldierType("type1", 1, 10, 1, 10, 1,
     List(new Attack(1, 3, 2, Impact, false), new Attack(2, 1, 2, Pierce, true)),
-    Map(), Map(SandDefence -> 50), Map(Impact -> 0, Pierce -> 0))
+    Map(), Map(SandDefence -> 50), Map(Impact -> 0, Pierce -> 0), viewName = "")
 
   val secondType = new SoldierType("type2", 1, 12, 1, 10, 1,
     List(new Attack(1, 2, 3, Impact, false)),
-    Map(), Map(SandDefence -> 30), Map(Impact -> 0, Pierce -> 0))
+    Map(), Map(SandDefence -> 30), Map(Impact -> 0, Pierce -> 0), viewName = "")
 
   var firstSoldier: Soldier = _
   var secondSoldier: Soldier = _
@@ -149,7 +149,7 @@ class AttackTest extends FunSuite with BeforeAndAfter {
 
     val someType = new SoldierType("type1", 1, 10, 1, 10, 1,
       List(), Map(), Map(SandDefence -> 50, BuildingDefence -> 60),
-      Map(Impact -> 0, Pierce -> 0))
+      Map(Impact -> 0, Pierce -> 0), viewName = "")
 
     val soldier = new Soldier("1", someType, Player("1"))
     assert(Attack.calculateSoldierDefence(soldier, hex1).defence === 50)
@@ -162,7 +162,7 @@ class AttackTest extends FunSuite with BeforeAndAfter {
 
     val someType = new SoldierType("type1", 1, 10, 1, 10, 1,
       List(), Map(), Map(SandDefence -> 50, GrassDefence -> 60),
-      Map(Impact -> 0, Pierce -> 0))
+      Map(Impact -> 0, Pierce -> 0), viewName = "")
 
     val soldier = new Soldier("1", someType, Player("1"))
     assert(Attack.calculateSoldierDefence(soldier, hex1).defence === 60)

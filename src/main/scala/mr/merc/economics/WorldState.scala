@@ -83,7 +83,7 @@ trait WorldStateParliamentActions {
     possiblePartiesRegime(system.rulingParty.regime).contains(r.regime))
 
   def partyPopularity(state: State): Map[Party, Double] = {
-    val election = new Election(state.rulingParty, state.primeCulture, possibleParties(state.politicalSystem))
+    val election = new Election(state.rulingParty, state.primeCulture, Party.allParties)
     election.doElections(states(state)).votes
   }
 
@@ -167,7 +167,7 @@ trait WorldStateEnterpriseActions {
 
   def regions: List[EconomicRegion]
 
-  import WorldEconomicConstants.Enterprises._
+  import WorldConstants.Enterprises._
   import MapUtil.FloatOperations._
 
   def stateCanExpandFactory(factory:IndustrialFactory):Boolean = {

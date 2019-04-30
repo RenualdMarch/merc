@@ -15,7 +15,7 @@ class AIAgentTest extends FunSuite with BeforeAndAfter {
   val field = new TerrainHexField(10, 10, TerrainHex.grassInit)
   val model = new BattleModel(new GameField(field, List(Player("1"), Player("2"))))
   val soldierType = new SoldierType("", 20, 40, 4, 1, 1,
-    List(new Attack(0, 10, 2, Impact, false)), Map(GrassKind -> 2), Map(GrassDefence -> 50), Map(Impact -> 0))
+    List(new Attack(0, 10, 2, Impact, false)), Map(GrassKind -> 2), Map(GrassDefence -> 50), Map(Impact -> 0), viewName = "")
   val attacker = new Soldier("1", soldierType, Player("1"))
   val defender1 = new Soldier("1", soldierType, Player("2"))
   val defender2 = new Soldier("1", soldierType, Player("2"))
@@ -64,7 +64,7 @@ class AIAgentTest extends FunSuite with BeforeAndAfter {
     val field = new TerrainHexField(1, 10, hexInit)
     val model = new BattleModel(new GameField(field, List(Player("1"), Player("2"))))
     val soldierType = new SoldierType("", 20, 40, 10, 1, 1,
-      List(new Attack(0, 10, 2, Impact, false)), Map(GrassKind -> 2, SandKind -> 2), Map(GrassDefence -> 50, SandDefence -> 60), Map(Impact -> 0))
+      List(new Attack(0, 10, 2, Impact, false)), Map(GrassKind -> 2, SandKind -> 2), Map(GrassDefence -> 50, SandDefence -> 60), Map(Impact -> 0), viewName = "")
     val conf1 = AIConfiguration(0.4, 0, 0, 1, 10, 1)
     val soldier = new Soldier("1", soldierType, Player("1"))
     field.hex(0, 0).soldier = Some(soldier)

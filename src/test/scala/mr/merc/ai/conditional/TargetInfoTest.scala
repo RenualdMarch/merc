@@ -14,7 +14,7 @@ class TargetInfoTest extends FunSuite {
   val conf = AIConfiguration(0.65, 0, 0, 0, 10, 1)
   val field = new TerrainHexField(10, 10, TerrainHex.grassInit)
   def soldierType(cost: Int) = new SoldierType("", cost, 10, 0, 1, 1,
-    List(new Attack(0, 10, 2, Impact, false)), Map(), Map(), Map())
+    List(new Attack(0, 10, 2, Impact, false)), Map(), Map(), Map(), viewName = "")
   val attacker = new Soldier("1", soldierType(10), Player("1"))
   val defender1 = new Soldier("1", soldierType(10), Player("2"))
   val defender2 = new Soldier("1", soldierType(11), Player("2"))

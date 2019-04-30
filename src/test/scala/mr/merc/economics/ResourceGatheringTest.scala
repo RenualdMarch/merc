@@ -34,7 +34,7 @@ class ResourceGatheringTest extends FunSuite with BeforeAndAfter with Matchers {
 
       override val regionMarket: RegionMarket = null
       override val regionPopulation: RegionPopulation = new RegionPopulation(List(aristocrats, magicalAristocrats, workers))
-
+      override val regionWarriors: RegionWarriors = null
       override def toString: String = "region1"
 
       override def owner: State = country
@@ -45,7 +45,7 @@ class ResourceGatheringTest extends FunSuite with BeforeAndAfter with Matchers {
 
       override val regionMarket: RegionMarket = null
       override val regionPopulation: RegionPopulation = null
-
+      override val regionWarriors: RegionWarriors = null
       override def toString: String = "region2"
 
       override def owner: State = country
@@ -56,7 +56,7 @@ class ResourceGatheringTest extends FunSuite with BeforeAndAfter with Matchers {
 
       override val regionMarket: RegionMarket = null
       override val regionPopulation: RegionPopulation = null
-
+      override val regionWarriors: RegionWarriors = null
       override def toString: String = "region3"
 
       override def owner: State = country

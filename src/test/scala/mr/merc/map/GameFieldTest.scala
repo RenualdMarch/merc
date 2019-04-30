@@ -9,7 +9,7 @@ import mr.merc.map.terrain._
 class GameFieldTest extends FunSuite {
   val soldierType = new SoldierType("someType", 10, 10, 6, 10, 1,
     List(), Map((GrassKind -> 2)), Map((GrassDefence -> 50)),
-    Map())
+    Map(), viewName = "")
 
   val player1 = Player("1")
   val player2 = Player("2")

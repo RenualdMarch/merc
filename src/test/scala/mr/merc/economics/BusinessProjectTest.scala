@@ -1,5 +1,6 @@
 package mr.merc.economics
 
+import mr.merc.army.WarriorViewNames
 import scalafx.scene.paint.Color
 import mr.merc.economics.Population.{Capitalists, Culture, Humans}
 import mr.merc.economics.Products.{Coal, Grain, Product, Weapons}
@@ -9,7 +10,7 @@ import org.scalatest.FunSuite
 
 class BusinessProjectTest extends FunSuite {
 
-  val culture = new Culture("test", Humans, HumanVillageHouse, Color.White) {}
+  val culture = new Culture("test", Humans, HumanVillageHouse, Color.White, WarriorViewNames(Map())) {}
 
   test("business project flow") {
 
@@ -90,6 +91,7 @@ class BusinessProjectTest extends FunSuite {
 
       override def economicNeighbours: Set[EconomicRegion] = ???
 
+      override val regionWarriors: RegionWarriors = null
       override val regionMarket: RegionMarket = null
       override val regionPopulation: RegionPopulation = null
     }

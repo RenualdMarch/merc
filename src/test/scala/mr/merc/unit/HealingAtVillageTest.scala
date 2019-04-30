@@ -12,7 +12,7 @@ class HealingAtVillageTest extends FunSuite with BeforeAndAfter {
   var field: TerrainHexField = _
   def simpleSoldierType(attributes: Set[SoldierTypeAttribute] = Set()) = new SoldierType("1", 1, 20, 10, 5, 1,
     List(), Map(SandKind -> 2, WallsKind -> 1),
-    Map(SandDefence -> 60, BuildingDefence -> 60), Map(Impact -> 0), attributes)
+    Map(SandDefence -> 60, BuildingDefence -> 60), Map(Impact -> 0), attributes, viewName = "")
 
   before {
     field = new TerrainHexField(10, 10, (x, y) => if (x == 5 && y == 5)

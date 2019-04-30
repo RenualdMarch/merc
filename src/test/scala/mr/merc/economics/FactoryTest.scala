@@ -34,7 +34,7 @@ class FactoryTest extends FunSuite with BeforeAndAfter with MockitoSugar with Ma
 
       override val regionMarket: RegionMarket = testRegionMarket
       override val regionPopulation: RegionPopulation = new RegionPopulation(List(capitalists))
-
+      override val regionWarriors: RegionWarriors = null
       override def toString: String = "region1"
 
       override def owner: State = FactoryTest.this.owner
@@ -45,7 +45,7 @@ class FactoryTest extends FunSuite with BeforeAndAfter with MockitoSugar with Ma
 
       override val regionMarket: RegionMarket = testRegionMarket
       override val regionPopulation: RegionPopulation = null
-
+      override val regionWarriors: RegionWarriors = null
       override def toString: String = "region2"
 
       override def owner: State = FactoryTest.this.owner
@@ -56,7 +56,7 @@ class FactoryTest extends FunSuite with BeforeAndAfter with MockitoSugar with Ma
 
       override val regionMarket: RegionMarket = testRegionMarket
       override val regionPopulation: RegionPopulation = null
-
+      override val regionWarriors: RegionWarriors = null
       override def toString: String = "region3"
 
       override def owner: State = FactoryTest.this.owner

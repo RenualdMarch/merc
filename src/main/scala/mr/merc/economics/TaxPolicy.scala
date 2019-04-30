@@ -20,7 +20,7 @@ object TaxPolicy {
 
 class TaxPolicy(private var taxes:Map[Income, Double]) {
   def tax(income: Income, bureaucratsPercentage:Double): Double = taxes.getOrElse(income, 0d) *
-    WorldEconomicConstants.Taxes.taxCollectionPart(bureaucratsPercentage)
+    WorldConstants.Taxes.taxCollectionPart(bureaucratsPercentage)
 
   def taxPolicyValue(income: Income):Double = taxes(income)
 

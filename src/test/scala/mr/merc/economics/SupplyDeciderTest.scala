@@ -12,7 +12,7 @@ class SupplyDeciderTest extends FunSuite{
 
   private val region1:EconomicRegion = new EconomicRegion {
     override def economicNeighbours: Set[EconomicRegion] = Set(region2, region1)
-
+    override val regionWarriors: RegionWarriors = null
     override val regionMarket:RegionMarket = null
     override val regionPopulation:RegionPopulation = null
 
@@ -26,7 +26,7 @@ class SupplyDeciderTest extends FunSuite{
 
     override val regionMarket:RegionMarket = null
     override val regionPopulation:RegionPopulation = null
-
+    override val regionWarriors: RegionWarriors = null
     override def toString: String = "region2"
 
     override def owner: State = country
@@ -37,7 +37,7 @@ class SupplyDeciderTest extends FunSuite{
 
     override val regionMarket:RegionMarket = null
     override val regionPopulation:RegionPopulation = null
-
+    override val regionWarriors: RegionWarriors = null
     override def toString: String = "region3"
 
     override def owner: State = country

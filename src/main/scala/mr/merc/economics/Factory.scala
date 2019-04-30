@@ -5,7 +5,7 @@ import mr.merc.economics.Factory.{FactoryRecord, FactoryStorage}
 import mr.merc.economics.Population._
 import mr.merc.economics.MapUtil.FloatOperations._
 import mr.merc.economics.TaxPolicy.CorporateTax
-import WorldEconomicConstants.Enterprises._
+import WorldConstants.Enterprises._
 
 object Factory {
 

@@ -29,7 +29,7 @@ class SkirmisherAttributeTest extends FunSuite with BeforeAndAfter {
 
   def simpleSoldierType(attributes: Set[SoldierTypeAttribute] = Set()) = new SoldierType("1", 1, 20, 6, 5, 1,
     List(Attack(1, 10, 1, Impact, false), Attack(2, 6, 2, Impact, false)), Map(GrassKind -> 2),
-    Map(GrassDefence -> 60), Map(Impact -> 0), attributes)
+    Map(GrassDefence -> 60), Map(Impact -> 0), attributes, viewName = "")
 
   test("possible moves are correct with skirmisher soldier") {
     val currentField = field

@@ -23,7 +23,7 @@ class ConditionalAI(config: AIConfiguration) extends BattleAI with AIQueueAdapte
 
     val stream = soldiersAndHexes.toStream.map {
       case (s, h) =>
-        val agent = new AIAgent(s, h, config)
+        val agent = AIAgent(s, h, config)
         soldierStates += s -> Moved
         agent.makeMove(command, model)
     }

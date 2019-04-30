@@ -1,48 +1,53 @@
 package mr.merc.players
 
-import scala.util.Random
+import mr.merc.log.Logging
 import scalafx.scene.paint.Color
 
-class ColorGenerator {
+import scala.collection.mutable
 
-  private var returnedColors: Set[Color] = Set()
+object ColorGenerator {
 
-  private var stage = 1d
+  def colorStream:Stream[Color] = {
+    val generator = new ColorGenerator()
+    Stream.continually (generator.nextColor())
+  }
+}
 
-  private def currentStep = 1 / stage
+class ColorGenerator extends Logging {
+  private var stage:Int = -1
 
-  private def isOne(a: Double) = math.abs(1 - a) <= 10e-10
+  private val notSelectedColors = mutable.Set[Color]()
 
-  private var r = 0d
-  private var g = 0d
-  private var b = 0d
+  private val selectedColors = mutable.Set[Color]()
+
+  private def possibleColorsCount = BigDecimal(2).pow(stage)
+
+  private def mostDistantFromNotSelected: Color = {
+    notSelectedColors.maxBy { c =>
+      selectedColors.map(s =>
+        math.abs(s.red - c.red) + math.abs(s.green - c.green) + math.abs(s.blue - c.blue)
+      ).sum
+    }
+  }
 
   def nextColor(): Color = {
-    val result = Color.color(r, g, b)
-    if (isOne(r)) {
-      if (isOne(g)) {
-        if (isOne(b)) {
-          stage += 1
-          r = 0
-          g = 0
-          b = 0
-        } else {
-          b += currentStep
-          r = 0
-          g = 0
-        }
-      } else {
-        g += currentStep
-        r = 0
-      }
-    } else {
-      r += currentStep
-    }
-    if (returnedColors.contains(result)) {
+    if (notSelectedColors.isEmpty) {
+      stage += 1
+      val interval = BigDecimal(0xFF) / possibleColorsCount
+      val newAndOld = for {
+        r <- BigDecimal(0).to(0xFF).by(interval)
+        g <- BigDecimal(0).to(0xFF).by(interval)
+        b <- BigDecimal(0).to(0xFF).by(interval)
+      } yield Color.rgb(r.rounded.toInt, g.rounded.toInt, b.rounded.toInt)
+      notSelectedColors ++= newAndOld.toSet -- selectedColors
       nextColor()
     } else {
-      returnedColors += result
-      result
+      val max = mostDistantFromNotSelected
+      info(s"generated new color $max")
+      notSelectedColors -= max
+      selectedColors += max
+      max
     }
+
   }
 }

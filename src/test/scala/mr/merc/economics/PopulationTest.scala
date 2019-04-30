@@ -1,5 +1,6 @@
 package mr.merc.economics
 
+import mr.merc.army.WarriorViewNames
 import mr.merc.economics.Population._
 import mr.merc.economics.Products.{Coal, Fruit, Grain}
 import mr.merc.economics.TaxPolicy.MiddleSalaryTax
@@ -19,7 +20,7 @@ class PopulationTest extends FunSuite with Matchers {
     LuxuryNeeds -> Map(Fruit -> 3.0))
 
   case object TestRace extends Race
-  object TestCulture extends Culture("test",TestRace, HumanCityHouse, Color.Black) {
+  object TestCulture extends Culture("test",TestRace, HumanCityHouse, Color.Black, WarriorViewNames(Map())) {
     override def needs: PopulationNeeds = Map(Upper -> smallNeeds, Middle -> smallNeeds, Lower -> smallNeeds)
   }
   def newPopulation(money: Double) = new Population(TestCulture, Traders, 1000, money, 0, PoliticalViews.averagePoliticalViews)
@@ -409,7 +410,7 @@ class PopulationTest extends FunSuite with Matchers {
     val state = new State("", TestCulture, 0, new PoliticalSystem(absoluteRadicalParty))
 
     pop.politicalHappiness(state) shouldBe 1d
-    pop2.politicalHappiness(state) shouldBe (1d - WorldEconomicConstants.Population.DifferentCulturePoliticalHappinessPenalty)
+    pop2.politicalHappiness(state) shouldBe (1d - WorldConstants.Population.DifferentCulturePoliticalHappinessPenalty)
 
     val radicallyDifferentParty = new Party("", Color.Black,
       Migration.OpenBorders, Regime.Democracy, ForeignPolicy.Pacifism,

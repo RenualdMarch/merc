@@ -1,5 +1,6 @@
 package mr.merc.economics
 
+import mr.merc.army.WarriorViewNames
 import mr.merc.economics.Population._
 import mr.merc.economics.Products.Grain
 import mr.merc.economics.SpendingPolicy.{BureaucratsSalary, Pensions, ScholarsSalary}
@@ -13,7 +14,7 @@ class StateBudgetTest extends FunSuite {
 
   test("Spending of budget money doesnt create pop") {
 
-    val culture = new Culture("testCulture", Humans, HumanCityHouse, Color.Red) {
+    val culture = new Culture("testCulture", Humans, HumanCityHouse, Color.Red, WarriorViewNames(Map())) {
 
       override val needs = Map(
         Lower -> Map(
@@ -43,7 +44,7 @@ class StateBudgetTest extends FunSuite {
       }
 
       override def economicNeighbours: Set[EconomicRegion] = Set()
-
+      override val regionWarriors: RegionWarriors = null
       override val regionMarket: RegionMarket = new RegionMarket(Map(Grain -> 0.1))
       override val regionPopulation: RegionPopulation = new RegionPopulation(List(traders, bureaucrats, farmers))
     }
@@ -78,7 +79,7 @@ class StateBudgetTest extends FunSuite {
 
   test("Spend budget money") {
 
-    val culture = new Culture("testCulture", Humans, HumanCityHouse, Color.Red) {
+    val culture = new Culture("testCulture", Humans, HumanCityHouse, Color.Red, WarriorViewNames(Map())) {
 
       override val needs = Map(
         Lower -> Map(
@@ -108,7 +109,7 @@ class StateBudgetTest extends FunSuite {
       }
 
       override def economicNeighbours: Set[EconomicRegion] = Set()
-
+      override val regionWarriors: RegionWarriors = null
       override val regionMarket: RegionMarket = new RegionMarket(Map(Grain -> 0.1))
       override val regionPopulation: RegionPopulation = new RegionPopulation(List(scholars, bureaucrats, farmers))
     }
@@ -142,7 +143,7 @@ class StateBudgetTest extends FunSuite {
 
   test("Not enough money in budget") {
 
-    val culture = new Culture("testCulture", Humans, HumanCityHouse, Color.Red) {
+    val culture = new Culture("testCulture", Humans, HumanCityHouse, Color.Red, WarriorViewNames(Map())) {
 
       override val needs = Map(
         Lower -> Map(
@@ -172,7 +173,7 @@ class StateBudgetTest extends FunSuite {
       }
 
       override def economicNeighbours: Set[EconomicRegion] = Set()
-
+      override val regionWarriors: RegionWarriors = null
       override val regionMarket: RegionMarket = new RegionMarket(Map(Grain -> 0.1))
       override val regionPopulation: RegionPopulation = new RegionPopulation(List(scholars, bureaucrats, farmers))
     }

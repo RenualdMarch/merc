@@ -6,7 +6,8 @@ import mr.merc.economics.Population._
 import mr.merc.economics.util.DistributionCalculator
 import mr.merc.politics.{PoliticalViews, State}
 import mr.merc.economics.MapUtil.FloatOperations.MapWithFloatOperations
-import WorldEconomicConstants.Population._
+import WorldConstants.Population._
+import mr.merc.army.Warrior
 
 trait EconomicRegion {
 
@@ -17,6 +18,8 @@ trait EconomicRegion {
   val regionMarket:RegionMarket
 
   val regionPopulation: RegionPopulation
+
+  val regionWarriors: RegionWarriors
 
   var enterprises:Vector[Enterprise] = Vector()
 
@@ -72,7 +75,7 @@ trait EconomicRegion {
     if (totalPopulation == 0) 0
     else {
       val div = bureaucrats.toDouble / totalPopulation
-      val max = totalPopulation * WorldEconomicConstants.Population.maxPop(Bureaucrats)
+      val max = totalPopulation * WorldConstants.Population.maxPop(Bureaucrats)
       div / max
     }
   }
@@ -194,6 +197,8 @@ class RegionPopulation(initialPops: List[Population]) {
       p.learnLiteracy(perc)
     }
   }
+
+  def populationCount: Int = pops.map(_.populationCount).sum
 }
 
 class RegionMarket(initialPrices:Map[Product, Double]) {
@@ -251,5 +256,58 @@ class RegionMarket(initialPrices:Map[Product, Double]) {
 
   def currentPrices: Map[Product, Double] = marketDaysForProduct.map { case (product, market) =>
     product -> market.price
+  }
+}
+
+class RegionWarriors(initial: List[Warrior], neighbours: => Set[EconomicRegion]) {
+  private var destinations:Map[Option[EconomicRegion], List[Warrior]] = Map(None -> initial)
+
+  def allWarriors:Set[Warrior] = warriorDestinations.values.flatten.toSet
+
+  def warriorDestinations:Map[Option[EconomicRegion], List[Warrior]] = destinations
+
+  def planSendWarriors(whom:List[Warrior], to:Option[EconomicRegion]): Unit = {
+    require(to.forall(neighbours.contains), s"Illegal destination $to, possible $neighbours")
+
+    val withoutWhom = destinations.transform { case (_, list) =>
+        list.filterNot(whom.contains)
+    }
+    val newTo = withoutWhom.getOrElse(to, Nil) ::: whom
+    destinations = withoutWhom + (to -> newTo)
+  }
+
+  def sendWarriorsToDestinations():Map[EconomicRegion, List[Warrior]] = {
+    val remain = destinations.getOrElse(None, Nil)
+    val result = destinations.collect {
+      case (Some(region), list) => region -> list
+    }
+    destinations = Map(None -> remain)
+    result
+  }
+
+  def receiveWarriors(list:List[Warrior]): Unit = {
+    val present = destinations.getOrElse(None, Nil)
+    destinations += None -> (present ::: list)
+  }
+
+  def takeWarriors(list:List[Warrior]): List[Warrior] = {
+
+    val result = list.filter(allWarriors.contains)
+
+    destinations = destinations.transform { case (_, l) =>
+      l.filterNot(list.contains)
+    }
+
+    result
+  }
+
+  def clearDeadWarriors(): Set[Warrior] = {
+    val dead = allWarriors.filterNot(_.isAlive)
+
+    destinations = destinations.transform { case (_, list) =>
+        list.filter(_.isAlive)
+    }
+
+    dead
   }
 }

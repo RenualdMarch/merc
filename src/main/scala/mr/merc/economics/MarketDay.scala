@@ -2,7 +2,7 @@ package mr.merc.economics
 
 import scala.collection.mutable
 import Products.Product
-import WorldEconomicConstants.Market._
+import WorldConstants.Market._
 
 class MarketDay(product: Product, val price: Double, val turn: Int) {
 

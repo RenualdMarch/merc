@@ -7,7 +7,7 @@ import scalafx.scene.canvas.GraphicsContext
 class VerticalBarView(width:Int, height:Int, borderColor:Color, fillColor:Color, private var _fillPercentage:Double) {
 	def fillPercentage = _fillPercentage
 	def fillPercentage_=(perc:Double) {
-	  require(perc >= 0 && perc <= 1)
+	  require(perc >= 0 && perc <= 1, s"Percentage is $perc")
 	  _fillPercentage = perc
 	}
 	

@@ -10,7 +10,9 @@ import mr.merc.politics.{PoliticalViews, State}
 import scalafx.scene.paint.Color
 import pureconfig.loadConfigOrThrow
 import pureconfig.generic.auto._
-import WorldEconomicConstants.Population._
+import WorldConstants.Population._
+import mr.merc.army.WarriorViewNames
+import scala.collection.JavaConverters._
 
 import scala.util.Random
 
@@ -437,24 +439,24 @@ object Population {
     // do not remove
     import mr.merc.util.MercUtils.ConfigConvertProtocol.camelCaseHint
 
-    private val config = ConfigFactory.load("conf/cultures.conf")
-    val cultureConfig: Map[Culture, CultureInfo] = Population.cultures.map { c =>
-      c -> loadConfigOrThrow[CultureInfo](config.getConfig(c.name))
+    private val config = ConfigFactory.parseResourcesAnySyntax("conf/cultures.conf")
+    val cultureConfig: Map[String, CultureInfo] = config.root().asScala.keySet.map { c =>
+      c -> loadConfigOrThrow[CultureInfo](config.getConfig(c))
     } toMap
   }
 
   // removed sealed for test purposes only
-  abstract class Culture(val name: String, val race: Race, val houseStyle: House, val color: Color) {
+  abstract class Culture(val name: String, val race: Race, val houseStyle: House, val color: Color, val warriorViewNames:WarriorViewNames) {
     def needs: PopulationNeeds = scaleNeeds(defaultHumanNeeds(this))
 
     def cultureNameKey: String = "culture." + name
   }
 
-  case object LatinHuman extends Culture("latin", Humans, HumanCityHouse, Color.Red)
+  case object LatinHuman extends Culture("latin", Humans, HumanCityHouse, Color.Red, WarriorViewNames.LatinCulture)
 
-  case object KnightHuman extends Culture("french", Humans, HumanVillageHouse, Color.Blue)
+  case object KnightHuman extends Culture("french", Humans, HumanVillageHouse, Color.Blue, WarriorViewNames.WesnothCulture)
 
-  case object DarkHuman extends Culture("german", Humans, HumanCottage, Color.Black)
+  case object DarkHuman extends Culture("german", Humans, HumanCottage, Color.Black, WarriorViewNames.DarkHumanCulture)
 
   //
   // DISABLED CULTURES

@@ -13,7 +13,7 @@ class CuresAttributeTest extends FunSuite with BeforeAndAfter {
   var field: TerrainHexField = _
   def simpleSoldierType(attributes: Set[SoldierTypeAttribute] = Set()) = new SoldierType("1", 1, 20, 10, 5, 1,
     List(Attack(0, 10, 1, Impact, false), Attack(1, 6, 2, Impact, false)), Map(SandKind -> 2),
-    Map(SandDefence -> 60), Map(Impact -> 0), attributes)
+    Map(SandDefence -> 60), Map(Impact -> 0), attributes, viewName = "")
 
   before {
     field = new TerrainHexField(10, 10, (x, y) => new TerrainHex(x, y, DesertSand))

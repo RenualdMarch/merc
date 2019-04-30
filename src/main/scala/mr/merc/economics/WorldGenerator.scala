@@ -9,9 +9,10 @@ import mr.merc.map.terrain.WaterKind
 import mr.merc.players.{ColorGenerator, NamesGenerator}
 import mr.merc.politics.{Party, PoliticalViews, Province, State}
 import mr.merc.util.WeightedRandom
-
-import WorldEconomicConstants.Enterprises._
+import WorldConstants.Enterprises._
 import WorldGenerationConstants._
+import mr.merc.army.WarriorType.Professional
+import mr.merc.army.{Warrior, WarriorType}
 
 import scala.util.Random
 
@@ -33,9 +34,9 @@ class WorldGenerator(field:TerrainHexField) {
     }
   }
 
-  private val colorGenerator = new ColorGenerator()
+  private var colorStream = ColorGenerator.colorStream
   private val namesGenerators:Map[Culture, NamesGenerator] = Population.cultures.map { c =>
-    c -> new NamesGenerator(Culture.cultureConfig(c))
+    c -> new NamesGenerator(Culture.cultureConfig(c.name))
   } toMap
 
   private val resourceGenerator = new WeightedRandom(ResourcesRarity)
@@ -76,6 +77,14 @@ class WorldGenerator(field:TerrainHexField) {
     cultures.map(Ritual.apply)
   }
 
+  private def generateWarriors(province: Province):List[Warrior] = {
+    val culture = province.owner.primeCulture
+    val possibleWarriors = culture.warriorViewNames.possibleWarriors.keySet.map(_._1)
+    val random = new WeightedRandom[WarriorType](possibleWarriors.map(_ -> 1d).toMap)
+    val count = province.regionPopulation.populationCount / WarriorPerPopulation
+    random.nextRandomItems(count).map(wt => new Warrior(wt, Professional, culture, province.owner))
+  }
+
   private def generateRegionPops(culture: Culture): RegionPopulation = {
 
     val pq = MinProvinceSize + Random.nextInt(MaxProvinceSize - MinProvinceSize)
@@ -106,7 +115,8 @@ class WorldGenerator(field:TerrainHexField) {
   }
 
   private def generateState(culture: Culture):State = {
-    val color = colorGenerator.nextColor()
+    val color = colorStream.head
+    colorStream = colorStream.tail
     val name = namesGenerators(culture).stateNames.extract()
     new State(name, culture, StateStartingMoney, new PoliticalSystem(Party.aristocratic), color)
   }
@@ -131,7 +141,7 @@ class WorldGenerator(field:TerrainHexField) {
 
     val racesZipCM = raceSizes.map(_._1) zip divideIntoContinuousParts(connectivityMap, raceSizes.map(_._2))
     racesZipCM.flatMap {case (race, raceMap) =>
-      val cultures = Population.cultures.filter(_.race == race)
+      val cultures = Random.shuffle(Population.cultures.filter(_.race == race))
       val cultureSizes = raceMap.size divList cultures.size
       val cultureZipMaps = cultures zip divideIntoContinuousParts(raceMap, cultureSizes)
       cultureZipMaps.flatMap { case (culture, cultureMap) =>
@@ -159,6 +169,7 @@ class WorldGenerator(field:TerrainHexField) {
         val name = namesGenerators(state.primeCulture).cityNames.extract()
         val p = Province(name, state, generateRegionMarket,generateRegionPops(state.primeCulture), provincesHexes(capital), capital)
         p.enterprises = generateEnterprises(p).toVector
+        p.regionWarriors.receiveWarriors(generateWarriors(p))
         provincesHexes(capital).foreach(_.province = Some(p))
         p
       }
@@ -257,14 +268,10 @@ class WorldGenerator(field:TerrainHexField) {
 }
 
 object WorldGenerator extends Logging {
-  private val worldMapWidth = 50
-  private val worldMapHeight = 50
-  private val hexesPerProvince = 150
-  private val provinces = (worldMapHeight * worldMapWidth * WorldMapGenerator.landPercentage / hexesPerProvince).toInt
 
     def generateWorld(): WorldState = {
     val timeBefore = System.currentTimeMillis()
-    val world = WorldMapGenerator.generateWorldMap(worldMapWidth, worldMapHeight, provinces)
+    val world = WorldMapGenerator.generateWorldMap(WorldMapWidth, WorldMapHeight, Provinces)
     val generator = new WorldGenerator(world.terrain)
     val r = (generator.generateStateAndProvinces(world.provinces), world.terrain)
     val playerState = r._1.keys.find(_.primeCulture == LatinHuman).get

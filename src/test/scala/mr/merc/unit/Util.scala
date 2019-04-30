@@ -6,10 +6,10 @@ object Util extends FunSuite {
   def soldierType(hp: Int, defence: Int, attackDamage: Int, attackCount: Int, attributes: Set[AttackAttribute] = Set(), resistance: Int = 0) =
     new SoldierType("type0", 1, hp, 1, 10, 1,
       List(new Attack(1, attackDamage, attackCount, Impact, false, attributes)),
-      Map(), Map(SandDefence -> defence), Map(Impact -> resistance))
+      Map(), Map(SandDefence -> defence), Map(Impact -> resistance), viewName = "")
   def soldierType(defence: Int, attacks: List[Attack]) =
     new SoldierType("type0", 1, 100, 1, 10, 1,
-      attacks, Map(), Map(SandDefence -> defence), Map(Impact -> 0))
+      attacks, Map(), Map(SandDefence -> defence), Map(Impact -> 0), viewName = "")
 
   def f(t: Int)(c: ChanceOfSuccess): Boolean = t <= c.chanceNumber
 

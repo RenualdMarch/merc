@@ -1,5 +1,6 @@
 package mr.merc.economics
 
+import mr.merc.army.WarriorViewNames
 import mr.merc.economics.Population.{Aristocrats, Capitalists, Culture, Humans, Traders}
 import mr.merc.map.objects.HumanVillageHouse
 import mr.merc.politics._
@@ -7,8 +8,8 @@ import org.scalatest.FunSuite
 import scalafx.scene.paint.Color
 
 class ElectionTest extends FunSuite {
-  val culture = new Culture("test", Humans, HumanVillageHouse, Color.White) {}
-  val culture2 = new Culture("test2", Humans, HumanVillageHouse, Color.White) {}
+  val culture = new Culture("test", Humans, HumanVillageHouse, Color.White, WarriorViewNames(Map())) {}
+  val culture2 = new Culture("test2", Humans, HumanVillageHouse, Color.White, WarriorViewNames(Map())) {}
 
   test("choose best party") {
     val bestParty = Party("best", Color.White,
@@ -92,6 +93,7 @@ class ElectionTest extends FunSuite {
 
       override def economicNeighbours: Set[EconomicRegion] = ???
 
+      override val regionWarriors: RegionWarriors = null
       override val regionMarket: RegionMarket = null
       override val regionPopulation: RegionPopulation = rp
     }

@@ -13,7 +13,7 @@ class RegeneratesAttributeTest extends FunSuite with BeforeAndAfter {
   var field: TerrainHexField = _
   def simpleSoldierType(attributes: Set[SoldierTypeAttribute] = Set()) = new SoldierType("1", 1, 20, 10, 5, 1,
     List(Attack(1, 10, 1, Impact, false), Attack(2, 6, 2, Impact, false)), Map(SandKind -> 2),
-    Map(SandDefence -> 60), Map(Impact -> 0), attributes)
+    Map(SandDefence -> 60), Map(Impact -> 0), attributes, viewName = "")
   var soldier: Soldier = _
 
   before {

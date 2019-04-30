@@ -54,7 +54,7 @@ object SoldierType {
         (attackType, resistance)
       }).toMap withDefault (a => 0)
 
-      new SoldierType(name, cost, hp, movement, exp, level, attacks, moveCostsMap, defencesMap, resistancesMap, attributes)
+      new SoldierType(name, cost, hp, movement, exp, level, attacks, moveCostsMap, defencesMap, resistancesMap, attributes, name)
     })
 
     parsed.toList
@@ -82,7 +82,7 @@ object SoldierType {
 
 case class SoldierType(name: String, cost: Int, hp: Int, movement: Int, exp: Int, level: Int,
                        attacks: List[Attack], moveCost: Map[TerrainKind, Int], defence: Map[DefenceType, Int],
-                       resistance: Map[AttackType, Int], attributes: Set[SoldierTypeAttribute] = Set()) {
+                       resistance: Map[AttackType, Int], attributes: Set[SoldierTypeAttribute] = Set(), viewName: String) {
 }
 
 sealed trait DefenceType

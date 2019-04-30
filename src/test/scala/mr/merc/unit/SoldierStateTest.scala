@@ -7,7 +7,7 @@ import mr.merc.map.terrain.DesertSand
 
 class SoldierStateTest extends FunSuite{
     val soldierType = new SoldierType("type0", 1, 20, 1, 10, 1, 
-		List(), Map(), Map(), Map())
+		List(), Map(), Map(), Map(), viewName = "")
   
 	test("poisoned state results in 8 hp drop") {
 	  val soldier = new Soldier("1", soldierType, Player("1"))

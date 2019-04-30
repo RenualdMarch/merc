@@ -1,145 +1,153 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <views>
-	<view name="testType1">
-		<attack1 imageName="image1" projectile="testProjectile3">
-			<!-- should be used either <all> tag or all tags <n,ne,se,s> they cann't be skipped -->
-			<n>
-				<succ>
-				<!-- alpha default is 1, x and y is 0 -->
-					<image name="im1n" alpha="0.5" x="5" y="3"/>
-					<image name="im2n"/>
-				</succ>
-				
-				<!-- fail is optional, if it absent, succ will be used -->
-				<fail>
-					<image name="im3n"/>
-				</fail>
-			</n>
-			<ne>
-				<succ>
-					<image name="im1m"/>
-					<image name="im2m"/>
-				</succ>
-				<fail>
-					<image name="im3m"/>
-				</fail>
-			</ne>
-			<se>
-				<succ>
-					<image name="im1r"/>
-					<image name="im2r"/>
-				</succ>				
-				<fail>
-					<image name="im3r"/>
-				</fail>
-			</se>
-			<s>
-				<succ>
-					<image name="im1s"/>
-					<image name="im2s"/>
-				</succ>
-				
-			</s>
-		</attack1>
-		<!-- the same as attack1, optional if character doesn't have second attack -->
-		<attack2 imageName="image10" >
-			<all>
-				<!-- effects have ther's own configuration in special file -->
-				<succ>
-					<image name="im4a"/>
-					<image name="im5a"/>
-				</succ>
-				<fail>
-					<image name="im6a"/>
-				</fail>
-			</all>
-		</attack2>
-		<!-- have to be replaced with standing if absent -->
-		<idle>
-			<image name="im7"/>
-			<image name="im8"/>
-		</idle>
-		<stand>
-			<image name="im9"/>
-		</stand>
-		<!-- if absent, must be replaced with standing animation that disappears slowly -->
-		<death>
-			<image name="im10" alpha="0.7"/>
-			<image name="im11" alpha="0.3"/>
-		</death>
-		<!-- again, replaced with standing if absent -->
-		<move>
-			<image name="im12"/>
-		</move>
-		<!-- and again, same thing - replaced with standing -->
-		<defence>
-			<image name="im13"/>
-		</defence>
-		<sounds>
-			<attack1 succ="1" fail="2"/>
-			<attack2 succ="3" fail="4"/>
-			<move sound="5"/>
-			<death sound="6"/>
-			<pain sound="7"/>
-		</sounds>
-	</view>
-	<view name="testType2">
-		<attack1>
-			<all>
-				<succ>
-					<image name="im14"/>
-				</succ>
-			</all>
-		</attack1>
-		<attack2>
-			<all>
-				<succ>
-					<image name="im14"/>
-				</succ>
-			</all>
-		</attack2>
-		<attack3>
-			<all>
-				<succ>
-					<image name="im15"/>
-				</succ>
-			</all>
-		</attack3>
-		<stand>
-			<image name="im15"/>
-		</stand>
-		<sounds>
-			<attack1 succ="10" fail="20"/>
-			<move sound="50"/>
-		</sounds>
-	</view>
-	<view name="testSoldier">
-		<attack1 imageName="image100" projectile="testProjectile3">
-			<all>
-				<succ>
-					<image name="im14"/>
-				</succ>
-			</all>
-		</attack1>
-		<stand>
-			<image name="im15"/>
-		</stand>
-	</view>
-	<view name="testSoldier2">
-		<attack1 imageName="111" projectile="testProjectile3">
-			<all>
-				<succ>
-					<image name="im14"/>
-					<image name="im15"/>
-					<image name="im16"/>
-					<image name="im17"/>
-				</succ>
-			</all>
-		</attack1>
-		<stand>
-			<image name="im15"/>
-			<image name="im16"/>
-			<image name="im17"/>
-		</stand>
-	</view>
+    <view name="testType1">
+        <attack1 imageName="image1" projectile="testProjectile3">
+            <!-- should be used either <all> tag or all tags <n,ne,se,s> they cann't be skipped -->
+            <n>
+                <succ>
+                    <!-- alpha default is 1, x and y is 0 -->
+                    <image name="im1n" alpha="0.5" x="5" y="3"/>
+                    <image name="im2n"/>
+                </succ>
+
+                <!-- fail is optional, if it absent, succ will be used -->
+                <fail>
+                    <image name="im3n"/>
+                </fail>
+            </n>
+            <ne>
+                <succ>
+                    <image name="im1m"/>
+                    <image name="im2m"/>
+                </succ>
+                <fail>
+                    <image name="im3m"/>
+                </fail>
+            </ne>
+            <se>
+                <succ>
+                    <image name="im1r"/>
+                    <image name="im2r"/>
+                </succ>
+                <fail>
+                    <image name="im3r"/>
+                </fail>
+            </se>
+            <s>
+                <succ>
+                    <image name="im1s"/>
+                    <image name="im2s"/>
+                </succ>
+
+            </s>
+        </attack1>
+        <!-- the same as attack1, optional if character doesn't have second attack -->
+        <attack2 imageName="image10">
+            <all>
+                <!-- effects have ther's own configuration in special file -->
+                <succ>
+                    <image name="im4a"/>
+                    <image name="im5a"/>
+                </succ>
+                <fail>
+                    <image name="im6a"/>
+                </fail>
+            </all>
+        </attack2>
+        <!-- have to be replaced with standing if absent -->
+        <idle>
+            <image name="im7"/>
+            <image name="im8"/>
+        </idle>
+        <stand>
+            <image name="im9"/>
+        </stand>
+        <!-- if absent, must be replaced with standing animation that disappears slowly -->
+        <death>
+            <image name="im10" alpha="0.7"/>
+            <image name="im11" alpha="0.3"/>
+        </death>
+        <!-- again, replaced with standing if absent -->
+        <move>
+            <image name="im12"/>
+        </move>
+        <!-- and again, same thing - replaced with standing -->
+        <defence>
+            <image name="im13"/>
+        </defence>
+        <sounds>
+            <attack1 succ="1" fail="2"/>
+            <attack2 succ="3" fail="4"/>
+            <move sound="5"/>
+            <death sound="6"/>
+            <pain sound="7"/>
+        </sounds>
+    </view>
+    <view name="testType2">
+        <attack1>
+            <all>
+                <succ>
+                    <image name="im14"/>
+                </succ>
+            </all>
+        </attack1>
+        <attack2>
+            <all>
+                <succ>
+                    <image name="im14"/>
+                </succ>
+            </all>
+        </attack2>
+        <attack3>
+            <all>
+                <succ>
+                    <image name="im15"/>
+                </succ>
+            </all>
+        </attack3>
+        <stand>
+            <image name="im15"/>
+        </stand>
+        <sounds>
+            <attack1 succ="10" fail="20"/>
+            <move sound="50"/>
+        </sounds>
+    </view>
+    <view name="testSoldier">
+        <attack1 imageName="image100" projectile="testProjectile3">
+            <all>
+                <succ>
+                    <image name="im14"/>
+                </succ>
+            </all>
+        </attack1>
+        <stand>
+            <image name="im15"/>
+        </stand>
+    </view>
+    <view name="testSoldier2">
+        <attack1 imageName="111" projectile="testProjectile3">
+            <image name="im14"/>
+            <image name="im15"/>
+            <image name="im16"/>
+            <image name="im17"/>
+        </attack1>
+        <stand>
+            <image name="im15"/>
+            <image name="im16"/>
+            <image name="im17"/>
+        </stand>
+    </view>
+    <view name="oneImageSoldier">
+        <attack1 imageName="111"/>
+        <attack2 imageName="222" projectile="testProjectile3"/>
+        <stand>
+            <image name="im14"/>
+        </stand>
+        <sounds>
+            <attack1 succ="10" fail="20"/>
+            <attack2 succ="30" fail="40"/>
+            <move sound="50"/>
+        </sounds>
+    </view>
 </views>

@@ -1,540 +1,1150 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <views>
-	<view name="Human-Horseman">
-		<attack1 imageName="spear">
-			<n>
-				<succ>
-					<image name="horseman-n-attack1"/>
-					<image name="horseman-n-attack2"/>
-					<image name="horseman-n-attack3"/>
-					<image name="horseman-n-attack4"/>
-					<image name="horseman-n-attack5"/>
-					<image name="horseman-n-attack6"/>
-					<image name="horseman-n-attack7"/>
-					<image name="horseman-n-attack8"/>
-					<image name="horseman-n-attack9"/>
-					<image name="horseman-n-attack10"/>
-					<image name="horseman-n-attack11"/>
-					<image name="horseman-n-attack12"/>					
-				</succ>
-			</n>
-			<ne>
-				<succ>
-					<image name="horseman-ne-attack1"/>
-					<image name="horseman-ne-attack2"/>
-					<image name="horseman-ne-attack3"/>
-					<image name="horseman-ne-attack4"/>
-					<image name="horseman-ne-attack5"/>
-					<image name="horseman-ne-attack6"/>
-					<image name="horseman-ne-attack7"/>
-					<image name="horseman-ne-attack8"/>
-					<image name="horseman-ne-attack9"/>
-					<image name="horseman-ne-attack10"/>
-					<image name="horseman-ne-attack11"/>
-					<image name="horseman-ne-attack12"/>	
-				</succ>
-			</ne>
-			<se>
-				<succ>
-					<image name="horseman-se-attack1"/>
-					<image name="horseman-se-attack2"/>
-					<image name="horseman-se-attack3"/>
-					<image name="horseman-se-attack4"/>
-					<image name="horseman-se-attack5"/>
-					<image name="horseman-se-attack6"/>
-					<image name="horseman-se-attack7"/>
-					<image name="horseman-se-attack8"/>
-					<image name="horseman-se-attack9"/>
-					<image name="horseman-se-attack10"/>
-					<image name="horseman-se-attack11"/>
-					<image name="horseman-se-attack12"/>	
-				</succ>
-			</se>
-			<s>
-				<succ>
-					<image name="horseman-s-attack1"/>
-					<image name="horseman-s-attack2"/>
-					<image name="horseman-s-attack3"/>
-					<image name="horseman-s-attack4"/>
-					<image name="horseman-s-attack5"/>
-					<image name="horseman-s-attack6"/>
-					<image name="horseman-s-attack7"/>
-					<image name="horseman-s-attack8"/>
-					<image name="horseman-s-attack9"/>
-					<image name="horseman-s-attack10"/>
-					<image name="horseman-s-attack11"/>
-					<image name="horseman-s-attack12"/>	
-				</succ>				
-			</s>
-		</attack1>
-		<stand>
-			<image name="horseman"/>
-		</stand>
-		<death>
-			<image name="horseman-se-die1"/>
-			<image name="horseman-se-die2"/>
-			<image name="horseman-se-die3"/>
-			<image name="horseman-se-die4"/>
-			<image name="horseman-se-die5"/>
-		</death>
-		<move>
-			<image name="horseman-se-run1"/>
-		</move>
-		<sounds>
-			<attack1 succ="spear" fail="spearFail"/>
-			<move sound="horseMovement"/>
-			<pain sound="horsePain"/>
-		</sounds>
-	</view>
-	<view name="Human-Mage">
-		<attack1 imageName="staff-magic">
-			<all>
-				<succ>
-					<image name="mage-attack-staff1"/>
-					<image name="mage-attack-staff2"/>
-				</succ>
-			</all>
-		</attack1>
-		<attack2 imageName="fireball" projectile="Fireball">
-			<all>
-				<succ>
-					<image name="mage-attack-magic1"/>
-					<image name="mage-attack-magic2"/>
-				</succ>
-			</all>
-		</attack2>
-		<stand>
-			<image name="mage"/>
-		</stand>
-		<defence>
-			<image name="mage-defend"/>
-		</defence>
-		<sounds>
-			<attack1 succ="staff" fail="miss1"/>
-			<attack2 succ="magicAttack1" fail="magicAttack1Fail"/>
-			<pain sound="humanPain1"/>
-		</sounds>
-	</view>
-	<view name="Human-Peasant">
-		<attack1 imageName="pitchfork">
-			<all>
-				<succ>
-					<image name="peasant-attack"/>
-					<image name="peasant-attack2"/>
-				</succ>
-			</all>
-		</attack1>
-		<attack2 imageName="pitchfork" projectile="Pitchfork">
-			<all>
-				<succ>
-					<image name="peasant-ranged"/>
-				</succ>
-			</all>
-		</attack2>
-		<stand>
-			<image name="peasant"/>
-		</stand>
-		<idle>
-			<image name="peasant-idle-1"/>
-			<image name="peasant-idle-2"/>
-			<image name="peasant-idle-3"/>
-			<image name="peasant-idle-4"/>
-			<image name="peasant-idle-5"/>
-			<image name="peasant-idle-6"/>
-			<image name="peasant-idle-7"/>
-		</idle>
-		<defence>
-			<image name="peasant-defend"/>
-		</defence>
-		<sounds>
-			<attack1 succ="spear" fail="spearFail"/>
-			<attack2 succ="spear" fail="miss1"/>
-			<pain sound="humanPain1"/>
-		</sounds>
-	</view>
-	<view name="Human-Woodsman">
-		<attack1 imageName="dagger-human">
-			<all>
-				<succ>
-					<image name="woodsman-melee-1"/>
-					<image name="woodsman-melee-2"/>
-				</succ>
-			</all>
-		</attack1>
-		<attack2 imageName="bow" projectile="Arrow">
-			<all>
-				<succ>
-					<image name="woodsman-bow"/>
-					<image name="woodsman-bow-attack-1"/>
-					<image name="woodsman-bow-attack-2"/>
-					<image name="woodsman-bow-attack-3"/>
-					<image name="woodsman-bow-attack-4"/>
-				</succ>
-			</all>
-		</attack2>
-		<stand>
-			<image name="woodsman"/>
-		</stand>
-		<idle>
-			<image name="woodsman-idle-1"/>
-			<image name="woodsman-idle-2"/>
-			<image name="woodsman-idle-3"/>
-			<image name="woodsman-idle-4"/>
-			<image name="woodsman-idle-5"/>
-			<image name="woodsman-idle-6"/>
-			<image name="woodsman-idle-7"/>
-			<image name="woodsman-idle-8"/>
-			<image name="woodsman-idle-9"/>
-			<image name="woodsman-idle-10"/>
-			<image name="woodsman-idle-11"/>
-			<image name="woodsman-idle-12"/>
-			<image name="woodsman-idle-13"/>
-			<image name="woodsman-idle-14"/>	
-		</idle>
-		<defence>
-			<image name="woodsman-bow-defend"/>
-		</defence>
-		<sounds>
-			<attack1 succ="dagger" fail="miss1"/>
-			<attack2 succ="bow" fail="bowFail"/>
-			<pain sound="humanPain1"/>
-		</sounds>
-	</view>
-	<view name="Human-Ruffian">
-		<attack1 imageName="club">
-			<all>
-				<succ>
-					<image name="ruffian-attack-1"/>
-					<image name="ruffian-attack-2"/>
-					<image name="ruffian-attack-3"/>
-					<image name="ruffian-attack-4"/>
-					<image name="ruffian-attack-5"/>
-					<image name="ruffian-attack-6"/>
-					<image name="ruffian-attack-7"/>
-					<image name="ruffian-attack-8"/>
-					<image name="ruffian-attack-9"/>					
-				</succ>
-			</all>
-		</attack1>
-		<defence>
-			<image name="ruffian-defend-1"/>
-		</defence>
-		<stand>
-			<image name="ruffian"/>
-		</stand>
-		<sounds>
-			<attack1 succ="club" fail="miss1"/>
-			<pain sound="humanPain1"/>
-		</sounds>
-	</view>
-	<view name="Human-Bowman">
-		<attack1 imageName="sword-human-short">
-			<all>
-				<succ>
-					<image name="bowman-melee-attack-1"/>
-					<image name="bowman-melee-attack-2"/>
-					<image name="bowman-melee-attack-3"/>
-					<image name="bowman-melee-attack-4"/>
-				</succ>
-			</all>
-		</attack1>
-		<attack2 imageName="bow" projectile="Arrow">
-			<all>
-				<succ>
-					<image name="bowman-bow"/>
-					<image name="bowman-bow-attack-1"/>
-					<image name="bowman-bow-attack-2"/>
-					<image name="bowman-bow-attack-3"/>
-					<image name="bowman-bow-attack-4"/>
-				</succ>
-			</all>
-		</attack2>
-		<defence>
-			<image name="bowman-bow-defend"/>
-		</defence>
-		<stand>
-			<image name="bowman"/>
-		</stand>
-		<sounds>
-			<attack1 succ="sword" fail="miss1"/>
-			<attack2 succ="bow" fail="bowFail"/>
-			<pain sound="humanPain1"/>
-		</sounds>
-	</view>
-	<view name="Human-Cavalryman">
-		<attack1 imageName="sword-human">
-			<all>
-				<succ>
-					<image name="cavalryman-attack"/>
-				</succ>
-			</all>
-		</attack1>
-		<defence>
-			<image name="cavalryman-defend"/>
-		</defence>
-		<stand>
-			<image name="cavalryman"/>
-		</stand>
-		<move>
-			<image name="cavalryman-moving"/>
-		</move>
-		<death>
-			<image name="cavalryman-die-1"/>
-			<image name="cavalryman-die-2"/>
-		</death>
-		<sounds>
-			<attack1 succ="sword" fail="miss1"/>
-			<move sound="horseMovement"/>
-			<pain sound="horsePain"/>
-		</sounds>
-	</view>
-	<view name="Human-Fencer">
-		<attack1 imageName="saber-human">
-			<all>
-				<succ>
-					<image name="fencer-attack-1"/>
-					<image name="fencer-attack-2"/>
-					<image name="fencer-attack-3"/>
-					<image name="fencer-attack-4"/>
-					<image name="fencer-attack-5"/>
-					<image name="fencer-attack-6"/>
-					<image name="fencer-attack-7"/>
-					<image name="fencer-attack-8"/>
-					<image name="fencer-attack-9"/>
-				</succ>
-			</all>
-		</attack1>
-		<defence>
-			<image name="fencer-defend"/>
-		</defence>
-		<stand>
-			<image name="fencer-stand-1"/>
-			<image name="fencer-stand-2"/>
-			<image name="fencer-stand-3"/>
-			<image name="fencer-stand-4"/>
-			<image name="fencer-stand-5"/>
-			<image name="fencer-stand-6"/>
-			<image name="fencer-stand-7"/>
-			<image name="fencer-stand-8"/>
-		</stand>
-		<death>
-			<image name="fencer-die1"/>
-			<image name="fencer-die2"/>
-			<image name="fencer-die3"/>
-			<image name="fencer-die4"/>
-			<image name="fencer-die5"/>
-		</death>
-		<idle>
-			<image name="fencer-idle-1"/>
-			<image name="fencer-idle-2"/>
-			<image name="fencer-idle-3"/>
-			<image name="fencer-idle-4"/>
-			<image name="fencer-idle-5"/>
-			<image name="fencer-idle-6"/>
-			<image name="fencer-idle-7"/>
-		</idle>
-		<sounds>
-			<attack1 succ="sword" fail="miss1"/>
-			<pain sound="humanPain1"/>
-		</sounds>
-	</view>
-	<view name="Human-HeavyInfantryman">
-		<attack1 imageName="mace-spiked">
-			<all>
-				<succ>
-					<image name="heavyinfantry-attack-1"/>
-					<image name="heavyinfantry-attack-2"/>
-				</succ>
-			</all>
-		</attack1>
-		<stand>
-			<image name="heavyinfantry"/>
-		</stand>
-		<defence>
-			<image name="heavyinfantry-defend-2"/>
-		</defence>
-		<idle>
-			<image name="heavy-infantry-idle-1"/>
-			<image name="heavy-infantry-idle-2"/>
-			<image name="heavy-infantry-idle-3"/>
-			<image name="heavy-infantry-idle-4"/>
-			<image name="heavy-infantry-idle-5"/>
-			<image name="heavy-infantry-idle-6"/>
-			<image name="heavy-infantry-idle-7"/>
-			<image name="heavy-infantry-idle-8"/>
-			<image name="heavy-infantry-idle-9"/>
-		</idle>
-		<sounds>
-			<attack1 succ="mace" fail="miss1"/>
-			<pain sound="humanPain1"/>
-		</sounds>
-	</view>
-	<view name="Human-Spearman">
-		<attack1 imageName="spear">
-			<n>
-				<succ>
-					<image name="spearman-attack-n"/>			
-				</succ>
-			</n>
-			<ne>
-				<succ>
-					<image name="spearman-attack-ne"/>
-				</succ>
-			</ne>
-			<se>
-				<succ>
-					<image name="spearman-attack-se-1"/>
-					<image name="spearman-attack-se-2"/>
-					<image name="spearman-attack-se-3"/>
-					<image name="spearman-attack-se-4"/>
-					<image name="spearman-attack-se-5"/>
-					<image name="spearman-attack-se-6"/>
-					<image name="spearman-attack-se-7"/>
-					<image name="spearman-attack-se-8"/>
-					<image name="spearman-attack-se-9"/>
-					<image name="spearman-attack-se-10"/>
-					<image name="spearman-attack-se-11"/>
-					<image name="spearman-attack-se-12"/>
-				</succ>
-			</se>
-			<s>
-				<succ>
-					<image name="spearman-attack-s-1"/>
-					<image name="spearman-attack-s-2"/>
-					<image name="spearman-attack-s-3"/>
-					<image name="spearman-attack-s-4"/>
-					<image name="spearman-attack-s-5"/>
-					<image name="spearman-attack-s-6"/>
-					<image name="spearman-attack-s-7"/>
-					<image name="spearman-attack-s-8"/>
-					<image name="spearman-attack-s-9"/>
-					<image name="spearman-attack-s-10"/>
-					<image name="spearman-attack-s-11"/>
-					<image name="spearman-attack-s-12"/>
-					<image name="spearman-attack-s-13"/>
-					<image name="spearman-attack-s-14"/>
-				</succ>
-			</s>
-		</attack1>
-		<attack2 imageName="javelin-human" projectile="Spear">
-			<all>
-				<succ>
-				   <image name="spearman-attack-ranged"/>
-				</succ>
-			</all>
-		</attack2>
-		<stand>
-			<image name="spearman-stand-1"/>
-			<image name="spearman-stand-2"/>
-			<image name="spearman-stand-3"/>
-			<image name="spearman-stand-4"/>
-			<image name="spearman-stand-5"/>
-			<image name="spearman-stand-6"/>
-		</stand>
-		<idle>
-			<image name="spearman-idle1"/>
-			<image name="spearman-idle2"/>
-			<image name="spearman-idle3"/>
-			<image name="spearman-idle4"/>
-		</idle>
-		<defence>
-			<image name="spearman-defend"/>
-		</defence>
-		<death>
-			<image name="spearman-death1"/>
-			<image name="spearman-death2"/>
-			<image name="spearman-death3"/>
-			<image name="spearman-death4"/>
-		</death>
-		<sounds>
-			<attack1 succ="spear" fail="spearFail"/>
-			<attack2 succ="spear" fail="miss1"/>
-			<pain sound="humanPain1"/>
-		</sounds>
-	</view>
-	<view name="Human-Longbowman">
-		<attack1 imageName="sword-human-short">
-			<all>
-				<succ>
-					<image name="longbowman-melee-attack-1"/>
-					<image name="longbowman-melee-attack-2"/>
-					<image name="longbowman-melee-attack-3"/>
-					<image name="longbowman-melee-attack-4"/>
-				</succ>
-			</all>
-		</attack1>
-		<attack2 imageName="bow" projectile="Arrow">
-			<all>
-				<succ>
-					<image name="longbowman-bow"/>
-					<image name="longbowman-bow-attack-1"/>
-					<image name="longbowman-bow-attack-2"/>
-					<image name="longbowman-bow-attack-3"/>
-					<image name="longbowman-bow-attack-4"/>
-				</succ>
-			</all>
-		</attack2>
-		<defence>
-			<image name="longbowman-bow-defend"/>
-		</defence>
-		<stand>
-			<image name="longbowman"/>
-		</stand>
-		<idle>
-			<image name="longbowman-idle-1"/>
-			<image name="longbowman-idle-2"/>
-			<image name="longbowman-idle-3"/>
-			<image name="longbowman-idle-4"/>
-		</idle>
-		<sounds>
-			<attack1 succ="sword" fail="miss1"/>
-			<attack2 succ="bow" fail="bowFail"/>
-			<pain sound="humanPain1"/>
-		</sounds>
-	</view>
-	<view name="Human-Dragoon">
-		<attack1 imageName="sword-human">
-			<all>
-				<succ>
-					<image name="dragoon-attack"/>
-				</succ>
-			</all>
-		</attack1>
-		<attack2 imageName="crossbow-human" projectile="Arrow">
-			<all>
-				<succ>
-					<image name="dragoon-ranged-1"/>
-					<image name="dragoon-ranged-2"/>
-					<image name="dragoon-ranged-3"/>
-					<image name="dragoon-ranged-4"/>
-					<image name="dragoon-ranged-5"/>
-					<image name="dragoon-ranged-6"/>
-					<image name="dragoon-ranged-7"/>
-				</succ>
-			</all>
-		</attack2>
-		<defence>
-			<image name="dragoon-defend"/>
-		</defence>
-		<stand>
-			<image name="dragoon"/>
-		</stand>
-		<move>
-			<image name="dragoon-moving"/>
-		</move>
-		<idle>
-			<image name="dragoon-idle-1"/>
-			<image name="dragoon-idle-2"/>
-			<image name="dragoon-idle-3"/>
-			<image name="dragoon-idle-4"/>
-			<image name="dragoon-idle-5"/>
-			<image name="dragoon-idle-6"/>
-		</idle>
-		<sounds>
-			<attack1 succ="sword" fail="miss1"/>
-			<move sound="horseMovement"/>
-			<pain sound="horsePain"/>
-		</sounds>
-	</view>
+    <view name="HumanWesnoth-Horseman">
+        <attack1 imageName="spear">
+            <n>
+                <succ>
+                    <image name="horseman-n-attack1"/>
+                    <image name="horseman-n-attack2"/>
+                    <image name="horseman-n-attack3"/>
+                    <image name="horseman-n-attack4"/>
+                    <image name="horseman-n-attack5"/>
+                    <image name="horseman-n-attack6"/>
+                    <image name="horseman-n-attack7"/>
+                    <image name="horseman-n-attack8"/>
+                    <image name="horseman-n-attack9"/>
+                    <image name="horseman-n-attack10"/>
+                    <image name="horseman-n-attack11"/>
+                    <image name="horseman-n-attack12"/>
+                </succ>
+            </n>
+            <ne>
+                <succ>
+                    <image name="horseman-ne-attack1"/>
+                    <image name="horseman-ne-attack2"/>
+                    <image name="horseman-ne-attack3"/>
+                    <image name="horseman-ne-attack4"/>
+                    <image name="horseman-ne-attack5"/>
+                    <image name="horseman-ne-attack6"/>
+                    <image name="horseman-ne-attack7"/>
+                    <image name="horseman-ne-attack8"/>
+                    <image name="horseman-ne-attack9"/>
+                    <image name="horseman-ne-attack10"/>
+                    <image name="horseman-ne-attack11"/>
+                    <image name="horseman-ne-attack12"/>
+                </succ>
+            </ne>
+            <se>
+                <succ>
+                    <image name="horseman-se-attack1"/>
+                    <image name="horseman-se-attack2"/>
+                    <image name="horseman-se-attack3"/>
+                    <image name="horseman-se-attack4"/>
+                    <image name="horseman-se-attack5"/>
+                    <image name="horseman-se-attack6"/>
+                    <image name="horseman-se-attack7"/>
+                    <image name="horseman-se-attack8"/>
+                    <image name="horseman-se-attack9"/>
+                    <image name="horseman-se-attack10"/>
+                    <image name="horseman-se-attack11"/>
+                    <image name="horseman-se-attack12"/>
+                </succ>
+            </se>
+            <s>
+                <succ>
+                    <image name="horseman-s-attack1"/>
+                    <image name="horseman-s-attack2"/>
+                    <image name="horseman-s-attack3"/>
+                    <image name="horseman-s-attack4"/>
+                    <image name="horseman-s-attack5"/>
+                    <image name="horseman-s-attack6"/>
+                    <image name="horseman-s-attack7"/>
+                    <image name="horseman-s-attack8"/>
+                    <image name="horseman-s-attack9"/>
+                    <image name="horseman-s-attack10"/>
+                    <image name="horseman-s-attack11"/>
+                    <image name="horseman-s-attack12"/>
+                </succ>
+            </s>
+        </attack1>
+        <stand>
+            <image name="horseman"/>
+        </stand>
+        <death>
+            <image name="horseman-se-die1"/>
+            <image name="horseman-se-die2"/>
+            <image name="horseman-se-die3"/>
+            <image name="horseman-se-die4"/>
+            <image name="horseman-se-die5"/>
+        </death>
+        <move>
+            <image name="horseman-se-run1"/>
+        </move>
+        <sounds>
+            <attack1 succ="spear" fail="spearFail"/>
+            <move sound="horseMovement"/>
+            <pain sound="horsePain"/>
+        </sounds>
+    </view>
+    <view name="HumanWesnoth-Mage">
+        <attack1 imageName="staff-magic">
+            <all>
+                <succ>
+                    <image name="mage-attack-staff1"/>
+                    <image name="mage-attack-staff2"/>
+                </succ>
+            </all>
+        </attack1>
+        <attack2 imageName="fireball" projectile="Fireball">
+            <all>
+                <succ>
+                    <image name="mage-attack-magic1"/>
+                    <image name="mage-attack-magic2"/>
+                </succ>
+            </all>
+        </attack2>
+        <stand>
+            <image name="mage"/>
+        </stand>
+        <defence>
+            <image name="mage-defend"/>
+        </defence>
+        <sounds>
+            <attack1 succ="staff" fail="miss1"/>
+            <attack2 succ="magicAttack1" fail="magicAttack1Fail"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanWesnoth-Peasant">
+        <attack1 imageName="pitchfork">
+            <all>
+                <succ>
+                    <image name="peasant-attack"/>
+                    <image name="peasant-attack2"/>
+                </succ>
+            </all>
+        </attack1>
+        <attack2 imageName="pitchfork" projectile="Pitchfork">
+            <all>
+                <succ>
+                    <image name="peasant-ranged"/>
+                </succ>
+            </all>
+        </attack2>
+        <stand>
+            <image name="peasant"/>
+        </stand>
+        <idle>
+            <image name="peasant-idle-1"/>
+            <image name="peasant-idle-2"/>
+            <image name="peasant-idle-3"/>
+            <image name="peasant-idle-4"/>
+            <image name="peasant-idle-5"/>
+            <image name="peasant-idle-6"/>
+            <image name="peasant-idle-7"/>
+        </idle>
+        <defence>
+            <image name="peasant-defend"/>
+        </defence>
+        <sounds>
+            <attack1 succ="spear" fail="spearFail"/>
+            <attack2 succ="spear" fail="miss1"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanWesnoth-Woodsman">
+        <attack1 imageName="dagger-human">
+            <all>
+                <succ>
+                    <image name="woodsman-melee-1"/>
+                    <image name="woodsman-melee-2"/>
+                </succ>
+            </all>
+        </attack1>
+        <attack2 imageName="bow" projectile="Arrow">
+            <all>
+                <succ>
+                    <image name="woodsman-bow"/>
+                    <image name="woodsman-bow-attack-1"/>
+                    <image name="woodsman-bow-attack-2"/>
+                    <image name="woodsman-bow-attack-3"/>
+                    <image name="woodsman-bow-attack-4"/>
+                </succ>
+            </all>
+        </attack2>
+        <stand>
+            <image name="woodsman"/>
+        </stand>
+        <idle>
+            <image name="woodsman-idle-1"/>
+            <image name="woodsman-idle-2"/>
+            <image name="woodsman-idle-3"/>
+            <image name="woodsman-idle-4"/>
+            <image name="woodsman-idle-5"/>
+            <image name="woodsman-idle-6"/>
+            <image name="woodsman-idle-7"/>
+            <image name="woodsman-idle-8"/>
+            <image name="woodsman-idle-9"/>
+            <image name="woodsman-idle-10"/>
+            <image name="woodsman-idle-11"/>
+            <image name="woodsman-idle-12"/>
+            <image name="woodsman-idle-13"/>
+            <image name="woodsman-idle-14"/>
+        </idle>
+        <defence>
+            <image name="woodsman-bow-defend"/>
+        </defence>
+        <sounds>
+            <attack1 succ="dagger" fail="miss1"/>
+            <attack2 succ="bow" fail="bowFail"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanWesnoth-Ruffian">
+        <attack1 imageName="club">
+            <all>
+                <succ>
+                    <image name="ruffian-attack-1"/>
+                    <image name="ruffian-attack-2"/>
+                    <image name="ruffian-attack-3"/>
+                    <image name="ruffian-attack-4"/>
+                    <image name="ruffian-attack-5"/>
+                    <image name="ruffian-attack-6"/>
+                    <image name="ruffian-attack-7"/>
+                    <image name="ruffian-attack-8"/>
+                    <image name="ruffian-attack-9"/>
+                </succ>
+            </all>
+        </attack1>
+        <defence>
+            <image name="ruffian-defend-1"/>
+        </defence>
+        <stand>
+            <image name="ruffian"/>
+        </stand>
+        <sounds>
+            <attack1 succ="club" fail="miss1"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanWesnoth-Bowman">
+        <attack1 imageName="sword-human-short">
+            <all>
+                <succ>
+                    <image name="bowman-melee-attack-1"/>
+                    <image name="bowman-melee-attack-2"/>
+                    <image name="bowman-melee-attack-3"/>
+                    <image name="bowman-melee-attack-4"/>
+                </succ>
+            </all>
+        </attack1>
+        <attack2 imageName="bow" projectile="Arrow">
+            <all>
+                <succ>
+                    <image name="bowman-bow"/>
+                    <image name="bowman-bow-attack-1"/>
+                    <image name="bowman-bow-attack-2"/>
+                    <image name="bowman-bow-attack-3"/>
+                    <image name="bowman-bow-attack-4"/>
+                </succ>
+            </all>
+        </attack2>
+        <defence>
+            <image name="bowman-bow-defend"/>
+        </defence>
+        <stand>
+            <image name="bowman"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <attack2 succ="bow" fail="bowFail"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanWesnoth-Cavalryman">
+        <attack1 imageName="sword-human">
+            <all>
+                <succ>
+                    <image name="cavalryman-attack"/>
+                </succ>
+            </all>
+        </attack1>
+        <defence>
+            <image name="cavalryman-defend"/>
+        </defence>
+        <stand>
+            <image name="cavalryman"/>
+        </stand>
+        <move>
+            <image name="cavalryman-moving"/>
+        </move>
+        <death>
+            <image name="cavalryman-die-1"/>
+            <image name="cavalryman-die-2"/>
+        </death>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <move sound="horseMovement"/>
+            <pain sound="horsePain"/>
+        </sounds>
+    </view>
+    <view name="HumanWesnoth-Fencer">
+        <attack1 imageName="saber-human">
+            <all>
+                <succ>
+                    <image name="fencer-attack-1"/>
+                    <image name="fencer-attack-2"/>
+                    <image name="fencer-attack-3"/>
+                    <image name="fencer-attack-4"/>
+                    <image name="fencer-attack-5"/>
+                    <image name="fencer-attack-6"/>
+                    <image name="fencer-attack-7"/>
+                    <image name="fencer-attack-8"/>
+                    <image name="fencer-attack-9"/>
+                </succ>
+            </all>
+        </attack1>
+        <defence>
+            <image name="fencer-defend"/>
+        </defence>
+        <stand>
+            <image name="fencer-stand-1"/>
+            <image name="fencer-stand-2"/>
+            <image name="fencer-stand-3"/>
+            <image name="fencer-stand-4"/>
+            <image name="fencer-stand-5"/>
+            <image name="fencer-stand-6"/>
+            <image name="fencer-stand-7"/>
+            <image name="fencer-stand-8"/>
+        </stand>
+        <death>
+            <image name="fencer-die1"/>
+            <image name="fencer-die2"/>
+            <image name="fencer-die3"/>
+            <image name="fencer-die4"/>
+            <image name="fencer-die5"/>
+        </death>
+        <idle>
+            <image name="fencer-idle-1"/>
+            <image name="fencer-idle-2"/>
+            <image name="fencer-idle-3"/>
+            <image name="fencer-idle-4"/>
+            <image name="fencer-idle-5"/>
+            <image name="fencer-idle-6"/>
+            <image name="fencer-idle-7"/>
+        </idle>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanWesnoth-HeavyInfantryman">
+        <attack1 imageName="mace-spiked">
+            <all>
+                <succ>
+                    <image name="heavyinfantry-attack-1"/>
+                    <image name="heavyinfantry-attack-2"/>
+                    <image name="heavyinfantry-attack-3"/>
+                    <image name="heavyinfantry-attack-4"/>
+                    <image name="heavyinfantry-attack-5"/>
+                    <image name="heavyinfantry-attack-6"/>
+                    <image name="heavyinfantry-attack-7"/>
+                    <image name="heavyinfantry-attack-8"/>
+                    <image name="heavyinfantry-attack-9"/>
+                    <image name="heavyinfantry-attack-10"/>
+                    <image name="heavyinfantry-attack-11"/>
+                    <image name="heavyinfantry-attack-12"/>
+                    <image name="heavyinfantry-attack-13"/>
+                    <image name="heavyinfantry-attack-14"/>
+                    <image name="heavyinfantry-attack-15"/>
+                </succ>
+            </all>
+        </attack1>
+        <stand>
+            <image name="heavyinfantry"/>
+        </stand>
+        <defence>
+            <image name="heavyinfantry-defend-1"/>
+            <image name="heavyinfantry-defend-2"/>
+        </defence>
+        <sounds>
+            <attack1 succ="mace" fail="miss1"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanWesnoth-Shocktrooper">
+        <attack1 imageName="mace-spiked">
+            <image name="shocktrooper-attack-1"/>
+            <image name="shocktrooper-attack-2"/>
+            <image name="shocktrooper-attack-3"/>
+            <image name="shocktrooper-attack-4"/>
+            <image name="shocktrooper-attack-5"/>
+            <image name="shocktrooper-attack-6"/>
+        </attack1>
+        <stand>
+            <image name="shocktrooper"/>
+        </stand>
+        <defence>
+            <image name="shocktrooper-defend-1"/>
+            <image name="shocktrooper-defend-2"/>
+        </defence>
+        <sounds>
+            <attack1 succ="mace" fail="miss1"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanWesnoth-Spearman">
+        <attack1 imageName="spear">
+            <n>
+                <succ>
+                    <image name="spearman-attack-n"/>
+                </succ>
+            </n>
+            <ne>
+                <succ>
+                    <image name="spearman-attack-ne"/>
+                </succ>
+            </ne>
+            <se>
+                <succ>
+                    <image name="spearman-attack-se-1"/>
+                    <image name="spearman-attack-se-2"/>
+                    <image name="spearman-attack-se-3"/>
+                    <image name="spearman-attack-se-4"/>
+                    <image name="spearman-attack-se-5"/>
+                    <image name="spearman-attack-se-6"/>
+                    <image name="spearman-attack-se-7"/>
+                    <image name="spearman-attack-se-8"/>
+                    <image name="spearman-attack-se-9"/>
+                    <image name="spearman-attack-se-10"/>
+                    <image name="spearman-attack-se-11"/>
+                    <image name="spearman-attack-se-12"/>
+                </succ>
+            </se>
+            <s>
+                <succ>
+                    <image name="spearman-attack-s-1"/>
+                    <image name="spearman-attack-s-2"/>
+                    <image name="spearman-attack-s-3"/>
+                    <image name="spearman-attack-s-4"/>
+                    <image name="spearman-attack-s-5"/>
+                    <image name="spearman-attack-s-6"/>
+                    <image name="spearman-attack-s-7"/>
+                    <image name="spearman-attack-s-8"/>
+                    <image name="spearman-attack-s-9"/>
+                    <image name="spearman-attack-s-10"/>
+                    <image name="spearman-attack-s-11"/>
+                    <image name="spearman-attack-s-12"/>
+                    <image name="spearman-attack-s-13"/>
+                    <image name="spearman-attack-s-14"/>
+                </succ>
+            </s>
+        </attack1>
+        <attack2 imageName="javelin-human" projectile="Spear">
+            <all>
+                <succ>
+                    <image name="spearman-attack-ranged"/>
+                </succ>
+            </all>
+        </attack2>
+        <stand>
+            <image name="spearman-stand-1"/>
+            <image name="spearman-stand-2"/>
+            <image name="spearman-stand-3"/>
+            <image name="spearman-stand-4"/>
+            <image name="spearman-stand-5"/>
+            <image name="spearman-stand-6"/>
+        </stand>
+        <idle>
+            <image name="spearman-idle1"/>
+            <image name="spearman-idle2"/>
+            <image name="spearman-idle3"/>
+            <image name="spearman-idle4"/>
+        </idle>
+        <defence>
+            <image name="spearman-defend"/>
+        </defence>
+        <death>
+            <image name="spearman-death1"/>
+            <image name="spearman-death2"/>
+            <image name="spearman-death3"/>
+            <image name="spearman-death4"/>
+        </death>
+        <sounds>
+            <attack1 succ="spear" fail="spearFail"/>
+            <attack2 succ="spear" fail="miss1"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanWesnoth-Longbowman">
+        <attack1 imageName="sword-human-short">
+            <all>
+                <succ>
+                    <image name="longbowman-melee-attack-1"/>
+                    <image name="longbowman-melee-attack-2"/>
+                    <image name="longbowman-melee-attack-3"/>
+                    <image name="longbowman-melee-attack-4"/>
+                </succ>
+            </all>
+        </attack1>
+        <attack2 imageName="bow" projectile="Arrow">
+            <all>
+                <succ>
+                    <image name="longbowman-bow"/>
+                    <image name="longbowman-bow-attack-1"/>
+                    <image name="longbowman-bow-attack-2"/>
+                    <image name="longbowman-bow-attack-3"/>
+                    <image name="longbowman-bow-attack-4"/>
+                </succ>
+            </all>
+        </attack2>
+        <defence>
+            <image name="longbowman-bow-defend"/>
+        </defence>
+        <stand>
+            <image name="longbowman"/>
+        </stand>
+        <idle>
+            <image name="longbowman-idle-1"/>
+            <image name="longbowman-idle-2"/>
+            <image name="longbowman-idle-3"/>
+            <image name="longbowman-idle-4"/>
+        </idle>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <attack2 succ="bow" fail="bowFail"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanWesnoth-Dragoon">
+        <attack1 imageName="sword-human">
+            <all>
+                <succ>
+                    <image name="dragoon-attack"/>
+                </succ>
+            </all>
+        </attack1>
+        <attack2 imageName="crossbow-human" projectile="Arrow">
+            <all>
+                <succ>
+                    <image name="dragoon-ranged-1"/>
+                    <image name="dragoon-ranged-2"/>
+                    <image name="dragoon-ranged-3"/>
+                    <image name="dragoon-ranged-4"/>
+                    <image name="dragoon-ranged-5"/>
+                    <image name="dragoon-ranged-6"/>
+                    <image name="dragoon-ranged-7"/>
+                </succ>
+            </all>
+        </attack2>
+        <defence>
+            <image name="dragoon-defend"/>
+        </defence>
+        <stand>
+            <image name="dragoon"/>
+        </stand>
+        <move>
+            <image name="dragoon-moving"/>
+        </move>
+        <idle>
+            <image name="dragoon-idle-1"/>
+            <image name="dragoon-idle-2"/>
+            <image name="dragoon-idle-3"/>
+            <image name="dragoon-idle-4"/>
+            <image name="dragoon-idle-5"/>
+            <image name="dragoon-idle-6"/>
+        </idle>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <move sound="horseMovement"/>
+            <pain sound="horsePain"/>
+        </sounds>
+    </view>
+    <view name="HumanWesnoth-MasterAtArms">
+        <attack1 imageName="saber-human">
+            <all>
+                <succ>
+                    <image name="master-at-arms-melee-2-1"/>
+                    <image name="master-at-arms-melee-2-2"/>
+                    <image name="master-at-arms-melee-2-3"/>
+                    <image name="master-at-arms-melee-3-3"/>
+                    <image name="master-at-arms-recover-1"/>
+                    <image name="master-at-arms-recover-2"/>
+                </succ>
+            </all>
+        </attack1>
+        <defence>
+            <image name="master-at-arms-defend-1"/>
+            <image name="master-at-arms-defend-2"/>
+        </defence>
+        <stand>
+            <image name="master-at-arms"/>
+        </stand>
+        <idle>
+            <image name="master-at-arms-victory-1"/>
+            <image name="master-at-arms-victory-2"/>
+            <image name="master-at-arms-victory-3"/>
+            <image name="master-at-arms-victory-4"/>
+            <image name="master-at-arms-victory-5"/>
+            <image name="master-at-arms-victory-6"/>
+        </idle>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanWesnoth-RedMage">
+        <attack1 imageName="staff-magic">
+            <all>
+                <succ>
+                    <image name="red-mage-attack-staff-1"/>
+                    <image name="red-mage-attack-staff-2"/>
+                </succ>
+            </all>
+        </attack1>
+        <attack2 imageName="fireball" projectile="Fireball">
+            <all>
+                <succ>
+                    <image name="red-mage-attack-magic-1"/>
+                    <image name="red-mage-attack-magic-2"/>
+                </succ>
+            </all>
+        </attack2>
+        <stand>
+            <image name="red-mage"/>
+        </stand>
+        <defence>
+            <image name="red-mage-defend"/>
+        </defence>
+        <sounds>
+            <attack1 succ="staff" fail="miss1"/>
+            <attack2 succ="magicAttack1" fail="magicAttack1Fail"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanWesnoth-General">
+        <attack1 imageName="greatsword-human">
+            <image name="general-attack-sword1"/>
+            <image name="general-attack-sword2"/>
+            <image name="general-attack-sword3"/>
+            <image name="general-attack-sword4"/>
+            <image name="general-attack-sword5"/>
+        </attack1>
+        <stand>
+            <image name="general"/>
+        </stand>
+        <defence>
+            <image name="general-defend-1"/>
+            <image name="general-defend-2"/>
+        </defence>
+        <idle>
+            <image name="general-idle-1"/>
+            <image name="general-idle-2"/>
+            <image name="general-idle-3"/>
+            <image name="general-idle-4"/>
+            <image name="general-idle-5"/>
+            <image name="general-idle-6"/>
+        </idle>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanWesnoth-Lancer">
+        <attack1 imageName="spear">
+            <all>
+                <succ>
+                    <image name="lancer-se-attack1"/>
+                </succ>
+            </all>
+        </attack1>
+        <defence>
+            <image name="lancer-se-defend1"/>
+        </defence>
+        <stand>
+            <image name="lancer"/>
+        </stand>
+        <sounds>
+            <attack1 succ="spear" fail="spearFail"/>
+            <move sound="horseMovement"/>
+            <pain sound="horsePain"/>
+        </sounds>
+    </view>
+    <view name="HumanWesnoth-Knight">
+        <attack1 imageName="spear">
+            <n>
+                <succ>
+                    <image name="knight-n-attack1"/>
+                    <image name="knight-n-attack2"/>
+                    <image name="knight-n-attack3"/>
+                    <image name="knight-n-attack4"/>
+                    <image name="knight-n-attack5"/>
+                    <image name="knight-n-attack6"/>
+                    <image name="knight-n-attack7"/>
+                    <image name="knight-n-attack8"/>
+                    <image name="knight-n-attack9"/>
+                    <image name="knight-n-attack10"/>
+                    <image name="knight-n-attack11"/>
+                    <image name="knight-n-attack12"/>
+                </succ>
+            </n>
+            <ne>
+                <succ>
+                    <image name="knight-ne-attack1"/>
+                    <image name="knight-ne-attack2"/>
+                    <image name="knight-ne-attack3"/>
+                    <image name="knight-ne-attack4"/>
+                    <image name="knight-ne-attack5"/>
+                    <image name="knight-ne-attack6"/>
+                    <image name="knight-ne-attack7"/>
+                    <image name="knight-ne-attack8"/>
+                    <image name="knight-ne-attack9"/>
+                    <image name="knight-ne-attack10"/>
+                    <image name="knight-ne-attack11"/>
+                    <image name="knight-ne-attack12"/>
+                </succ>
+            </ne>
+            <se>
+                <succ>
+                    <image name="knight-se-attack1"/>
+                    <image name="knight-se-attack2"/>
+                    <image name="knight-se-attack3"/>
+                    <image name="knight-se-attack4"/>
+                    <image name="knight-se-attack5"/>
+                    <image name="knight-se-attack6"/>
+                    <image name="knight-se-attack7"/>
+                    <image name="knight-se-attack8"/>
+                    <image name="knight-se-attack9"/>
+                    <image name="knight-se-attack10"/>
+                    <image name="knight-se-attack11"/>
+                    <image name="knight-se-attack12"/>
+                    <image name="knight-se-attack13"/>
+                </succ>
+            </se>
+            <s>
+                <succ>
+                    <image name="knight-s-attack1"/>
+                    <image name="knight-s-attack2"/>
+                    <image name="knight-s-attack3"/>
+                    <image name="knight-s-attack4"/>
+                    <image name="knight-s-attack5"/>
+                    <image name="knight-s-attack6"/>
+                    <image name="knight-s-attack7"/>
+                    <image name="knight-s-attack8"/>
+                    <image name="knight-s-attack9"/>
+                    <image name="knight-s-attack10"/>
+                    <image name="knight-s-attack11"/>
+                    <image name="knight-s-attack12"/>
+                    <image name="knight-s-attack13"/>
+                </succ>
+            </s>
+        </attack1>
+        <stand>
+            <image name="knight"/>
+        </stand>
+        <death>
+            <image name="knight-se-die1"/>
+            <image name="knight-se-die2"/>
+            <image name="knight-se-die3"/>
+            <image name="knight-se-die4"/>
+            <image name="knight-se-die5"/>
+        </death>
+        <defence>
+            <image name="knight-se-defend1"/>
+            <image name="knight-se-defend2"/>
+        </defence>
+        <move>
+            <image name="knight-se-run1"/>
+            <image name="knight-se-run2"/>
+            <image name="knight-se-run3"/>
+            <image name="knight-se-run4"/>
+            <image name="knight-se-run5"/>
+            <image name="knight-se-run6"/>
+            <image name="knight-se-run7"/>
+            <image name="knight-se-run8"/>
+        </move>
+        <sounds>
+            <attack1 succ="spear" fail="spearFail"/>
+            <move sound="horseMovement"/>
+            <pain sound="horsePain"/>
+        </sounds>
+    </view>
+    <view name="HumanWesnoth-SilverMage">
+        <attack1 imageName="staff-magic">
+            <all>
+                <succ>
+                    <image name="silver-mage-attack-staff1"/>
+                    <image name="silver-mage-attack-staff2"/>
+                </succ>
+            </all>
+        </attack1>
+        <attack2 imageName="fireball" projectile="Fireball">
+            <all>
+                <succ>
+                    <image name="silver-mage-attack-magic1"/>
+                    <image name="silver-mage-attack-magic2"/>
+                </succ>
+            </all>
+        </attack2>
+        <stand>
+            <image name="silver-mage"/>
+        </stand>
+        <defence>
+            <image name="silver-mage-defend"/>
+        </defence>
+        <sounds>
+            <attack1 succ="staff" fail="miss1"/>
+            <attack2 succ="magicAttack1" fail="magicAttack1Fail"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanWesnoth-Sergeant">
+        <attack1 imageName="greatsword-human">
+            <image name="sergeant-attack-sword-1"/>
+            <image name="sergeant-attack-sword-2"/>
+            <image name="sergeant-attack-sword-3"/>
+        </attack1>
+        <stand>
+            <image name="sergeant"/>
+        </stand>
+        <defence>
+            <image name="sergeant-defend"/>
+        </defence>
+        <idle>
+            <image name="sergeant-idle-1"/>
+            <image name="sergeant-idle-2"/>
+            <image name="sergeant-idle-3"/>
+            <image name="sergeant-idle-4"/>
+            <image name="sergeant-idle-5"/>
+            <image name="sergeant-idle-6"/>
+            <image name="sergeant-idle-7"/>
+            <image name="sergeant-idle-8"/>
+            <image name="sergeant-idle-9"/>
+            <image name="sergeant-idle-10"/>
+            <image name="sergeant-idle-11"/>
+        </idle>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanCeresian-Acolyte">
+        <attack1 imageName="fist-human"/>
+        <attack2 imageName="fireball" projectile="Fireball"/>
+        <stand>
+            <image name="acolyte"/>
+        </stand>
+        <sounds>
+            <attack1 succ="fist"/>
+            <attack2 succ="magicAttack1" fail="magicAttack1Fail"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanCeresian-Deacon">
+        <attack1 imageName="fist-human"/>
+        <attack2 imageName="fireball" projectile="Fireball"/>
+        <stand>
+            <image name="deacon"/>
+        </stand>
+        <sounds>
+            <attack1 succ="fist"/>
+            <attack2 succ="magicAttack1" fail="magicAttack1Fail"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanChaos-Invader">
+        <attack1 imageName="sword-human">
+            <image name="invader-attack1"/>
+            <image name="invader-attack2"/>
+            <image name="invader-attack3"/>
+        </attack1>
+        <stand>
+            <image name="invader"/>
+        </stand>
+        <defence>
+            <image name="invader-defend"/>
+        </defence>
+        <move>
+            <image name="invader-move"/>
+        </move>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanChaos-Invoker">
+        <attack1 imageName="fist-human">
+            <image name="invoker-melee"/>
+        </attack1>
+        <attack2 imageName="fireball" projectile="Fireball">
+            <image name="invoker-magic-1"/>
+            <image name="invoker-magic-2"/>
+            <image name="invoker-magic-3"/>
+        </attack2>
+        <defence>
+            <image name="invoker-defend"/>
+        </defence>
+        <stand>
+            <image name="invoker"/>
+        </stand>
+        <sounds>
+            <attack1 succ="fist"/>
+            <attack2 succ="magicAttack1" fail="magicAttack1Fail"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanChaos-Knight">
+        <attack1 imageName="sword-human">
+            <image name="dark-knight-attack1"/>
+            <image name="dark-knight-attack2"/>
+            <image name="dark-knight-attack3"/>
+        </attack1>
+        <stand>
+            <image name="dark-knight"/>
+        </stand>
+        <defence>
+            <image name="dark-knight-defend"/>
+        </defence>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanChaos-Magus">
+        <attack1 imageName="staff-magic"/>
+        <attack2 imageName="fireball" projectile="Fireball"/>
+        <stand>
+            <image name="magus"/>
+        </stand>
+        <sounds>
+            <attack1 succ="fist"/>
+            <attack2 succ="magicAttack1" fail="magicAttack1Fail"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanDark-Berserk">
+        <attack1 imageName="greatsword-human"/>
+        <stand>
+            <image name="sword-berserk"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanDark-Bowman">
+        <attack1 imageName="sword-human-short"/>
+        <attack2 imageName="bow" projectile="Arrow"/>
+        <stand>
+            <image name="bow-bowman"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <attack2 succ="bow" fail="bowFail"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanDark-Cavalier">
+        <attack1 imageName="spear"/>
+        <stand>
+            <image name="horse-cavalier"/>
+        </stand>
+        <sounds>
+            <attack1 succ="spear" fail="spearFail"/>
+            <move sound="horseMovement"/>
+            <pain sound="horsePain"/>
+        </sounds>
+    </view>
+    <view name="HumanDark-Champion">
+        <attack1 imageName="greatsword-human"/>
+        <stand>
+            <image name="sword-champion"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanDark-HeavyBowman">
+        <attack1 imageName="sword-human-short"/>
+        <attack2 imageName="bow" projectile="Arrow"/>
+        <stand>
+            <image name="bow-heavy-bowman"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <attack2 succ="bow" fail="bowFail"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanDark-Knight">
+        <attack1 imageName="spear"/>
+        <stand>
+            <image name="horse-knight"/>
+        </stand>
+        <sounds>
+            <attack1 succ="spear" fail="spearFail"/>
+            <move sound="horseMovement"/>
+            <pain sound="horsePain"/>
+        </sounds>
+    </view>
+    <view name="HumanDark-Soldier">
+        <attack1 imageName="greatsword-human"/>
+        <stand>
+            <image name="sword-soldier"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanLavinian-Bowman">
+        <attack1 imageName="sword-human-short"/>
+        <attack2 imageName="bow" projectile="Arrow">
+            <image name="bowman-attack-1"/>
+            <image name="bowman-attack-2"/>
+            <image name="bowman-attack-3"/>
+        </attack2>
+        <stand>
+            <image name="bowman"/>
+        </stand>
+        <defence>
+            <image name="bowman-defend"/>
+        </defence>
+        <death>
+            <image name="bowman-death-1"/>
+            <image name="bowman-death-2"/>
+            <image name="bowman-death-3"/>
+            <image name="bowman-death-4"/>
+        </death>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <attack2 succ="bow" fail="bowFail"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanLavinian-Legionnaire">
+        <attack1 imageName="sword-human">
+            <image name="legionnaire-attack-gladius-1"/>
+            <image name="legionnaire-attack-gladius-2"/>
+        </attack1>
+        <stand>
+            <image name="legionnaire"/>
+        </stand>
+        <defence>
+            <image name="legionnaire-defend"/>
+        </defence>
+        <death>
+            <image name="legionnaire-death-1"/>
+            <image name="legionnaire-death-2"/>
+            <image name="legionnaire-death-3"/>
+            <image name="legionnaire-death-4"/>
+        </death>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanLavinian-LightInfantry">
+        <attack1 imageName="sword-human">
+            <image name="light-infantry-attack-1"/>
+            <image name="light-infantry-attack-2"/>
+        </attack1>
+        <stand>
+            <image name="light-infantry"/>
+        </stand>
+        <death>
+            <image name="light-infantry-death-1"/>
+            <image name="light-infantry-death-2"/>
+            <image name="light-infantry-death-3"/>
+            <image name="light-infantry-death-4"/>
+        </death>
+        <defence>
+            <image name="light-infantry-defend"/>
+        </defence>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanLavinian-Propugnator">
+        <attack1 imageName="sword-human">
+            <image name="propugnator-attack-gladius-1"/>
+            <image name="propugnator-attack-gladius-2"/>
+        </attack1>
+        <stand>
+            <image name="propugnator"/>
+        </stand>
+        <defence>
+            <image name="propugnator-defend-1"/>
+            <image name="propugnator-defend-2"/>
+        </defence>
+        <death>
+            <image name="propugnator-death-1"/>
+            <image name="propugnator-death-2"/>
+            <image name="propugnator-death-3"/>
+            <image name="propugnator-death-4"/>
+        </death>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanLavinian-SiegeArcher">
+        <attack1 imageName="sword-human-short"/>
+        <attack2 imageName="bow" projectile="Arrow">
+            <image name="siege-archer-attack-1"/>
+            <image name="siege-archer-attack-2"/>
+            <image name="siege-archer-attack-3"/>
+        </attack2>
+        <stand>
+            <image name="siege-archer"/>
+        </stand>
+        <defence>
+            <image name="siege-archer-defend"/>
+        </defence>
+        <death>
+            <image name="siege-archer-death-1"/>
+            <image name="siege-archer-death-2"/>
+            <image name="siege-archer-death-3"/>
+            <image name="siege-archer-death-4"/>
+        </death>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <attack2 succ="bow" fail="bowFail"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanLavinian-Rorarius">
+        <attack1 imageName="sword-human">
+            <image name="rorarius-attack-1"/>
+            <image name="rorarius-attack-2"/>
+        </attack1>
+        <stand>
+            <image name="rorarius"/>
+        </stand>
+        <death>
+            <image name="rorarius-death-1"/>
+            <image name="rorarius-death-2"/>
+            <image name="rorarius-death-3"/>
+            <image name="rorarius-death-4"/>
+        </death>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanOracles-Oracle">
+        <attack1 imageName="fist-human"/>
+        <attack2 imageName="fireball" projectile="Fireball"/>
+        <stand>
+            <image name="oracle"/>
+        </stand>
+        <sounds>
+            <attack1 succ="fist"/>
+            <attack2 succ="magicAttack1" fail="magicAttack1Fail"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
 
 </views>

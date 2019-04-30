@@ -1,8 +1,8 @@
 package mr.merc.map.hex
 
-import org.scalatest.FunSuite
+import org.scalatest.{FunSuite, Matchers}
 
-class HexFieldTest extends FunSuite {
+class HexFieldTest extends FunSuite with Matchers {
   val field = new HexField[Hex](3, 4, Hex.hexInit)
   val bigField = new HexField[Hex](6, 5, Hex.hexInit)
 
@@ -190,5 +190,18 @@ class HexFieldTest extends FunSuite {
     def falsePredicate(h: Any) = false
     val no = bigField.findClosest(bigField.hex(2, 2), falsePredicate)
     assert(no.isEmpty)
+  }
+
+  test("closest for list of hexes") {
+    def hex(x:Int, y:Int) = bigField.hex(x, y)
+    val stream = bigField.closest(Set(hex(1,1), hex(2,1)))
+    val two = stream.take(2)
+    two.toSet shouldBe Set(hex(1,1), hex(2,1))
+
+    val eight = stream.drop(2).take(8)
+
+    eight.toSet shouldBe Set(hex(0, 1),hex(1, 0),hex(2, 0),hex(3, 0),hex(3, 1),hex(2, 2),hex(1, 2),hex(0, 2))
+    val nextEight = stream.drop(10).take(8)
+    nextEight.toSet shouldBe Set(hex(0, 0),hex(0, 3),hex(1, 3),hex(2, 3),hex(3, 2),hex(4, 2),hex(4, 1),hex(4, 0))
   }
 }

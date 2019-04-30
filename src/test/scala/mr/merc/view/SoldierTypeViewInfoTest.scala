@@ -81,7 +81,6 @@ class SoldierTypeViewInfoTest extends FunSuite with Matchers {
     for (d <- Direction.list; b <- List(true, false); n = 1) {
       val s = SoldierViewAttackState(b, d, n)
       val attack2 = vt.images(s)
-      val configurable = Set(N, NE, SE, S)
 
       if (s.success) {
         assert(attack2.size === 2)
@@ -197,5 +196,95 @@ class SoldierTypeViewInfoTest extends FunSuite with Matchers {
     assert(attacks1(1).index === 1)
     assert(attacks1(1).imageName === "image10")
     assert(attacks1(1).projectile === None)
+  }
+
+  test("loading one image soldier") {
+    val vt = SoldierTypeViewInfo("oneImageSoldier")
+    val attacks = vt.attacks
+    attacks should have size 2
+    val List(at1, at2) = attacks
+    at1.index shouldBe 0
+    at1.projectile shouldBe None
+    at1.imageName shouldBe "111"
+    at2.index shouldBe 1
+    at2.projectile shouldBe Some("testProjectile3")
+    at2.imageName shouldBe "222"
+
+    for(d <- Direction.list; b <- List(true, false); n <- List(0, 1)) {
+      val images = vt.images(SoldierViewAttackState(b, d, n))
+      images should have size 1
+      images.head.imagePath shouldBe Some("/images/units/oneImageSoldier/im14.png")
+    }
+
+    val idle = vt.images(IdleState)
+    assert(idle.size === 1)
+    assert(idle.head.imagePath.get === "/images/units/oneImageSoldier/im14.png")
+
+    val move = vt.images(MoveState)
+    assert(move.size === 1)
+    assert(move.head.imagePath.get === "/images/units/oneImageSoldier/im14.png")
+
+    val defence = vt.images(DefenceState)
+    assert(defence.size === 1)
+    assert(defence.head.imagePath.get === "/images/units/oneImageSoldier/im14.png")
+
+    val stand = vt.images(StandState)
+    assert(stand.size === 1)
+    assert(stand.head.imagePath.get === "/images/units/oneImageSoldier/im14.png")
+
+    val death = vt.images(DeathState)
+    assert(death.size === 5)
+    death foreach {
+      _.imagePath shouldBe Some("/images/units/oneImageSoldier/im14.png")
+    }
+  }
+
+  test("all/succ is optional") {
+    val vt = SoldierTypeViewInfo("testSoldier2")
+    val attacks = vt.attacks
+    attacks should have size 1
+    val attack = attacks.head
+    attack.imageName shouldBe "111"
+    attack.projectile shouldBe Some("testProjectile3")
+
+    for(d <- Direction.list; b <- List(true, false)) {
+      val images = vt.images(SoldierViewAttackState(b, d, 0))
+      images should have size 4
+      images(0).imagePath shouldBe Some("/images/units/testSoldier2/im14.png")
+      images(1).imagePath shouldBe Some("/images/units/testSoldier2/im15.png")
+      images(2).imagePath shouldBe Some("/images/units/testSoldier2/im16.png")
+      images(3).imagePath shouldBe Some("/images/units/testSoldier2/im17.png")
+    }
+
+    val idle = vt.images(IdleState)
+    assert(idle.size === 3)
+    assert(idle(0).imagePath.get === "/images/units/testSoldier2/im15.png")
+    assert(idle(1).imagePath.get === "/images/units/testSoldier2/im16.png")
+    assert(idle(2).imagePath.get === "/images/units/testSoldier2/im17.png")
+
+
+    val move = vt.images(MoveState)
+    assert(move.size === 3)
+    assert(move(0).imagePath.get === "/images/units/testSoldier2/im15.png")
+    assert(move(1).imagePath.get === "/images/units/testSoldier2/im16.png")
+    assert(move(2).imagePath.get === "/images/units/testSoldier2/im17.png")
+
+    val defence = vt.images(DefenceState)
+    assert(defence.size === 3)
+    assert(defence(0).imagePath.get === "/images/units/testSoldier2/im15.png")
+    assert(defence(1).imagePath.get === "/images/units/testSoldier2/im16.png")
+    assert(defence(2).imagePath.get === "/images/units/testSoldier2/im17.png")
+
+    val stand = vt.images(StandState)
+    assert(stand.size === 3)
+    assert(stand(0).imagePath.get === "/images/units/testSoldier2/im15.png")
+    assert(stand(1).imagePath.get === "/images/units/testSoldier2/im16.png")
+    assert(stand(2).imagePath.get === "/images/units/testSoldier2/im17.png")
+
+    val death = vt.images(DeathState)
+    assert(death.size === 5)
+    death foreach {
+      _.imagePath shouldBe Some("/images/units/testSoldier2/im15.png")
+    }
   }
 }

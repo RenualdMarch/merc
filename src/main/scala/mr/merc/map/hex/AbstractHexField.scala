@@ -80,6 +80,16 @@ abstract class AbstractHexField[T <: Hex](init: (Int, Int) => T) {
     Stream.from(0).map(radius => hexRing(hex, radius)).takeWhile(_.nonEmpty).flatten
   }
 
+  def closest(hexes:Set[T]):Stream[T] = {
+    case class Step(allPrev: Set[T], current: Set[T], step: Int)
+    def close:Stream[Step] = Step(Set(), hexes, 0) #:: close.zip(Stream.from(1)).map { case (prevStep, radius) =>
+      val allPrev = prevStep.allPrev ++ prevStep.current
+      val current = hexes.flatMap(hexRing(_, radius)) -- allPrev
+      Step(allPrev, current, radius)
+    }.takeWhile(_.current.nonEmpty)
+    close.flatMap(_.current)
+  }
+
   def findClosest(start: T, predicate: T => Boolean):Option[T] = {
     closest(start).find(predicate)
   }

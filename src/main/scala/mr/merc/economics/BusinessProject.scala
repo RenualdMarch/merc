@@ -122,7 +122,7 @@ trait ExpandFactoryProject {
 
 trait BuildFactoryProject {
 
-  import WorldEconomicConstants.Enterprises._
+  import WorldConstants.Enterprises._
 
   def region: EconomicRegion
 

@@ -13,7 +13,7 @@ import mr.merc.players.Player
 class SteadfastAttributeTest extends FunSuite {
   def simpleSoldierType(attributes: Set[SoldierTypeAttribute] = Set(), resistance: Int) = new SoldierType("1", 1, 20, 10, 5, 1,
     List(Attack(1, 10, 1, Impact, false), Attack(2, 6, 2, Impact, false)), Map(SandKind -> 2),
-    Map(SandDefence -> 60), Map(Impact -> resistance), attributes)
+    Map(SandDefence -> 60), Map(Impact -> resistance), attributes, viewName = "")
 
   val steadfast = new Soldier("1", simpleSoldierType(Set(Steadfast), 10), Player("1"))
 

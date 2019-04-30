@@ -18,7 +18,7 @@ class PriceExtractionTest extends FunSuite with BeforeAndAfter with Matchers {
     override def economicNeighbours: Set[EconomicRegion] = Set()
 
     override val regionMarket: RegionMarket = null
-
+    override val regionWarriors: RegionWarriors = null
     override def bureaucratsPercentageFromMax: Double = 1d
 
     override val regionPopulation: RegionPopulation = new RegionPopulation(List(traders))

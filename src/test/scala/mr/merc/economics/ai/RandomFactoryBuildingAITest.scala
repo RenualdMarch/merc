@@ -11,7 +11,7 @@ import org.scalatest.FunSuite
 class RandomFactoryBuildingAITest extends FunSuite {
 
   test("test random capitalists ai") {
-    import WorldEconomicConstants.Enterprises._
+    import WorldConstants.Enterprises._
     val ai = new RandomFactoryBuildingAI()
     val state = new State("", LatinHuman, 0,
       new PoliticalSystem(Party.absolute.copy(economy = StateEconomy)))
@@ -20,7 +20,7 @@ class RandomFactoryBuildingAITest extends FunSuite {
       override def owner: State = state
 
       override def economicNeighbours: Set[EconomicRegion] = Set()
-
+      override val regionWarriors: RegionWarriors = null
       override val regionMarket: RegionMarket = new RegionMarket(Map(Coal -> 1))
       override val regionPopulation: RegionPopulation = new RegionPopulation(
         List(

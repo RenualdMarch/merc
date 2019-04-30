@@ -10,9 +10,9 @@ import mr.merc.map.terrain._
 import scala.collection.mutable
 import scala.math.{abs, max, pow}
 import scala.util.Random
+import mr.merc.economics.WorldGenerationConstants._
 
 object WorldMapGenerator {
-  val landPercentage = 0.6
 
   def generateWorldMap(width: Int, height: Int, provinces: Int): WorldMap = {
     val terrainNoise = Noise(5).add(0.5, Noise(10)).add(0.25, Noise(20)).applyFunction { case ((x, y), n) =>
@@ -34,7 +34,7 @@ object WorldMapGenerator {
 
     def f(x: Int, y: Int): TerrainHex = {
       val n = terrainNoise(x, width, y, height)
-      if (n > terrainNoise.percentageBelow(1 - landPercentage)) new TerrainHex(x, y, biome(x, y))
+      if (n > terrainNoise.percentageBelow(1 - LandPercentage)) new TerrainHex(x, y, biome(x, y))
       else new TerrainHex(x, y, ShallowWater)
     }
 

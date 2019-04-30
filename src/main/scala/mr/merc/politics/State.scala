@@ -9,7 +9,7 @@ import scalafx.scene.paint.Color
 
 class State(initialName: String, val primeCulture:Culture, startingMoney: Double, val politicalSystem: PoliticalSystem, val color: Color = Color.Black) {
   def name: String = {
-    val governmentType = Localization(Culture.cultureConfig(primeCulture).stateForm.monarchy)
+    val governmentType = Localization(Culture.cultureConfig(primeCulture.name).stateForm.monarchy)
     s"$initialName $governmentType"
   }
 
@@ -44,6 +44,8 @@ case class Province(name: String, var owner: State, regionMarket: RegionMarket,
   override def economicNeighbours: Set[EconomicRegion] = {
     neighbourProvinces.getOrElse(Set()).asInstanceOf[Set[EconomicRegion]]
   }
+
+  val regionWarriors = new RegionWarriors(Nil, economicNeighbours)
 
   def totalPopulation:Int = regionPopulation.pops.map(_.populationCount).sum
 }

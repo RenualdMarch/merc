@@ -36,6 +36,7 @@ object SoldierTypeViewInfo {
     val parsed = xml \ "view" map (node => {
       val typeName = (node \ "@name").toString()
       val stand = parseImagesList(typeName, node \ "stand", Nil)
+      require(stand.nonEmpty, s"Stand is empty for $typeName")
       val move = parseImagesList(typeName, node \ "move", stand)
       val idle = parseImagesList(typeName, node \ "idle", stand)
       val defence = parseImagesList(typeName, node \ "defence", stand)
@@ -77,7 +78,7 @@ object SoldierTypeViewInfo {
     death foreach (m => map += (DeathSound -> m))
     pain foreach (m => map += (PainSound -> m))
 
-    for (number <- SoldierType(name).attacks.indices) {
+    for (number <- 0 to 10) {
       val attackNodeOpt = getNode(node, "attack" + (number + 1))
       attackNodeOpt match {
         case Some(attackNode) =>
@@ -144,7 +145,16 @@ object SoldierTypeViewInfo {
     val fullSuccess = success.map(p => SoldierViewAttackState(success = true, p._1, attackNumber) -> p._2)
     val fullFail = fail.map(p => SoldierViewAttackState(success = false, p._1, attackNumber) -> p._2)
 
-    fullFail ++ fullSuccess
+    val result = fullFail ++ fullSuccess
+    if (success.values.forall(_.isEmpty)) {
+      emptyAttack(typeNode, typeName, attackNumber)
+    } else result
+  }
+
+  private def emptyAttack(typeNode: Node, typeName: String, attackNumber: Int): Map[SoldierViewAttackState, List[MImage]] = {
+    val standing = parseImagesList(typeName, typeNode \ "stand", Nil)
+    val states = for (d <- Direction.list; s <- Set(true, false)) yield SoldierViewAttackState(s, d, attackNumber) -> standing
+    states.toMap
   }
 
   private def addSWandNW(map: Map[SoldierViewAttackState, List[MImage]]): Map[SoldierViewAttackState, List[MImage]] = {
@@ -166,12 +176,11 @@ object SoldierTypeViewInfo {
   private def parseAttackDirection(typeNode: Node, typeName: String, attackName: String, success: String, direction: Direction): List[MImage] = {
     val images = parseImagesList(typeName, typeNode \ attackName \ direction.toString().toLowerCase() \ success, Nil)
     val allImages = parseImagesList(typeName, typeNode \ attackName \ "all" \ success, Nil)
+    val allDefaultImages = parseImagesList(typeName, typeNode \ attackName, Nil)
 
-    if (images.isEmpty) {
-      allImages
-    } else {
-      images
-    }
+    if (images.nonEmpty) images
+    else if (allImages.nonEmpty) allImages
+    else allDefaultImages
   }
 
   private def createDeathAnimation(stand: MImage): List[MImage] = {

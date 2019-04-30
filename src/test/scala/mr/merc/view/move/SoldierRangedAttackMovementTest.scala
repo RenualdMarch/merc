@@ -21,7 +21,7 @@ import mr.merc.map.view.SoldiersDrawer
 
 class SoldierRangedAttackMovementTest extends FunSuite {
   val simpleSoldierType = new SoldierType("testSoldier2", 1, 20, 10, 5, 1,
-    List(Attack(0, 5, 2, Impact, true)), Map(), Map(), Map())
+    List(Attack(0, 5, 2, Impact, true)), Map(), Map(), Map(), Set(),"testSoldier2")
 
   // FIXME unignore me
   ignore("simple attack") {

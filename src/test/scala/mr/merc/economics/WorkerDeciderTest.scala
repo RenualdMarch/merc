@@ -21,7 +21,7 @@ class WorkerDeciderTest extends FunSuite with BeforeAndAfter {
     override def economicNeighbours: Set[EconomicRegion] = ???
 
     override val regionMarket: RegionMarket = null
-
+    override val regionWarriors: RegionWarriors = null
     override val regionPopulation: RegionPopulation = new RegionPopulation(populations)
 
     override def owner: State = country
@@ -159,7 +159,7 @@ class WorkerDeciderTest extends FunSuite with BeforeAndAfter {
       override def economicNeighbours: Set[EconomicRegion] = ???
 
       override val regionMarket: RegionMarket = null
-
+      override val regionWarriors: RegionWarriors = null
       override val regionPopulation: RegionPopulation = new RegionPopulation(List(latinClergy, westClergy))
 
       override def owner: State = country

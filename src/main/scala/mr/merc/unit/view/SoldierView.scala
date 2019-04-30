@@ -31,7 +31,7 @@ object SoldierView {
 
 }
 
-class SoldierView(val soldier: Soldier, factor: Double) extends AbstractSoldierView(SoldierTypeViewInfo(soldier.soldierType.name, soldier.owner.color), factor) {
+class SoldierView(val soldier: Soldier, factor: Double, drawOval: Boolean = true, drawCircleState:Boolean = true) extends AbstractSoldierView(SoldierTypeViewInfo(soldier.soldierType.viewName, soldier.owner.color), factor) {
 
   private val maxHp = 100
   private val healthBarHeight = Math.min(soldier.soldierType.hp, maxHp) * 2 * TerrainHexView.side(factor) / 3 / maxHp
@@ -50,17 +50,17 @@ class SoldierView(val soldier: Soldier, factor: Double) extends AbstractSoldierV
   def xpPercent = soldier.exp.toDouble / soldier.soldierType.exp
 
   override def drawItself(gc: GraphicsContext, xOffset: Int, yOffset: Int) {
-    if (state != DeathState && state != NoState && !state.isInstanceOf[SoldierViewAttackState]) {
+    if (state != DeathState && state != NoState && !state.isInstanceOf[SoldierViewAttackState] && drawOval) {
       drawOvalUnderSoldier(gc, xOffset: Int, yOffset: Int, soldier.owner.color)
     }
 
-    if (state != DeathState && state != NoState) {
+    if (state != DeathState && state != NoState && drawCircleState) {
       drawAttackStatusCircleNearSoldier(gc, xOffset, yOffset)
     }
 
     super.drawItself(gc, xOffset, yOffset)
 
-    if (state != DeathState && state != NoState) {
+    if (state != DeathState && state != NoState && hpPercent != 1) {
       healthBar.draw(x + xOffset + 12, y + yOffset + 15, gc)
       //xpBar.draw(x + 6, y + TerrainHexView.Side - xpBarHeight, gc)
     }
@@ -86,9 +86,11 @@ class SoldierView(val soldier: Soldier, factor: Double) extends AbstractSoldierV
   }
 
   def refreshBars() {
-    healthBar.fillPercentage = hpPercent
-    xpBar.fillPercentage = xpPercent
-    markAsDirty()
+    if (healthBar.fillPercentage != hpPercent || xpBar.fillPercentage != xpPercent) {
+      healthBar.fillPercentage = hpPercent
+      //xpBar.fillPercentage = xpPercent
+      markAsDirty()
+    }
   }
 }
 
