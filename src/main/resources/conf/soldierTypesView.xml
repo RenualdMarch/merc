@@ -1147,4 +1147,71 @@
         </sounds>
     </view>
 
+    <view name="HumanDardo-Bowman">
+        <attack1 imageName="sword-human-short"/>
+        <attack2 imageName="bow" projectile="Arrow"/>
+        <stand>
+            <image name="bowman"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <attack2 succ="bow" fail="bowFail"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanDardo-HeavyCavalier">
+        <attack1 imageName="sword-human"/>
+        <stand>
+            <image name="heavy-cavalier"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <move sound="horseMovement"/>
+            <pain sound="horsePain"/>
+        </sounds>
+    </view>
+    <view name="HumanDardo-Hoplite">
+
+    </view>
+    <view name="HumanDardo-Justicar"></view>
+    <view name="HumanDardo-Longbowman"></view>
+    <view name="HumanDardo-Sellsword"></view>
+    <view name="HumanDardo-Mercenary"></view>
+    <view name="HumanDardo-Phalanx"></view>
+    <view name="HumanDardo-Praetorian"></view>
+    <view name="HumanDardo-Rider">
+        <attack1 imageName="sword-human"/>
+        <stand>
+            <image name="rider"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <move sound="horseMovement"/>
+            <pain sound="horsePain"/>
+        </sounds>
+    </view>
+
+    <view name="HumanChevalier-Bowman">
+        <attack1 imageName="sword-human-short"/>
+        <attack2 imageName="bow" projectile="Arrow"/>
+        <stand>
+            <image name="bowman"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <attack2 succ="bow" fail="bowFail"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanChevalier-Chevalier"></view>
+    <view name="HumanChevalier-Doctor"></view>
+    <view name="HumanChevalier-Halbeirder"></view>
+    <view name="HumanChevalier-Horseman"></view>
+    <view name="HumanChevalier-Lancer"></view>
+    <view name="HumanChevalier-Miliz"></view>
+    <view name="HumanChevalier-Quack"></view>
+    <view name="HumanChevalier-Rider"></view>
+    <view name="HumanChevalier-Siegebowman"></view>
+    <view name="HumanChevalier-Soldier"></view>
+    <view name="HumanChevalier-Swordsman"></view>
 </views>

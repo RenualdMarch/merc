@@ -5,7 +5,9 @@ Current battle issues:
 
 
 //"-Dglass.win.uiScale=100%"
-
+Add all human-dardo as greek culture
+Add all human-chevalier as french culture and extract wesnoth culture
+tests for balancing warrior types
 armies movement
 armies economic part
 next turn button async, messages framework
