@@ -456,8 +456,11 @@ object Population {
 
   case object KnightHuman extends Culture("french", Humans, HumanVillageHouse, Color.Blue, WarriorViewNames.WesnothCulture)
 
-  case object DarkHuman extends Culture("german", Humans, HumanCottage, Color.Black, WarriorViewNames.DarkHumanCulture)
+  case object DarkHuman extends Culture("nilf", Humans, HumanCottage, Color.Black, WarriorViewNames.DarkHumanCulture)
 
+  case object GreekHuman extends Culture("greek", Humans, HumanCityHouse, Color.White, WarriorViewNames.GreekDardoCulture)
+
+  case object GermanHuman extends Culture("german", Humans, HumanVillageHouse, Color.Orange, WarriorViewNames.ChevalierCulture)
   //
   // DISABLED CULTURES
   //
@@ -472,7 +475,7 @@ object Population {
 */
   // good words: alliance, protectorate, tribe, army
 
-  def cultures: List[Culture] = List(LatinHuman, KnightHuman, DarkHuman) //, HighElf, DarkElf, BarbarianOrc, RockDwarf, GreenSaurian, OldDrakes, Forsaken, RedDemons)
+  def cultures: List[Culture] = List(LatinHuman, KnightHuman, DarkHuman, GreekHuman, GermanHuman) //, HighElf, DarkElf, BarbarianOrc, RockDwarf, GreenSaurian, OldDrakes, Forsaken, RedDemons)
 
   class ProductFulfillmentRecord(prices: Map[Products.Product, Double], needs: Map[PopulationNeedsType, Map[Products.Product, Double]], products: Map[Product, Double]) {
 

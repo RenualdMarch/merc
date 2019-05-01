@@ -5,18 +5,18 @@ Current battle issues:
 
 
 //"-Dglass.win.uiScale=100%"
-Add all human-dardo as greek culture
-Add all human-chevalier as french culture and extract wesnoth culture
-tests for balancing warrior types
-armies movement
+draw soldier centered like mountains
+armies movement and ui
 armies economic part
 next turn button async, messages framework
 remove ai from player
+move cultures.conf to code
 battles
 check conditional AI logic - unused expression
 1 season per turn, 4 turns per year
 elections
 idle animation for soldiers on world map
+tests for balancing warrior types
 Polishing:
 issues - balance production and needs multipliers
 localization - add parameters order, like %1, %2, %3

@@ -45,8 +45,36 @@ object WarriorViewNames {
     (FireWizard, Militia) -> "HumanChaos-Invoker",
     (FireWizard, Professional) -> "HumanChaos-Magus",
     (PikeCavalry, Militia) -> "HumanDark-Knight",
-    (PikeCavalry, Professional) -> "HumanDark-Cavalier"
-    //(HeavyBladeInfantry, Militia) -> "HumanDark-Soldier",
-    //(HeavyBladeInfantry, Professional) -> "HumanDark-Champion",
+    (PikeCavalry, Professional) -> "HumanDark-Cavalier",
+    (HeavyBladeInfantry, Militia) -> "HumanDark-Soldier",
+    (HeavyBladeInfantry, Professional) -> "HumanDark-Champion"
+  ))
+
+  val GreekDardoCulture = WarriorViewNames(Map(
+    (HeavyBladeInfantry, Militia) -> "HumanDardo-Praetorian",
+    (HeavyBladeInfantry, Professional) -> "HumanDardo-Justicar",
+    (LightBladeInfantry, Militia) -> "HumanDardo-Sellsword",
+    (LightBladeInfantry, Professional) -> "HumanDardo-Mercenary",
+    (Archer, Militia) -> "HumanDardo-Bowman",
+    (Archer, Professional) -> "HumanDardo-Longbowman",
+    (HeavyPikeInfantry, Militia) -> "HumanDardo-Hoplite",
+    (HeavyPikeInfantry, Professional) -> "HumanDardo-Phalanx",
+    (BladeCavalry, Militia) -> "HumanDardo-Rider",
+    (BladeCavalry, Professional) -> "HumanDardo-HeavyCavalier",
+  ))
+
+  val ChevalierCulture = WarriorViewNames(Map(
+    (HeavyPikeInfantry, Militia) -> "HumanChevalier-Miliz",
+    (HeavyPikeInfantry, Professional) -> "HumanChevalier-Halberdier",
+    (HeavyBladeInfantry, Militia) -> "HumanChevalier-Soldier",
+    (HeavyBladeInfantry, Professional) -> "HumanChevalier-Swordsman",
+    (Archer, Militia) -> "HumanChevalier-Bowman",
+    (Archer, Professional) -> "HumanChevalier-Siegebowman",
+    (FireWizard, Militia) -> "HumanChevalier-Quack",
+    (FireWizard, Professional) -> "HumanChevalier-Doctor",
+    (PikeCavalry, Militia) -> "HumanChevalier-Horseman",
+    (PikeCavalry, Professional) -> "HumanChevalier-Lancer",
+    (BladeCavalry, Militia) -> "HumanChevalier-Rider",
+    (BladeCavalry, Professional) -> "HumanChevalier-Chevalier",
   ))
 }
