@@ -1,5 +1,7 @@
 package mr.merc.ui.world
 
+import mr.merc.army.Warrior
+import mr.merc.army.WarriorType.{Militia, Professional}
 import mr.merc.economics.Products.Ritual
 import mr.merc.economics._
 import mr.merc.local.Localization
@@ -52,5 +54,14 @@ object EconomicLocalization {
     products.map{ case (p, amount) =>
         s"${localizeProduct(p)}:${DoubleFormatter().format(amount)}"
     }.mkString(", ")
+  }
+
+  def localizeWarriorType(warrior: Warrior): String = {
+    val competence = warrior.competence match {
+      case Militia => Localization("army.militia")
+      case Professional => Localization("army.professional")
+    }
+    val warriorType = Localization(warrior.warriorType.name)
+    s"$competence $warriorType"
   }
 }

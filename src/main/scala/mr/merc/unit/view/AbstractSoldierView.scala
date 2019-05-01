@@ -7,6 +7,8 @@ import scalafx.scene.canvas.GraphicsContext
 abstract class AbstractSoldierView(viewInfo: SoldierTypeViewInfo, factor: Double) extends Sprite[SoldierViewState](viewInfo.images, StandState, factor) {
   viewInfo.eagerLoad()
 
+  centered = Some(factor * 72 toInt)
+
   override def updateTime(delta: Int): Int = {
     val result = super.updateTime(delta)
 

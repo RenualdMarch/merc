@@ -1,6 +1,5 @@
 package mr.merc.army
 
-import mr.merc.ai.BattleAI
 import mr.merc.army.WarriorType.WarriorCompetence
 import mr.merc.economics.Population.Culture
 import mr.merc.local.Localization
@@ -10,7 +9,7 @@ import mr.merc.unit.view.SoldierView
 import mr.merc.unit.{Soldier, SoldierType}
 import mr.merc.util.CacheFactoryMap
 
-class Warrior(warriorType: WarriorType, competence: WarriorCompetence, culture: Culture, owner: State) {
+class Warrior(val warriorType: WarriorType, val competence: WarriorCompetence, val culture: Culture, val owner: State) {
 
   def hpPercentage:Double = soldier.hp.toDouble / soldierType.hp
 

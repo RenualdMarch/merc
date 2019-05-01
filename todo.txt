@@ -5,7 +5,7 @@ Current battle issues:
 
 
 //"-Dglass.win.uiScale=100%"
-draw soldier centered like mountains
++draw soldier centered like mountains
 armies movement and ui
 armies economic part
 next turn button async, messages framework
@@ -28,7 +28,7 @@ For M9
 
 Consider following:
 
-less products - refactor needs
+less or more products - refactor needs
 technologies
 migration(with churches and mage guilds creation and destruction)
 smarter capitalists when creating and expanding factories
@@ -36,7 +36,6 @@ terrain additives specifically for given terrain types
 add winter weather on maps
 corruption and tax evasion
 world state unit testing
-legendary warriors - leaders
 ability to retreat from battle
 
 Dreams:
