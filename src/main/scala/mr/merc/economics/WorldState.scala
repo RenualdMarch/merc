@@ -1,5 +1,6 @@
 package mr.merc.economics
 
+import mr.merc.army.Warrior
 import mr.merc.economics.Products.IndustryProduct
 import mr.merc.economics.TaxPolicy.Income
 import mr.merc.economics.WorldStateEnterpriseActions.{FactoryCommand, PopExpandFactoryCommand, StateExpandFactoryCommand}
@@ -192,4 +193,22 @@ trait WorldStateEnterpriseActions {
       command.region.projects ::= project
     }
   }
+}
+
+trait WorldStateArmyMovementActions {
+  def playerState: State
+
+  def regions: List[Province]
+
+  def canPlanMoveArmy(from:Province, to:Province) : Boolean = {
+    from.economicNeighbours.contains(to) && from.owner == to.owner
+  }
+
+  def planMoveArmy(from:Province, to:Option[Province], warriors:List[Warrior]): Unit = {
+    to match {
+      case None => from.regionWarriors.planSendWarriors(warriors, None)
+      case Some(p) => if (canPlanMoveArmy(from, p)) from.regionWarriors.planSendWarriors(warriors, to)
+    }
+  }
+
 }

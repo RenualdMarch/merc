@@ -41,6 +41,8 @@ case class Province(name: String, var owner: State, regionMarket: RegionMarket,
     this.neighbourProvinces = Some(set)
   }
 
+  def neighbours:List[Province] = neighbourProvinces.getOrElse(Set()).toList
+
   override def economicNeighbours: Set[EconomicRegion] = {
     neighbourProvinces.getOrElse(Set()).asInstanceOf[Set[EconomicRegion]]
   }

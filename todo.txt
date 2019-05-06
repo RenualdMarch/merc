@@ -37,6 +37,7 @@ add winter weather on maps
 corruption and tax evasion
 world state unit testing
 ability to retreat from battle
+army supply
 
 Dreams:
 
