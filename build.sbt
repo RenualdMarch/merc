@@ -2,10 +2,10 @@ name:= "Merc"
 
 version := "0.2"
 
-scalaVersion := "2.12.7"
+scalaVersion := "2.12.8"
 
 // Add dependency on ScalaFX library
-libraryDependencies += "org.scalafx" %% "scalafx" % "11-R16"
+libraryDependencies += "org.scalafx" %% "scalafx" % "12.0.1-R17"
 
 // Determine OS version of JavaFX binaries
 lazy val osName = System.getProperty("os.name") match {
@@ -17,10 +17,10 @@ lazy val osName = System.getProperty("os.name") match {
 
 lazy val javaFXModules = Seq("base", "controls", "fxml", "graphics", "media", "swing", "web")
 libraryDependencies ++= javaFXModules.map( m =>
-  "org.openjfx" % s"javafx-$m" % "11" classifier osName
+  "org.openjfx" % s"javafx-$m" % "12.0.1" classifier osName
 )
 
-libraryDependencies += "org.scala-lang" % "scala-reflect" % "2.12.1"
+libraryDependencies += "org.scala-lang" % "scala-reflect" % "2.12.8"
 
 libraryDependencies += "org.scalactic" %% "scalactic" % "3.0.4"
 
@@ -44,21 +44,13 @@ libraryDependencies += "org.typelevel" %% "cats-core" % "1.0.0-RC1"
 
 libraryDependencies += "com.typesafe" % "config" % "1.3.2"
 
-libraryDependencies += "com.github.pureconfig" %% "pureconfig" % "0.10.0"
-
 libraryDependencies += "org.kordamp.ikonli" % "ikonli-javafx" % "11.0.0"
 
 libraryDependencies += "org.kordamp.ikonli" % "ikonli-fontawesome-pack" % "11.0.0"
 
 libraryDependencies += "org.kordamp.ikonli" % "ikonli-entypo-pack" % "11.0.0"
 
-libraryDependencies += "org.controlsfx" % "controlsfx" % "9.0.0"
-
 libraryDependencies += "com.object-refinery" % "orsoncharts" % "1.7"
-
-libraryDependencies += "com.github.andr83" %% "scalaconfig" % "0.4"
-
-//libraryDependencies += "org.typelevel" %% "spire" % "0.16.0"
 
 scalacOptions ++= Seq("-feature", "-deprecation", "-language:postfixOps",
   "-language:implicitConversions", "-language:reflectiveCalls", "-Ypartial-unification")

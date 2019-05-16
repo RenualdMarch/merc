@@ -6,7 +6,7 @@ object SoldierTypeAttribute {
   def apply(name:String) = map(name)
 }
 
-sealed trait SoldierTypeAttribute {
+sealed trait SoldierTypeAttribute extends Product {
 
 }
 

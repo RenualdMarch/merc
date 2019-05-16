@@ -13,11 +13,11 @@ class StateBudget(startingMoney: Double, val taxPolicy: TaxPolicy) {
 
   def moneyReserve: Double = currentMoney
 
-  var spendingPolicyConfig: SpendingPolicyConfig = SpendingPolicyConfig(0, 0, 0)
+  var spendingPolicyConfig: SpendingPolicyConfig = SpendingPolicyConfig(0, 0, 0, 0)
 
   private var currentReport: BudgetDayReport = BudgetDayReport(Map(), Map(), Map())
 
-  private var historyReports:Vector[BudgetDayReport] = Vector()
+  private var historyReports: Vector[BudgetDayReport] = Vector()
 
   def history: Vector[BudgetDayReport] = historyReports
 
@@ -40,14 +40,14 @@ class StateBudget(startingMoney: Double, val taxPolicy: TaxPolicy) {
     currentMoney += taxData.taxed
   }
 
-  def receiveInvestmentsBack(money: Double): Unit = {
+  def receiveInvestmentsBack(money: Double, spending: Spending): Unit = {
     this.currentMoney += money
-    this.currentReport = currentReport.copy(expenses = currentReport.expenses |+| Map(Construction -> -money))
+    this.currentReport = currentReport.copy(expenses = currentReport.expenses |+| spending -> -money)
   }
 
   def spendBudgetMoney(regions: List[EconomicRegion], primaryCulture: Culture): Unit = {
     if (regions.isEmpty) {
-      _yesterdaySpendingPolicy = SpendingPolicy(0, 0, 0, 0)
+      _yesterdaySpendingPolicy = SpendingPolicy(0, 0, 0)
       return
     }
 
@@ -64,27 +64,27 @@ class StateBudget(startingMoney: Double, val taxPolicy: TaxPolicy) {
     currentMoney -= spending.pensions + spending.bureaucratsSalary + spending.bureaucratsSalary
   }
 
-  private def scholarsMoneyPerNeeds(regions: List[EconomicRegion]):Map[PopulationNeedsType, Double] = {
+  private def scholarsMoneyPerNeeds(regions: List[EconomicRegion]): Map[PopulationNeedsType, Double] = {
     regions.map { r =>
       r.moneyToFulfillNeeds(Scholars)
     }.reduce(_ |+| _)
   }
 
-  def scholarsSpendingFunction(regions: List[EconomicRegion])(d:Double): Double = {
+  def scholarsSpendingFunction(regions: List[EconomicRegion])(d: Double): Double = {
     scholarsMoneyPerNeeds(regions) dot SpendingPolicyConfig.needsSize(d)
   }
 
-  private def bureaucratsMoneyPerNeeds(regions: List[EconomicRegion]):Map[PopulationNeedsType, Double] = {
+  private def bureaucratsMoneyPerNeeds(regions: List[EconomicRegion]): Map[PopulationNeedsType, Double] = {
     regions.map { r =>
       r.moneyToFulfillNeeds(Bureaucrats)
     }.reduce(_ |+| _)
   }
 
-  def bureaucratsSpendingFunction(regions: List[EconomicRegion])(d:Double): Double = {
+  def bureaucratsSpendingFunction(regions: List[EconomicRegion])(d: Double): Double = {
     bureaucratsMoneyPerNeeds(regions) dot SpendingPolicyConfig.needsSize(d)
   }
 
-  private def pensionsMoneyPerNeeds(regions: List[EconomicRegion]):Map[PopulationNeedsType, Double] = {
+  private def pensionsMoneyPerNeeds(regions: List[EconomicRegion]): Map[PopulationNeedsType, Double] = {
     regions.flatMap { r =>
       r.regionPopulation.pops.filter(_.populationType.populationClass == Lower).map(r.moneyToFulfillNeeds)
     }.reduce(_ |+| _)
@@ -94,7 +94,11 @@ class StateBudget(startingMoney: Double, val taxPolicy: TaxPolicy) {
     pensionsMoneyPerNeeds(regions) dot SpendingPolicyConfig.needsSize(d)
   }
 
-  def spendingToPercent(needsMap:Map[PopulationNeedsType, Double])(spending: Double): Double = {
+  def armySpendingFunction(regions: List[EconomicRegion])(d: Double): Double = {
+    regions.map(_.moneyToFulfillArmyNeeds()).sum * d
+  }
+
+  def spendingToPercent(needsMap: Map[PopulationNeedsType, Double])(spending: Double): Double = {
     if (spending <= needsMap(LifeNeeds)) {
       spending / needsMap(LifeNeeds) / 3
     } else if (spending <= needsMap(LifeNeeds) + needsMap(RegularNeeds)) {
@@ -118,14 +122,22 @@ class StateBudget(startingMoney: Double, val taxPolicy: TaxPolicy) {
     spendingToPercent(pensionsMoneyPerNeeds(regions))
   }
 
+  def armyReverseFunction(regions: List[EconomicRegion]): Double => Double = {
+    d => {
+      val max = regions.map(_.moneyToFulfillArmyNeeds()).sum
+      if (max != 0) d / max
+      else 1d
+    }
+  }
+
   def spendingPolicyByConfig(regions: List[EconomicRegion]): SpendingPolicy = {
     SpendingPolicy(scholarsSpendingFunction(regions)(spendingPolicyConfig.scholarsNeeds),
       bureaucratsSpendingFunction(regions)(spendingPolicyConfig.bureaucratsNeeds),
-      pensionsSpendingFunction(regions)(spendingPolicyConfig.pensionsNeeds), 0)
+      pensionsSpendingFunction(regions)(spendingPolicyConfig.pensionsNeeds))
   }
 
   def projectIncomeFunction(income: Income): Double => Double = {
-    history.lastOption.map(_.projectionFunction(income)).getOrElse{case _ => 0d}
+    history.lastOption.map(_.projectionFunction(income)).getOrElse { case _ => 0d }
   }
 
   private def divideAccordingToEfficiency(regions: List[EconomicRegion], popType: PopulationType,
@@ -152,7 +164,7 @@ class StateBudget(startingMoney: Double, val taxPolicy: TaxPolicy) {
   }
 
   private def payPensions(regions: List[EconomicRegion], primaryCulture: Culture, money: Double): Unit = {
-    currentReport = currentReport.copy(expenses = currentReport.expenses |+| Map(Pensions -> money))
+    currentReport = currentReport.copy(expenses = currentReport.expenses |+| Pensions -> money)
     val pops = regions.flatMap(_.regionPopulation.pops).filter(p => p.populationType.populationClass == Lower)
     val totalEff = pops.map(_.totalPopEfficiency).sum
     if (totalEff == 0) {
@@ -168,11 +180,17 @@ class StateBudget(startingMoney: Double, val taxPolicy: TaxPolicy) {
     }
   }
 
-  def investMoney(neededMoney: Double): Double = {
+  def investMoney(neededMoney: Double, spending: Spending): Double = {
     val investment = if (currentMoney > neededMoney) neededMoney else if (currentMoney > 0) currentMoney else 0
     this.currentMoney -= investment
-    this.currentReport = currentReport.copy(expenses = currentReport.expenses |+| Map(Construction -> investment))
+    this.currentReport = currentReport.copy(expenses = currentReport.expenses |+| spending -> investment)
     investment
+  }
+
+  def spendMoneyOnArmySupply(neededMoney: Double): Double = {
+    this.currentMoney -= neededMoney
+    this.currentReport = currentReport.copy(expenses = currentReport.expenses |+| Army -> neededMoney)
+    neededMoney
   }
 }
 

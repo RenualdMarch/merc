@@ -1,6 +1,6 @@
 package mr.merc.economics
 
-import mr.merc.economics.Population.KnightHuman
+import mr.merc.economics.Culture.KnightHuman
 import mr.merc.politics.{Party, State}
 import org.scalatest.FunSuite
 

@@ -3,6 +3,7 @@ package mr.merc.economics
 import scala.collection.mutable
 import Products.Product
 import WorldConstants.Market._
+import mr.merc.army.Warrior
 
 class MarketDay(product: Product, val price: Double, val turn: Int) {
 
@@ -136,13 +137,16 @@ sealed abstract class SupplyRequest(product: Product, val count: Double) extends
 case class PopulationDemandRequest(pop: Population, override val product: Product, override val count: Double) extends DemandRequest(product, count)
 case class EnterpriseDemandRequest(enterprise: Enterprise, override val product: Product, override val count: Double) extends DemandRequest(product, count)
 case class BusinessDemandRequest(project: BusinessProject, override val product: Product, override val count:Double) extends DemandRequest(product, count)
+case class WarriorDemandRequest(warrior: Warrior, override val product: Product, override val count: Double) extends DemandRequest(product, count)
 case class EnterpriseSupplyRequest(enterprise: Enterprise, override val product: Product, override val count: Double) extends SupplyRequest(product, count)
 
 case class FulfilledDemandRequest(bought: Double, price: Double, request: DemandRequest) {
   def shortage: Double = request.count - bought
   def spentMoney:Double = price * bought
+  def product: Product = request.product
 }
 case class FulfilledSupplyRequest(sold: Double, price: Double, request: SupplyRequest) {
   def excess: Double = request.count - sold
   def receivedMoney:Double = sold * price
+  def product: Product = request.product
 }

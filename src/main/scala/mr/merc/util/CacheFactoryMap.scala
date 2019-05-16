@@ -12,6 +12,10 @@ class CacheFactoryMap[P, R](f:P => R) extends Function[P, R]{
 
     m(p)
   }
+
+  def clear(): Unit = {
+    m.clear()
+  }
 }
 
 object CacheFactoryMap {

@@ -1,15 +1,31 @@
 package mr.merc.army
 
 import mr.merc.army.WarriorType.WarriorCompetence
-import mr.merc.economics.Population.Culture
+import mr.merc.economics.Culture
+import mr.merc.economics.{FulfilledDemandRequest, Products, WarriorDemandRequest, WorldConstants}
 import mr.merc.local.Localization
 import mr.merc.players.Player
 import mr.merc.politics.State
-import mr.merc.unit.view.SoldierView
+import mr.merc.unit.view.{SoldierView, StandState}
 import mr.merc.unit.{Soldier, SoldierType}
 import mr.merc.util.CacheFactoryMap
+import mr.merc.economics.MapUtil.FloatOperations._
+import WorldConstants.Army._
+import mr.merc.army.Warrior.WarriorNeedRecord
+import scalafx.scene.image.Image
+
+object Warrior {
+  case class WarriorNeedRecord(demanded: Map[Products.Product, Double], received:Map[Products.Product, Double], turn:Int)
+}
 
 class Warrior(val warriorType: WarriorType, val competence: WarriorCompetence, val culture: Culture, val owner: State) {
+
+  private var historicalNeedsRecords:Vector[WarriorNeedRecord] = Vector()
+  private val historicalRecords = 30
+
+  def historicalNeeds:Vector[WarriorNeedRecord] = historicalNeedsRecords
+
+  private var currentNeeds:Map[Products.Product, Double] = Map()
 
   def hpPercentage:Double = soldier.hp.toDouble / soldierType.hp
 
@@ -37,4 +53,27 @@ class Warrior(val warriorType: WarriorType, val competence: WarriorCompetence, v
     sv
   }
 
+  def needs:Map[Products.Product, Double] = SoldierSupply(competence)
+
+  def buyDemand(demand:FulfilledDemandRequest): Unit = {
+    owner.budget.spendMoneyOnArmySupply(demand.spentMoney)
+    currentNeeds |+|= demand.product -> demand.bought
+  }
+
+  def allNeedsReceived(turn:Int): Unit = {
+    val expectedTotal = needs.values.sum
+    val receivedTotal = currentNeeds.values.sum
+    val newHp = NeedsToHP(receivedTotal / expectedTotal)
+    if (newHp == 1d || newHp > hpPercentage) {
+      hpPercentage += HpGainStep
+    } else {
+      hpPercentage -= HpLossStep
+    }
+
+    historicalNeedsRecords :+= WarriorNeedRecord(needs, currentNeeds, turn)
+    currentNeeds = Map()
+    historicalNeedsRecords = historicalNeeds.takeRight(historicalRecords)
+  }
+
+  def image:Image = soldierView(1d, false).images(StandState).head.image
 }

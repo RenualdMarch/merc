@@ -2,7 +2,7 @@ package mr.merc.politics
 
 import mr.merc.economics.{EconomicRegion, Population}
 import mr.merc.economics.MapUtil.FloatOperations._
-import mr.merc.economics.Population.Culture
+import mr.merc.economics.Culture
 
 class Election(currentParty: Party, primaryCulture: Culture, possibleParties: List[Party]) {
 

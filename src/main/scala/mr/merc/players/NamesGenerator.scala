@@ -1,6 +1,6 @@
 package mr.merc.players
 
-import mr.merc.economics.Population.Culture.CultureInfo
+import mr.merc.economics.Culture.CultureInfo
 
 import scala.util.Random
 

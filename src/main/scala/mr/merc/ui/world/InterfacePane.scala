@@ -135,3 +135,11 @@ class TopTitledBorderPane extends BorderPane {
     BorderPane.setAlignment(top.value, Pos.TopCenter)
   }
 }
+
+class PaneForTooltip(content:Region) extends Pane {
+
+  content.prefWidth <== this.width
+  content.prefHeight <== this.height
+
+  children.add(content)
+}

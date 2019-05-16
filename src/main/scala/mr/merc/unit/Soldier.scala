@@ -7,11 +7,21 @@ import mr.merc.map.objects.House
 import mr.merc.map.objects.WoodenBridge
 import mr.merc.map.terrain._
 
-class Soldier(val name: String, val soldierType: SoldierType, val owner: Player) {
+class Soldier(val name: String, initialSoldierType: SoldierType, val owner: Player) {
+  private var _soldierType = initialSoldierType
   private var _hp = soldierType.hp
   private var _state = Set[SoldierState]()
 
   var turnState: SoldierTurnState = NotHisTurn
+
+
+  def soldierType: SoldierType = _soldierType
+  def soldierType_=(value: SoldierType): Unit = {
+    val hpIncrease = if (value.hp > soldierType.hp) value.hp - soldierType.hp else 0
+    val newHp = if (hp + hpIncrease > value.hp) value.hp else hp + hpIncrease
+    _soldierType = value
+    hp = newHp
+  }
 
   def hp = _hp
   def hp_=(newHp: Int) {

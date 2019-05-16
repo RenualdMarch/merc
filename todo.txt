@@ -6,21 +6,32 @@ Current battle issues:
 
 //"-Dglass.win.uiScale=100%"
 +draw soldier centered like mountains
-armies movement and ui
-armies economic part
++armies movement and ui
++add user country on left top with color
++cultures.conf to scala code
++armies economic part
++armies ui economic part
+diplomacy
 next turn button async, messages framework
-remove ai from player
-move cultures.conf to code
+remove ai from player in battles
 battles
 check conditional AI logic - unused expression
 1 season per turn, 4 turns per year
 elections
 idle animation for soldiers on world map
-tests for balancing warrior types
+add state selection screen with offlane word generation
+allow hire people from other cultures with some political configurations
+when hiring soldiers, use actual population
+when showing tooltip, if it is big, find way to show it more when size is too big(recruit soldier tooltip)
+terrain season changes
+
 Polishing:
 issues - balance production and needs multipliers
 localization - add parameters order, like %1, %2, %3
 soldiers and battles and wars
+tests for balancing warrior types
+when armies move they should try move near middle borders
+
 
 
 For M8 game polishing and AI
@@ -38,6 +49,7 @@ corruption and tax evasion
 world state unit testing
 ability to retreat from battle
 army supply
+change cursor while drag&drop
 
 Dreams:
 

@@ -113,6 +113,8 @@ object SupplyDemandTables {
           Demand(localizePopulation(pop, province), count, r.bought, r.price)
         case BusinessDemandRequest(project, _, count) =>
           Demand(localizeProject(project), count, r.bought, r.price)
+        case WarriorDemandRequest(warrior, _, count) =>
+          Demand(localizeWarriorType(warrior), count, r.bought, r.price)
       }
     }
 

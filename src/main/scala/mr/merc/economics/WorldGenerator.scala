@@ -1,6 +1,6 @@
 package mr.merc.economics
 
-import mr.merc.economics.Population.{Culture, LatinHuman, Lower, Middle, Upper}
+import mr.merc.economics.Population.{Lower, Middle, Upper}
 import mr.merc.economics.Products._
 import mr.merc.log.Logging
 import mr.merc.map.generator.WorldMapGenerator
@@ -35,8 +35,8 @@ class WorldGenerator(field:TerrainHexField) {
   }
 
   private var colorStream = ColorGenerator.colorStream
-  private val namesGenerators:Map[Culture, NamesGenerator] = Population.cultures.map { c =>
-    c -> new NamesGenerator(Culture.cultureConfig(c.name))
+  private val namesGenerators:Map[Culture, NamesGenerator] = Culture.cultures.map { c =>
+    c -> new NamesGenerator(c.cultureInfo)
   } toMap
 
   private val resourceGenerator = new WeightedRandom(ResourcesRarity)
@@ -134,14 +134,14 @@ class WorldGenerator(field:TerrainHexField) {
 
   private def generateCultureStateDivisions(connectivityMap: Map[TerrainHex, Set[TerrainHex]]):List[(State, List[TerrainHex])] = {
     import mr.merc.util.Divide.DivideIntegral
-    val provincesPerCulture = Population.cultures zip (connectivityMap.size divList Population.cultures.size)
+    val provincesPerCulture = Culture.cultures zip (connectivityMap.size divList Culture.cultures.size)
     val raceSizes = provincesPerCulture.groupBy(_._1.race).toList.map {case (race, list) =>
       race -> list.map(_._2).sum
     }
 
     val racesZipCM = raceSizes.map(_._1) zip divideIntoContinuousParts(connectivityMap, raceSizes.map(_._2))
     racesZipCM.flatMap {case (race, raceMap) =>
-      val cultures = Random.shuffle(Population.cultures.filter(_.race == race))
+      val cultures = Random.shuffle(Culture.cultures.filter(_.race == race))
       val cultureSizes = raceMap.size divList cultures.size
       val cultureZipMaps = cultures zip divideIntoContinuousParts(raceMap, cultureSizes)
       cultureZipMaps.flatMap { case (culture, cultureMap) =>
@@ -274,7 +274,7 @@ object WorldGenerator extends Logging {
     val world = WorldMapGenerator.generateWorldMap(WorldMapWidth, WorldMapHeight, Provinces)
     val generator = new WorldGenerator(world.terrain)
     val r = (generator.generateStateAndProvinces(world.provinces), world.terrain)
-    val playerState = r._1.keys.find(_.primeCulture == LatinHuman).get
+    val playerState = r._1.keys.head
     val ws = new WorldState(r._1.values.flatten.toList, playerState, world.terrain)
     0 until TradeDaysBeforeStart foreach(_ => ws.nextTurn())
     info(s"World generation took ${(System.currentTimeMillis() - timeBefore) / 1000d} seconds")

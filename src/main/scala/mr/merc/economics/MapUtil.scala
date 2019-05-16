@@ -17,6 +17,10 @@ object MapUtil {
         map.filterKeys(keysInMapOnly.contains) ++ other.filterKeys(keysInOtherOnly.contains) ++ sumMap
       }
 
+      def |+| (other: (K, V)):Map[K, V] = {
+        this |+| Map(other)
+      }
+
       def |-| (other: Map[K, V]): Map[K, V] = {
         // intersecting keys
         val first = map.map{case (p, c) => p -> num.minus(c, other.getOrElse(p, num.zero))}

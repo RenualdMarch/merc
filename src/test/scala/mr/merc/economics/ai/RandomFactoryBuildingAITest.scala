@@ -1,6 +1,7 @@
 package mr.merc.economics.ai
 
-import mr.merc.economics.Population.{Capitalists, Craftsmen, Humans, LatinHuman}
+import mr.merc.economics.Population.{Capitalists, Craftsmen, Humans}
+import mr.merc.economics.Culture._
 import mr.merc.economics.Products.{Coal, IndustryProduct}
 import mr.merc.economics.WorldStateEnterpriseActions.{PopBuildFactoryCommand, PopExpandFactoryCommand}
 import mr.merc.economics._

@@ -18,7 +18,7 @@ class CanvasLayers(layers: List[CanvasLayer], fullMapSize: Rectangle2D) extends 
     children.add(c)
   }
 
-  private def redraw() {
+  def redraw() {
     canvasList foreach {
       case (layer, canvas) =>
         if (canvas.width.value >= 0 && canvas.height.value >= 0) {

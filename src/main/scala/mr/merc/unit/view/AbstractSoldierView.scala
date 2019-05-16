@@ -4,7 +4,7 @@ import scalafx.scene.paint.Color
 import mr.merc.view.Sprite
 import scalafx.scene.canvas.GraphicsContext
 
-abstract class AbstractSoldierView(viewInfo: SoldierTypeViewInfo, factor: Double) extends Sprite[SoldierViewState](viewInfo.images, StandState, factor) {
+abstract class AbstractSoldierView(val viewInfo: SoldierTypeViewInfo, factor: Double) extends Sprite[SoldierViewState](viewInfo.images, StandState, factor) {
   viewInfo.eagerLoad()
 
   centered = Some(factor * 72 toInt)

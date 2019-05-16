@@ -1,6 +1,7 @@
 package mr.merc.economics
 
 import mr.merc.economics.Population._
+import Culture._
 import mr.merc.economics.TaxPolicy.{SalesTax, TariffTax, TransitTax}
 import mr.merc.politics.{Party, PoliticalViews, State}
 import org.scalatest.{BeforeAndAfter, FunSuite, Matchers}

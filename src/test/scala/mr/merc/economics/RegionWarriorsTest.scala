@@ -2,17 +2,22 @@ package mr.merc.economics
 
 import mr.merc.army.WarriorType.{HeavyMaceInfantry, Militia, Professional}
 import mr.merc.army.{Warrior, WarriorViewNames}
-import mr.merc.economics.Population.{Culture, Humans}
+import mr.merc.economics.Population.Humans
 import mr.merc.map.objects.HumanCityHouse
 import mr.merc.politics.{Party, State}
 import org.scalatest.{FunSuite, Matchers}
 import scalafx.scene.paint.Color
+import MapUtil.FloatOperations._
+import mr.merc.economics.Culture.{CultureInfo, StateForm}
 
 class RegionWarriorsTest extends FunSuite with Matchers {
 
-  val testCulture = new Culture("testCulture", Humans, HumanCityHouse, Color.White, WarriorViewNames(Map(
-    (HeavyMaceInfantry, Professional) -> "oneImageSoldier",
-    (HeavyMaceInfantry, Militia) -> "testSoldier2"))) {}
+  val testCulture = new Culture("testCulture", Humans, HumanCityHouse, Color.White) {
+    override val warriorViewNames: WarriorViewNames = WarriorViewNames(Map(
+      (HeavyMaceInfantry, Professional) -> "oneImageSoldier",
+      (HeavyMaceInfantry, Militia) -> "testSoldier2"))
+    override val cultureInfo: Culture.CultureInfo = CultureInfo(StateForm("a", "b"), Nil, Nil)
+  }
 
   val state = new State("", testCulture, 0, new PoliticalSystem(Party.absolute))
 
@@ -120,7 +125,48 @@ class RegionWarriorsTest extends FunSuite with Matchers {
 
     w1.hpPercentage = 0
     val dead = regionWarriors.clearDeadWarriors()
-    dead shouldBe Set(w1)
+    dead shouldBe List(w1)
     regionWarriors.warriorDestinations shouldBe Map(None -> List(w2))
+  }
+
+  test("generate demands when money are present") {
+    val state = new State("", testCulture, 100000, new PoliticalSystem(Party.absolute))
+
+    val w1 = new Warrior(HeavyMaceInfantry, Professional, testCulture, state)
+    val w2 = new Warrior(HeavyMaceInfantry, Professional, testCulture, state)
+
+    val region3 = new EconomicRegion {
+      override def owner: State = state
+
+      override def economicNeighbours: Set[EconomicRegion] = ???
+
+      override val regionMarket: RegionMarket = new RegionMarket(Map().withDefaultValue(1d))
+      override val regionPopulation: RegionPopulation = null
+      override val regionWarriors: RegionWarriors = new RegionWarriors(List(w1, w2), Set())
+    }
+
+    val armyNeeds = region3.regionWarriors.generateArmyNeeds()
+    val totalNeeds = armyNeeds.map(an => Map(an.product -> an.count)).reduce(_ |+| _)
+    totalNeeds shouldBe w1.needs |+| w2.needs
+  }
+
+  test("no demands when money are absent") {
+    val state = new State("", testCulture, 0, new PoliticalSystem(Party.absolute))
+
+    val w1 = new Warrior(HeavyMaceInfantry, Professional, testCulture, state)
+    val w2 = new Warrior(HeavyMaceInfantry, Professional, testCulture, state)
+
+    val region3 = new EconomicRegion {
+      override def owner: State = state
+
+      override def economicNeighbours: Set[EconomicRegion] = ???
+
+      override val regionMarket: RegionMarket = new RegionMarket(Map().withDefaultValue(1d))
+      override val regionPopulation: RegionPopulation = null
+      override val regionWarriors: RegionWarriors = new RegionWarriors(List(w1, w2), Set())
+    }
+
+    val armyNeeds = region3.regionWarriors.generateArmyNeeds()
+    armyNeeds should have size 0
   }
 }

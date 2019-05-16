@@ -1,18 +1,11 @@
 package mr.merc.economics
 
-import com.typesafe.config.ConfigFactory
 import mr.merc.economics.Population._
-import mr.merc.economics.Products.{Medicine, _}
+import mr.merc.economics.Products._
 import mr.merc.economics.MapUtil.FloatOperations._
 import mr.merc.economics.TaxPolicy.{LowSalaryTax, MiddleSalaryTax, UpperSalaryTax}
-import mr.merc.map.objects.{House, HumanCityHouse, HumanCottage, HumanVillageHouse}
 import mr.merc.politics.{PoliticalViews, State}
-import scalafx.scene.paint.Color
-import pureconfig.loadConfigOrThrow
-import pureconfig.generic.auto._
 import WorldConstants.Population._
-import mr.merc.army.WarriorViewNames
-import scala.collection.JavaConverters._
 
 import scala.util.Random
 
@@ -374,38 +367,6 @@ object Population {
 
   type PopulationNeeds = Map[PopulationClass, Map[PopulationNeedsType, ProductBracket]]
 
-  private def scaleNeeds(needsToScale: PopulationNeeds): PopulationNeeds = {
-    needsToScale.transform { case (popClass, classNeedsMap) =>
-      classNeedsMap.transform { case (popNeedsType, needsMap) =>
-        val q = needsQ(popClass)(popNeedsType)
-        needsMap.scaleToSum(q)
-      }
-    }
-  }
-
-  private def defaultHumanNeeds(culture: Culture): PopulationNeeds = Map(
-    Lower -> Map(
-      LifeNeeds -> Map(Grain -> 3, Fruit -> 1, Cattle -> 1),
-      RegularNeeds -> Map(Tea -> 1, Clothes -> 1, Liquor -> 1, Furniture -> 1, Coal -> 1,
-        Lumber -> 1, Ritual(culture) -> 1),
-      LuxuryNeeds -> Map(Magic -> 1, Paper -> 1, Coffee -> 1, Weapons -> 1, Wine -> 1, Medicine -> 1)
-    ),
-    Middle -> Map(
-      LifeNeeds -> Map(Grain -> 2, Fruit -> 1, Cattle -> 1),
-      RegularNeeds -> Map(Tea -> 1, Clothes -> 1, Liquor -> 1, Furniture -> 1, Coal -> 1, Ritual(culture) -> 1,
-        Glass -> 1, Wine -> 1, Magic -> 1, Medicine -> 1, Paper -> 1, Weapons -> 1, Cement -> 1),
-      LuxuryNeeds -> Map(Wine -> 1, Magic -> 1, Medicine -> 1,
-        Furniture -> 1, Opium -> 1, Paper -> 1, Jewelry -> 1)
-    ),
-    Upper -> Map(
-      LifeNeeds -> Map(Grain -> 1, Fruit -> 1, Cattle -> 2),
-      RegularNeeds -> Map(Tea -> 5, Clothes -> 5, Liquor -> 5, Furniture -> 5, Coal -> 10, Cement -> 5,
-        Glass -> 5, Wine -> 10, Magic -> 10, Medicine -> 5, Paper -> 10, Jewelry -> 5, Weapons -> 5, Opium -> 5, Ritual(culture) -> 1),
-      LuxuryNeeds -> Map(Furniture -> 5, Coal -> 5, Paper -> 5, Magic -> 5,
-        Medicine -> 5, Weapons -> 5, Cement -> 5, Opium -> 5, Ritual(culture) -> 2, Jewelry -> 5)
-    )
-  )
-
   // removed sealed for test purposes only
   abstract class Race extends scala.Product with Serializable {
     def name: String = productPrefix.toLowerCase
@@ -429,53 +390,6 @@ object Population {
   case object Undead extends Race
 
   case object Demons extends Race
-
-  object Culture {
-
-    case class StateForm(monarchy: String, democracy: String)
-
-    case class CultureInfo(stateForm: StateForm, cities: List[String], states: List[String])
-
-    // do not remove
-    import mr.merc.util.MercUtils.ConfigConvertProtocol.camelCaseHint
-
-    private val config = ConfigFactory.parseResourcesAnySyntax("conf/cultures.conf")
-    val cultureConfig: Map[String, CultureInfo] = config.root().asScala.keySet.map { c =>
-      c -> loadConfigOrThrow[CultureInfo](config.getConfig(c))
-    } toMap
-  }
-
-  // removed sealed for test purposes only
-  abstract class Culture(val name: String, val race: Race, val houseStyle: House, val color: Color, val warriorViewNames:WarriorViewNames) {
-    def needs: PopulationNeeds = scaleNeeds(defaultHumanNeeds(this))
-
-    def cultureNameKey: String = "culture." + name
-  }
-
-  case object LatinHuman extends Culture("latin", Humans, HumanCityHouse, Color.Red, WarriorViewNames.LatinCulture)
-
-  case object KnightHuman extends Culture("french", Humans, HumanVillageHouse, Color.Blue, WarriorViewNames.WesnothCulture)
-
-  case object DarkHuman extends Culture("nilf", Humans, HumanCottage, Color.Black, WarriorViewNames.DarkHumanCulture)
-
-  case object GreekHuman extends Culture("greek", Humans, HumanCityHouse, Color.White, WarriorViewNames.GreekDardoCulture)
-
-  case object GermanHuman extends Culture("german", Humans, HumanVillageHouse, Color.Orange, WarriorViewNames.ChevalierCulture)
-  //
-  // DISABLED CULTURES
-  //
-  /*case object HighElf extends Culture("state.federation", Elves)
-  case object DarkElf extends Culture("state.confederation", Elves)
-  case object BarbarianOrc extends Culture("state.horde", Orcs)
-  case object RockDwarf extends Culture("state.clan", Dwarfs)
-  case object GreenSaurian extends Culture("state.syndicate", Saurians)
-  case object OldDrakes extends Culture("state.dominion", Drakes)
-  case object Forsaken extends Culture("state.collective", Undead)
-  case object RedDemons extends Culture("state.legion", Demons)
-*/
-  // good words: alliance, protectorate, tribe, army
-
-  def cultures: List[Culture] = List(LatinHuman, KnightHuman, DarkHuman, GreekHuman, GermanHuman) //, HighElf, DarkElf, BarbarianOrc, RockDwarf, GreenSaurian, OldDrakes, Forsaken, RedDemons)
 
   class ProductFulfillmentRecord(prices: Map[Products.Product, Double], needs: Map[PopulationNeedsType, Map[Products.Product, Double]], products: Map[Product, Double]) {
 

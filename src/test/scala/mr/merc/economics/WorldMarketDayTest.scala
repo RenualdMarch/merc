@@ -1,6 +1,7 @@
 package mr.merc.economics
 
 import mr.merc.economics.Population._
+import Culture._
 import mr.merc.economics.Products._
 import mr.merc.economics.TaxPolicy._
 import mr.merc.politics.{Party, PoliticalViews, Province, State}
@@ -37,7 +38,7 @@ class WorldMarketDayTest extends FunSuite with Matchers {
       override def economicNeighbours: Set[EconomicRegion] = Set(region2, region3)
 
       override val regionMarket: RegionMarket = new RegionMarket(initialPrices)
-      override val regionWarriors: RegionWarriors = null
+      override val regionWarriors: RegionWarriors = new RegionWarriors(Nil, economicNeighbours)
       override val regionPopulation: RegionPopulation = new RegionPopulation(List(
         new Population(KnightHuman, Farmers, 1000, 200, 0, PoliticalViews.averagePoliticalViews),
         new Population(KnightHuman, Aristocrats, 10, 200, 0, PoliticalViews.averagePoliticalViews),
@@ -54,7 +55,7 @@ class WorldMarketDayTest extends FunSuite with Matchers {
       override def economicNeighbours: Set[EconomicRegion] = Set(region1, region3)
 
       override val regionMarket: RegionMarket = new RegionMarket(initialPrices)
-      override val regionWarriors: RegionWarriors = null
+      override val regionWarriors: RegionWarriors = new RegionWarriors(Nil, economicNeighbours)
       override val regionPopulation: RegionPopulation = new RegionPopulation(List(
         new Population(KnightHuman, Labourers, 1000, 500, 0, PoliticalViews.averagePoliticalViews),
         new Population(KnightHuman, Aristocrats, 10, 200, 0, PoliticalViews.averagePoliticalViews),
@@ -68,7 +69,7 @@ class WorldMarketDayTest extends FunSuite with Matchers {
       override def owner: State = state1
 
       override def economicNeighbours: Set[EconomicRegion] = Set(region1, region2)
-      override val regionWarriors: RegionWarriors = null
+      override val regionWarriors: RegionWarriors = new RegionWarriors(Nil, economicNeighbours)
       override val regionMarket: RegionMarket = new RegionMarket(initialPrices)
       override val regionPopulation: RegionPopulation = new RegionPopulation(List(
         new Population(KnightHuman, Craftsmen, 1000, 300, 0, PoliticalViews.averagePoliticalViews),

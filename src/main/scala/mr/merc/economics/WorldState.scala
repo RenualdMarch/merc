@@ -1,8 +1,10 @@
 package mr.merc.economics
 
-import mr.merc.army.Warrior
+import mr.merc.army.{Warrior, WarriorType}
+import mr.merc.army.WarriorType.WarriorCompetence
 import mr.merc.economics.Products.IndustryProduct
 import mr.merc.economics.TaxPolicy.Income
+import mr.merc.economics.WorldConstants.Army.SoldierRecruitmentCost
 import mr.merc.economics.WorldStateEnterpriseActions.{FactoryCommand, PopExpandFactoryCommand, StateExpandFactoryCommand}
 import mr.merc.map.hex.TerrainHexField
 import mr.merc.politics.IssuePosition.{EconomyPosition, RegimePosition}
@@ -14,7 +16,8 @@ import mr.merc.util.FxPropertyUtils.PropertyBindingMap
 class WorldState(val regions: List[Province], val playerState: State, val worldHexField: TerrainHexField, var turn: Int = 0)
   extends WorldStateParliamentActions
     with WorldStateBudgetActions
-    with WorldStateEnterpriseActions {
+    with WorldStateEnterpriseActions
+    with WorldStateArmyActions {
 
   def playerRegions: List[Province] = regions.filter(_.owner == playerState)
 
@@ -195,7 +198,7 @@ trait WorldStateEnterpriseActions {
   }
 }
 
-trait WorldStateArmyMovementActions {
+trait WorldStateArmyActions {
   def playerState: State
 
   def regions: List[Province]
@@ -211,4 +214,19 @@ trait WorldStateArmyMovementActions {
     }
   }
 
+  def recruitSoldier(province: Province, competence: WarriorCompetence, warriorType: WarriorType, warriorCulture: Culture): Unit = {
+    val project = new StateRecruitWarrior(province, province.owner, SoldierRecruitmentCost(competence), warriorType, competence, warriorCulture)
+    province.projects ::= project
+  }
+
+  def disposeSoldier(p: Province, w: Warrior): Unit = {
+    p.regionWarriors.takeWarriors(List(w))
+  }
+
+  def possibleWarriorsToRecruit(p: Province): List[(WarriorType, WarriorCompetence, Culture)] = {
+    val ownerCulture = p.owner.primeCulture
+    ownerCulture.warriorViewNames.possibleWarriors.map { case ((wt, wc), _) =>
+      (wt, wc, ownerCulture)
+    }.toList
+  }
 }

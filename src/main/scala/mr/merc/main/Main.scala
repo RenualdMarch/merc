@@ -12,7 +12,7 @@ object Main extends JFXApp {
   val screenRect = Screen.primary.visualBounds
 
   stage = new PrimaryStage {
-    title = "Mercenary 0.2 (M6)"
+    title = "Mercenary 0.2 (M7)"
     // to make it fit on the screen
     scene = new Scene(screenRect.width - 100, screenRect.height - 100)
     fullScreenExitHint = ""

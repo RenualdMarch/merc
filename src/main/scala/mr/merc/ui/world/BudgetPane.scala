@@ -49,7 +49,7 @@ class SpendingReportPane(budget: StateBudget) extends TopTitledBorderPane with W
     pane.add(MediumText(spending(Pensions)), "wrap")
     pane.add(MediumText(Localization("budget.spending.construction")))
     pane.add(MediumText(spending(Construction)), "wrap")
-    pane.add(MediumText(Localization("budget.spending.army")))
+    pane.add(MediumText(Localization("budget.spending.armySupply")))
     pane.add(MediumText(spending(Army)), "wrap")
     val separator = new Separator {
       style = s"-fx-border-width: ${Components.mediumFontSize / 10} 0 0 0; -fx-border-style: solid;"
@@ -69,31 +69,54 @@ class SpendingConfiguration(worldState: WorldStateBudgetActions) extends TopTitl
   private val state = worldState.playerState
   private val regions = worldState.playerRegions
 
-  val scholarsSlider = new PopulationSpendingSlider(Localization("budget.spending.scholars"),
-    conf.scholarsNeeds, state.budget.scholarsSpendingFunction(regions))
+  val scholarsTitle = BigText(Localization("budget.spending.scholars"))
+  val scholarsSlider = new PopulationSpendingSlider(conf.scholarsNeeds, state.budget.scholarsSpendingFunction(regions))
   scholarsSlider.sliderValue.onChange {
     val budget = state.budget
     worldState.setStateSpending(state, budget.spendingPolicyConfig.copy(scholarsNeeds = scholarsSlider.sliderValue.value))
   }
+  val scholarsSpending = scholarsSlider.money
 
-  val bureaucratsSlider = new PopulationSpendingSlider(Localization("budget.spending.bureaucrats"),
-    conf.bureaucratsNeeds, state.budget.bureaucratsSpendingFunction(regions))
+  val bureaucratsTitle = BigText(Localization("budget.spending.bureaucrats"))
+  val bureaucratsSlider = new PopulationSpendingSlider(conf.bureaucratsNeeds, state.budget.bureaucratsSpendingFunction(regions))
   bureaucratsSlider.sliderValue.onChange {
     val budget = state.budget
     worldState.setStateSpending(state, budget.spendingPolicyConfig.copy(bureaucratsNeeds = bureaucratsSlider.sliderValue.value))
   }
+  val bureaucratsSpending = bureaucratsSlider.money
 
-  val pensionsSlider = new PopulationSpendingSlider(Localization("budget.spending.pensions"),
-    conf.pensionsNeeds, state.budget.pensionsSpendingFunction(regions))
+  val pensionsTitle = BigText(Localization("budget.spending.pensions"))
+  val pensionsSlider = new PopulationSpendingSlider(conf.pensionsNeeds, state.budget.pensionsSpendingFunction(regions))
   pensionsSlider.sliderValue.onChange {
     val budget = state.budget
-    worldState.setStateSpending(state,budget.spendingPolicyConfig.copy(pensionsNeeds = pensionsSlider.sliderValue.value))
+    worldState.setStateSpending(state, budget.spendingPolicyConfig.copy(pensionsNeeds = pensionsSlider.sliderValue.value))
   }
+  val pensionsSpending = pensionsSlider.money
 
-  val centerPane = new MigPane("", "10%[]10%")
+  val armySupplyTitle = BigText(Localization("budget.spending.armySupply"))
+  val armySupplySlider = new ArmySpendingSlider(conf.armyNeeds, state.budget.armySpendingFunction(regions))
+  armySupplySlider.sliderValue.onChange {
+    val budget = state.budget
+    worldState.setStateSpending(state, budget.spendingPolicyConfig.copy(armyNeeds = armySupplySlider.sliderValue.value))
+  }
+  val armySupplySpending = armySupplySlider.money
+
+  val centerPane = new MigPane("", "5%[][20%]5%[50%]10%")
+  centerPane.add(scholarsTitle)
+  centerPane.add(scholarsSpending)
   centerPane.add(scholarsSlider, "push, grow, wrap")
+
+  centerPane.add(bureaucratsTitle)
+  centerPane.add(bureaucratsSpending)
   centerPane.add(bureaucratsSlider, "push, grow, wrap")
+
+  centerPane.add(pensionsTitle)
+  centerPane.add(pensionsSpending)
   centerPane.add(pensionsSlider, "push, grow, wrap")
+
+  centerPane.add(armySupplyTitle)
+  centerPane.add(armySupplySpending)
+  centerPane.add(armySupplySlider, "push, grow, wrap")
 
   center = centerPane
 
@@ -159,7 +182,7 @@ class TaxesConfigurationPane(worldState: WorldStateBudgetActions) extends TopTit
   }
 
   val salaryMiddleTax = new TaxLevelSlider(Localization("budget.income.salary.middle"),
-    state.budget.taxPolicy.taxPolicyValue(MiddleSalaryTax),state.rulingParty.economy.salaryTax.min,
+    state.budget.taxPolicy.taxPolicyValue(MiddleSalaryTax), state.rulingParty.economy.salaryTax.min,
     state.rulingParty.economy.salaryTax.max, budget.projectIncomeFunction(MiddleSalaryTax))
   salaryMiddleTax.sliderValue.onChange {
     worldState.setStateTax(state, MiddleSalaryTax, salaryMiddleTax.sliderValue.value)
@@ -206,7 +229,7 @@ class TaxesConfigurationPane(worldState: WorldStateBudgetActions) extends TopTit
   def addPane(taxLevelSlider: TaxLevelSlider): Unit = {
     centerPane.add(taxLevelSlider.titleLabel)
     centerPane.add(taxLevelSlider.money)
-    centerPane.add(taxLevelSlider.slider, "grow")
+    centerPane.add(taxLevelSlider.slider, "grow, push")
 
     val s = Bindings.createStringBinding(() => DoubleFormatter().format(taxLevelSlider.projectedIncome.value), taxLevelSlider.projectedIncome)
 
@@ -291,7 +314,7 @@ class TaxLevelSlider(title: String, initialValue: Double, minValue: Double, maxV
 
 }
 
-class PopulationSpendingSlider(title: String, initialPositionPerc: Double, percToSpending: Double => Double) extends TopTitledBorderPane {
+class PopulationSpendingSlider(initialPositionPerc: Double, percToSpending: Double => Double) extends BorderPane {
   private val slider = new Slider(0d, 1d, initialPositionPerc) {
     style = Components.mediumFontStyle
     showTickLabels = true
@@ -328,10 +351,54 @@ class PopulationSpendingSlider(title: String, initialPositionPerc: Double, percT
 
   val spendingValue: DoubleProperty = new DoubleProperty()
   spendingValue <== Bindings.createDoubleBinding(() => percToSpending(sliderValue.value), sliderValue)
-  private val titleWithMoney = BigText("")
-  titleWithMoney.text <== Bindings.createStringBinding(() => title + " " + DoubleFormatter().format(percToSpending(slider.value.value)), slider.value)
+  val money = BigText("")
+  money.text <== Bindings.createStringBinding(() => DoubleFormatter().format(percToSpending(slider.value.value)), slider.value)
 
-  top = titleWithMoney
   center = slider
 
+}
+
+class ArmySpendingSlider(initialPositionPerc: Double, percToSpending: Double => Double) extends BorderPane {
+  private val slider = new Slider(0d, 1d, initialPositionPerc) {
+    style = Components.mediumFontStyle
+    showTickLabels = true
+    showTickMarks = true
+    majorTickUnit = 1d / 4
+    minorTickCount = 1
+    private val minValue = 0d
+    private val maxValue = 1d
+    value.onChange {
+      if (this.value.value > maxValue) {
+        this.value = maxValue
+      } else if (this.value.value < minValue) {
+        this.value = minValue
+      }
+    }
+
+    snapToTicks = false
+    labelFormatter = new StringConverter[Double] {
+      override def fromString(string: String): Double =
+        if (string == "0%") 0d
+        else if (string == "50%") 1d / 2
+        else if (string == "25%") 1d / 4
+        else if (string == "75%") 3d / 4
+        else 1d
+
+      override def toString(t: Double): String =
+        if (t <= 0d) "0%"
+        else if (t <= 1d / 2) "50%"
+        else if (t <= 1d / 4) "25%"
+        else if (t <= 3d / 4) "75%"
+        else "100%"
+    }
+  }
+
+  def sliderValue: DoubleProperty = slider.value
+
+  val spendingValue: DoubleProperty = new DoubleProperty()
+  spendingValue <== Bindings.createDoubleBinding(() => percToSpending(sliderValue.value), sliderValue)
+  val money = BigText("")
+  money.text <== Bindings.createStringBinding(() => DoubleFormatter().format(percToSpending(slider.value.value)), slider.value)
+
+  center = slider
 }

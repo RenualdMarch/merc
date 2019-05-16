@@ -1,7 +1,7 @@
 package mr.merc.army
 
 import mr.merc.army.WarriorType._
-import mr.merc.economics.Population.Culture
+import mr.merc.economics.Culture
 import mr.merc.map.terrain._
 import mr.merc.unit._
 

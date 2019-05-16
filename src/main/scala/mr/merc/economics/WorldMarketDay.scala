@@ -35,25 +35,24 @@ class WorldMarketDay(worldState: WorldStateEnterpriseActions, turn:Int) {
       r.enterprises.foreach(_.newDay(taxPolicy, b, turn))
     }
 
-    // 1 step - receive population demands, add them to markets
-    // 2 step - receive factory demands, add them to markets
-    // 3 step - project demands
+    // population demands, add them to markets
+    // factory demands, add them to markets
+    // army demands
+    // project demands
     regions.foreach { r =>
       val popDemands = r.regionPopulation.generatePopDemands(r.regionMarket.currentPrices)
       r.regionMarket.acceptDemands(popDemands)
-      val enterpriseDemands = r.enterprises.map(f => f -> f.componentDemandRequests(r.regionMarket.currentPrices)).toMap
-      enterpriseDemands.foreach { case (_, productsMap) =>
-        productsMap.foreach { case (_, demand) =>
-          r.regionMarket.acceptDemands(List(demand))
-        }
-      }
+
+      val enterpriseDemands = r.enterprises.flatMap(_.componentDemandRequests(r.regionMarket.currentPrices).values)
+      r.regionMarket.acceptDemands(enterpriseDemands.toList)
+
+      r.regionMarket.acceptDemands(r.regionWarriors.generateArmyNeeds())
+
       val projectDemands = r.projects.flatMap(_.demandRequests(r.regionMarket.currentPrices))
-      projectDemands.foreach { p =>
-        r.regionMarket.acceptDemands(List(p))
-      }
+      r.regionMarket.acceptDemands(projectDemands)
     }
 
-    // 3 step - let farms, mines and factories send supplies
+    // let farms, mines and factories send supplies
     regions.foreach { r =>
       val profitMap = buildSupplyProfitForRegion(r)
       r.enterprises.foreach { e =>
@@ -77,6 +76,8 @@ class WorldMarketDay(worldState: WorldStateEnterpriseActions, turn:Int) {
               e.enterprise.buyDemandedProducts(List(demand))
             case p:BusinessDemandRequest =>
               p.project.buyDemandedProducts(List(demand))
+            case w: WarriorDemandRequest =>
+              w.warrior.buyDemand(demand)
           }
         }
       }
@@ -120,6 +121,7 @@ class WorldMarketDay(worldState: WorldStateEnterpriseActions, turn:Int) {
 
       r.enterprises.foreach(_.produce())
       r.regionPopulation.pops.foreach(_.fulfillNeedsUsingAlreadyReceivedProducts())
+      r.regionWarriors.allWarriors.foreach(_.allNeedsReceived(turn))
     }
 
     // let all pop receive salaries + taxes to budget and do end of day tasks

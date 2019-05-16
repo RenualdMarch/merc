@@ -10,7 +10,7 @@ import mr.merc.unit.Soldier
 import mr.merc.unit.view.SoldierView
 import mr.merc.economics.WorldConstants.Population._
 
-class ProvinceView(province: Province, field: TerrainHexField, view: TerrainHexFieldView) {
+class ProvinceView(val province: Province, field: TerrainHexField, view: TerrainHexFieldView) {
 
   def refreshCity(): Unit = {
     val alreadyHouses = province.hexes.filter(_.mapObj.exists(_.isInstanceOf[House]))

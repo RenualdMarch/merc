@@ -2,8 +2,9 @@ package mr.merc.map.hex.view
 
 import mr.merc.army.{Warrior, WarriorViewNames}
 import mr.merc.army.WarriorType.{HeavyBladeInfantry, HeavyMaceInfantry, Militia, Professional}
-import mr.merc.economics.Population.{Culture, Humans, KnightHuman, LatinHuman}
-import mr.merc.economics.{EconomicRegion, PoliticalSystem, RegionPopulation, RegionWarriors}
+import mr.merc.economics.Culture._
+import mr.merc.economics.Population.Humans
+import mr.merc.economics._
 import mr.merc.map.hex.{TerrainHex, TerrainHexField}
 import mr.merc.map.objects.{House, HumanCityHouse, HumanVillageHouse}
 import mr.merc.map.terrain.{Castle, ShallowWater}
@@ -27,9 +28,12 @@ class ProvinceViewTest extends FunSuite with MockitoSugar with BeforeAndAfter wi
   val province = mock[Province]
   val population = mock[RegionPopulation]
 
-  val testCulture = new Culture("testCulture", Humans, HumanCityHouse, Color.White, WarriorViewNames(Map(
-    (HeavyMaceInfantry, Professional) -> "oneImageSoldier",
-    (HeavyMaceInfantry, Militia) -> "testSoldier2"))) {}
+  val testCulture = new Culture("testCulture", Humans, HumanCityHouse, Color.White) {
+    override val warriorViewNames: WarriorViewNames = WarriorViewNames(Map(
+      (HeavyMaceInfantry, Professional) -> "oneImageSoldier",
+      (HeavyMaceInfantry, Militia) -> "testSoldier2"))
+    override val cultureInfo: CultureInfo = null
+  }
 
   val state = new State("", testCulture, 0, new PoliticalSystem(Party.absolute))
 

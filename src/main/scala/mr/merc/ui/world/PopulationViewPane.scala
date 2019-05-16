@@ -101,7 +101,7 @@ class PopDetailsPane(populationProperty: ReadOnlyObjectProperty[PopulationInfo],
 
   private val generalInfoPane = new Tab() {
     text = Localization("generalInfo")
-    style = s"-fx-font-size: ${Components.largeFontSize}"
+    style = Components.largeFontStyle
     content = new MigPane() {
       add(MediumText(Localization("population.populationCount")),"")
       add(new MediumText{
@@ -147,7 +147,7 @@ class PopDetailsPane(populationProperty: ReadOnlyObjectProperty[PopulationInfo],
 
   private val politicalViewsPane = new Tab() {
     text = Localization("politicalViews")
-    style = s"-fx-font-size: ${Components.largeFontSize}"
+    style = Components.largeFontStyle
     content = new MigPane("fill") {
       add(popToPie(_.sumViews.foreignPolicy, ForeignPolicy), "span 1,grow,push")
       add(popToPie(_.sumViews.votersPolicy, VotersPolicy), "span 1,grow,push")

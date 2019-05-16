@@ -2,6 +2,7 @@ package mr.merc.economics
 
 import mr.merc.army.WarriorViewNames
 import mr.merc.economics.Population._
+import Culture._
 import mr.merc.economics.Products.{Coal, Fruit, Grain}
 import mr.merc.economics.TaxPolicy.MiddleSalaryTax
 import mr.merc.map.objects.HumanCityHouse
@@ -20,7 +21,11 @@ class PopulationTest extends FunSuite with Matchers {
     LuxuryNeeds -> Map(Fruit -> 3.0))
 
   case object TestRace extends Race
-  object TestCulture extends Culture("test",TestRace, HumanCityHouse, Color.Black, WarriorViewNames(Map())) {
+  object TestCulture extends Culture("test",TestRace, HumanCityHouse, Color.Black) {
+
+    override val warriorViewNames: WarriorViewNames = null
+    override val cultureInfo: Culture.CultureInfo = null
+
     override def needs: PopulationNeeds = Map(Upper -> smallNeeds, Middle -> smallNeeds, Lower -> smallNeeds)
   }
   def newPopulation(money: Double) = new Population(TestCulture, Traders, 1000, money, 0, PoliticalViews.averagePoliticalViews)

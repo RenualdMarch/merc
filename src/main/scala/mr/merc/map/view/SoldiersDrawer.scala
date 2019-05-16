@@ -2,12 +2,14 @@ package mr.merc.map.view
 
 import mr.merc.view.move.Movement
 import scalafx.scene.canvas.GraphicsContext
-import scala.collection.mutable.Queue
+
+import scala.collection.mutable.{ArrayBuffer, Queue}
 import mr.merc.map.hex.view.TerrainHexView
 import mr.merc.log.Logging
 import scalafx.geometry.Rectangle2D
 import mr.merc.view.Drawable
 import mr.merc.unit.view.AbstractSoldierView
+
 import scala.reflect.ClassTag
 
 class SoldiersDrawer[T <: AbstractSoldierView: ClassTag] extends Logging {

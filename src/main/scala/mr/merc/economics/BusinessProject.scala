@@ -2,6 +2,9 @@ package mr.merc.economics
 
 import MapUtil.FloatOperations._
 import Products.{IndustryProduct, Product}
+import mr.merc.army.WarriorType.WarriorCompetence
+import mr.merc.army.{Warrior, WarriorType}
+import mr.merc.economics.SpendingPolicy.{Army, Construction, Spending}
 import mr.merc.politics.State
 
 abstract class BusinessProject(productsToBuy: Map[Product, Double]) {
@@ -98,14 +101,14 @@ abstract class PopulationBusinessProject(investors: List[Population], cost: Map[
 }
 
 
-abstract class StateBusinessProject(state: State, cost: Map[Product, Double]) extends BusinessProject(cost) {
+abstract class StateBusinessProject(state: State, cost: Map[Product, Double], spending: Spending) extends BusinessProject(cost) {
 
   private def budget = state.budget
 
-  override def takeMoreMoneyFromInvestor(neededSum: Double): Double = budget.investMoney(neededSum)
+  override def takeMoreMoneyFromInvestor(neededSum: Double): Double = budget.investMoney(neededSum, spending)
 
   override def returnNotSpentMoneyToInvestor(): Unit = {
-    budget.receiveInvestmentsBack(takeNotSpentMoney())
+    budget.receiveInvestmentsBack(takeNotSpentMoney(), spending)
   }
 }
 
@@ -141,11 +144,32 @@ trait BuildFactoryProject {
   }
 }
 
+trait RecruitWarriorProject {
+
+  def region: EconomicRegion
+
+  def isComplete: Boolean
+
+  def warriorType:WarriorType
+
+  def competence: WarriorCompetence
+
+  def warriorCulture: Culture
+
+  def owner:State
+
+  def executeProjectAim(): Unit = {
+    require(isComplete, "Project not completed!")
+    val w = new Warrior(warriorType, competence, warriorCulture, owner)
+    region.regionWarriors.receiveWarriors(List(w))
+  }
+}
+
 class PopulationExpandFactory(val factory: IndustrialFactory, investors: List[Population], cost: Map[Product, Double])
   extends PopulationBusinessProject(investors, cost) with ExpandFactoryProject
 
 class StateExpandFactory(val factory: IndustrialFactory, state: State, cost: Map[Product, Double])
-  extends StateBusinessProject(state, cost) with ExpandFactoryProject
+  extends StateBusinessProject(state, cost, Construction) with ExpandFactoryProject
 
 class PopulationBuildFactory(val region: EconomicRegion, val product: IndustryProduct,
                              investors: List[Population], cost: Map[Product, Double])
@@ -153,4 +177,10 @@ class PopulationBuildFactory(val region: EconomicRegion, val product: IndustryPr
 
 class StateBuildFactory(val region: EconomicRegion, val product: IndustryProduct,
                         state: State, cost: Map[Product, Double])
-  extends StateBusinessProject(state, cost) with BuildFactoryProject
+  extends StateBusinessProject(state, cost, Construction) with BuildFactoryProject
+
+class StateRecruitWarrior(val region: EconomicRegion, val state: State, cost: Map[Product, Double], val warriorType:WarriorType,
+                          val competence: WarriorCompetence, val warriorCulture: Culture)
+  extends StateBusinessProject(state, cost, Army) with RecruitWarriorProject {
+  override def owner: State = state
+}

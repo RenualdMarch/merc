@@ -1,6 +1,6 @@
 package mr.merc.politics
 
-import mr.merc.economics.Population.Culture
+import mr.merc.economics.Culture
 import mr.merc.economics.TaxPolicy._
 import mr.merc.economics._
 import mr.merc.local.Localization
@@ -9,7 +9,7 @@ import scalafx.scene.paint.Color
 
 class State(initialName: String, val primeCulture:Culture, startingMoney: Double, val politicalSystem: PoliticalSystem, val color: Color = Color.Black) {
   def name: String = {
-    val governmentType = Localization(Culture.cultureConfig(primeCulture.name).stateForm.monarchy)
+    val governmentType = Localization(primeCulture.cultureInfo.stateForm.monarchy)
     s"$initialName $governmentType"
   }
 
@@ -29,7 +29,7 @@ class State(initialName: String, val primeCulture:Culture, startingMoney: Double
   }
 
   val budget: StateBudget = new StateBudget(startingMoney, taxPolicy)
-  budget.spendingPolicyConfig = SpendingPolicyConfig(1d/3, 1d/3, 0)
+  budget.spendingPolicyConfig = SpendingPolicyConfig(1d/3, 1d/3, 0, 1d)
 }
 
 case class Province(name: String, var owner: State, regionMarket: RegionMarket,

@@ -4,7 +4,7 @@ import mr.merc.economics.Population.{LifeNeeds, LuxuryNeeds, PopulationNeedsType
 
 object SpendingPolicy {
 
-  def zeroSpending: SpendingPolicy = SpendingPolicy(0, 0, 0, 0)
+  def zeroSpending: SpendingPolicy = SpendingPolicy(0, 0, 0)
 
   sealed abstract class Spending
 
@@ -17,15 +17,15 @@ object SpendingPolicy {
   val allSpending = List(ScholarsSalary, BureaucratsSalary, Pensions, Construction, Army)
 }
 
-case class SpendingPolicy(scholarsSalary: Double, bureaucratsSalary: Double, pensions: Double, constructions: Double) {
+case class SpendingPolicy(scholarsSalary: Double, bureaucratsSalary: Double, pensions: Double) {
 
   def scaleSpendingPolicy(actualMoney: Double):SpendingPolicy = {
-    val sum = scholarsSalary + bureaucratsSalary + pensions + constructions
+    val sum = scholarsSalary + bureaucratsSalary + pensions
 
     if (sum <= actualMoney || sum == 0) this
     else {
       val m = actualMoney / sum
-      SpendingPolicy(scholarsSalary * m, bureaucratsSalary * m, pensions * m , constructions * m)
+      SpendingPolicy(scholarsSalary * m, bureaucratsSalary * m, pensions * m)
     }
   }
 }
@@ -45,7 +45,7 @@ object SpendingPolicyConfig {
   }
 }
 
-case class SpendingPolicyConfig(scholarsNeeds: Double, bureaucratsNeeds: Double, pensionsNeeds: Double) {
+case class SpendingPolicyConfig(scholarsNeeds: Double, bureaucratsNeeds: Double, pensionsNeeds: Double, armyNeeds: Double) {
 
   def scholarsNeedsMap:Map[PopulationNeedsType, Double] = SpendingPolicyConfig.needsSize(scholarsNeeds)
 

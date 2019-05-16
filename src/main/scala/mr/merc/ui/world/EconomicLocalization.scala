@@ -1,7 +1,7 @@
 package mr.merc.ui.world
 
-import mr.merc.army.Warrior
-import mr.merc.army.WarriorType.{Militia, Professional}
+import mr.merc.army.{Warrior, WarriorType}
+import mr.merc.army.WarriorType.{Militia, Professional, WarriorCompetence}
 import mr.merc.economics.Products.Ritual
 import mr.merc.economics._
 import mr.merc.local.Localization
@@ -40,6 +40,7 @@ object EconomicLocalization {
       case p:StateExpandFactory => Localization("project.expandFactory", Localization(p.factory.product.name))
       case p:PopulationBuildFactory => Localization("project.buildFactory", Localization(p.product.name))
       case p:StateBuildFactory => Localization("project.buildFactory", Localization(p.product.name))
+      case p:StateRecruitWarrior => Localization("project.recruitWarrior", localizeWarriorTypeInOneLine(p.competence, p.warriorType))
     }
   }
 
@@ -48,7 +49,7 @@ object EconomicLocalization {
     case _ => Localization("product." + p.name.toLowerCase)
   }
 
-
+  def localizeCulture(c:Culture): String = Localization(c.cultureNameKey)
 
   def localizeProductsBucket(products:Map[Products.Product, Double]): String = {
     products.map{ case (p, amount) =>
@@ -56,12 +57,16 @@ object EconomicLocalization {
     }.mkString(", ")
   }
 
-  def localizeWarriorType(warrior: Warrior): String = {
-    val competence = warrior.competence match {
-      case Militia => Localization("army.militia")
-      case Professional => Localization("army.professional")
-    }
-    val warriorType = Localization(warrior.warriorType.name)
-    s"$competence $warriorType"
+  def localizeWarriorType(warrior: Warrior): String = localizeWarriorTypeInOneLine(warrior.competence, warrior.warriorType)
+
+  def localizeWarriorCompetence(competence: WarriorCompetence): String = competence match {
+    case Militia => Localization("army.militia")
+    case Professional => Localization("army.professional")
+  }
+
+  def localizeWarriorTypeInOneLine(competence: WarriorCompetence, warriorType: WarriorType): String = {
+    val competenceString = localizeWarriorCompetence(competence)
+    val warriorTypeString = Localization(warriorType.name)
+    s"$competenceString $warriorTypeString"
   }
 }

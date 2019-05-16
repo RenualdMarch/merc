@@ -1,12 +1,11 @@
 .party-pane:focused {
-    -fx-border-width: 1, 1;
-    /*-fx-border-color: -fx-focus-color, -fx-faint-focus-color;*/
+    -fx-border-width: 2;
     -fx-border-color: #039ED3;
-    -fx-border-insets: -4 -4 -6 -5, -2 -2 -5 -3;
-    -fx-border-radius: 2, 1;
+    /*-fx-border-insets: -4 -4 -6 -5, -2 -2 -5 -3;
+    -fx-border-radius: 2, 1;*/
 }
 
 .party-pane {
   -fx-border-color: black;
-  -fx-border-width: 1;
+  -fx-border-width: 2;
 }

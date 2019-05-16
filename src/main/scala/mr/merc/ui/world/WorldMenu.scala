@@ -1,8 +1,15 @@
 package mr.merc.ui.world
 
 import mr.merc.local.Localization
-import scalafx.scene.control.{Menu, MenuBar, MenuItem}
+import mr.merc.politics.State
+import mr.merc.util.MercUtils
+import org.tbee.javafx.scene.layout.MigPane
+import scalafx.scene.control.{CustomMenuItem, Menu, MenuBar, MenuItem}
+import scalafx.scene.paint.Color
+import scalafx.scene.shape.Rectangle
+
 import scala.collection.JavaConverters._
+import scalafx.Includes._
 
 class WorldMenu(parent: WorldFrame) extends MenuBar {
   this.stylesheets.add("/css/worldMenu.css")

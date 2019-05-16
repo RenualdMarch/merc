@@ -1,13 +1,11 @@
 package mr.merc.economics
 
-import mr.merc.economics.Population.Culture
-
 object Products {
   val AllProducts:List[Product] = List(
     Grain, Fruit, Cattle, Tea, Coffee, Opium, Cotton, Herbs, Timber, Coal, Iron,
     Lumber, Cement, Fabric, Jewelry, Paper, Glass, Steel, Magic, Medicine,
     Furniture, Liquor, Clothes, Wine, Weapons, PreciousMetal
-  ) ++ Population.cultures.map(Ritual.apply)
+  ) ++ Culture.cultures.map(Ritual.apply)
 
   val IndustryProducts:List[IndustryProduct] = AllProducts.collect {
     case x:IndustryProduct => x

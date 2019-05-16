@@ -52,7 +52,7 @@ object SoldierType {
         val attackType = AttackType((resNode \ "@type").toString())
         val resistance = (resNode \ "@resistance").toString().toInt
         (attackType, resistance)
-      }).toMap withDefault (a => 0)
+      }).toMap withDefaultValue (0)
 
       new SoldierType(name, cost, hp, movement, exp, level, attacks, moveCostsMap, defencesMap, resistancesMap, attributes, name)
     })

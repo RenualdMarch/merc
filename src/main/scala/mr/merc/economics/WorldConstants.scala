@@ -1,7 +1,10 @@
 package mr.merc.economics
 
+import mr.merc.army.WarriorType.{Militia, Professional, WarriorCompetence}
 import mr.merc.economics.Population._
 import mr.merc.economics.Products.{Cement, Clothes, Fabric, Furniture, Glass, Liquor, Lumber, Paper, Steel, Weapons, Wine, _}
+
+import MapUtil.FloatOperations._
 
 object WorldConstants {
 
@@ -117,6 +120,28 @@ object WorldConstants {
       val x = bureaucracyPercentageFromMax
       a*x+b*math.sqrt(x)+c
     }
+  }
+
+  object Army {
+    private val supply = Map(Weapons -> 100d, Clothes -> 100d, Grain -> 100d, Cattle -> 100d)
+    private val recruitmentCost = Map[Product, Double](Weapons -> 500d, Clothes -> 500d)
+
+    val SoldierSupply:Map[WarriorCompetence, Map[Product, Double]] = Map(
+      Professional -> (supply |*| 2),
+      Militia -> supply)
+
+    val SoldierRecruitmentCost:Map[WarriorCompetence, Map[Product, Double]] = Map(
+      Professional -> (recruitmentCost |*| 4),
+      Militia -> recruitmentCost
+    )
+
+    def NeedsToHP(d:Double):Double = {
+      val result = d + 0.33
+      if (result > 1) 1 else result
+    }
+
+    val HpLossStep = 0.1
+    val HpGainStep = 0.05
   }
 }
 

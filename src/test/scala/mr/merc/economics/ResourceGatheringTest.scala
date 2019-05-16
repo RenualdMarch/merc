@@ -1,6 +1,7 @@
 package mr.merc.economics
 
 import mr.merc.economics.Population._
+import mr.merc.economics.Culture._
 import mr.merc.economics.Products.Grain
 import mr.merc.economics.TaxPolicy.CorporateTax
 import mr.merc.politics.{Party, PoliticalViews, State}

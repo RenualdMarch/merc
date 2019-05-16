@@ -6,7 +6,7 @@ import mr.merc.log.Logging
 import mr.merc.map.hex.view.ProvinceView
 import mr.merc.map.hex.view.TerrainHexFieldView.WorldMapViewMode
 import mr.merc.map.view.MapView
-import mr.merc.politics.Province
+import mr.merc.politics.{Province, State}
 import mr.merc.ui.common.{CanvasLayers, SceneManager}
 import scalafx.geometry.Rectangle2D
 import scalafx.scene.layout.{BorderPane, Pane}
@@ -14,6 +14,9 @@ import scalafx.scene.input.{KeyCode, KeyEvent, MouseEvent}
 import scalafx.Includes._
 import javafx.scene.input.{KeyEvent => JKeyEvent}
 import javafx.scene.input.{KeyCode => JKeyCode}
+import org.tbee.javafx.scene.layout.MigPane
+import scalafx.scene.paint.Color
+import scalafx.scene.shape.Rectangle
 
 object WorldFrame {
   val PixelsPerScroll = 200
@@ -25,12 +28,14 @@ class WorldFrame(sceneManager: SceneManager) extends Pane with Logging {
   val worldState = WorldGenerator.generateWorld()
   val mapView = new MapView(worldState.worldHexField, factor, mode = WorldMapViewMode)
   val menu = new WorldMenu(this)
+  val stateLabel:Pane = new PlayerStateData(worldState.playerState)
 
   val provinceViews = worldState.states.flatMap { case (_, pList) =>
     pList.map { p =>
       new ProvinceView(p, worldState.worldHexField, mapView.terrainView)
     }
   }
+  val provinceViewsMap = provinceViews.map(p => p.province -> p).toMap
   provinceViews.foreach(_.refreshCity())
   provinceViews.foreach(_.refreshSoldiers())
   mapView.terrainView.refreshTerrainDirt()
@@ -38,15 +43,17 @@ class WorldFrame(sceneManager: SceneManager) extends Pane with Logging {
 
   private val interfacePane = new WorldInterfacePane(this, worldCanvas, worldState.worldHexField, factor)
 
-  menu.prefWidth <== this.width
+  menu.prefWidth <== this.width - this.stateLabel.width
+  menu.layoutX <== this.stateLabel.width
+  stateLabel.prefHeight <== menu.height
   interfacePane.layoutY <== menu.height
   interfacePane.prefWidth <== this.width
   interfacePane.prefHeight <== this.height - menu.height
 
-  this.children = List(menu, interfacePane)
+  this.children = List(stateLabel, menu, interfacePane)
 
   worldCanvas.onMouseClicked = (event: MouseEvent) => {
-    info(s"clicked on (${event.x}, ${event.y}")
+    info(s"clicked on (${event.x}, ${event.y})")
     val rect = worldCanvas.viewRect
     val provinceOpt = mapView.provinceByPixel(event.x + rect.minX toInt, event.y + rect.minY toInt)
     provinceOpt.foreach { p =>
@@ -67,6 +74,16 @@ class WorldFrame(sceneManager: SceneManager) extends Pane with Logging {
   def showEnterprisesPane(province: Province): Unit = {
     val pane = new EnterprisesViewPane(province, sceneManager.stage, worldState)
     interfacePane.setFacePanel(new InterfacePane(pane, () => hideFacePane()))
+  }
+
+  def showArmyMovement(province: Province): Unit = {
+    val pane = new ArmyPane(province, provinceViewsMap(province), worldState, sceneManager.stage)
+    interfacePane.setFullPanel(new InterfacePane(pane, () => {
+      if (pane.soldiersWhereChanged) {
+        worldCanvas.redraw()
+      }
+      hideFullPane()
+    }))
   }
 
   def showMarket(province: Province): Unit = {
@@ -146,6 +163,15 @@ class WorldFrame(sceneManager: SceneManager) extends Pane with Logging {
         worldCanvas.hvalue.value = v
       case _ => // do nothing
     }
+  }
+
+  class PlayerStateData(state: State) extends MigPane("center") with WorldInterfaceJavaNode {
+    val rect = Rectangle(Components.largeFontSize, Components.largeFontSize)
+    rect.fill = state.color
+    rect.stroke = Color.Black
+    val text = BigText(state.name)
+    add(rect)
+    add(text)
   }
 }
 

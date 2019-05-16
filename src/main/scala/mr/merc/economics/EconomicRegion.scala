@@ -43,10 +43,12 @@ trait EconomicRegion {
 
   def moneyToFulfillNeeds(populationClass: PopulationClass, culture:Culture): Map[PopulationNeedsType, Double] = {
     culture.needs(populationClass).transform { case (_, needs) =>
-      needs.map { case (p, v) =>
-        regionMarket.currentPrices(p) * v
-      }.sum
+      needs dot regionMarket.currentPrices
     }
+  }
+
+  def moneyToFulfillArmyNeeds(): Double = {
+    regionWarriors.allWarriors.map(_.needs).reduceOption(_ |+| _).map(_ dot regionMarket.currentPrices).getOrElse(0)
   }
 
   var projects:List[BusinessProject] = Nil
@@ -262,7 +264,7 @@ class RegionMarket(initialPrices:Map[Product, Double]) {
 class RegionWarriors(initial: List[Warrior], neighbours: => Set[EconomicRegion]) {
   private var destinations:Map[Option[EconomicRegion], List[Warrior]] = Map(None -> initial)
 
-  def allWarriors:Set[Warrior] = warriorDestinations.values.flatten.toSet
+  def allWarriors:List[Warrior] = warriorDestinations.values.flatten.toList
 
   def warriorDestinations:Map[Option[EconomicRegion], List[Warrior]] = destinations
 
@@ -301,13 +303,20 @@ class RegionWarriors(initial: List[Warrior], neighbours: => Set[EconomicRegion])
     result
   }
 
-  def clearDeadWarriors(): Set[Warrior] = {
+  def clearDeadWarriors(): List[Warrior] = {
     val dead = allWarriors.filterNot(_.isAlive)
 
-    destinations = destinations.transform { case (_, list) =>
-        list.filter(_.isAlive)
-    }
+    takeWarriors(dead)
+  }
 
-    dead
+  def generateArmyNeeds(): List[WarriorDemandRequest]= {
+    allWarriors.flatMap { w =>
+      val budgetArmyNeeds = w.owner.budget.spendingPolicyConfig.armyNeeds
+      if (w.owner.budget.moneyReserve > 0 && budgetArmyNeeds > 0) {
+        (w.needs |*| budgetArmyNeeds).map { case (p, c) =>
+          WarriorDemandRequest(w, p, c)
+        }
+      } else Nil
+    }
   }
 }

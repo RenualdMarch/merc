@@ -1,6 +1,5 @@
 package mr.merc.view.move
 
-import mr.merc.map.hex.view.TerrainHexView
 
 object MomentaryMovement {
   def apply(f: => Unit) = new MomentaryMovement(f)

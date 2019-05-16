@@ -14,7 +14,11 @@ class StateBudgetTest extends FunSuite {
 
   test("Spending of budget money doesnt create pop") {
 
-    val culture = new Culture("testCulture", Humans, HumanCityHouse, Color.Red, WarriorViewNames(Map())) {
+    val culture = new Culture("testCulture", Humans, HumanCityHouse, Color.Red) {
+
+
+      override val warriorViewNames: WarriorViewNames = null
+      override val cultureInfo: Culture.CultureInfo = null
 
       override val needs = Map(
         Lower -> Map(
@@ -61,7 +65,7 @@ class StateBudgetTest extends FunSuite {
       Map(LowSalaryTax -> 100000, CorporateTax -> 500000), Map()))
     assert(budget.moneyReserve === 15000)
 
-    budget.spendingPolicyConfig = SpendingPolicyConfig(1d/3, 0.5, 1d/6)
+    budget.spendingPolicyConfig = SpendingPolicyConfig(1d/3, 0.5, 1d/6, 1d)
 
     budget.spendBudgetMoney(List(region), culture)
 
@@ -72,14 +76,17 @@ class StateBudgetTest extends FunSuite {
     assert(bureaucrats.moneyReserves === 350)
 
     budget.endDay()
-    assert(budget.yesterdaySpendingPolicy === SpendingPolicy(0, 350, 500, 0))
+    assert(budget.yesterdaySpendingPolicy === SpendingPolicy(0, 350, 500))
     assert(budget.history === Vector(BudgetDayReport(Map(LowSalaryTax -> 10000, CorporateTax -> 5000),
       Map(LowSalaryTax -> 100000, CorporateTax -> 500000), Map(ScholarsSalary -> 0, BureaucratsSalary -> 350, Pensions-> 500))))
   }
 
   test("Spend budget money") {
 
-    val culture = new Culture("testCulture", Humans, HumanCityHouse, Color.Red, WarriorViewNames(Map())) {
+    val culture = new Culture("testCulture", Humans, HumanCityHouse, Color.Red) {
+
+      override val warriorViewNames: WarriorViewNames = null
+      override val cultureInfo: Culture.CultureInfo = null
 
       override val needs = Map(
         Lower -> Map(
@@ -127,7 +134,7 @@ class StateBudgetTest extends FunSuite {
       Map(LowSalaryTax -> 100000, CorporateTax -> 500000), Map()))
     assert(budget.moneyReserve === 15000)
 
-    budget.spendingPolicyConfig = SpendingPolicyConfig(1d/3, 0.5, 1d/6)
+    budget.spendingPolicyConfig = SpendingPolicyConfig(1d/3, 0.5, 1d/6, 1d)
 
     budget.spendBudgetMoney(List(region), culture)
 
@@ -136,14 +143,17 @@ class StateBudgetTest extends FunSuite {
     assert(bureaucrats.moneyReserves === 350)
 
     budget.endDay()
-    assert(budget.yesterdaySpendingPolicy === SpendingPolicy(200, 350, 500, 0))
+    assert(budget.yesterdaySpendingPolicy === SpendingPolicy(200, 350, 500))
     assert(budget.history === Vector(BudgetDayReport(Map(LowSalaryTax -> 10000, CorporateTax -> 5000),
       Map(LowSalaryTax -> 100000, CorporateTax -> 500000), Map(ScholarsSalary -> 200, BureaucratsSalary -> 350, Pensions-> 500))))
   }
 
   test("Not enough money in budget") {
 
-    val culture = new Culture("testCulture", Humans, HumanCityHouse, Color.Red, WarriorViewNames(Map())) {
+    val culture = new Culture("testCulture", Humans, HumanCityHouse, Color.Red) {
+
+      override val warriorViewNames: WarriorViewNames = null
+      override val cultureInfo: Culture.CultureInfo = null
 
       override val needs = Map(
         Lower -> Map(
@@ -190,7 +200,7 @@ class StateBudgetTest extends FunSuite {
       Map(LowSalaryTax -> 100000, CorporateTax -> 500000), Map()))
     assert(budget.moneyReserve === 525)
 
-    budget.spendingPolicyConfig = SpendingPolicyConfig(1d/3, 0.5, 1d/6)
+    budget.spendingPolicyConfig = SpendingPolicyConfig(1d/3, 0.5, 1d/6, 1d)
 
     budget.spendBudgetMoney(List(region), culture)
 
@@ -199,7 +209,7 @@ class StateBudgetTest extends FunSuite {
     assert(bureaucrats.moneyReserves === 175)
 
     budget.endDay()
-    assert(budget.yesterdaySpendingPolicy === SpendingPolicy(100, 175, 250, 0))
+    assert(budget.yesterdaySpendingPolicy === SpendingPolicy(100, 175, 250))
     assert(budget.history === Vector(BudgetDayReport(Map(LowSalaryTax -> 500, CorporateTax -> 25),
       Map(LowSalaryTax -> 100000, CorporateTax -> 500000),
       Map(ScholarsSalary -> 100, BureaucratsSalary -> 175, Pensions-> 250))))

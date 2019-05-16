@@ -28,6 +28,7 @@ class ProvinceDetailsPane(province: Province, parent: WorldFrame) extends MigPan
       val factoriesViewButton = MediumButton(Localization("production"))
       factoriesViewButton.onAction = _ => parent.showEnterprisesPane(province)
       val armyViewButton = MediumButton(Localization("army"))
+      armyViewButton.onAction = _ => parent.showArmyMovement(province)
       val marketViewButton = MediumButton(Localization("market"))
       marketViewButton.onAction = _ => parent.showMarket(province)
       add(populationViewButton, "pushx,growx")
