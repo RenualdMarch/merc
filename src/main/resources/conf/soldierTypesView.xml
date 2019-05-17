@@ -151,7 +151,7 @@
             <attack2 succ="spear" fail="miss1"/>
             <pain sound="humanPain1"/>
         </sounds>
-    </view>
+    </view><!-- not used-->
     <view name="HumanWesnoth-Woodsman">
         <attack1 imageName="dagger-human">
             <all>
@@ -199,7 +199,7 @@
             <attack2 succ="bow" fail="bowFail"/>
             <pain sound="humanPain1"/>
         </sounds>
-    </view>
+    </view><!-- not used-->
     <view name="HumanWesnoth-Ruffian">
         <attack1 imageName="club">
             <all>
@@ -226,7 +226,7 @@
             <attack1 succ="club" fail="miss1"/>
             <pain sound="humanPain1"/>
         </sounds>
-    </view>
+    </view><!-- not used-->
     <view name="HumanWesnoth-Bowman">
         <attack1 imageName="sword-human-short">
             <all>
@@ -260,7 +260,7 @@
             <attack2 succ="bow" fail="bowFail"/>
             <pain sound="humanPain1"/>
         </sounds>
-    </view>
+    </view><!-- not used-->
     <view name="HumanWesnoth-Cavalryman">
         <attack1 imageName="sword-human">
             <all>
@@ -1384,4 +1384,242 @@
             <pain sound="humanPain1"/>
         </sounds>
     </view>
+    <view name="HumanDuneWesnoth-Apothecary">
+        <attack1 imageName="staff-magic"/>
+        <attack2 imageName="fireball" projectile="Fireball"/>
+        <stand>
+            <image name="apothecary"/>
+        </stand>
+        <sounds>
+            <attack1 succ="staff" fail="miss1"/>
+            <attack2 succ="magicAttack1" fail="magicAttack1Fail"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanDuneWesnoth-Herbalist">
+        <attack1 imageName="staff-magic"/>
+        <attack2 imageName="fireball" projectile="Fireball"/>
+        <stand>
+            <image name="herbalist"/>
+        </stand>
+        <sounds>
+            <attack1 succ="staff" fail="miss1"/>
+            <attack2 succ="magicAttack1" fail="magicAttack1Fail"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanDuneWesnoth-Cataphract">
+        <attack1 imageName="spear"/>
+        <stand>
+            <image name="cataphract"/>
+        </stand>
+        <sounds>
+            <attack1 succ="spear" fail="spearFail"/>
+            <move sound="horseMovement"/>
+            <pain sound="horsePain"/>
+        </sounds>
+    </view>
+    <view name="HumanDuneWesnoth-Piercer">
+        <attack1 imageName="spear"/>
+        <stand>
+            <image name="piercer"/>
+        </stand>
+        <sounds>
+            <attack1 succ="spear" fail="spearFail"/>
+            <move sound="horseMovement"/>
+            <pain sound="horsePain"/>
+        </sounds>
+    </view>
+    <view name="HumanDuneWesnoth-Skirmisher">
+        <attack1 imageName="scimitar"/>
+        <stand>
+            <image name="skirmisher"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanDuneWesnoth-Warmaster">
+        <attack1 imageName="scimitar"/>
+        <stand>
+            <image name="warmaster"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanDuneWesnoth-Spearguard">
+        <attack1 imageName="spear"/>
+        <stand>
+            <image name="spearguard"/>
+        </stand>
+        <sounds>
+            <attack1 succ="spear" fail="spearFail"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanDuneWesnoth-Spearmaster">
+        <attack1 imageName="spear"/>
+        <stand>
+            <image name="spearmaster"/>
+        </stand>
+        <sounds>
+            <attack1 succ="spear" fail="spearFail"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanDuneWesnoth-Swordsman">
+        <attack1 imageName="scimitar"/>
+        <stand>
+            <image name="swordsman"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanDuneWesnoth-Soldier">
+        <attack1 imageName="scimitar"/>
+        <stand>
+            <image name="Soldier"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanCeresians-Knight-Commander">
+        <attack1 imageName="sword-human"/>
+        <stand>
+            <image name="knight-commander"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <move sound="horseMovement"/>
+            <pain sound="horsePain"/>
+        </sounds>
+    </view>
+    <view name="HumanCeresians-Knight-Errant">
+        <attack1 imageName="sword-human"/>
+        <stand>
+            <image name="knight-errant"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <move sound="horseMovement"/>
+            <pain sound="horsePain"/>
+        </sounds>
+    </view> <!-- not used-->
+    <view name="HumanCeresians-Cavalryman">
+        <attack1 imageName="sword-human"/>
+        <stand>
+            <image name="cavalryman"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <move sound="horseMovement"/>
+            <pain sound="horsePain"/>
+        </sounds>
+    </view>
+    <view name="HumanMountain-Eremit">
+        <attack1 imageName="staff-magic"/>
+        <attack2 imageName="fireball" projectile="Fireball"/>
+        <stand>
+            <image name="eremit"/>
+        </stand>
+        <sounds>
+            <attack1 succ="staff" fail="miss1"/>
+            <attack2 succ="magicAttack1" fail="magicAttack1Fail"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanMountain-Mage">
+        <attack1 imageName="staff-magic"/>
+        <attack2 imageName="fireball" projectile="Fireball"/>
+        <stand>
+            <image name="mage"/>
+        </stand>
+        <sounds>
+            <attack1 succ="staff" fail="miss1"/>
+            <attack2 succ="magicAttack1" fail="magicAttack1Fail"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanMountain-Hunter">
+        <attack1 imageName="sword-human-short"/>
+        <attack2 imageName="bow" projectile="Arrow"/>
+        <stand>
+            <image name="hunter"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <attack2 succ="bow" fail="bowFail"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanMountain-Ranger">
+        <attack1 imageName="sword-human-short"/>
+        <attack2 imageName="bow" projectile="Arrow"/>
+        <stand>
+            <image name="ranger"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <attack2 succ="bow" fail="bowFail"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanMountain-Wolf-Champion">
+        <attack1 imageName="claws"/>
+        <stand>
+            <image name="wolf-champion"/>
+        </stand>
+        <sounds>
+            <attack1 succ="claws" fail="miss1"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanMountain-Wolf-Warrior">
+        <attack1 imageName="claws"/>
+        <stand>
+            <image name="wolf-warrior"/>
+        </stand>
+        <sounds>
+            <attack1 succ="claws" fail="miss1"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanMountain-Wolf-Fighter">
+        <attack1 imageName="claws"/>
+        <stand>
+            <image name="wolf-fighter"/>
+        </stand>
+        <sounds>
+            <attack1 succ="claws" fail="miss1"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanMountain-Wolf-Guard">
+        <attack1 imageName="sword-human"/>
+        <stand>
+            <image name="wolf-guard"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view> <!-- not used -->
+    <view name="HumanMountain-Wolf-Swordmaster">
+        <attack1 imageName="sword-human"/>
+        <stand>
+            <image name="wolf-swordmaster"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+
 </views>

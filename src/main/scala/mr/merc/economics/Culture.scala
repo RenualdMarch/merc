@@ -4,15 +4,14 @@ import mr.merc.army.WarriorViewNames
 import mr.merc.economics.Population._
 import mr.merc.economics.Products._
 import mr.merc.economics.WorldConstants.Population.needsQ
-import mr.merc.map.objects.{House, HumanCityHouse, HumanCottage, HumanVillageHouse}
+import mr.merc.map.objects._
 import scalafx.scene.paint.Color
 import MapUtil.FloatOperations._
 
 object Culture {
 
-  def cultures: List[Culture] = List(LatinHuman, KnightHuman, DarkHuman, GreekHuman, GermanHuman) //, HighElf, DarkElf, BarbarianOrc, RockDwarf, GreenSaurian, OldDrakes, Forsaken, RedDemons)
-
-  // slavic - first to add
+  def cultures: List[Culture] = List(LatinHuman, KnightHuman, DarkHuman, GreekHuman, GermanHuman, ArabHuman, SlavicHuman)
+  //, HighElf, DarkElf, BarbarianOrc, RockDwarf, GreenSaurian, OldDrakes, Forsaken, RedDemons)
 
   //
   // DISABLED CULTURES
@@ -354,9 +353,9 @@ object Culture {
   }
 
   case object SlavicHuman extends Culture("slavic", Humans, HumanCottage, Color.Violet) {
-    val warriorViewNames: WarriorViewNames = null
+    val warriorViewNames: WarriorViewNames = WarriorViewNames.SlavicCulture
 
-    val cultureInfo: CultureInfo = CultureInfo(StateForm("tsardom", "republic"),
+    val cultureInfo: CultureInfo = CultureInfo(StateForm("kingdom", "republic"),
       List("Asichow",
         "Stolya",
         "Ederenye",
@@ -399,10 +398,69 @@ object Culture {
       List("Ukrainian",
         "Russian",
         "Polish",
+        "Belarus",
         "Slovak",
         "Czech",
         "Moravian",
         "Bulgarian"))
+  }
+
+  case object ArabHuman extends Culture("arab", Humans, DesertHouse, Color.Green) {
+    override val warriorViewNames: WarriorViewNames = WarriorViewNames.ArabCulture
+
+    override val cultureInfo: CultureInfo = CultureInfo(StateForm("caliphate", "republic"),
+      List("Sivrikent",
+        "Kagipinari",
+        "Jirozeh",
+        "Javahreza",
+        "Az Zuyala",
+        "Tall Hilladiyah",
+        "Siwareya",
+        "Ralkha",
+        "Sharurma",
+        "Dubasha",
+        "As Sataq",
+        "Ash Shiwit",
+        "Arizah",
+        "Amarraq",
+        "Ovasi",
+        "Çukupasa",
+        "Latiabod",
+        "Genaft",
+        "Hadirnah",
+        "Hadibayr",
+        "Ismailqas",
+        "Farayoum",
+        "Jubahat",
+        "Dhabail",
+        "Zajibar",
+        "Sa'dabar",
+        "Damabi",
+        "Qardalkrom",
+        "Çanasun",
+        "Inhiceli",
+        "Bardalam",
+        "Saralmas",
+        "Barah",
+        "An Nasiwr",
+        "Abu Humein",
+        "Senuroh",
+        "Dhuhran",
+        "Jalath",
+        "Sahayya",
+        "Say'uwkhah",
+        "Al Suqameir",
+        "Al Sisasiyah"),
+      List("Rashidun",
+          "Umayyad",
+          "Abbasid",
+          "Ushmaan",
+          "Fatimid",
+          "Almohad",
+          "Sokoto",
+          "Ramazan",
+      )
+    )
   }
 
   private def scaleNeeds(needsToScale: PopulationNeeds): PopulationNeeds = {

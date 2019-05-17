@@ -16,6 +16,7 @@
 	<sound name="miss1" path="miss-1.ogg"/>
 	<sound name="mace" path="mace.ogg"/>
 	<sound name="fist" path="fist.ogg"/>
+	<sound name="claws" path="claws.ogg"/>
 		
 	<!-- movements -->
 	<sound name="horseMovement" path="horse-elf-canter.ogg"/>

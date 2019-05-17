@@ -206,7 +206,7 @@ object WorldGenerationConstants {
   val StateShuffles = 20
 
   val TradeDaysBeforeStart = 1
-  val WarriorPerPopulation = 15000
+  val WarriorPerPopulation = 10000
 
   val WorldMapWidth = 50
   val WorldMapHeight = 50

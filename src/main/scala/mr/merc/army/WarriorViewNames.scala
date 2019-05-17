@@ -77,4 +77,30 @@ object WarriorViewNames {
     (BladeCavalry, Militia) -> "HumanChevalier-Rider",
     (BladeCavalry, Professional) -> "HumanChevalier-Chevalier",
   ))
+
+  val ArabCulture = WarriorViewNames(Map(
+    (HeavyPikeInfantry, Militia) -> "HumanDuneWesnoth-Spearguard",
+    (HeavyPikeInfantry, Professional) -> "HumanDuneWesnoth-Spearmaster",
+    (PikeCavalry, Militia) -> "HumanDuneWesnoth-Piercer",
+    (PikeCavalry, Professional) -> "HumanDuneWesnoth-Cataphract",
+    (FireWizard, Militia) -> "HumanDuneWesnoth-Apothecary",
+    (FireWizard, Professional) -> "HumanDuneWesnoth-Herbalist",
+    (HeavyBladeInfantry, Militia) -> "HumanDuneWesnoth-Swordsman",
+    (HeavyBladeInfantry, Professional) -> "HumanDuneWesnoth-Soldier",
+    (LightBladeInfantry, Militia) -> "HumanDuneWesnoth-Skirmisher",
+    (LightBladeInfantry, Professional) -> "HumanDuneWesnoth-Warmaster"
+  ))
+
+  val SlavicCulture = WarriorViewNames(Map(
+    (BladeCavalry, Militia) -> "HumanCeresians-Cavalryman",
+    (BladeCavalry, Professional) -> "HumanCeresians-Knight-Commander",
+    (FireWizard, Militia) -> "HumanMountain-Mage",
+    (FireWizard, Professional) -> "HumanMountain-Eremit",
+    (Archer, Militia) -> "HumanMountain-Hunter",
+    (Archer, Professional) -> "HumanMountain-Ranger",
+    (LightBladeInfantry, Militia) -> "HumanMountain-Wolf-Warrior",
+    (LightBladeInfantry, Professional) -> "HumanMountain-Wolf-Champion",
+    (HeavyPikeInfantry, Militia) -> "HumanMountain-Wolf-Fighter",
+    (HeavyPikeInfantry, Professional) -> "HumanMountain-Wolf-Swordmaster",
+  ))
 }
