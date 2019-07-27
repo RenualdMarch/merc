@@ -6,6 +6,7 @@ import mr.merc.map.hex.Hex
 import mr.merc.map.hex.HexField
 import mr.merc.map.hex.TerrainHexField
 import mr.merc.map.hex.TerrainHex
+import mr.merc.map.objects.House.HumanCityHouse
 import mr.merc.map.terrain._
 import mr.merc.map.objects._
 

@@ -10,6 +10,8 @@
 	<sound name="staff" path="staff.ogg"/>
 	<sound name="bow" path="bow.ogg"/>
 	<sound name="bowFail" path="bow-miss.ogg"/>
+	<sound name="crossbow" path="crossbow.ogg"/>
+	<sound name="crossbowFail" path="crossbow-miss.ogg"/>
 	<sound name="dagger" path="dagger-swish.ogg"/>
 	<sound name="club" path="club.ogg"/>
 	<sound name="sword" path="sword-1.ogg"/>

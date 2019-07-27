@@ -143,6 +143,49 @@ object WorldConstants {
     val HpLossStep = 0.1
     val HpGainStep = 0.05
   }
+
+  object Diplomacy {
+    val DeclareWarRelationshipChange:Int  = -20
+
+    val NeutralRelationshipChange:Int = 0
+    val WarRelationshipChange:Int = -50
+    val SeparatePeaceRelationshipChange = -100
+    val SeparatePeaceDuration = 40
+
+
+    val TruceDuration = 20
+    val TruceRelationshipChange = -100
+    val BrokenTruceRelationshipChange = -200
+    val BrokenTruceDuration = 60
+
+    val DefaultAllianceDuration = 40
+    val AllianceRelationshipChange:Int = 50
+    val WereTogetherInAllianceTurns = 20
+    val AllianceBetrayalDuration = 20
+    val AllianceBetrayalRelationshipsChange = -50
+    val AllianceRejectionDuration = 10
+    val AllianceRejectionRelationshipChange = -20
+    val AllianceHonoredDuration = 20
+    val AllianceHonoredRelationshipChange = 30
+
+    val VassalRelationshipChange:Int = 100
+    val OverlordRelationshipChange:Int = 100
+    val SetVassalFreeDuration = 40
+    val SetVassalFreeRelationshipChange = 50
+    val VassalRevoltingDuration = 20
+    val VassalRevoltingRelationshipChange = -100
+    val VassalRejectionDuration = 10
+    val VassalRejectionRelationshipChange = -20
+    val OverlordshipRejectionDuration = 10
+    val OverlordshipRejectionRelationshipChange = -20
+
+    val StrongClaimRelationshipBonus = -20
+    val WeakClaimRelationshipBonus = -10
+
+    val SameCultureRelationshipBonus = 20
+    val SameRaceRelationshipBonus = 10
+    val DifferentRaceRelationshipBonus = -10
+  }
 }
 
 object WorldGenerationConstants {
@@ -210,7 +253,7 @@ object WorldGenerationConstants {
 
   val WorldMapWidth = 50
   val WorldMapHeight = 50
-  val HexesPerProvince = 150
+  val HexesPerProvince = 100
   val LandPercentage = 0.7
   val Provinces = (WorldMapHeight * WorldMapWidth * LandPercentage / HexesPerProvince).toInt
 

@@ -25,7 +25,7 @@ class FactoryTest extends FunSuite with BeforeAndAfter with MockitoSugar with Ma
   before {
     capitalists = new Population(LatinHuman, Capitalists, 1000, 0, 0, PoliticalViews.averagePoliticalViews)
     capitalists.newDay(zeroTaxes, 1)
-    owner = new State("", KnightHuman, 0, new PoliticalSystem(Party.absolute)) {
+    owner = new State("", FrenchHuman, 0, new PoliticalSystem(Party.absolute)) {
       override val taxPolicy: TaxPolicy = TaxPolicy.zeroTaxes
     }
     testRegionMarket = mock[RegionMarket]

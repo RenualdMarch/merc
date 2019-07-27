@@ -2,22 +2,31 @@ package mr.merc.economics
 
 import mr.merc.army.{Warrior, WarriorType}
 import mr.merc.army.WarriorType.WarriorCompetence
+import mr.merc.diplomacy.DiplomaticAgreement.WarAgreement
+import mr.merc.diplomacy.DiplomaticMessage.DeclareWar
+import mr.merc.diplomacy.WorldDiplomacy.RelationshipBonus
+import mr.merc.diplomacy._
 import mr.merc.economics.Products.IndustryProduct
 import mr.merc.economics.TaxPolicy.Income
 import mr.merc.economics.WorldConstants.Army.SoldierRecruitmentCost
+import mr.merc.economics.WorldGenerationConstants.StateStartingMoney
 import mr.merc.economics.WorldStateEnterpriseActions.{FactoryCommand, PopExpandFactoryCommand, StateExpandFactoryCommand}
 import mr.merc.map.hex.TerrainHexField
+import mr.merc.players.NamesGenerator
 import mr.merc.politics.IssuePosition.{EconomyPosition, RegimePosition}
 import mr.merc.politics.Regime.{Absolute, Constitutional, Democracy}
 import mr.merc.politics.{Election, Party, Province, State}
 import scalafx.beans.property.ObjectProperty
 import mr.merc.util.FxPropertyUtils.PropertyBindingMap
+import scalafx.scene.paint.Color
 
-class WorldState(val regions: List[Province], val playerState: State, val worldHexField: TerrainHexField, var turn: Int = 0)
+class WorldState(val regions: List[Province], val playerState: State, val worldHexField: TerrainHexField,
+                 val namesGenerators:Map[Culture, NamesGenerator], var colorStream:Stream[Color], var turn: Int = 0)
   extends WorldStateParliamentActions
     with WorldStateBudgetActions
     with WorldStateEnterpriseActions
-    with WorldStateArmyActions {
+    with WorldStateArmyActions
+    with WorldStateDiplomacyActions {
 
   def playerRegions: List[Province] = regions.filter(_.owner == playerState)
 
@@ -229,4 +238,70 @@ trait WorldStateArmyActions {
       (wt, wc, ownerCulture)
     }.toList
   }
+}
+
+trait WorldStateDiplomacyActions {
+  //def playerState: State
+
+  def regions: List[Province]
+
+  def namesGenerators:Map[Culture, NamesGenerator]
+
+  def turn:Int
+
+  var colorStream:Stream[Color]
+
+  private val diplomacyEngine = new WorldDiplomacy(this)
+
+  def addClaim(claim:Claim): Unit = {
+    diplomacyEngine.addClaim(claim)
+  }
+
+  def generateNewState(culture: Culture, rulingParty:Party):State = {
+    val color = colorStream.head
+    colorStream = colorStream.tail
+    val name = namesGenerators(culture).stateNames.extract()
+    new State(name, culture, StateStartingMoney, new PoliticalSystem(rulingParty), color)
+  }
+
+  def possibleMessages(from:State, to:State):List[DiplomaticMessage] = ???
+
+  def relationships(state: State): Map[State, Int] = diplomacyEngine.relationships(state, turn)
+
+  def relationshipsDescribed(state: State): Map[State, List[RelationshipBonus]] = diplomacyEngine.relationshipsDescribed(state, turn)
+
+  def sendMessage(message: DiplomaticMessage): Unit = {
+    diplomacyEngine.sendMessage(message, turn)
+  }
+
+  def mailbox(state:State):List[DiplomaticMessage] = {
+    diplomacyEngine.messages(state, turn)
+  }
+
+  def acknowledgeMessage(declaration:DiplomaticDeclaration): Unit = {
+    diplomacyEngine.answerMessage(declaration, turn)
+  }
+
+  def answerMessage(proposal:DiplomaticProposal, answerIsYes:Boolean): Unit = {
+    diplomacyEngine.answerMessage(proposal, answerIsYes, turn)
+  }
+
+  def defaultCustomMessageAnswer(custom:CustomDiplomaticQuestion): Unit = {
+    diplomacyEngine.defaultAnswerMessage(custom, turn)
+  }
+
+  def answerDeclareWar(dw:DeclareWar, allies:Set[State]): Unit = {
+    diplomacyEngine.answerDeclareWarMessage(dw, turn, allies)
+  }
+
+  def processUnansweredMessages(): Unit = {
+    diplomacyEngine.processAllUnansweredMessages(turn)
+  }
+
+  def agreements(state: State):List[DiplomaticAgreement] = diplomacyEngine.agreements(state)
+
+
+  def attackerLeader(warAgreement: WarAgreement):State = warAgreement.attackersLeader(diplomacyEngine)
+
+  def defendersLeader(warAgreement: WarAgreement):State = warAgreement.defendersLeader(diplomacyEngine)
 }

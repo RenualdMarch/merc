@@ -1621,5 +1621,132 @@
             <pain sound="humanPain1"/>
         </sounds>
     </view>
+    <view name="HumanLuz-Arbalist">
+        <attack1 imageName="mace"/>
+        <attack2 imageName="crossbow-human" projectile="Arrow"/>
+        <stand>
+            <image name="arbalist"/>
+        </stand>
+        <sounds>
+            <attack1 succ="mace" fail="miss1"/>
+            <attack2 succ="crossbow" fail="crossbowFail"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanLuz-crossbow">
+        <attack1 imageName="club"/>
+        <attack2 imageName="crossbow-human" projectile="Arrow"/>
+        <stand>
+            <image name="crossbow"/>
+        </stand>
+        <sounds>
+            <attack1 succ="mace" fail="miss1"/>
+            <attack2 succ="crossbow" fail="crossbowFail"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanLuz-Pope">
+        <attack1 imageName="staff-magic"/>
+        <attack2 imageName="fireball" projectile="Fireball"/>
+        <stand>
+            <image name="pope"/>
+        </stand>
+        <sounds>
+            <attack1 succ="staff" fail="miss1"/>
+            <attack2 succ="magicAttack1" fail="magicAttack1Fail"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view> <!-- not used -->
+    <view name="HumanLuz-Cleric">
+        <attack1 imageName="staff-magic"/>
+        <attack2 imageName="fireball" projectile="Fireball"/>
+        <stand>
+            <image name="cleric"/>
+        </stand>
+        <sounds>
+            <attack1 succ="staff" fail="miss1"/>
+            <attack2 succ="magicAttack1" fail="magicAttack1Fail"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanLuz-Bishop">
+        <attack1 imageName="staff-magic"/>
+        <attack2 imageName="fireball" projectile="Fireball"/>
+        <stand>
+            <image name="bishop"/>
+        </stand>
+        <sounds>
+            <attack1 succ="staff" fail="miss1"/>
+            <attack2 succ="magicAttack1" fail="magicAttack1Fail"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanLuz-Inquisition-Warrior">
+        <attack1 imageName="sword-human"/>
+        <stand>
+            <image name="inquisition-warrior"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanLuz-Inquisitor">
+        <attack1 imageName="sword-human"/>
+        <stand>
+            <image name="inquisitor"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanLuz-Knight">
+        <attack1 imageName="sword-human"/>
+        <stand>
+            <image name="knight"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <move sound="horseMovement"/>
+            <pain sound="horsePain"/>
+        </sounds>
+    </view>
+    <view name="HumanLuz-Rider">
+        <attack1 imageName="sword-human"/>
+        <stand>
+            <image name="rider"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <move sound="horseMovement"/>
+            <pain sound="horsePain"/>
+        </sounds>
+    </view>
+    <view name="HumanLuz-Keeper">
+        <attack1 imageName="spear"/>
+        <stand>
+            <image name="keeper"/>
+        </stand>
+        <sounds>
+            <attack1 succ="spear" fail="spearFail"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanLuz-Sentinel">
+        <attack1 imageName="spear"/>
+        <stand>
+            <image name="sentinel"/>
+        </stand>
+        <sounds>
+            <attack1 succ="spear" fail="spearFail"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+
+
+
+
+
 
 </views>

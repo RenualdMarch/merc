@@ -4,7 +4,7 @@ import mr.merc.army.WarriorViewNames
 import scalafx.scene.paint.Color
 import mr.merc.economics.Population.{Capitalists, Humans}
 import mr.merc.economics.Products.{Coal, Grain, Product, Weapons}
-import mr.merc.map.objects.HumanVillageHouse
+import mr.merc.map.objects.House.HumanVillageHouse
 import mr.merc.politics.{Party, PoliticalViews, State}
 import org.scalatest.FunSuite
 

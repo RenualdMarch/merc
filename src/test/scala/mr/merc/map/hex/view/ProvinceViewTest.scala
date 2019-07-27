@@ -6,7 +6,7 @@ import mr.merc.economics.Culture._
 import mr.merc.economics.Population.Humans
 import mr.merc.economics._
 import mr.merc.map.hex.{TerrainHex, TerrainHexField}
-import mr.merc.map.objects.{House, HumanCityHouse, HumanVillageHouse}
+import mr.merc.map.objects.House.{HumanCityHouse, HumanVillageHouse}
 import mr.merc.map.terrain.{Castle, ShallowWater}
 import mr.merc.map.view.SoldiersDrawer
 import mr.merc.politics.{Party, Province, State}
@@ -16,6 +16,7 @@ import org.scalatest.{BeforeAndAfter, FunSuite, Inspectors, Matchers}
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
 import mr.merc.economics.WorldConstants.Population._
+import mr.merc.map.objects.House
 import scalafx.scene.paint.Color
 
 class ProvinceViewTest extends FunSuite with MockitoSugar with BeforeAndAfter with Inspectors with Matchers {
@@ -44,9 +45,9 @@ class ProvinceViewTest extends FunSuite with MockitoSugar with BeforeAndAfter wi
     when(province.capital).thenReturn(field.hex(2, 2))
     when(province.hexes).thenReturn(field.hexes.toSet)
     val firstMap = Map[Culture, Int](LatinHuman -> HousePerPopulation * 3)
-    val secondMap = Map[Culture, Int](LatinHuman -> HousePerPopulation * 3, KnightHuman -> 1)
-    val thirdMap = Map[Culture, Int](LatinHuman -> HousePerPopulation * 2, KnightHuman -> HousePerPopulation)
-    val fourthMap = Map[Culture, Int](LatinHuman -> HousePerPopulation * 3, KnightHuman -> HousePerPopulation)
+    val secondMap = Map[Culture, Int](LatinHuman -> HousePerPopulation * 3, FrenchHuman -> 1)
+    val thirdMap = Map[Culture, Int](LatinHuman -> HousePerPopulation * 2, FrenchHuman -> HousePerPopulation)
+    val fourthMap = Map[Culture, Int](LatinHuman -> HousePerPopulation * 3, FrenchHuman -> HousePerPopulation)
 
 
     when(population.cultureMembers).thenReturn(firstMap, secondMap, thirdMap, fourthMap)

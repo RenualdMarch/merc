@@ -13,6 +13,7 @@ object SpendingPolicy {
   object Pensions extends Spending
   object Construction extends Spending
   object Army extends Spending
+  object Reparations extends Spending
 
   val allSpending = List(ScholarsSalary, BureaucratsSalary, Pensions, Construction, Army)
 }

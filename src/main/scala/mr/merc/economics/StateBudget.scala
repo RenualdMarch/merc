@@ -1,6 +1,6 @@
 package mr.merc.economics
 
-import mr.merc.economics.TaxPolicy.Income
+import mr.merc.economics.TaxPolicy.{Contribution, Income}
 import mr.merc.economics.MapUtil.FloatOperations._
 import mr.merc.economics.Population._
 import mr.merc.economics.SpendingPolicy._
@@ -191,6 +191,18 @@ class StateBudget(startingMoney: Double, val taxPolicy: TaxPolicy) {
     this.currentMoney -= neededMoney
     this.currentReport = currentReport.copy(expenses = currentReport.expenses |+| Army -> neededMoney)
     neededMoney
+  }
+
+  def spendMoneyOnReparations(neededMoney: Double): Double = {
+    this.currentMoney -= neededMoney
+    this.currentReport = currentReport.copy(expenses = currentReport.expenses |+| Reparations -> neededMoney)
+    neededMoney
+  }
+
+  def receiveMoneyFromReparations(money: Double): Double = {
+    this.currentMoney += money
+    this.currentReport = currentReport.copy(income = currentReport.income |+| Contribution -> money)
+    money
   }
 }
 

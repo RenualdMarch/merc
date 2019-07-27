@@ -3,6 +3,7 @@ package mr.merc.unit
 import org.scalatest.FunSuite
 import org.scalatest.BeforeAndAfter
 import mr.merc.map.hex.TerrainHex
+import mr.merc.map.objects.House.HumanCityHouse
 import mr.merc.players.Player
 import mr.merc.map.terrain._
 import mr.merc.map.objects._

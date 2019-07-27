@@ -3,7 +3,7 @@ package mr.merc.economics
 import mr.merc.army.WarriorType.{HeavyMaceInfantry, Militia, Professional}
 import mr.merc.army.{Warrior, WarriorViewNames}
 import mr.merc.economics.Population.Humans
-import mr.merc.map.objects.HumanCityHouse
+import mr.merc.map.objects.House.HumanCityHouse
 import mr.merc.politics.{Party, State}
 import org.scalatest.{FunSuite, Matchers}
 import scalafx.scene.paint.Color

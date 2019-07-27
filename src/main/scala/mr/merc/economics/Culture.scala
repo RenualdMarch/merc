@@ -4,13 +4,15 @@ import mr.merc.army.WarriorViewNames
 import mr.merc.economics.Population._
 import mr.merc.economics.Products._
 import mr.merc.economics.WorldConstants.Population.needsQ
-import mr.merc.map.objects._
+import mr.merc.map.objects.House._
 import scalafx.scene.paint.Color
 import MapUtil.FloatOperations._
+import mr.merc.map.objects.House
 
 object Culture {
 
-  def cultures: List[Culture] = List(LatinHuman, KnightHuman, DarkHuman, GreekHuman, GermanHuman, ArabHuman, SlavicHuman)
+  def cultures: List[Culture] = List(LatinHuman, FrenchHuman, DarkHuman, GreekHuman, GermanHuman, ArabHuman, SlavicHuman, SpainHuman)
+
   //, HighElf, DarkElf, BarbarianOrc, RockDwarf, GreenSaurian, OldDrakes, Forsaken, RedDemons)
 
   //
@@ -111,7 +113,7 @@ object Culture {
         "Lux"))
   }
 
-  case object KnightHuman extends Culture("french", Humans, HumanVillageHouse, Color.Blue) {
+  case object FrenchHuman extends Culture("french", Humans, HumanVillageHouse, Color.Blue) {
     val warriorViewNames: WarriorViewNames = WarriorViewNames.WesnothCulture
 
     val cultureInfo: CultureInfo = CultureInfo(StateForm("kingdom", "republic"),
@@ -353,9 +355,9 @@ object Culture {
   }
 
   case object SlavicHuman extends Culture("slavic", Humans, HumanCottage, Color.Violet) {
-    val warriorViewNames: WarriorViewNames = WarriorViewNames.SlavicCulture
+    val warriorViewNames: WarriorViewNames = WarriorViewNames.WolfCulture
 
-    val cultureInfo: CultureInfo = CultureInfo(StateForm("kingdom", "republic"),
+    val cultureInfo: CultureInfo = CultureInfo(StateForm("principality", "republic"),
       List("Asichow",
         "Stolya",
         "Ederenye",
@@ -397,12 +399,10 @@ object Culture {
         "Kamytrov"),
       List("Ukrainian",
         "Russian",
-        "Polish",
-        "Belarus",
-        "Slovak",
-        "Czech",
-        "Moravian",
-        "Bulgarian"))
+        "Belarusian",
+        "Galician",
+        "Volhynian",
+        "Podolian"))
   }
 
   case object ArabHuman extends Culture("arab", Humans, DesertHouse, Color.Green) {
@@ -452,15 +452,69 @@ object Culture {
         "Al Suqameir",
         "Al Sisasiyah"),
       List("Rashidun",
-          "Umayyad",
-          "Abbasid",
-          "Ushmaan",
-          "Fatimid",
-          "Almohad",
-          "Sokoto",
-          "Ramazan",
+        "Umayyad",
+        "Abbasid",
+        "Ushmaan",
+        "Fatimid",
+        "Almohad",
+        "Sokoto",
+        "Ramazan",
       )
     )
+  }
+
+  case object SpainHuman extends Culture("spanish", Humans, HumanVillageHouse, Color.Orange) {
+    override val warriorViewNames: WarriorViewNames = WarriorViewNames.LuzCulture
+
+    override val cultureInfo: CultureInfo = CultureInfo(StateForm("kingdom", "republic"),
+      List("Panoschato",
+        "Metakala",
+        "Dralfeia",
+        "Gammare",
+        "Bergarsa",
+        "Bagheria",
+        "Louroso",
+        "Bedes",
+        "Almeires",
+        "Laledo",
+        "Almercia",
+        "Corudorm",
+        "Nafpargyroi",
+        "Badine",
+        "Agrine",
+        "Rogola",
+        "Covilves",
+        "Liganca",
+        "Senchal",
+        "Blavera",
+        "Hospidorm",
+        "Ourecante",
+        "Iliounghi",
+        "Lepani",
+        "Molfeto",
+        "Parebaca",
+        "Gandofeira",
+        "Felgueisinde",
+        "Corurotira",
+        "Santanaria",
+        "Madra",
+        "Kosa",
+        "Kilene",
+        "Ligna",
+        "Pesanevento",
+        "Aveigoa",
+        "Marivelas",
+        "Valenresa",
+        "Benilmas"),
+      List("Asturian",
+        "Valencian",
+        "Aragonese",
+        "Spanish",
+        "Catalan",
+        "Cuban",
+        "Brazilian",
+        "Mexican",
+        "Balearic"))
   }
 
   private def scaleNeeds(needsToScale: PopulationNeeds): PopulationNeeds = {

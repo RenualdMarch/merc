@@ -5,7 +5,7 @@ import mr.merc.economics.Population._
 import mr.merc.economics.Products.Grain
 import mr.merc.economics.SpendingPolicy.{BureaucratsSalary, Pensions, ScholarsSalary}
 import mr.merc.economics.TaxPolicy.{CorporateTax, LowSalaryTax}
-import mr.merc.map.objects.HumanCityHouse
+import mr.merc.map.objects.House.HumanCityHouse
 import mr.merc.politics.{Party, PoliticalViews, State}
 import org.scalatest.FunSuite
 import scalafx.scene.paint.Color

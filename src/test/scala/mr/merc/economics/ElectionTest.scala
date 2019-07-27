@@ -2,7 +2,7 @@ package mr.merc.economics
 
 import mr.merc.army.WarriorViewNames
 import mr.merc.economics.Population.{Aristocrats, Capitalists, Humans, Traders}
-import mr.merc.map.objects.HumanVillageHouse
+import mr.merc.map.objects.House.HumanVillageHouse
 import mr.merc.politics._
 import org.scalatest.FunSuite
 import scalafx.scene.paint.Color

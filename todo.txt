@@ -11,8 +11,6 @@ Current battle issues:
 +cultures.conf to scala code
 +armies economic part
 +armies ui economic part
-+arabs
-+mountaintribe
 diplomacy
 next turn button async, messages framework
 remove ai from player in battles
@@ -26,10 +24,14 @@ allow hire people from other cultures with some political configurations
 when hiring soldiers, use actual population
 when showing tooltip, if it is big, find way to show it more when size is too big(recruit soldier tooltip)
 terrain season changes
+
 add more cultures:
-luz culture as spain
-Marashy culture as indian
-Emperor's Guard culture as Japanese
++arabs
++mountaintribe
++luz culture as spain
+Marashy culture as indian?
+Vikings culture as scandinavian?
+chinese?
 
 Polishing:
 issues - balance production and needs multipliers

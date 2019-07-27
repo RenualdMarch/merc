@@ -10,13 +10,13 @@ class WorkerDeciderTest extends FunSuite with BeforeAndAfter {
 
   val latinClergy = new Population(LatinHuman, Clergy, 1000, 0, 0, PoliticalViews.averagePoliticalViews)
   val westFarmer = new Population(LatinHuman, Farmers, 2000, 0, 0, PoliticalViews.averagePoliticalViews)
-  val latinFarmer = new Population(KnightHuman, Farmers, 2000, 0, 0, PoliticalViews.averagePoliticalViews)
-  val westCraftsmen = new Population(KnightHuman, Craftsmen, 3000, 0, 0, PoliticalViews.averagePoliticalViews)
+  val latinFarmer = new Population(FrenchHuman, Farmers, 2000, 0, 0, PoliticalViews.averagePoliticalViews)
+  val westCraftsmen = new Population(FrenchHuman, Craftsmen, 3000, 0, 0, PoliticalViews.averagePoliticalViews)
   val latinCraftsmen = new Population(LatinHuman, Craftsmen, 1000, 0, 0, PoliticalViews.averagePoliticalViews)
 
   val populations = List(latinClergy, westFarmer, latinFarmer, westCraftsmen, latinCraftsmen)
 
-  val country: State = new State("", KnightHuman, 0, new PoliticalSystem(Party.absolute))
+  val country: State = new State("", FrenchHuman, 0, new PoliticalSystem(Party.absolute))
 
   val region = new EconomicRegion {
     override def economicNeighbours: Set[EconomicRegion] = ???
@@ -154,7 +154,7 @@ class WorkerDeciderTest extends FunSuite with BeforeAndAfter {
   }
 
   test("clergy works only for its church") {
-    val westClergy = new Population(KnightHuman, Clergy, 500, 0, 0, PoliticalViews.averagePoliticalViews)
+    val westClergy = new Population(FrenchHuman, Clergy, 500, 0, 0, PoliticalViews.averagePoliticalViews)
 
     val region = new EconomicRegion {
       override def economicNeighbours: Set[EconomicRegion] = ???
@@ -167,7 +167,7 @@ class WorkerDeciderTest extends FunSuite with BeforeAndAfter {
     }
 
     val westChurch = new MockEnterprise(Clergy, 10, 100000, true, "westChurch") {
-      override val product: Product = Ritual(KnightHuman)
+      override val product: Product = Ritual(FrenchHuman)
     }
 
     val latinChurch = new MockEnterprise(Clergy, 15, 100000, true, "latinChurch") {

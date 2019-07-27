@@ -4,7 +4,7 @@ import mr.merc.army.WarriorType.Professional
 import mr.merc.economics.Culture.{CultureInfo, StateForm}
 import mr.merc.economics.{Culture, FulfilledDemandRequest, PoliticalSystem, WarriorDemandRequest}
 import mr.merc.economics.Population.Humans
-import mr.merc.map.objects.HumanVillageHouse
+import mr.merc.map.objects.House.HumanVillageHouse
 import mr.merc.map.terrain.TerrainKind
 import mr.merc.politics.{Party, State}
 import mr.merc.unit.{Attack, AttackType, DefenceType, SoldierTypeAttribute}

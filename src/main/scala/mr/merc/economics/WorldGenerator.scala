@@ -167,7 +167,7 @@ class WorldGenerator(field:TerrainHexField) {
     val result = divisions.map{case (state, capitals) =>
       state -> capitals.map {capital =>
         val name = namesGenerators(state.primeCulture).cityNames.extract()
-        val p = Province(name, state, generateRegionMarket,generateRegionPops(state.primeCulture), provincesHexes(capital), capital)
+        val p = new Province(name, state, generateRegionMarket,generateRegionPops(state.primeCulture), provincesHexes(capital), capital)
         p.enterprises = generateEnterprises(p).toVector
         p.regionWarriors.receiveWarriors(generateWarriors(p))
         provincesHexes(capital).foreach(_.province = Some(p))
@@ -275,7 +275,7 @@ object WorldGenerator extends Logging {
     val generator = new WorldGenerator(world.terrain)
     val r = (generator.generateStateAndProvinces(world.provinces), world.terrain)
     val playerState = r._1.keys.head
-    val ws = new WorldState(r._1.values.flatten.toList, playerState, world.terrain)
+    val ws = new WorldState(r._1.values.flatten.toList, playerState, world.terrain, generator.namesGenerators, generator.colorStream)
     0 until TradeDaysBeforeStart foreach(_ => ws.nextTurn())
     info(s"World generation took ${(System.currentTimeMillis() - timeBefore) / 1000d} seconds")
     ws

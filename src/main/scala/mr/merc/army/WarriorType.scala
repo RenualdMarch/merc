@@ -53,7 +53,7 @@ object WarriorType {
   case object Militia extends WarriorCompetence
   case object Professional extends WarriorCompetence
 
-  def allWarriorTypes:List[WarriorType] = List(HeavyBladeInfantry, LightBladeInfantry, Archer,
+  def allWarriorTypes:List[WarriorType] = List(HeavyBladeInfantry, LightBladeInfantry, BladeArcher, MaceArcher,
     BladeCavalry, PikeCavalry, FireWizard, HeavyMaceInfantry, HeavyPikeInfantry)
 
   case object HeavyBladeInfantry extends WarriorType("heavyBladeInfantry") {
@@ -141,13 +141,36 @@ object WarriorType {
     override def attributes: Set[SoldierTypeAttribute] = Set(Skirmisher)
   }
 
-  case object Archer extends WarriorType("archer") {
+  case object BladeArcher extends WarriorType("bladeArcher") {
     override def baseHp: Int = 51
 
     override def movement: Int = 5
 
     override def baseAttacks: List[Attack] = List(
       Attack(0, 8, 2, Blade, ranged = false),
+      Attack(1, 10, 3, Pierce, ranged = true))
+
+    override def moveCost: Map[TerrainKind, Int] = Map(
+      WaterKind -> 3, ForestKind -> 2, SwampKind -> 3, HillKind -> 2,
+      MountainKind -> 3, SandKind -> 2, GrassKind -> 1, WallsKind -> 1)
+
+    override def defence: Map[DefenceType, Int] = Map(
+      WaterDefence -> 20, ForestDefence -> 50, SwampDefence -> 20, HillDefence -> 50,
+      MountainDefence -> 60, SandDefence -> 30, GrassDefence -> 40, BuildingDefence -> 70)
+
+    override def resistance: Map[AttackType, Int] = Map(
+      Blade -> 0, Pierce -> 0, Impact -> 0, Fire -> 0, Cold -> 0, Arcane -> 20)
+
+    override def attributes: Set[SoldierTypeAttribute] = Set()
+  }
+
+  case object MaceArcher extends WarriorType("maceArcher") {
+    override def baseHp: Int = 51
+
+    override def movement: Int = 5
+
+    override def baseAttacks: List[Attack] = List(
+      Attack(0, 8, 2, Impact, ranged = false),
       Attack(1, 10, 3, Pierce, ranged = true))
 
     override def moveCost: Map[TerrainKind, Int] = Map(

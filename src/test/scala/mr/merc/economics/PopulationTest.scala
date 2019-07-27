@@ -5,7 +5,7 @@ import mr.merc.economics.Population._
 import Culture._
 import mr.merc.economics.Products.{Coal, Fruit, Grain}
 import mr.merc.economics.TaxPolicy.MiddleSalaryTax
-import mr.merc.map.objects.HumanCityHouse
+import mr.merc.map.objects.House.HumanCityHouse
 import mr.merc.politics.ForeignPolicy.{Expansionism, Pacifism}
 import mr.merc.politics._
 import org.scalatest.{FunSuite, Matchers}

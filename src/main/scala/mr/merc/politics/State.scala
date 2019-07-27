@@ -32,10 +32,12 @@ class State(initialName: String, val primeCulture:Culture, startingMoney: Double
   budget.spendingPolicyConfig = SpendingPolicyConfig(1d/3, 1d/3, 0, 1d)
 }
 
-case class Province(name: String, var owner: State, regionMarket: RegionMarket,
-               regionPopulation: RegionPopulation, hexes: Set[TerrainHex], capital: TerrainHex) extends EconomicRegion {
+class Province(val name: String, var owner: State, val regionMarket: RegionMarket,
+               val regionPopulation: RegionPopulation, val hexes: Set[TerrainHex], val capital: TerrainHex) extends EconomicRegion {
 
   private var neighbourProvinces:Option[Set[Province]] = None
+
+  var controller: State = owner
 
   def initNeighbours(set:Set[Province]): Unit = {
     this.neighbourProvinces = Some(set)
@@ -50,4 +52,11 @@ case class Province(name: String, var owner: State, regionMarket: RegionMarket,
   val regionWarriors = new RegionWarriors(Nil, economicNeighbours)
 
   def totalPopulation:Int = regionPopulation.pops.map(_.populationCount).sum
+
+  def culture:Culture = {
+    val cultures = regionPopulation.pops.groupBy(_.culture).mapValues(_.map(_.populationCount).sum)
+    if (cultures.isEmpty) owner.primeCulture
+    else cultures.maxBy(_._2)._1
+  }
+
 }

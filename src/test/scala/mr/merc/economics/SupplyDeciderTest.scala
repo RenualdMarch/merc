@@ -1,12 +1,12 @@
 package mr.merc.economics
 
-import mr.merc.economics.Culture.KnightHuman
+import mr.merc.economics.Culture.FrenchHuman
 import mr.merc.politics.{Party, State}
 import org.scalatest.FunSuite
 
 class SupplyDeciderTest extends FunSuite{
 
-  val country: State = new State("", KnightHuman, 0, new PoliticalSystem(Party.absolute)) {
+  val country: State = new State("", FrenchHuman, 0, new PoliticalSystem(Party.absolute)) {
     override val taxPolicy: TaxPolicy = TaxPolicy.zeroTaxes
   }
 

@@ -12,7 +12,8 @@ import mr.merc.battle.event.AttackModelEvent
 import mr.merc.battle.event.AttackModelEventResult
 import mr.merc.battle.event.MovementModelEvent
 import mr.merc.battle.event.MovementModelEventResult
-import mr.merc.map.objects._
+import mr.merc.map.objects.House._
+import mr.merc.map.objects.WoodenBridge
 
 class BattleModelTest extends FunSuite with BeforeAndAfter {
   var field: TerrainHexField = _

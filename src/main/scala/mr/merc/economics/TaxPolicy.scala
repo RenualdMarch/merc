@@ -13,6 +13,7 @@ object TaxPolicy {
   object SalesTax extends Income
   object TariffTax extends Income
   object TransitTax extends Income
+  object Contribution extends Income
 
   val allTaxes = List(CorporateTax, LowSalaryTax, MiddleSalaryTax, UpperSalaryTax, SalesTax, TariffTax, TransitTax)
 
