@@ -19,7 +19,7 @@ class ProvinceDetailsPane(province: Province, parent: WorldFrame) extends MigPan
     add(MediumText(Localization("bureaucratsPercentage")), "")
     add(MediumText(DoubleFormatter().format(province.bureaucratsPercentageFromMax)), "wrap")
     add(MediumText(Localization("gdp")))
-    add(MediumText(IntFormatter().format(province.gpd)), "wrap")
+    add(MediumText(IntFormatter().format(province.gdp)), "wrap")
     add(MediumText(Localization("cultures")), "span,center,wrap")
     add(culturesDiagram, "span,wrap")
     add(new MigPane("", "") {

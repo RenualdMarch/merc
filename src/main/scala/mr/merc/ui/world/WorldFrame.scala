@@ -101,6 +101,16 @@ class WorldFrame(sceneManager: SceneManager) extends Pane with Logging {
     interfacePane.setFullPanel(new InterfacePane(pane, () => hideFullPane()))
   }
 
+  def showDiplomacyPane(): Unit = {
+    val pane = new DiplomacyPane(worldState, worldState.playerState, sceneManager.stage)
+    interfacePane.setFullPanel(new InterfacePane(pane, () => hideFullPane()))
+  }
+
+  def showMailPane(): Unit ={
+    val pane = new MailPane(worldState.playerState, worldState)
+    interfacePane.setFullPanel(new InterfacePane(pane, () => hideFullPane()))
+  }
+
   def hideFacePane(): Unit = {
     interfacePane.removeFacePanel()
   }

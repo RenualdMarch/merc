@@ -23,6 +23,8 @@ class WorldDiplomacy(actions:WorldStateDiplomacyActions) {
 
   private var claims: List[Claim] = Nil
 
+  def allClaims:List[Claim] = claims
+
   def addEvent(event: RelationshipEvent): Unit = {
     events ::= event
   }
@@ -47,7 +49,12 @@ class WorldDiplomacy(actions:WorldStateDiplomacyActions) {
     mailbox += message.to -> (message :: messages)
   }
 
-  def messages(state:State, currentTurn:Int):List[DiplomaticMessage] = mailbox.getOrElse(state, Nil).filter(_.isPossible(this, currentTurn))
+  def existsMessages(states:Set[State]):Boolean = {
+    states.forall(s => mailbox.get(s).forall(_.nonEmpty))
+  }
+
+  def messages(state:State, currentTurn:Int):List[DiplomaticMessage] = mailbox.getOrElse(state, Nil).
+    filter(_.isPossible(this, currentTurn))
 
   def answerMessage(question:DiplomaticProposal, answerIsYes:Boolean, currentTurn:Int): Unit = {
     extractMessage(question, currentTurn).foreach { q =>
@@ -66,7 +73,9 @@ class WorldDiplomacy(actions:WorldStateDiplomacyActions) {
   }
 
   def answerMessage(declaration:DiplomaticDeclaration, currentTurn:Int): Unit = {
-    extractMessage(declaration, currentTurn).foreach(_.ok(this, currentTurn))
+    extractMessage(declaration, currentTurn).foreach {m =>
+      m.ok(this, currentTurn)
+    }
   }
 
   def defaultAnswerMessage(customMessage:CustomDiplomaticQuestion, currentTurn:Int): Unit = {
@@ -79,14 +88,16 @@ class WorldDiplomacy(actions:WorldStateDiplomacyActions) {
     extractMessage(war, currentTurn).foreach { w =>
       w.okAndCallAllies(this, currentTurn, allies)
     }
-
   }
 
   def processUnansweredMessages(state:State, currentTurn:Int): Unit = {
     messages(state, currentTurn).foreach {
       case dp:DiplomaticProposal => answerMessage(dp, false, currentTurn)
       case dd:DiplomaticDeclaration => answerMessage(dd, currentTurn)
-      case c:CustomDiplomaticQuestion => c.defaultOk(this, currentTurn)
+      case c:CustomDiplomaticQuestion =>
+        extractMessage(c, currentTurn).foreach { m =>
+          m.defaultOk(this, currentTurn)
+        }
     }
   }
 
@@ -138,7 +149,7 @@ class WorldDiplomacy(actions:WorldStateDiplomacyActions) {
   def events(from: State, to: State): List[RelationshipEvent] =
     events.filter(e => e.fromState == from && e.toState == to)
 
-  def claims(from: State): List[RelationshipBonus] = {
+  def claimsBonuses(from: State): List[RelationshipBonus] = {
     claims.filter(_.state == from).map {
       case str: StrongProvinceClaim => RelationshipBonus(from, str.province.owner, StrongClaimRelationshipBonus,
         Localization("diplomacy.strongClaim", from.name, str.province.name))
@@ -168,7 +179,7 @@ class WorldDiplomacy(actions:WorldStateDiplomacyActions) {
   def relationshipsDescribed(state: State, currentTurn: Int): Map[State, List[RelationshipBonus]] = {
     val bonuses = events(state).map(_.relationshipsChange(currentTurn)) ++
       agreements(state).flatMap(_.relationshipBonus).filter(_.from == state) ++
-      claims(state) ++ (states - state).map(s => raceAndCultureBonuses(state, s))
+      claimsBonuses(state) ++ (states - state).map(s => raceAndCultureBonuses(state, s))
     bonuses.groupBy(_.to)
   }
 
@@ -205,6 +216,8 @@ class WorldDiplomacy(actions:WorldStateDiplomacyActions) {
       claims ::= claim
     }
   }
+
+  def claims(state:State): List[Claim] = this.claims.filter(_.state == state)
 
   def joinWar(wa:WarAgreement, ally: State, newSide:State, currentTurn:Int): Unit = {
     if (wa.defenders.contains(ally)) {
@@ -283,7 +296,8 @@ object WorldDiplomacy {
 }
 
 sealed trait Claim {
-  val state: State
+  def state: State
+  def targetState: State
 }
 
 object Claim {
@@ -293,10 +307,16 @@ object Claim {
     val province: Province
   }
 
-  case class StrongProvinceClaim(state: State, province: Province) extends ProvinceClaim
+  case class StrongProvinceClaim(state: State, province: Province) extends ProvinceClaim {
+    override def targetState: State = province.owner
+  }
 
-  case class WeakProvinceClaim(state: State, province: Province, claimTurnEnd: Int) extends ProvinceClaim
+  case class WeakProvinceClaim(state: State, province: Province, claimTurnEnd: Int) extends ProvinceClaim {
+    override def targetState: State = province.owner
+  }
 
-  case class VassalizationClaim(state: State, possibleVassal:State, claimTurnEnd:Int) extends Claim
+  case class VassalizationClaim(state: State, possibleVassal:State, claimTurnEnd:Int) extends Claim {
+    override def targetState: State = possibleVassal
+  }
 }
 

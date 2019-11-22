@@ -13,6 +13,9 @@ import WorldConstants.Enterprises._
 import WorldGenerationConstants._
 import mr.merc.army.WarriorType.Professional
 import mr.merc.army.{Warrior, WarriorType}
+import mr.merc.diplomacy.Claim.{StrongProvinceClaim, WeakProvinceClaim}
+import mr.merc.diplomacy.DiplomaticAgreement.WarAgreement.CrackState
+import mr.merc.diplomacy.DiplomaticMessage.DeclareWar
 
 import scala.util.Random
 
@@ -269,7 +272,7 @@ class WorldGenerator(field:TerrainHexField) {
 
 object WorldGenerator extends Logging {
 
-    def generateWorld(): WorldState = {
+  def generateWorld(): WorldState = {
     val timeBefore = System.currentTimeMillis()
     val world = WorldMapGenerator.generateWorldMap(WorldMapWidth, WorldMapHeight, Provinces)
     val generator = new WorldGenerator(world.terrain)
@@ -278,7 +281,21 @@ object WorldGenerator extends Logging {
     val ws = new WorldState(r._1.values.flatten.toList, playerState, world.terrain, generator.namesGenerators, generator.colorStream)
     0 until TradeDaysBeforeStart foreach(_ => ws.nextTurn())
     info(s"World generation took ${(System.currentTimeMillis() - timeBefore) / 1000d} seconds")
+    addClaims(ws)
+    ws.initialAiDiplomacy()
     ws
+  }
+
+  def addClaims(state:WorldState): Unit ={
+    Random.shuffle(state.regions).take(state.regions.size / 2).foreach { r =>
+      (r.neighbours.map(_.owner).toSet - r.owner).headOption.foreach { s =>
+        if (s.primeCulture == r.culture) {
+          state.addClaim(StrongProvinceClaim(s, r))
+        } else {
+          state.addClaim(WeakProvinceClaim(s, r, 100))
+        }
+      }
+    }
   }
 
   def buildConnectivityMap(field:TerrainHexField, map:Map[TerrainHex, Set[TerrainHex]]):Map[TerrainHex, Set[TerrainHex]] = {

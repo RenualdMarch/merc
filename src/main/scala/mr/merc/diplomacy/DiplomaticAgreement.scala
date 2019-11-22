@@ -161,8 +161,8 @@ object DiplomaticAgreement {
 
   }
 
-  class WarAgreement(var attackers: Set[State], var defenders: Set[State], val warInitiator: State,
-                     val warVictim: State, startingTurn: Int, var targets: Set[WarTarget])
+  case class WarAgreement(var attackers: Set[State], var defenders: Set[State], warInitiator: State,
+                     warVictim: State, startingTurn: Int, var targets: Set[WarTarget])
     extends DiplomaticAgreement(startingTurn, None) {
 
     override def sides: Set[State] = attackers ++ defenders
@@ -230,6 +230,10 @@ object DiplomaticAgreement {
     def localizeWar: String = {
       Localization("diplomacy.war", attackers.map(_.name).mkString(","), defenders.map(_.name).mkString(","),
         WarAgreement.localizeTargetsList(targets.toList))
+    }
+
+    def localizeWarName: String = {
+      Localization("diplomacy.warname", warInitiator.name, warVictim.name)
     }
   }
 

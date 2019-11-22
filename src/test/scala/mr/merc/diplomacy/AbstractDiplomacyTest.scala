@@ -20,7 +20,11 @@ class AbstractDiplomacyTest extends FunSuite with Matchers with BeforeAndAfter {
   before {
     actions = new WorldStateDiplomacyActions {
 
+      override val playerState:State = null
+
       override val regions: List[Province] = generateRegions()
+
+      override def states: Map[State, List[Province]] = regions.groupBy(_.owner)
 
       override def namesGenerators: Map[Culture, NamesGenerator] = cultures.map { c =>
         c -> new NamesGenerator(c.cultureInfo)
@@ -29,6 +33,8 @@ class AbstractDiplomacyTest extends FunSuite with Matchers with BeforeAndAfter {
       override def turn: Int = 1
 
       override var colorStream: Stream[Color] = ColorGenerator.colorStream
+
+      override def aiTurn(onlyAnswer: Boolean): Unit = {}
     }
   }
 

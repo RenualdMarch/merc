@@ -90,7 +90,7 @@ trait EconomicRegion {
     }.reduceOption(_ |+| _).getOrElse(Map())
   }
 
-  def gpd:Double = {
+  def gdp:Double = {
     goodsProducedLastTurn dot regionMarket.currentPrices
   }
 }

@@ -27,6 +27,7 @@ trait DiplomaticDeclaration extends DiplomaticMessage {
 }
 
 trait DiplomaticProposal extends DiplomaticMessage {
+
   def accept(diplomacy: WorldDiplomacy, currentTurn: Int): Unit
 
   def decline(diplomacy: WorldDiplomacy, currentTurn: Int): Unit
@@ -37,14 +38,6 @@ trait CustomDiplomaticQuestion extends DiplomaticMessage {
 }
 
 object DiplomaticMessage {
-
-  def possibleMessages(from: State, to: State, diplomacy: WorldDiplomacy, currentTurn: Int): List[(DiplomaticMessage, Boolean)] = {
-    List(
-      new AllianceProposal(from, to),
-      new VassalizationProposal(from, to),
-      new OverlordshipProposal(from, to)
-    ).map(p => p -> p.isPossible(diplomacy, currentTurn))
-  }
 
   class AllianceProposal(val from: State, val to: State) extends DiplomaticProposal {
     override def accept(diplomacy: WorldDiplomacy, currentTurn: Int): Unit = {
@@ -244,7 +237,7 @@ object DiplomaticMessage {
         case v: VassalAgreement if v.vassal == from => true
         case v: VassalAgreement if v.sides == Set(from, to) => true
         case aa: AllianceAgreement if aa.sides == Set(from, to) => true
-        case wa: WarAgreement => wa.onDifferentSides(Set(from, to)) && wa != war.get
+        case wa: WarAgreement => wa.onDifferentSides(Set(from, to)) && Some(wa) != war
         case _ => false
       }
     }
@@ -256,7 +249,7 @@ object DiplomaticMessage {
     override def body: String = Localization("diplomacy.declareWar.body", from.name, war.get.targets.map(_.localizeTarget).mkString("\n"))
   }
 
-  class AskJoinWar(val from: State, val to: State, warAgreement: WarAgreement) extends DiplomaticProposal {
+  class AskJoinWar(val from: State, val to: State, val warAgreement: WarAgreement) extends DiplomaticProposal {
     override def accept(diplomacy: WorldDiplomacy, currentTurn: Int): Unit = {
       diplomacy.joinWar(warAgreement, from, to, currentTurn)
       diplomacy.sendMessage(new AgreeJoinWar(to, from, warAgreement), currentTurn)
@@ -339,7 +332,7 @@ object DiplomaticMessage {
     override def body: String = Localization("diplomacy.declineJoinWar.body", from.name, warAgreement.localizeWar)
   }
 
-  class ProposePeace(val from: State, val to: State, warAgreement: WarAgreement, acceptedTargets: Set[WarTarget])
+  case class ProposePeace(from: State, to: State, warAgreement: WarAgreement, acceptedTargets: Set[WarTarget])
     extends DiplomaticProposal {
     override def accept(diplomacy: WorldDiplomacy, currentTurn: Int): Unit = {
       val otherSides = warAgreement.sides - from - to

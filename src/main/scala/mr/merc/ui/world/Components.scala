@@ -2,10 +2,16 @@ package mr.merc.ui.world
 
 import java.text.DecimalFormat
 
+import mr.merc.local.Localization
+import org.tbee.javafx.scene.layout.MigPane
 import scalafx.beans.binding.{ObjectBinding, StringBinding}
 import scalafx.beans.property.{ObjectProperty, ReadOnlyObjectProperty, ReadOnlyStringProperty}
+import scalafx.scene.{Node, Scene}
 import scalafx.scene.control.Button
 import scalafx.scene.text.{Font, Text}
+import scalafx.stage.Stage
+
+import scalafx.Includes._
 
 object Components {
   val largeFontSize = 24
@@ -22,7 +28,7 @@ object BigText {
     this.text = t
   }
 
-  def apply(t:ReadOnlyObjectProperty[String]): BigText = new BigText {
+  def apply(t: ReadOnlyObjectProperty[String]): BigText = new BigText {
     this.text <== t
   }
 }
@@ -36,11 +42,11 @@ object MediumText {
     this.text = t
   }
 
-  def apply(t:StringBinding): MediumText = new MediumText {
+  def apply(t: StringBinding): MediumText = new MediumText {
     this.text <== t
   }
 
-  def apply(t:ObjectProperty[String]): MediumText = new MediumText {
+  def apply(t: ObjectProperty[String]): MediumText = new MediumText {
     this.text <== t
   }
 }
@@ -54,7 +60,7 @@ object BigButton {
     this.text = t
   }
 
-  def apply(t:ReadOnlyStringProperty): BigButton = new BigButton {
+  def apply(t: ReadOnlyStringProperty): BigButton = new BigButton {
     this.text <== t
   }
 }
@@ -68,7 +74,7 @@ object MediumButton {
     this.text = t
   }
 
-  def apply(t:ReadOnlyStringProperty): MediumButton = new MediumButton {
+  def apply(t: ReadOnlyStringProperty): MediumButton = new MediumButton {
     this.text <== t
   }
 }
@@ -78,7 +84,7 @@ class MediumButton extends Button {
 }
 
 object IntFormatter {
-  def apply():DecimalFormat = {
+  def apply(): DecimalFormat = {
     val asIntFormat = new DecimalFormat("#0")
     asIntFormat.setGroupingSize(3)
     asIntFormat.setGroupingUsed(true)
@@ -87,10 +93,48 @@ object IntFormatter {
 }
 
 object DoubleFormatter {
-  def apply():DecimalFormat = {
+  def apply(): DecimalFormat = {
     val asIntFormat = new DecimalFormat("#0.00")
     asIntFormat.setGroupingSize(3)
     asIntFormat.setGroupingUsed(true)
     asIntFormat
+  }
+}
+
+abstract class DialogStage[T] extends Stage {
+  var dialogResult: Option[T] = None
+
+  private val okButton = BigButton(Localization("ok"))
+  okButton.onAction = { _ =>
+    close()
+  }
+
+  private val cancelButton = BigButton(Localization("cancel"))
+  cancelButton.onAction = { _ =>
+    dialogResult = None
+    close()
+  }
+
+  this.onCloseRequest = { _ =>
+    dialogResult = None
+  }
+
+  private val buttonsPane = new MigPane()
+  buttonsPane.add(okButton)
+  buttonsPane.add(cancelButton)
+
+  protected def dialogContent:Node
+
+  protected def css:Option[String]
+
+  val contentPane = new MigPane("")
+  contentPane.add(dialogContent, "grow, push, wrap")
+  contentPane.add(buttonsPane, "center")
+
+  scene = new Scene {
+    css.foreach {c =>
+      stylesheets.add(c)
+    }
+    content = new PaneForTooltip(contentPane)
   }
 }

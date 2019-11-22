@@ -25,7 +25,7 @@ import mr.merc.ui.world.SelectRecruitWarriorDialog.RecruitWarriorOrder
 import ModalDialog._
 import mr.merc.map.terrain._
 import mr.merc.unit._
-import scalafx.scene.Scene
+import scalafx.scene.{Node, Scene}
 import Localization._
 import mr.merc.image.MImage
 import mr.merc.unit.view.AttackView
@@ -148,7 +148,7 @@ class WarriorRecruitmentPane(controller: ArmyPaneController, stage: Stage) exten
   recruitWarriorButton.onAction = { _ =>
     val dialog = new SelectRecruitWarriorDialog(controller.possibleWarriorToRecruit())
     dialog.showDialog(stage)
-    dialog.recruitOrder.foreach { case RecruitWarriorOrder(wt, wc, c, st) =>
+    dialog.dialogResult.foreach { case RecruitWarriorOrder(wt, wc, c, st) =>
       controller.recruitWarrior(wt, wc, c)
     }
   }
@@ -324,8 +324,7 @@ object SelectRecruitWarriorDialog {
 
 }
 
-class SelectRecruitWarriorDialog(possibleChoices: List[RecruitWarriorOrder]) extends Stage {
-  var recruitOrder: Option[RecruitWarriorOrder] = None
+class SelectRecruitWarriorDialog(possibleChoices: List[RecruitWarriorOrder]) extends DialogStage[RecruitWarriorOrder] {
 
   class ParentWarriorPane(child: RecruitWarriorOrder) extends BorderPane {
     center = new WarriorTypeOrderPane(child)
@@ -333,21 +332,10 @@ class SelectRecruitWarriorDialog(possibleChoices: List[RecruitWarriorOrder]) ext
 
     this.onMouseClicked = { _ =>
       this.requestFocus()
-      recruitOrder = Some(child)
+      dialogResult = Some(child)
     }
 
     MercTooltip.applyTooltip(this, new WarriorTypeInfoPane(child.warrior))
-  }
-
-  private val selectButton = BigButton(Localization("ok"))
-  selectButton.onAction = { _ =>
-    close()
-  }
-
-  private val cancelButton = BigButton(Localization("cancel"))
-  cancelButton.onAction = { _ =>
-    recruitOrder = None
-    close()
   }
 
   val gridPane = new MigPane("wrap 4", "")
@@ -355,22 +343,9 @@ class SelectRecruitWarriorDialog(possibleChoices: List[RecruitWarriorOrder]) ext
     gridPane.add(new ParentWarriorPane(c), "grow")
   }
 
-  val buttonsPane = new MigPane()
-  buttonsPane.add(selectButton)
-  buttonsPane.add(cancelButton)
+  override protected def dialogContent: Node = gridPane
 
-  val contentPane = new MigPane("")
-  contentPane.add(gridPane, "grow, push, wrap")
-  contentPane.add(buttonsPane, "center")
-
-  scene = new Scene {
-    stylesheets.add("/css/partyPane.css")
-    content = new PaneForTooltip(contentPane)
-  }
-
-  this.onCloseRequest = { _ =>
-    recruitOrder = None
-  }
+  override protected def css: Option[String] = Some("/css/partyPane.css")
 }
 
 class WarriorTypeOrderPane(order: RecruitWarriorOrder) extends MigPane() {

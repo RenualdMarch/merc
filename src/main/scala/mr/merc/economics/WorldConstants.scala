@@ -185,6 +185,22 @@ object WorldConstants {
     val SameCultureRelationshipBonus = 20
     val SameRaceRelationshipBonus = 10
     val DifferentRaceRelationshipBonus = -10
+
+    val WarriorPowerMultiplier = 1000
+    val GDPPowerMultiplier = 1
+  }
+
+  object AI {
+    val MaxMessagesPerTurn = 3
+    val PowerDifferenceForVassalization = 5
+    val MinRelationshipForVassalization = 20
+    val EnemyPowerDifferenceForHelpAlly = 2
+    val MinRelationshipForHelpAlly = 20
+    val RelationshipForHate = -50
+    val MinRelationshipToStartAlliance = 10
+    val PowerDifferenceForPeace = 4
+    val PowerDifferenceForWhitePeace = 2
+    val PowerDifferenceToStartWar = 3
   }
 }
 

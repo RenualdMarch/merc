@@ -11,7 +11,9 @@ Current battle issues:
 +cultures.conf to scala code
 +armies economic part
 +armies ui economic part
-diplomacy
++diplomacy
+separate peace
+add war targets to going war
 next turn button async, messages framework
 remove ai from player in battles
 battles
