@@ -6,10 +6,10 @@ import scalafx.scene.canvas.Canvas
 import mr.merc.ui.common.SoldierWrapper
 import scalafx.scene.paint.Color
 import scalafx.geometry.Pos._
-import scalafx.beans.property.IntegerProperty
-class SoldierViewControl(wrapper: SoldierWrapper) extends VBox {
+import scalafx.beans.property.{DoubleProperty, IntegerProperty}
+class SoldierViewControl(wrapper: SoldierWrapper, factor:Double) extends VBox {
 
-  private val side = 72
+  private val side = 72 * factor
 
   prefHeight = side
   prefWidth = side
@@ -20,15 +20,15 @@ class SoldierViewControl(wrapper: SoldierWrapper) extends VBox {
 
   val canvas = new Canvas
   children = canvas
-  canvas.width <== IntegerProperty(side)
-  canvas.height <== IntegerProperty(side)
+  canvas.width <== DoubleProperty(side)
+  canvas.height <== DoubleProperty(side)
 
   refreshImage()
 
   def refreshImage() {
     val gc = canvas.graphicsContext2D
     gc.save()
-    gc.fill = Color.Black
+    gc.fill = Color.Green
     gc.fillRect(0, 0, side, side)
     wrapper.image.value.drawImage(gc, 0, 0)
     gc.restore()

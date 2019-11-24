@@ -63,7 +63,7 @@ class Soldier(val name: String, initialSoldierType: SoldierType, val owner: Play
     val attributes = soldierType.attributes
     val result = collection.mutable.ArrayBuffer[BeforeTurnAction]()
 
-    val neighbours = field.neighbours(x, y).flatMap(_.soldier).filter(_.owner.isFriend(this.owner))
+    val neighbours = field.neighbours(x, y).flatMap(_.soldier).filter(_.owner == this.owner)
     if (attributes.contains(Cures)) {
       val allies = neighbours.filter(_.state.contains(Poisoned))
       result ++= allies.map(t => CureSoldier(this, t))
@@ -74,15 +74,14 @@ class Soldier(val name: String, initialSoldierType: SoldierType, val owner: Play
     else None
 
     heal match {
-      case Some(healing) => {
+      case Some(healing) =>
         val whoNeedsHealing = neighbours.filter(_.needsHealing)
         val actions = healing match {
           case Heals4 => whoNeedsHealing.map(Heal4Soldier(this, _))
           case Heals8 => whoNeedsHealing.map(Heal8Soldier(this, _))
-          case x => sys.error(s"Impossible case with $x")
+          case xx => sys.error(s"Impossible case with $xx")
         }
         result ++= actions
-      }
       case None => // do nothing
     }
 

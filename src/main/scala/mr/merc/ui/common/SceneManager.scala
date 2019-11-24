@@ -1,5 +1,8 @@
 package mr.merc.ui.common
 
+import mr.merc.ai.BattleAI
+import mr.merc.economics.WorldGenerator
+import mr.merc.game.QuickGameGenerator
 import scalafx.Includes._
 import scalafx.stage.Stage
 import scalafx.scene.Parent
@@ -13,8 +16,14 @@ class SceneManager(val stage: Stage) extends Logging {
 
   def startNewBattle() {
     info("starting new battle")
-    //sceneRoot = new BattleFrame(this)
-    sceneRoot = new WorldFrame(this)
+    val gameField = new QuickGameGenerator().generateGame
+    val map = Map(gameField.players.find(_.name.contains("AI")).get -> BattleAI())
+    sceneRoot = new BattleFrame(this, gameField, map)
+  }
+
+  def startNewWorld(): Unit = {
+    val worldState = WorldGenerator.generateWorld()
+    sceneRoot = new WorldFrame(this, worldState)
   }
 
   def showMainMenu() {

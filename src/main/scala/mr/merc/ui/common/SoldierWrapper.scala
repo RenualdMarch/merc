@@ -8,7 +8,7 @@ import mr.merc.unit.view.StandState
 import mr.merc.image.MImage
 import mr.merc.local.Localization
 
-class SoldierWrapper(private var _soldier: Option[Soldier]) {
+class SoldierWrapper(private var _soldier: Option[Soldier], factor:Double) {
   val hp = StringProperty("")
   val name = StringProperty("")
   val exp = StringProperty("")
@@ -36,7 +36,7 @@ class SoldierWrapper(private var _soldier: Option[Soldier]) {
         expToNextLevel.value = soldier.soldierType.exp.toString
         movePoints.value = soldier.movePointsRemain.toString
         movePointsTotal.value = soldier.soldierType.movement.toString
-        image.value = standImage(soldier)
+        image.value = standImage(soldier).scaledImage(factor)
         level.value = soldier.soldierType.level.toString
         soldierType.value = Localization(soldier.soldierType.name)
       }

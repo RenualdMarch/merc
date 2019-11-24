@@ -2,14 +2,9 @@ package mr.merc.ui.menu
 
 import scalafx.scene.layout.BorderPane
 import scalafx.scene.layout.VBox
-import scalafx.geometry.Insets
-import scalafx.scene.control.Button
 import mr.merc.local.Localization
 import scalafx.geometry.Pos
-import mr.merc.ui.common.ConversionUtils._
 import javafx.event.ActionEvent
-import scalafx.scene.Scene
-import mr.merc.ui.battle.BattleFrame
 import mr.merc.ui.common.SceneManager
 import mr.merc.ui.world.BigButton
 
@@ -22,6 +17,13 @@ class MainMenu(sceneManager: SceneManager) extends BorderPane {
     text = Localization("menu.quickBattle")
     onAction = { e: ActionEvent =>
       sceneManager.startNewBattle()
+    }
+  }
+
+  val newWorldButton = new BigButton() {
+    text = Localization("menu.quickGame")
+    onAction = { e: ActionEvent =>
+      sceneManager.startNewWorld()
     }
   }
 
@@ -40,7 +42,7 @@ class MainMenu(sceneManager: SceneManager) extends BorderPane {
   }
 
   val menuPane = new VBox {
-    children = List(newBattleButton, optionsButton, exitButton)
+    children = List(newBattleButton, newWorldButton, optionsButton, exitButton)
   }
 
   menuPane.styleClass.add("menuPane")

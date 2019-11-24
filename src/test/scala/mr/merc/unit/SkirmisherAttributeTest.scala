@@ -20,7 +20,7 @@ class SkirmisherAttributeTest extends FunSuite with BeforeAndAfter {
 
   before {
     field = new TerrainHexField(10, 10, (x, y) => new TerrainHex(x, y, GreenGrass))
-    model = new BattleModel(new GameField(field, List(Player("1"), Player("2"))))
+    model = new BattleModel(new GameField(field, List(Player("1"), Player("2")), Set(Set(Player("1")), Set(Player("2")))))
     val enemy = new Soldier("2", simpleSoldierType(Set()), Player("2"))
     field.hex(1, 0).soldier = Some(enemy)
     soldier = new Soldier("1", simpleSoldierType(Set(Skirmisher)), Player("1"))

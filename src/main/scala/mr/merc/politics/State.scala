@@ -7,7 +7,7 @@ import mr.merc.local.Localization
 import mr.merc.map.hex.TerrainHex
 import scalafx.scene.paint.Color
 
-class State(initialName: String, val primeCulture:Culture, startingMoney: Double, val politicalSystem: PoliticalSystem, val color: Color = Color.Black) {
+class State(val initialName: String, val primeCulture:Culture, startingMoney: Double, val politicalSystem: PoliticalSystem, val color: Color = Color.Black) {
   def name: String = {
     val governmentType = Localization(primeCulture.cultureInfo.stateForm.monarchy)
     s"$initialName $governmentType"

@@ -4,11 +4,9 @@ package mr.merc.ui.battle
 import scalafx.scene.layout.VBox
 import scalafx.scene.layout.BorderPane
 import scalafx.scene.text.Text
-
 import scalafx.animation.Timeline
 import scalafx.animation.KeyFrame
 import mr.merc.battle.BattleController
-
 import scalafx.animation.Animation
 import mr.merc.battle.BattleControllerParent
 import mr.merc.unit.Soldier
@@ -17,58 +15,59 @@ import scalafx.scene.control.Button
 import scalafx.event.ActionEvent
 import scalafx.scene.Node
 import mr.merc.ui.minimap.Minimap
-
 import scalafx.geometry.Pos._
 import scalafx.scene.layout.GridPane
 import mr.merc.local.Localization
 import javafx.scene.{input => jfxin}
-
-import mr.merc.ui.common.ConversionUtils._
+import mr.merc.ai.BattleAI
 import mr.merc.ui.common.SceneManager
-
-import scalafx.scene.control.ScrollPane
-import mr.merc.map.generator.RandomTerrainGenerator
 import mr.merc.log.Logging
-
-import scalafx.scene.CacheHint
 import scalafx.geometry.Rectangle2D
 import mr.merc.game.QuickGameGenerator
 import mr.merc.battle.BattleResult
 import mr.merc.conf.Conf
+import mr.merc.map.GameField
+import mr.merc.players.Player
 import mr.merc.unit.Attack
-
 import scalafx.stage.Modality
 import mr.merc.ui.common.CanvasLayers
+import mr.merc.ui.world.{BigButton, BigText}
 
 // TODO move all styling to css
-class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleControllerParent with Logging {
+class BattleFrame(sceneManager: SceneManager, gameField:GameField, ai:Map[Player, BattleAI]) extends BorderPane with BattleControllerParent with Logging {
 
-  val scaling = Conf.double("MapScaling")
+  val scaling = Conf.double("BattleMapScaling")
 
   import scalafx.Includes._
   val pulse = 30 ms
-  val gameField = new QuickGameGenerator().generateGame
 
-  val controller = new BattleController(gameField, this, scaling)
+  val controller = new BattleController(gameField, this, scaling, ai)
 
   val mapView = controller.battleView.mapView
   private val battleCanvas = new CanvasLayers(mapView.canvasBattleLayers, new Rectangle2D(0, 0, mapView.pixelWidth, mapView.pixelHeight))
   private val minimap = new Minimap(gameField.hexField, battleCanvas, scaling)
-  private val soldierName = new Text()
-  private val soldierLevel = new Text()
-  private val soldierHP = new Text()
-  private val soldierType = new Text()
-  private val endTurnButton = new Button() {
+  private val soldierName = new BigText()
+  private val soldierLevel = new BigText()
+  private val soldierHP = new BigText()
+  private val soldierType = new BigText()
+  private val endTurnButton = new BigButton() {
     text = Localization("turn.end")
   }
   override val disableEndTurn = endTurnButton.disable
 
   private val soldierWrapper = controller.soldierToShow
-  private val soldierViewControl = new SoldierViewControl(soldierWrapper)
+  private val soldierViewControl = new SoldierViewControl(soldierWrapper, scaling)
 
   private val rightPanel = new VBox() {
     prefWidth = 400
-    style = "-fx-background-color: cyan"
+    maxWidth = 400
+    minWidth = 400
+    style =
+      """
+        |  -fx-background-color: white;
+        |  -fx-border-color: black;
+        |  -fx-border-width: 2;
+      """.stripMargin
     spacing = 20
     alignment = TopCenter
     children = List[Node](minimap, soldierViewControl, new GridPane {
@@ -76,21 +75,13 @@ class BattleFrame(sceneManager: SceneManager) extends BorderPane with BattleCont
       hgap = 10
       alignment = TopLeft
       style = "-fx-padding: 0 0 0 100;"
-      add(new Text {
-        text = Localization("soldier.type")
-      }, 0, 0)
+      add(BigText(Localization("soldier.type")), 0, 0)
       add(soldierType, 1, 0)
-      add(new Text {
-        text = Localization("soldier.name")
-      }, 0, 1)
+      add(BigText(Localization("soldier.name")), 0, 1)
       add(soldierName, 1, 1)
-      add(new Text {
-        text = Localization("soldier.level")
-      }, 0, 2)
+      add(BigText(Localization("soldier.level")), 0, 2)
       add(soldierLevel, 1, 2)
-      add(new Text {
-        text = Localization("soldier.hp")
-      }, 0, 3)
+      add(BigText(Localization("soldier.hp")), 0, 3)
       add(soldierHP, 1, 3)
     }, endTurnButton)
   }

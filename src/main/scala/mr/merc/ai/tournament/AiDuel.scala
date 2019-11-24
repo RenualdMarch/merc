@@ -6,19 +6,20 @@ import mr.merc.players.Player
 import mr.merc.battle.BattleModel
 
 class AiDuel(val first: BattleAI, val second: BattleAI) {
-  private val player1 = Player("1", ai = Some(first))
-  private val player2 = Player("2", ai = Some(second))
+  val player1 = Player("1")
+  val player2 = Player("2")
   val game = new QuickGameGenerator(player1, player2).generateGame
+  val aiMap = Map(player1 -> first, player2 -> second)
   val model = new BattleModel(game)
   var winner: Option[Player] = None
 
   def playGame() {
     while (!model.isOver) {
       val player = model.currentPlayer
-      val event = player.ai.get.nextTurn(model)
+      val event = aiMap(player).nextTurn(model)
       model.handleEvent(event)
     }
 
-    winner = Some(model.soldiersByAlliance.keys.toList(0).toList(0))
+    winner = Some(model.soldiersByAlliance.keys.head.head)
   }
 }

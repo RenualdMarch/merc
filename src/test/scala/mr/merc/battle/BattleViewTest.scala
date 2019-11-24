@@ -27,7 +27,7 @@ import org.mockito.ArgumentMatchers._
 
 class BattleViewTest extends FunSuite with BeforeAndAfter with MockitoSugar {
   val field = new TerrainHexField(10, 10, (x, y) => new TerrainHex(x, y, GreenGrass))
-  val model = new BattleModel(new GameField(field, List(Player("1"), Player("2"))))
+  val model = new BattleModel(new GameField(field, List(Player("1"), Player("2")), Set(Set(Player("1")), Set(Player("2")))))
   val simpleSoldierType = new SoldierType("testType1", 1, 20, 10, 5, 1,
     List(), Map(GrassKind -> 2), Map(), Map(), viewName = "testType1")
   val rangedSoldierType = new SoldierType("testType1", 1, 20, 10, 5, 1,

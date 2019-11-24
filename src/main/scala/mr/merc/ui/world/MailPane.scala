@@ -19,7 +19,7 @@ import scalafx.scene.shape.Rectangle
 
 class MailPane(playerState:State, actions: WorldStateDiplomacyActions) extends PaneWithTwoHorizontalChildren(0.4) {
   val titles = new MailTitles(playerState, actions)
-  val mail = new MailView(actions, titles.selectedMessage, titles.refresh)
+  val mail = new MailView(actions, titles.selectedMessage, () => titles.refresh())
   setTwoChildren(titles, mail)
 }
 

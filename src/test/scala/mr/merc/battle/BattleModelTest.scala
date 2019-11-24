@@ -24,7 +24,7 @@ class BattleModelTest extends FunSuite with BeforeAndAfter {
 
   before {
     field = new TerrainHexField(10, 10, (x, y) => new TerrainHex(x, y, GreenGrass))
-    model = new BattleModel(new GameField(field, List(Player("1"), Player("2"))))
+    model = new BattleModel(new GameField(field, List(Player("1"), Player("2")), Set(Set(Player("1")), Set(Player("2")))))
   }
 
   test("movement validation") {
@@ -354,7 +354,7 @@ class BattleModelTest extends FunSuite with BeforeAndAfter {
     }
 
     field = new TerrainHexField(10, 10, terrainHex)
-    model = new BattleModel(new GameField(field, List(Player("1"), Player("2"))))
+    model = new BattleModel(new GameField(field, List(Player("1"), Player("2")), Set(Set(Player("1")), Set(Player("2")))))
     val soldier = new Soldier("1", simpleSoldierType, Player("1"))
     field.hex(0, 0).soldier = Some(soldier)
     soldier.movePointsRemain = 2
@@ -383,7 +383,7 @@ class BattleModelTest extends FunSuite with BeforeAndAfter {
     }
 
     field = new TerrainHexField(10, 10, terrainHex)
-    model = new BattleModel(new GameField(field, List(Player("1"), Player("2"))))
+    model = new BattleModel(new GameField(field, List(Player("1"), Player("2")), Set(Set(Player("1")), Set(Player("2")))))
     val soldier = new Soldier("1", simpleSoldierType, Player("1"))
     field.hex(0, 0).soldier = Some(soldier)
     soldier.movePointsRemain = 3

@@ -37,7 +37,7 @@ class Warrior(val warriorType: WarriorType, val competence: WarriorCompetence, v
 
   def typeName:String = Localization(warriorType.name)
 
-  val player:Player = Player(owner.name, owner.color, None)
+  val player:Player = Player(owner.initialName, owner.color)
 
   def soldierType:SoldierType = warriorType.buildSoldierType(competence, culture)
 

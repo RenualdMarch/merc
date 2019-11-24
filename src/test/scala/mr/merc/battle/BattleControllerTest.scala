@@ -32,7 +32,7 @@ class BattleControllerTest extends FunSuite with BeforeAndAfter {
     hexField.hex(0, 4).soldier = Some(soldier3)
     hexField.hex(7, 4).soldier = Some(soldier4)
 
-    val gameField = new GameField(hexField, List(Player("1"), Player("2")))
+    val gameField = new GameField(hexField, List(Player("1"), Player("2")), Set(Set(Player("1")), Set(Player("2"))))
 
     controller = new BattleController(gameField, new BattleControllerParent() {
       def onMinimapChange() {}
@@ -40,7 +40,7 @@ class BattleControllerTest extends FunSuite with BeforeAndAfter {
       def showBattleOverDialog(result: BattleResult) = ???
       def showAttackSelectionDialog(attacker: Soldier, defender: Soldier, attackerHex: TerrainHex,
         defenderHex: TerrainHex) = ???
-    }, 1.0) {
+    }, 1.0, Map()) {
       override def selectAttack(attacker: Soldier, defender: Soldier,
         attackerHex: TerrainHex, defenderHex: TerrainHex) = Some(attacker.soldierType.attacks(0))
     }

@@ -1,7 +1,7 @@
 package mr.merc.ui.world
 
 import javafx.event.EventHandler
-import mr.merc.economics.WorldGenerator
+import mr.merc.economics.{WorldGenerator, WorldState}
 import mr.merc.log.Logging
 import mr.merc.map.hex.view.ProvinceView
 import mr.merc.map.hex.view.TerrainHexFieldView.WorldMapViewMode
@@ -14,18 +14,24 @@ import scalafx.scene.input.{KeyCode, KeyEvent, MouseEvent}
 import scalafx.Includes._
 import javafx.scene.input.{KeyEvent => JKeyEvent}
 import javafx.scene.input.{KeyCode => JKeyCode}
+import mr.merc.ui.dialog.WaitDialog
 import org.tbee.javafx.scene.layout.MigPane
 import scalafx.scene.paint.Color
 import scalafx.scene.shape.Rectangle
+import mr.merc.ui.dialog.ModalDialog._
+import scalafx.application.Platform
+
+import scala.concurrent.ExecutionContext.Implicits._
+import scala.concurrent.Future
+import scala.util.{Failure, Success}
 
 object WorldFrame {
   val PixelsPerScroll = 200
 }
 
-class WorldFrame(sceneManager: SceneManager) extends Pane with Logging {
+class WorldFrame(sceneManager: SceneManager, worldState:WorldState) extends Pane with Logging {
   val factor = 1d
 
-  val worldState = WorldGenerator.generateWorld()
   val mapView = new MapView(worldState.worldHexField, factor, mode = WorldMapViewMode)
   val menu = new WorldMenu(this)
   val stateLabel:Pane = new PlayerStateData(worldState.playerState)
@@ -128,7 +134,22 @@ class WorldFrame(sceneManager: SceneManager) extends Pane with Logging {
   }
 
   def nextTurn(): Unit = {
-    worldState.nextTurn()
+
+    val waitDialog = new WaitDialog
+
+    Future {
+      worldState.nextTurn()
+    }.onComplete {
+      case Success(_) =>
+        Platform.runLater(
+          waitDialog.close())
+      case Failure(ex) =>
+        error(ex.getMessage, ex)
+        Platform.runLater(
+          waitDialog.close())
+    }
+
+    waitDialog.showDialog(sceneManager.stage)
   }
 
   this.addEventFilter(javafx.scene.input.KeyEvent.KEY_PRESSED, new EventHandler[JKeyEvent] {

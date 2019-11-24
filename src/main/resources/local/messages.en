@@ -22,6 +22,7 @@ attackAttribute.poison=Poison
 attackAttribute.slow=Slow
 menu.newGame=New game
 menu.quickBattle=Quick battle
+menu.quickGame=Quick game
 menu.options=Options
 menu.exit=Exit
 options.soundsEnabled=Sounds

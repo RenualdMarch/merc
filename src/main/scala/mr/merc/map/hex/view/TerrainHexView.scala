@@ -10,7 +10,6 @@ import scalafx.scene.text.FontWeight
 import scalafx.scene.image.Image
 import mr.merc.ui.common.ImageHelper._
 import mr.merc.unit.SoldierDefence
-import mr.merc.map.objects.House
 import mr.merc.ui.common.geom.Line
 import mr.merc.util.CacheFactoryMap
 
@@ -19,13 +18,15 @@ object TerrainHexView {
 
   def side(factor: Double): Int = (72 * factor) toInt
 
+  def factor(side: Double): Double = side / 72
+
   def textLength(factor: Double): Int = side(factor) / 2
 
   private val hexGridImageCache = new CacheFactoryMap[Int, Image](
     side =>
       drawImage(side, side) { gc =>
         gc.stroke = Color.Black
-        gc.lineWidth = 0.25
+        gc.lineWidth = 0.5 * factor(side)
         gc.strokePolygon(angles(side))
       })
 

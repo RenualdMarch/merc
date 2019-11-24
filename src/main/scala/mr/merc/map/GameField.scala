@@ -7,13 +7,13 @@ import mr.merc.unit.Soldier
 import mr.merc.unit.Skirmisher
 
 // TODO add allies support
-class GameField(val hexField: TerrainHexField, val players: List[Player]) {
+class GameField(val hexField: TerrainHexField, val players: List[Player], val sides:Set[Set[Player]]) {
   def gridForSoldier(soldier: Soldier): UniversalGrid[TerrainHex] = {
     new UniversalGrid[TerrainHex] {
       private val mustStopHere = if (soldier.soldierType.attributes.contains(Skirmisher)) {
         Set.empty[TerrainHex]
       } else {
-        players.filterNot(_.isSamePlayer(soldier.owner)).map(zoneOfControlFor).reduce(_ ++ _)
+        players.filterNot(_ == soldier.owner).map(zoneOfControlFor).reduce(_ ++ _)
       }
 
       override def isBlocked(t: TerrainHex) = isBlockedFor(soldier, t)
@@ -26,8 +26,12 @@ class GameField(val hexField: TerrainHexField, val players: List[Player]) {
     }
   }
 
+  private def areEnemies(p1:Player, p2:Player):Boolean = {
+    sides.find(_.contains(p1)) != sides.find(_.contains(p2))
+  }
+
   def isBlockedFor(soldier: Soldier, t: TerrainHex): Boolean = {
-    t.soldier.map(_.owner.isEnemy(soldier.owner)).getOrElse(false)
+    t.soldier.exists(s => areEnemies(s.owner, soldier.owner))
   }
 
   def zoneOfControlFor(player: Player): Set[TerrainHex] = {
@@ -42,7 +46,7 @@ class GameField(val hexField: TerrainHexField, val players: List[Player]) {
   }
 
   private def hasPlayerOnHex(hex: TerrainHex, player: Player): Boolean = {
-    hex.soldier.map(_.owner.isSamePlayer(player)).getOrElse(false)
+    hex.soldier.exists(_.owner == player)
   }
 
   private def hasPlayerOnNeighborHex(hex: TerrainHex, player: Player): Boolean = {

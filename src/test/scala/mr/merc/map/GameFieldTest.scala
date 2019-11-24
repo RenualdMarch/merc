@@ -19,7 +19,7 @@ class GameFieldTest extends FunSuite {
   val soldier3 = new Soldier("2", soldierType, player2)
 
   val terrainField = new TerrainHexField(5, 5, (x, y) => new TerrainHex(x, y, GreenGrass))
-  val gameField = new GameField(terrainField, List(player1, player2))
+  val gameField = new GameField(terrainField, List(player1, player2), Set(Set(Player("1")), Set(Player("2"))))
 
   terrainField.hex(0, 1).soldier = Some(soldier1)
   terrainField.hex(1, 2).soldier = Some(soldier2)

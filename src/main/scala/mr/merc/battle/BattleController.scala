@@ -1,16 +1,9 @@
 package mr.merc.battle
 
-import scalafx.scene.canvas.Canvas
-import mr.merc.map.hex.TerrainHexField
+import mr.merc.ai.BattleAI
 import mr.merc.unit.Soldier
-import mr.merc.map.view.MapView
 import mr.merc.players.Player
-import mr.merc.unit.SoldierType
 import mr.merc.map.hex.TerrainHex
-import mr.merc.map.terrain._
-import mr.merc.map.objects._
-
-import scalafx.scene.canvas.GraphicsContext
 import mr.merc.map.GameField
 import mr.merc.ui.common.SoldierWrapper
 import mr.merc.battle.event.ShowArrow
@@ -19,25 +12,18 @@ import mr.merc.battle.event.HideMovementOptions
 import mr.merc.battle.event.ShowMovementOptions
 import mr.merc.battle.event.MovementModelEvent
 import mr.merc.battle.event.AttackModelEvent
-import mr.merc.ui.battle.BattleFrame
 import mr.merc.battle.event.EndMoveModelEvent
-import mr.merc.ui.battle.AttackSelectionDialog
-
-import scalafx.stage.Modality
 import mr.merc.unit.Attack
 import mr.merc.battle.event.HideDefence
 import mr.merc.battle.event.ShowDefence
-import mr.merc.conf.Conf
 import mr.merc.log.Logging
-
 import scalafx.geometry.Rectangle2D
-import mr.merc.ui.common.CanvasLayers
 
-class BattleController(gameField: GameField, parent: BattleControllerParent, factor: Double) extends Logging {
+class BattleController(gameField: GameField, parent: BattleControllerParent, factor: Double, aiMap:Map[Player, BattleAI]) extends Logging {
   val battleModel = new BattleModel(gameField)
   val battleView = new BattleView(battleModel, factor)
 
-  val soldierToShow = new SoldierWrapper(None)
+  val soldierToShow = new SoldierWrapper(None, factor)
 
   private[battle] var selectedSoldier: Option[Soldier] = None
   private[battle] var arrowIsShown = false
@@ -49,10 +35,10 @@ class BattleController(gameField: GameField, parent: BattleControllerParent, fac
     debug(s"Mouse moved to ($x, $y)")
     val hexOpt = battleView.hexByPixel(x, y, viewRect)
     hexOpt match {
-      case Some(hexView) => {
+      case Some(hexView) =>
         visitedHexesList.visitHex(hexView.hex)
         hexView.hex.soldier match {
-          case Some(soldier) => {
+          case Some(soldier) =>
             removeDefence()
             soldierToShow.soldier = Some(soldier)
             if (canBeCurrentHexAttackedFromPrevious) {
@@ -63,18 +49,18 @@ class BattleController(gameField: GameField, parent: BattleControllerParent, fac
             } else {
               removeArrow()
             }
-          }
-          case None => {
+
+          case None =>
             removeArrow()
             drawDefenceForSelectedTerrainHex()
             soldierToShow.soldier = selectedSoldier
-          }
+
         }
-      }
-      case None => {
+
+      case None =>
         removeArrow()
         removeDefence()
-      }
+
     }
   }
 
@@ -107,12 +93,12 @@ class BattleController(gameField: GameField, parent: BattleControllerParent, fac
   private def addMovementOptionsForSelectedSoldier() {
     val hexOpt = battleModel.hexBySoldier(selectedSoldier)
     hexOpt match {
-      case Some(hex) => {
+      case Some(hex) =>
         movementOptionsAreShown = true
         val possible = battleModel.possibleMoves(selectedSoldier.get, hex) ++ Set(hex) ++
           battleModel.possibleAttacksWhenThereAreNoMoves(selectedSoldier.get, hex)
         battleView.handleEvent(ShowMovementOptions(possible))
-      }
+
       case None => // do nothing
     }
   }
@@ -187,7 +173,7 @@ class BattleController(gameField: GameField, parent: BattleControllerParent, fac
 
   def endTurnButton() {
     debug(s"End turn button clicked")
-    if (battleModel.validateEndTurn && battleModel.currentPlayer.ai.isEmpty) {
+    if (battleModel.validateEndTurn && aiMap.get(battleModel.currentPlayer).isEmpty) {
       val result = battleModel.handleEvent(EndMoveModelEvent)
       battleView.handleEvent(result.buildBattleViewEvent)
       removeArrow()
@@ -298,7 +284,7 @@ class BattleController(gameField: GameField, parent: BattleControllerParent, fac
   def update(time: Int) {
     battleView.update(time)
     if (!battleModel.isOver) {
-      battleModel.currentPlayer.ai.foreach { ai =>
+      aiMap.get(battleModel.currentPlayer).foreach { ai =>
         if (!battleView.areMovementsGoing) {
           val event = ai.nextTurn(battleModel)
           val result = battleModel.handleEvent(event)
@@ -311,12 +297,12 @@ class BattleController(gameField: GameField, parent: BattleControllerParent, fac
       parent.showBattleOverDialog(buildBattleResult)
     }
 
-    parent.disableEndTurn.value = !(battleModel.validateEndTurn && battleModel.currentPlayer.ai.isEmpty)
+    parent.disableEndTurn.value = !(battleModel.validateEndTurn && aiMap.get(battleModel.currentPlayer).isEmpty)
   }
 
   def buildBattleResult: BattleResult = {
-    val players = battleModel.soldiersByAlliance.toList(0)._1
-    new BattleResult(players.toList)
+    val players = battleModel.soldiersByAlliance.head._1
+    BattleResult(players.toList)
   }
 }
 

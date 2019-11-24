@@ -13,7 +13,8 @@ import org.scalatest.BeforeAndAfter
 class AIAgentTest extends FunSuite with BeforeAndAfter {
   val conf = AIConfiguration(0.4, 0, 0, 1, 10, 1)
   val field = new TerrainHexField(10, 10, TerrainHex.grassInit)
-  val model = new BattleModel(new GameField(field, List(Player("1"), Player("2"))))
+  val sides = Set(Set(Player("1")), Set(Player("2")))
+  val model = new BattleModel(new GameField(field, List(Player("1"), Player("2")), sides))
   val soldierType = new SoldierType("", 20, 40, 4, 1, 1,
     List(new Attack(0, 10, 2, Impact, false)), Map(GrassKind -> 2), Map(GrassDefence -> 50), Map(Impact -> 0), viewName = "")
   val attacker = new Soldier("1", soldierType, Player("1"))
@@ -62,7 +63,7 @@ class AIAgentTest extends FunSuite with BeforeAndAfter {
   test("move closer to enemy") {
     def hexInit(x: Int, y: Int) = if (y == 4) new TerrainHex(x, y, DesertSand) else new TerrainHex(x, y, GreenGrass)
     val field = new TerrainHexField(1, 10, hexInit)
-    val model = new BattleModel(new GameField(field, List(Player("1"), Player("2"))))
+    val model = new BattleModel(new GameField(field, List(Player("1"), Player("2")), sides))
     val soldierType = new SoldierType("", 20, 40, 10, 1, 1,
       List(new Attack(0, 10, 2, Impact, false)), Map(GrassKind -> 2, SandKind -> 2), Map(GrassDefence -> 50, SandDefence -> 60), Map(Impact -> 0), viewName = "")
     val conf1 = AIConfiguration(0.4, 0, 0, 1, 10, 1)

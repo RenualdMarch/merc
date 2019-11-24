@@ -82,11 +82,11 @@ case class AIAgent(soldier: Soldier, hex: TerrainHex, conf: AIConfiguration) {
   private[conditional] def bestTarget(model: BattleModel): Option[TargetInfo] = {
     val reachableHexes = model.possibleMoves(soldier, hex) ++ Set(hex)
     val reachableHexesAndNeigs = reachableHexes.flatMap(model.map.hexField.neighbours(_))
-    val reachableEnemies = reachableHexesAndNeigs.filter(_.soldier.isDefined).filter(_.soldier.get.owner.isEnemy(soldier.owner))
+    val reachableEnemies = reachableHexesAndNeigs.filter(_.soldier.isDefined).filter(s => model.areEnemies(s.soldier.get.owner, soldier.owner))
     val enemyAndAttackPossitions = reachableEnemies.map(h => (h, model.map.hexField.neighboursSet(h) & reachableHexes))
     val targets = enemyAndAttackPossitions map {
       case (enemyHex, attackPositions) =>
-        val bestHexForAttack = attackPositions.toList.sortBy(h => Attack.calculateSoldierDefence(soldier, h).defence).last
+        val bestHexForAttack = attackPositions.toList.maxBy(h => Attack.calculateSoldierDefence(soldier, h).defence)
         val attacker = soldier
         val defender = enemyHex.soldier.get
         val attackersAttackIndex = AttackSelectionHelper.selectBestAttack(attacker, defender, bestHexForAttack, enemyHex)

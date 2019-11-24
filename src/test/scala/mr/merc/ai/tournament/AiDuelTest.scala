@@ -9,6 +9,6 @@ class AiDuelTest extends FunSuite {
     val predictedWinner = BattleAI()
     val duel = new AiDuel(new DummyAI, predictedWinner)
     duel.playGame()
-    assert(duel.winner.get.ai.get === predictedWinner)
+    assert(duel.winner === Some(duel.player2))
   }
 }
