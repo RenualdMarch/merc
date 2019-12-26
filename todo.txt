@@ -5,22 +5,13 @@ Current battle issues:
 
 
 //"-Dglass.win.uiScale=100%"
-+draw soldier centered like mountains
-+armies movement and ui
-+add user country on left top with color
-+cultures.conf to scala code
-+armies economic part
-+armies ui economic part
-+diplomacy
+battles
+reputation and relations
 separate peace
 when 1 and 2 are in alliance and 2 and 3 too, and 1 declares war on 3
-reputation and relations
 add war targets to going war
-+next turn button async, messages framework
 province claims must be understandable
 create claims diplomatically
-+remove ai from player in battles
-battles
 check conditional AI logic - unused expression
 1 season per turn, 4 turns per year
 elections
@@ -32,9 +23,6 @@ when showing tooltip, if it is big, find way to show it more when size is too bi
 terrain season changes
 
 add more cultures:
-+arabs
-+mountaintribe
-+luz culture as spain
 Marashy culture as indian?
 Vikings culture as scandinavian?
 chinese?

@@ -235,6 +235,16 @@ object DiplomaticAgreement {
     def localizeWarName: String = {
       Localization("diplomacy.warname", warInitiator.name, warVictim.name)
     }
+
+    def sideByState(state:State):Set[State] =
+      if (defenders.contains(state)) defenders
+      else if (attackers.contains(state)) attackers
+      else sys.error(s"Invalid side by state for state $state for war $this")
+
+    def oppositeSideByState(state:State):Set[State] =
+      if (attackers.contains(state)) defenders
+      else if (defenders.contains(state)) attackers
+      else sys.error(s"Invalid opposite side by state for state $state for war $this")
   }
 
   object WarAgreement {

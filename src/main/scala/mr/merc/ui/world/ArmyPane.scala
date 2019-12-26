@@ -396,7 +396,7 @@ class ArmyPaneController(province: Province, provinceView: ProvinceView, worldSt
   }
 
   def movementPossible(target: Province): Boolean = {
-    target == province || worldState.canPlanMoveArmy(province, target)
+    target == province || worldState.canPlanMoveArmy(province, target, worldState.playerState)
   }
 
   def dragStartPossible(from: Province): Boolean = {

@@ -16,7 +16,7 @@ object Main extends JFXApp {
     // to make it fit on the screen
     scene = new Scene(screenRect.width - 100, screenRect.height - 100)
     fullScreenExitHint = ""
-    fullScreen = false
+    fullScreen = true
   }
 
   val sceneManager = new SceneManager(stage)

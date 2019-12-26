@@ -1,6 +1,6 @@
 package mr.merc.army
 
-import mr.merc.army.WarriorType.WarriorCompetence
+import mr.merc.army.WarriorType.{Militia, Professional, WarriorCompetence}
 import mr.merc.economics.Culture
 import mr.merc.economics.{FulfilledDemandRequest, Products, WarriorDemandRequest, WorldConstants}
 import mr.merc.local.Localization
@@ -31,6 +31,11 @@ class Warrior(val warriorType: WarriorType, val competence: WarriorCompetence, v
 
   def hpPercentage_=(hp: Double): Unit = {
     soldier.hp = Math.round(soldierType.hp * hp).toInt
+  }
+
+  def warriorWeight:Double = competence match {
+    case Militia => 1
+    case Professional => 2
   }
 
   def isAlive:Boolean = soldier.hp > 0

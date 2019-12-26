@@ -79,8 +79,7 @@ class DiplomaticSituation(diplomacy:WorldDiplomacy) {
 
   def stateArmyTotalLevel(state: State): Double = {
     diplomacy.regions.flatMap(_.regionWarriors.allWarriors.filter(_.owner == state)).map { w =>
-      val typ = w.soldierType
-      typ.level * w.hpPercentage
+      w.hpPercentage * w.warriorWeight
     }.sum
   }
 

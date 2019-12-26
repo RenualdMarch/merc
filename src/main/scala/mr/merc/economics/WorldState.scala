@@ -221,14 +221,16 @@ trait WorldStateArmyActions {
 
   def regions: List[Province]
 
-  def canPlanMoveArmy(from:Province, to:Province) : Boolean = {
-    from.economicNeighbours.contains(to) && from.owner == to.owner
-  }
+  def canPlanMoveArmy(from:Province, to:Province, warriorOwner:State) : Boolean
 
   def planMoveArmy(from:Province, to:Option[Province], warriors:List[Warrior]): Unit = {
     to match {
       case None => from.regionWarriors.planSendWarriors(warriors, None)
-      case Some(p) => if (canPlanMoveArmy(from, p)) from.regionWarriors.planSendWarriors(warriors, to)
+      case Some(p) =>
+        warriors.groupBy(_.owner).foreach { case (state, list) =>
+          if (canPlanMoveArmy(from, p, state))
+            from.regionWarriors.planSendWarriors(list, to)
+        }
     }
   }
 
@@ -395,5 +397,36 @@ trait WorldStateDiplomacyActions {
     diplomacyEngine.agreements(state).collect {
       case aa:AllianceAgreement => aa.sides - state
     }.flatten
+  }
+
+  def vassals(state:State):List[State] = {
+    diplomacyEngine.getVassals(state)
+  }
+
+  def inWarTogether(state1:State, state2:State):Boolean = {
+    diplomacyEngine.wars.exists(ag => ag.onSameSide(Set(state1, state2)))
+  }
+
+  def inWarTogetherAgainst(state:State, together:State, against:State):Boolean = {
+    diplomacyEngine.wars.exists(ag => ag.onSameSide(Set(state, together)) && ag.onDifferentSides(Set(state, against)))
+  }
+
+  def inWarAgainst(state1: State, state2:State):Boolean = {
+    diplomacyEngine.wars.exists(ag => ag.onDifferentSides(Set(state1, state2)))
+  }
+
+  def mergeAttackersTogether(attackers:Set[State], defender:State):Set[Set[State]] = {
+    val defenderWars = diplomacyEngine.wars(defender)
+    defenderWars.map { war =>
+      val oppositeSide = war.oppositeSideByState(defender)
+      attackers & oppositeSide
+    }.filter(_.nonEmpty).toSet
+  }
+
+
+  def canPlanMoveArmy(from:Province, to:Province, warriorOwner:State) : Boolean = {
+    from.economicNeighbours.contains(to) &&
+      (from.owner == to.owner || inWarAgainst(warriorOwner, to.owner) || inWarTogether(warriorOwner, to.owner) ||
+        allies(warriorOwner).contains(to.owner) || vassals(warriorOwner).contains(to.owner))
   }
 }

@@ -270,6 +270,7 @@ class RegionWarriors(initial: List[Warrior], neighbours: => Set[EconomicRegion])
 
   def planSendWarriors(whom:List[Warrior], to:Option[EconomicRegion]): Unit = {
     require(to.forall(neighbours.contains), s"Illegal destination $to, possible $neighbours")
+    require(whom.toSet.subsetOf(allWarriors.toSet), s"planned send warriors $whom but present only $allWarriors")
 
     val withoutWhom = destinations.transform { case (_, list) =>
         list.filterNot(whom.contains)
