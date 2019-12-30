@@ -1,9 +1,9 @@
 package mr.merc.unit
 
+import mr.merc.economics.Culture.LatinHuman
 import org.scalatest.FunSuite
 import org.scalatest.BeforeAndAfter
 import mr.merc.map.hex.TerrainHex
-import mr.merc.map.objects.House.HumanCityHouse
 import mr.merc.players.Player
 import mr.merc.map.terrain._
 import mr.merc.map.objects._
@@ -146,7 +146,7 @@ class AttackTest extends FunSuite with BeforeAndAfter {
 
   test("village defence is separate thing") {
     val hex1 = new TerrainHex(0, 0, DesertSand)
-    val hex2 = new TerrainHex(0, 0, DesertSand, Some(HumanCityHouse))
+    val hex2 = new TerrainHex(0, 0, DesertSand, Some(House(LatinHuman)))
 
     val someType = new SoldierType("type1", 1, 10, 1, 10, 1,
       List(), Map(), Map(SandDefence -> 50, BuildingDefence -> 60),

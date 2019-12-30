@@ -1,12 +1,12 @@
 package mr.merc.map.hex.view
 
+import mr.merc.army.WarriorCompetence.{Militia, Professional}
 import mr.merc.army.{Warrior, WarriorViewNames}
-import mr.merc.army.WarriorType.{HeavyBladeInfantry, HeavyMaceInfantry, Militia, Professional}
+import mr.merc.army.WarriorType.{HeavyBladeInfantry, HeavyMaceInfantry}
 import mr.merc.economics.Culture._
 import mr.merc.economics.Population.Humans
 import mr.merc.economics._
 import mr.merc.map.hex.{TerrainHex, TerrainHexField}
-import mr.merc.map.objects.House.{HumanCityHouse, HumanVillageHouse}
 import mr.merc.map.terrain.{Castle, ShallowWater}
 import mr.merc.map.view.SoldiersDrawer
 import mr.merc.politics.{Party, Province, State}
@@ -29,7 +29,7 @@ class ProvinceViewTest extends FunSuite with MockitoSugar with BeforeAndAfter wi
   val province = mock[Province]
   val population = mock[RegionPopulation]
 
-  val testCulture = new Culture("testCulture", Humans, HumanCityHouse, Color.White) {
+  val testCulture = new Culture("testCulture", Humans, "testHouse", Color.White) {
     override val warriorViewNames: WarriorViewNames = WarriorViewNames(Map(
       (HeavyMaceInfantry, Professional) -> "oneImageSoldier",
       (HeavyMaceInfantry, Militia) -> "testSoldier2"))
@@ -56,15 +56,15 @@ class ProvinceViewTest extends FunSuite with MockitoSugar with BeforeAndAfter wi
     provinceView.refreshCity()
     val houses1 = field.hexes.filter(_.mapObj.exists(_.isInstanceOf[House]))
     assert(houses1.size === 4)
-    assert(houses1.forall(_.mapObj.contains(HumanCityHouse)))
+    assert(houses1.forall(_.mapObj.contains(House(LatinHuman))))
     assert(field.hex(3, 1).mapObj.isEmpty)
     assert(field.hex(3, 2).mapObj.isEmpty)
     provinceView.refreshCity()
 
     val houses2 = field.hexes.filter(_.mapObj.exists(_.isInstanceOf[House]))
     assert(houses2.size === 5)
-    val latinHouses2 = houses2.filter(_.mapObj.contains(HumanCityHouse))
-    val westHouses2 = houses2.filter(_.mapObj.contains(HumanVillageHouse))
+    val latinHouses2 = houses2.filter(_.mapObj.contains(House(LatinHuman)))
+    val westHouses2 = houses2.filter(_.mapObj.contains(House(FrenchHuman)))
     assert(latinHouses2.size === 4)
     assert(westHouses2.size === 1)
 
@@ -74,8 +74,8 @@ class ProvinceViewTest extends FunSuite with MockitoSugar with BeforeAndAfter wi
     val houses3 = field.hexes.filter(_.mapObj.exists(_.isInstanceOf[House]))
     assert(houses3.size === 5)
 
-    val latinHouses3 = houses3.filter(_.mapObj.contains(HumanCityHouse))
-    val westHouses3 = houses3.filter(_.mapObj.contains(HumanVillageHouse))
+    val latinHouses3 = houses3.filter(_.mapObj.contains(House(LatinHuman)))
+    val westHouses3 = houses3.filter(_.mapObj.contains(House(FrenchHuman)))
 
     assert(latinHouses3.size === 3)
     assert(westHouses3.size === 2)
@@ -86,8 +86,8 @@ class ProvinceViewTest extends FunSuite with MockitoSugar with BeforeAndAfter wi
     provinceView.refreshCity()
     val houses4 = field.hexes.filter(_.mapObj.exists(_.isInstanceOf[House]))
     assert(houses4.size === 6)
-    val latinHouses4 = houses4.filter(_.mapObj.contains(HumanCityHouse))
-    val westHouses4 = houses4.filter(_.mapObj.contains(HumanVillageHouse))
+    val latinHouses4 = houses4.filter(_.mapObj.contains(House(LatinHuman)))
+    val westHouses4 = houses4.filter(_.mapObj.contains(House(FrenchHuman)))
 
     assert(latinHouses4.size === 4)
     assert(westHouses4.size === 2)

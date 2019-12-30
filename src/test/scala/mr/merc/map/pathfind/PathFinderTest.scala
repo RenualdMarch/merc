@@ -1,12 +1,12 @@
 package mr.merc.map.pathfind
 
+import mr.merc.economics.Culture.LatinHuman
 import mr.merc.map.UniversalGrid
 import org.scalatest.FunSuite
 import mr.merc.map.hex.Hex
 import mr.merc.map.hex.HexField
 import mr.merc.map.hex.TerrainHexField
 import mr.merc.map.hex.TerrainHex
-import mr.merc.map.objects.House.HumanCityHouse
 import mr.merc.map.terrain._
 import mr.merc.map.objects._
 
@@ -91,7 +91,7 @@ class PathFinderTest extends FunSuite {
     } else if (y == 2) {
       new TerrainHex(x, y, DecForest)
     } else if (x == 4 && y == 3) {
-      new TerrainHex(x, y, GreenGrass, Some(HumanCityHouse))
+      new TerrainHex(x, y, GreenGrass, Some(House(LatinHuman)))
     } else {
       new TerrainHex(x, y, DesertSand)
     }

@@ -12,7 +12,7 @@ import mr.merc.util.FxPropertyUtils._
 import scalafx.beans.property.{ObjectProperty, ReadOnlyObjectProperty}
 import EconomicLocalization._
 import javafx.scene.control.TableCell
-import mr.merc.army.WarriorType.WarriorCompetence
+import mr.merc.army.WarriorCompetence
 import mr.merc.economics._
 import mr.merc.util.{GuiUtils, MercTooltip}
 import org.tbee.javafx.scene.layout.MigPane

@@ -4,10 +4,8 @@ import mr.merc.army.WarriorViewNames
 import mr.merc.economics.Population._
 import mr.merc.economics.Products._
 import mr.merc.economics.WorldConstants.Population.needsQ
-import mr.merc.map.objects.House._
 import scalafx.scene.paint.Color
 import MapUtil.FloatOperations._
-import mr.merc.map.objects.House
 
 object Culture {
 
@@ -33,7 +31,7 @@ object Culture {
 
   case class CultureInfo(stateForm: StateForm, cities: List[String], states: List[String])
 
-  case object LatinHuman extends Culture("latin", Humans, HumanCityHouse, Color.Red) {
+  case object LatinHuman extends Culture("latin", Humans, "humanCity", Color.Red) {
     val warriorViewNames: WarriorViewNames = WarriorViewNames.LatinCulture
 
     val cultureInfo: CultureInfo = CultureInfo(StateForm("empire", "republic"),
@@ -113,7 +111,7 @@ object Culture {
         "Lux"))
   }
 
-  case object FrenchHuman extends Culture("french", Humans, HumanVillageHouse, Color.Blue) {
+  case object FrenchHuman extends Culture("french", Humans, "humanVillage", Color.Blue) {
     val warriorViewNames: WarriorViewNames = WarriorViewNames.WesnothCulture
 
     val cultureInfo: CultureInfo = CultureInfo(StateForm("kingdom", "republic"),
@@ -178,7 +176,7 @@ object Culture {
         "Burgundian"))
   }
 
-  case object DarkHuman extends Culture("nilf", Humans, HumanCottage, Color.Black) {
+  case object DarkHuman extends Culture("nilf", Humans, "humanCottage", Color.Black) {
     val warriorViewNames: WarriorViewNames = WarriorViewNames.DarkHumanCulture
 
     val cultureInfo: CultureInfo = CultureInfo(StateForm("empire", "republic"),
@@ -234,7 +232,7 @@ object Culture {
         "Ublanian"))
   }
 
-  case object GreekHuman extends Culture("greek", Humans, HumanCityHouse, Color.Gray) {
+  case object GreekHuman extends Culture("greek", Humans, "humanCity", Color.Gray) {
     val warriorViewNames: WarriorViewNames = WarriorViewNames.GreekDardoCulture
 
     val cultureInfo: CultureInfo = CultureInfo(StateForm("kingdom", "republic"),
@@ -287,7 +285,7 @@ object Culture {
         "Corinthian"))
   }
 
-  case object GermanHuman extends Culture("german", Humans, HumanVillageHouse, Color.Yellow) {
+  case object GermanHuman extends Culture("german", Humans, "humanVillage", Color.Yellow) {
     val warriorViewNames: WarriorViewNames = WarriorViewNames.ChevalierCulture
 
     val cultureInfo: CultureInfo = CultureInfo(StateForm("empire", "republic"),
@@ -354,7 +352,7 @@ object Culture {
         "Prussian"))
   }
 
-  case object SlavicHuman extends Culture("slavic", Humans, HumanCottage, Color.Violet) {
+  case object SlavicHuman extends Culture("slavic", Humans, "humanCottage", Color.Violet) {
     val warriorViewNames: WarriorViewNames = WarriorViewNames.WolfCulture
 
     val cultureInfo: CultureInfo = CultureInfo(StateForm("principality", "republic"),
@@ -405,7 +403,7 @@ object Culture {
         "Podolian"))
   }
 
-  case object ArabHuman extends Culture("arab", Humans, DesertHouse, Color.Green) {
+  case object ArabHuman extends Culture("arab", Humans, "desertCity", Color.Green) {
     override val warriorViewNames: WarriorViewNames = WarriorViewNames.ArabCulture
 
     override val cultureInfo: CultureInfo = CultureInfo(StateForm("caliphate", "republic"),
@@ -463,7 +461,7 @@ object Culture {
     )
   }
 
-  case object SpainHuman extends Culture("spanish", Humans, HumanVillageHouse, Color.Orange) {
+  case object SpainHuman extends Culture("spanish", Humans, "humanVillage", Color.Orange) {
     override val warriorViewNames: WarriorViewNames = WarriorViewNames.LuzCulture
 
     override val cultureInfo: CultureInfo = CultureInfo(StateForm("kingdom", "republic"),
@@ -550,7 +548,7 @@ object Culture {
   )
 }
 
-abstract class Culture(val name: String, val race: Race, val houseStyle: House, val color: Color) {
+abstract class Culture(val name: String, val race: Race, val houseStyle: String, val color: Color) {
 
   import Culture._
 

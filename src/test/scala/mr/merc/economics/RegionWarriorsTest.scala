@@ -1,18 +1,18 @@
 package mr.merc.economics
 
-import mr.merc.army.WarriorType.{HeavyMaceInfantry, Militia, Professional}
+import mr.merc.army.WarriorType.HeavyMaceInfantry
 import mr.merc.army.{Warrior, WarriorViewNames}
 import mr.merc.economics.Population.Humans
-import mr.merc.map.objects.House.HumanCityHouse
 import mr.merc.politics.{Party, State}
 import org.scalatest.{FunSuite, Matchers}
 import scalafx.scene.paint.Color
 import MapUtil.FloatOperations._
+import mr.merc.army.WarriorCompetence.{Militia, Professional}
 import mr.merc.economics.Culture.{CultureInfo, StateForm}
 
 class RegionWarriorsTest extends FunSuite with Matchers {
 
-  val testCulture = new Culture("testCulture", Humans, HumanCityHouse, Color.White) {
+  val testCulture = new Culture("testCulture", Humans, "testHouse", Color.White) {
     override val warriorViewNames: WarriorViewNames = WarriorViewNames(Map(
       (HeavyMaceInfantry, Professional) -> "oneImageSoldier",
       (HeavyMaceInfantry, Militia) -> "testSoldier2"))

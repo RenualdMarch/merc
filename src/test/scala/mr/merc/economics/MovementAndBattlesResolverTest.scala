@@ -1,6 +1,6 @@
 package mr.merc.economics
 
-import mr.merc.army.{Warrior, WarriorType}
+import mr.merc.army.{Warrior, WarriorCompetence, WarriorType}
 import mr.merc.diplomacy.DiplomaticAgreement.WarAgreement
 import mr.merc.diplomacy.DiplomaticAgreement.WarAgreement.TakeProvince
 import mr.merc.map.hex.{TerrainHex, TerrainHexField}
@@ -28,7 +28,7 @@ class MovementAndBattlesResolverTest extends FunSuite with Matchers {
     province2.controller = state1
 
     province1.regionWarriors.receiveWarriors(List(new Warrior(WarriorType.HeavyBladeInfantry,
-      WarriorType.Professional, state1.primeCulture, state1)))
+      WarriorCompetence.Professional, state1.primeCulture, state1)))
 
     val w = province1.regionWarriors.allWarriors
     province1.regionWarriors.planSendWarriors(w, Some(province2))
@@ -43,7 +43,7 @@ class MovementAndBattlesResolverTest extends FunSuite with Matchers {
   test("simple one province battle") {
     val ws = build4ProvinceWorldState()
     province1.regionWarriors.receiveWarriors(List(new Warrior(WarriorType.HeavyBladeInfantry,
-      WarriorType.Professional, state1.primeCulture, state1)))
+      WarriorCompetence.Professional, state1.primeCulture, state1)))
 
     ws.diplomacyEngine.addAgreement(new WarAgreement(Set(state1), Set(state2), state1, state2, 0,
       Set(new TakeProvince(state1, state2, province2))))
@@ -67,14 +67,14 @@ class MovementAndBattlesResolverTest extends FunSuite with Matchers {
   test("complex one province battle") {
     val ws = build4ProvinceWorldState()
     province1.regionWarriors.receiveWarriors(List(new Warrior(WarriorType.HeavyBladeInfantry,
-      WarriorType.Professional, state1.primeCulture, state1)))
+      WarriorCompetence.Professional, state1.primeCulture, state1)))
     province2.regionWarriors.receiveWarriors(List(new Warrior(WarriorType.HeavyBladeInfantry,
-      WarriorType.Professional, state2.primeCulture, state2), new Warrior(WarriorType.HeavyBladeInfantry,
-      WarriorType.Professional, state2.primeCulture, state2)))
+      WarriorCompetence.Professional, state2.primeCulture, state2), new Warrior(WarriorType.HeavyBladeInfantry,
+      WarriorCompetence.Professional, state2.primeCulture, state2)))
     province3.regionWarriors.receiveWarriors(List(new Warrior(WarriorType.HeavyBladeInfantry,
-      WarriorType.Professional, state3.primeCulture, state3)))
+      WarriorCompetence.Professional, state3.primeCulture, state3)))
     province4.regionWarriors.receiveWarriors(List(new Warrior(WarriorType.HeavyBladeInfantry,
-      WarriorType.Professional, state4.primeCulture, state4)))
+      WarriorCompetence.Professional, state4.primeCulture, state4)))
 
     ws.diplomacyEngine.addAgreement(new WarAgreement(Set(state1, state2), Set(state3, state4), state1, state3, 0,
       Set(new TakeProvince(state1, state3, province3))))
@@ -105,14 +105,14 @@ class MovementAndBattlesResolverTest extends FunSuite with Matchers {
   test("only one possible one province battle") {
     val ws = build4ProvinceWorldState()
     province1.regionWarriors.receiveWarriors(List(new Warrior(WarriorType.HeavyBladeInfantry,
-      WarriorType.Professional, state1.primeCulture, state1)))
+      WarriorCompetence.Professional, state1.primeCulture, state1)))
     province2.regionWarriors.receiveWarriors(List(new Warrior(WarriorType.HeavyBladeInfantry,
-      WarriorType.Professional, state2.primeCulture, state2), new Warrior(WarriorType.HeavyBladeInfantry,
-      WarriorType.Professional, state2.primeCulture, state2)))
+      WarriorCompetence.Professional, state2.primeCulture, state2), new Warrior(WarriorType.HeavyBladeInfantry,
+      WarriorCompetence.Professional, state2.primeCulture, state2)))
     province3.regionWarriors.receiveWarriors(List(new Warrior(WarriorType.HeavyBladeInfantry,
-      WarriorType.Professional, state3.primeCulture, state3)))
+      WarriorCompetence.Professional, state3.primeCulture, state3)))
     province4.regionWarriors.receiveWarriors(List(new Warrior(WarriorType.HeavyBladeInfantry,
-      WarriorType.Professional, state4.primeCulture, state4)))
+      WarriorCompetence.Professional, state4.primeCulture, state4)))
 
     ws.diplomacyEngine.addAgreement(new WarAgreement(Set(state1), Set(state3, state4), state1, state3, 0,
       Set(new TakeProvince(state1, state3, province3))))
@@ -145,13 +145,13 @@ class MovementAndBattlesResolverTest extends FunSuite with Matchers {
   test("one province battle with allies from one province") {
     val ws = build4ProvinceWorldState()
     province1.regionWarriors.receiveWarriors(List(new Warrior(WarriorType.HeavyBladeInfantry,
-      WarriorType.Professional, state1.primeCulture, state1), new Warrior(WarriorType.HeavyBladeInfantry,
-      WarriorType.Professional, state2.primeCulture, state2), new Warrior(WarriorType.HeavyBladeInfantry,
-      WarriorType.Professional, state2.primeCulture, state2)))
+      WarriorCompetence.Professional, state1.primeCulture, state1), new Warrior(WarriorType.HeavyBladeInfantry,
+      WarriorCompetence.Professional, state2.primeCulture, state2), new Warrior(WarriorType.HeavyBladeInfantry,
+      WarriorCompetence.Professional, state2.primeCulture, state2)))
     province3.regionWarriors.receiveWarriors(List(new Warrior(WarriorType.HeavyBladeInfantry,
-      WarriorType.Professional, state3.primeCulture, state3)))
+      WarriorCompetence.Professional, state3.primeCulture, state3)))
     province4.regionWarriors.receiveWarriors(List(new Warrior(WarriorType.HeavyBladeInfantry,
-      WarriorType.Professional, state4.primeCulture, state4)))
+      WarriorCompetence.Professional, state4.primeCulture, state4)))
 
     ws.diplomacyEngine.addAgreement(new WarAgreement(Set(state1, state2), Set(state3, state4), state1, state3, 0,
       Set(new TakeProvince(state1, state3, province3))))
@@ -180,13 +180,13 @@ class MovementAndBattlesResolverTest extends FunSuite with Matchers {
   test("one province battle without allies") {
     val ws = build4ProvinceWorldState()
     province1.regionWarriors.receiveWarriors(List(new Warrior(WarriorType.HeavyBladeInfantry,
-      WarriorType.Professional, state1.primeCulture, state1), new Warrior(WarriorType.HeavyBladeInfantry,
-      WarriorType.Professional, state2.primeCulture, state2), new Warrior(WarriorType.HeavyBladeInfantry,
-      WarriorType.Professional, state2.primeCulture, state2)))
+      WarriorCompetence.Professional, state1.primeCulture, state1), new Warrior(WarriorType.HeavyBladeInfantry,
+      WarriorCompetence.Professional, state2.primeCulture, state2), new Warrior(WarriorType.HeavyBladeInfantry,
+      WarriorCompetence.Professional, state2.primeCulture, state2)))
     province3.regionWarriors.receiveWarriors(List(new Warrior(WarriorType.HeavyBladeInfantry,
-      WarriorType.Professional, state3.primeCulture, state3)))
+      WarriorCompetence.Professional, state3.primeCulture, state3)))
     province4.regionWarriors.receiveWarriors(List(new Warrior(WarriorType.HeavyBladeInfantry,
-      WarriorType.Professional, state4.primeCulture, state4)))
+      WarriorCompetence.Professional, state4.primeCulture, state4)))
 
     ws.diplomacyEngine.addAgreement(new WarAgreement(Set(state1), Set(state3, state4), state1, state3, 0,
       Set(new TakeProvince(state1, state3, province3))))
@@ -225,14 +225,14 @@ class MovementAndBattlesResolverTest extends FunSuite with Matchers {
     province4.owner = state3
 
     province1.regionWarriors.receiveWarriors(List(new Warrior(WarriorType.HeavyBladeInfantry,
-      WarriorType.Professional, state1.primeCulture, state1)))
+      WarriorCompetence.Professional, state1.primeCulture, state1)))
     province2.regionWarriors.receiveWarriors(List(new Warrior(WarriorType.HeavyBladeInfantry,
-      WarriorType.Professional, state1.primeCulture, state1), new Warrior(WarriorType.HeavyBladeInfantry,
-      WarriorType.Professional, state1.primeCulture, state1)))
+      WarriorCompetence.Professional, state1.primeCulture, state1), new Warrior(WarriorType.HeavyBladeInfantry,
+      WarriorCompetence.Professional, state1.primeCulture, state1)))
     province3.regionWarriors.receiveWarriors(List(new Warrior(WarriorType.HeavyBladeInfantry,
-      WarriorType.Professional, state3.primeCulture, state3)))
+      WarriorCompetence.Professional, state3.primeCulture, state3)))
     province4.regionWarriors.receiveWarriors(List(new Warrior(WarriorType.HeavyBladeInfantry,
-      WarriorType.Professional, state3.primeCulture, state3)))
+      WarriorCompetence.Professional, state3.primeCulture, state3)))
 
     ws.diplomacyEngine.addAgreement(new WarAgreement(Set(state1), Set(state3), state1, state3, 0,
       Set(new TakeProvince(state1, state3, province3))))
@@ -263,9 +263,9 @@ class MovementAndBattlesResolverTest extends FunSuite with Matchers {
   test("simple two province battle") {
     val ws = build4ProvinceWorldState()
     province1.regionWarriors.receiveWarriors(List(new Warrior(WarriorType.HeavyBladeInfantry,
-      WarriorType.Professional, state1.primeCulture, state1)))
+      WarriorCompetence.Professional, state1.primeCulture, state1)))
     province2.regionWarriors.receiveWarriors(List(new Warrior(WarriorType.HeavyBladeInfantry,
-      WarriorType.Professional, state2.primeCulture, state2)))
+      WarriorCompetence.Professional, state2.primeCulture, state2)))
 
     ws.diplomacyEngine.addAgreement(new WarAgreement(Set(state1), Set(state2), state1, state2, 0,
       Set(new TakeProvince(state1, state2, province2))))
@@ -304,15 +304,15 @@ class MovementAndBattlesResolverTest extends FunSuite with Matchers {
   test("complex two province battle") {
     val ws = build4ProvinceWorldState()
     province1.regionWarriors.receiveWarriors(List(new Warrior(WarriorType.HeavyBladeInfantry,
-      WarriorType.Professional, state1.primeCulture, state1)))
+      WarriorCompetence.Professional, state1.primeCulture, state1)))
     province2.regionWarriors.receiveWarriors(List(new Warrior(WarriorType.HeavyBladeInfantry,
-      WarriorType.Professional, state2.primeCulture, state2), new Warrior(WarriorType.HeavyBladeInfantry,
-      WarriorType.Professional, state2.primeCulture, state2)))
+      WarriorCompetence.Professional, state2.primeCulture, state2), new Warrior(WarriorType.HeavyBladeInfantry,
+      WarriorCompetence.Professional, state2.primeCulture, state2)))
     province3.regionWarriors.receiveWarriors(List(new Warrior(WarriorType.HeavyBladeInfantry,
-      WarriorType.Professional, state3.primeCulture, state3), new Warrior(WarriorType.HeavyBladeInfantry,
-      WarriorType.Professional, state3.primeCulture, state3)))
+      WarriorCompetence.Professional, state3.primeCulture, state3), new Warrior(WarriorType.HeavyBladeInfantry,
+      WarriorCompetence.Professional, state3.primeCulture, state3)))
     province4.regionWarriors.receiveWarriors(List(new Warrior(WarriorType.HeavyBladeInfantry,
-      WarriorType.Professional, state4.primeCulture, state4)))
+      WarriorCompetence.Professional, state4.primeCulture, state4)))
 
     ws.diplomacyEngine.addAgreement(new WarAgreement(Set(state1, state2), Set(state3, state4), state1, state3, 0,
       Set(new TakeProvince(state1, state3, province3))))
@@ -360,14 +360,14 @@ class MovementAndBattlesResolverTest extends FunSuite with Matchers {
     val ws = build4ProvinceWorldState()
 
     province1.regionWarriors.receiveWarriors(List(new Warrior(WarriorType.HeavyBladeInfantry,
-      WarriorType.Professional, state1.primeCulture, state1)))
+      WarriorCompetence.Professional, state1.primeCulture, state1)))
     province2.regionWarriors.receiveWarriors(List(new Warrior(WarriorType.HeavyBladeInfantry,
-      WarriorType.Professional, state2.primeCulture, state2), new Warrior(WarriorType.HeavyBladeInfantry,
-      WarriorType.Professional, state2.primeCulture, state2)))
+      WarriorCompetence.Professional, state2.primeCulture, state2), new Warrior(WarriorType.HeavyBladeInfantry,
+      WarriorCompetence.Professional, state2.primeCulture, state2)))
     province3.regionWarriors.receiveWarriors(List(new Warrior(WarriorType.HeavyBladeInfantry,
-      WarriorType.Professional, state3.primeCulture, state3)))
+      WarriorCompetence.Professional, state3.primeCulture, state3)))
     province4.regionWarriors.receiveWarriors(List(new Warrior(WarriorType.HeavyBladeInfantry,
-      WarriorType.Professional, state4.primeCulture, state4)))
+      WarriorCompetence.Professional, state4.primeCulture, state4)))
 
     ws.diplomacyEngine.addAgreement(new WarAgreement(Set(state1), Set(state2), state1, state2, 0,
       Set(new TakeProvince(state1, state2, province2))))
@@ -404,14 +404,14 @@ class MovementAndBattlesResolverTest extends FunSuite with Matchers {
     val ws = build4ProvinceWorldState()
 
     province1.regionWarriors.receiveWarriors(List(new Warrior(WarriorType.HeavyBladeInfantry,
-      WarriorType.Professional, state1.primeCulture, state1)))
+      WarriorCompetence.Professional, state1.primeCulture, state1)))
     province2.regionWarriors.receiveWarriors(List(new Warrior(WarriorType.HeavyBladeInfantry,
-      WarriorType.Professional, state2.primeCulture, state2), new Warrior(WarriorType.HeavyBladeInfantry,
-      WarriorType.Professional, state2.primeCulture, state2)))
+      WarriorCompetence.Professional, state2.primeCulture, state2), new Warrior(WarriorType.HeavyBladeInfantry,
+      WarriorCompetence.Professional, state2.primeCulture, state2)))
     province3.regionWarriors.receiveWarriors(List(new Warrior(WarriorType.HeavyBladeInfantry,
-      WarriorType.Professional, state3.primeCulture, state3)))
+      WarriorCompetence.Professional, state3.primeCulture, state3)))
     province4.regionWarriors.receiveWarriors(List(new Warrior(WarriorType.HeavyBladeInfantry,
-      WarriorType.Professional, state4.primeCulture, state4)))
+      WarriorCompetence.Professional, state4.primeCulture, state4)))
 
     ws.diplomacyEngine.addAgreement(new WarAgreement(Set(state1), Set(state2), state1, state2, 0,
       Set(new TakeProvince(state1, state2, province2))))

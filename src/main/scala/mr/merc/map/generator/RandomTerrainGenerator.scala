@@ -1,9 +1,11 @@
 package mr.merc.map.generator
 
+import mr.merc.economics.Culture.LatinHuman
 import mr.merc.map.hex.TerrainHexField
 import mr.merc.map.hex.TerrainHex
 import mr.merc.map.terrain._
 import mr.merc.map.objects._
+
 import scala.util.Random
 
 class RandomTerrainGenerator(houseChance: Double = 0.1, bridgeChance: Double = 0.1) extends MapGenerator {
@@ -18,7 +20,7 @@ class RandomTerrainGenerator(houseChance: Double = 0.1, bridgeChance: Double = 0
       val terrain = terrainTypes(random.nextInt(terrainTypes.size))
       val mapObj = if (terrain.is(GrassKind)) {
         if (random.nextDouble < houseChance) {
-          Some(House.HumanVillageHouse)
+          Some(new House(LatinHuman))
         } else {
           None
         }

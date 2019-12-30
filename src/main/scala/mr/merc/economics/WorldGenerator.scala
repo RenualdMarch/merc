@@ -11,7 +11,7 @@ import mr.merc.politics.{Party, PoliticalViews, Province, State}
 import mr.merc.util.WeightedRandom
 import WorldConstants.Enterprises._
 import WorldGenerationConstants._
-import mr.merc.army.WarriorType.Professional
+import mr.merc.army.WarriorCompetence.{Militia, Professional}
 import mr.merc.army.{Warrior, WarriorType}
 import mr.merc.diplomacy.Claim.{StrongProvinceClaim, WeakProvinceClaim}
 import mr.merc.diplomacy.DiplomaticAgreement.WarAgreement.CrackState

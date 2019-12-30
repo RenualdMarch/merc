@@ -1,10 +1,10 @@
 package mr.merc.army
 
-import mr.merc.army.WarriorType.Professional
+import mr.merc.army.WarriorCompetence.Professional
 import mr.merc.economics.Culture.{CultureInfo, StateForm}
 import mr.merc.economics.{Culture, FulfilledDemandRequest, PoliticalSystem, WarriorDemandRequest}
 import mr.merc.economics.Population.Humans
-import mr.merc.map.objects.House.HumanVillageHouse
+import mr.merc.map.objects.House
 import mr.merc.map.terrain.TerrainKind
 import mr.merc.politics.{Party, State}
 import mr.merc.unit.{Attack, AttackType, DefenceType, SoldierTypeAttribute}
@@ -30,7 +30,7 @@ class WarriorTest extends FunSuite with Matchers {
     override def attributes: Set[SoldierTypeAttribute] = Set()
   }
 
-  val culture = new Culture("testCulture", Humans, HumanVillageHouse, Color.White){
+  val culture = new Culture("testCulture", Humans, "houseStyle", Color.White){
     override val warriorViewNames: WarriorViewNames = WarriorViewNames(Map((warriorType, Professional) -> "testType1"))
     override val cultureInfo: Culture.CultureInfo = CultureInfo(StateForm("a", "b"), Nil, Nil)
   }

@@ -1,6 +1,6 @@
 package mr.merc.army
 
-import mr.merc.army.WarriorType._
+import mr.merc.army.WarriorCompetence._
 import mr.merc.economics.Culture
 import mr.merc.map.terrain._
 import mr.merc.unit._
@@ -47,11 +47,17 @@ abstract class WarriorType(val name: String) {
     attacks(c), moveCost, defence, resistance, attributes, viewName(culture, c))
 }
 
-object WarriorType {
 
-  sealed trait WarriorCompetence
+sealed trait WarriorCompetence
+
+object WarriorCompetence {
   case object Militia extends WarriorCompetence
   case object Professional extends WarriorCompetence
+}
+
+
+
+object WarriorType {
 
   def allWarriorTypes:List[WarriorType] = List(HeavyBladeInfantry, LightBladeInfantry, BladeArcher, MaceArcher,
     BladeCavalry, PikeCavalry, FireWizard, HeavyMaceInfantry, HeavyPikeInfantry)

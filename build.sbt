@@ -40,7 +40,7 @@ libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.0.6"
 
 libraryDependencies += "org.imgscalr" % "imgscalr-lib" % "4.2"
 
-libraryDependencies += "org.typelevel" %% "cats-core" % "1.0.0-RC1"
+libraryDependencies += "org.typelevel" %% "cats-core" % "2.0.0"
 
 libraryDependencies += "com.typesafe" % "config" % "1.3.2"
 

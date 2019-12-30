@@ -1,7 +1,7 @@
 package mr.merc.ui.world
 
-import mr.merc.army.{Warrior, WarriorType}
-import mr.merc.army.WarriorType.{Militia, Professional, WarriorCompetence}
+import mr.merc.army.{Warrior, WarriorCompetence, WarriorType}
+import mr.merc.army.WarriorCompetence.{Militia, Professional}
 import mr.merc.economics.Products.Ritual
 import mr.merc.economics._
 import mr.merc.local.Localization

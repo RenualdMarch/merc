@@ -1,10 +1,10 @@
 package mr.merc.economics
 
-import mr.merc.army.WarriorType.{Militia, Professional, WarriorCompetence}
+import mr.merc.army.WarriorCompetence.{Militia, Professional}
 import mr.merc.economics.Population._
 import mr.merc.economics.Products.{Cement, Clothes, Fabric, Furniture, Glass, Liquor, Lumber, Paper, Steel, Weapons, Wine, _}
-
 import MapUtil.FloatOperations._
+import mr.merc.army.WarriorCompetence
 
 object WorldConstants {
 

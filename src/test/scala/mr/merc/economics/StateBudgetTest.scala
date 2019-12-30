@@ -5,7 +5,6 @@ import mr.merc.economics.Population._
 import mr.merc.economics.Products.Grain
 import mr.merc.economics.SpendingPolicy.{BureaucratsSalary, Pensions, ScholarsSalary}
 import mr.merc.economics.TaxPolicy.{CorporateTax, LowSalaryTax}
-import mr.merc.map.objects.House.HumanCityHouse
 import mr.merc.politics.{Party, PoliticalViews, State}
 import org.scalatest.FunSuite
 import scalafx.scene.paint.Color
@@ -14,7 +13,7 @@ class StateBudgetTest extends FunSuite {
 
   test("Spending of budget money doesnt create pop") {
 
-    val culture = new Culture("testCulture", Humans, HumanCityHouse, Color.Red) {
+    val culture = new Culture("testCulture", Humans, "testHouse", Color.Red) {
 
 
       override val warriorViewNames: WarriorViewNames = null
@@ -83,7 +82,7 @@ class StateBudgetTest extends FunSuite {
 
   test("Spend budget money") {
 
-    val culture = new Culture("testCulture", Humans, HumanCityHouse, Color.Red) {
+    val culture = new Culture("testCulture", Humans, "testHouse", Color.Red) {
 
       override val warriorViewNames: WarriorViewNames = null
       override val cultureInfo: Culture.CultureInfo = null
@@ -150,7 +149,7 @@ class StateBudgetTest extends FunSuite {
 
   test("Not enough money in budget") {
 
-    val culture = new Culture("testCulture", Humans, HumanCityHouse, Color.Red) {
+    val culture = new Culture("testCulture", Humans, "testHouse", Color.Red) {
 
       override val warriorViewNames: WarriorViewNames = null
       override val cultureInfo: Culture.CultureInfo = null

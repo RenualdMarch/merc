@@ -5,6 +5,7 @@ import mr.merc.economics.TaxPolicy._
 import mr.merc.economics._
 import mr.merc.local.Localization
 import mr.merc.map.hex.TerrainHex
+import mr.merc.players.Player
 import scalafx.scene.paint.Color
 
 class State(val initialName: String, val primeCulture:Culture, startingMoney: Double, val politicalSystem: PoliticalSystem, val color: Color = Color.Black) {
@@ -30,6 +31,8 @@ class State(val initialName: String, val primeCulture:Culture, startingMoney: Do
 
   val budget: StateBudget = new StateBudget(startingMoney, taxPolicy)
   budget.spendingPolicyConfig = SpendingPolicyConfig(1d/3, 1d/3, 0, 1d)
+
+  def toPlayer:Player = Player(initialName, color)
 }
 
 class Province(val name: String, var owner: State, val regionMarket: RegionMarket,

@@ -1,6 +1,5 @@
 package mr.merc.army
 
-import mr.merc.army.WarriorType.{Militia, Professional, WarriorCompetence}
 import mr.merc.economics.Culture
 import mr.merc.economics.{FulfilledDemandRequest, Products, WarriorDemandRequest, WorldConstants}
 import mr.merc.local.Localization
@@ -12,6 +11,7 @@ import mr.merc.util.CacheFactoryMap
 import mr.merc.economics.MapUtil.FloatOperations._
 import WorldConstants.Army._
 import mr.merc.army.Warrior.WarriorNeedRecord
+import mr.merc.army.WarriorCompetence.{Militia, Professional}
 import scalafx.scene.image.Image
 
 object Warrior {
@@ -42,7 +42,7 @@ class Warrior(val warriorType: WarriorType, val competence: WarriorCompetence, v
 
   def typeName:String = Localization(warriorType.name)
 
-  val player:Player = Player(owner.initialName, owner.color)
+  val player:Player = owner.toPlayer
 
   def soldierType:SoldierType = warriorType.buildSoldierType(competence, culture)
 

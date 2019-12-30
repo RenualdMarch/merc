@@ -1,7 +1,7 @@
 package mr.merc.economics
 
-import mr.merc.army.{Warrior, WarriorType}
-import mr.merc.army.WarriorType.WarriorCompetence
+import mr.merc.army.{Warrior, WarriorCompetence, WarriorType}
+import mr.merc.army.WarriorCompetence.{Militia, Professional}
 import mr.merc.diplomacy.Claim.{StrongProvinceClaim, VassalizationClaim, WeakProvinceClaim}
 import mr.merc.diplomacy.DiplomaticAgreement.{AllianceAgreement, WarAgreement}
 import mr.merc.diplomacy.DiplomaticAgreement.WarAgreement.TakeMoney

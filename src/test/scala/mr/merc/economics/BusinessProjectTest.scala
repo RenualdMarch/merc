@@ -4,13 +4,12 @@ import mr.merc.army.WarriorViewNames
 import scalafx.scene.paint.Color
 import mr.merc.economics.Population.{Capitalists, Humans}
 import mr.merc.economics.Products.{Coal, Grain, Product, Weapons}
-import mr.merc.map.objects.House.HumanVillageHouse
 import mr.merc.politics.{Party, PoliticalViews, State}
 import org.scalatest.FunSuite
 
 class BusinessProjectTest extends FunSuite {
 
-  val culture = new Culture("test", Humans, HumanVillageHouse, Color.White) {
+  val culture = new Culture("test", Humans, "testHouse", Color.White) {
     override val warriorViewNames: WarriorViewNames = null
     override val cultureInfo: Culture.CultureInfo = null
   }

@@ -1,5 +1,6 @@
 package mr.merc.army
 
+import mr.merc.army.WarriorCompetence._
 import mr.merc.army.WarriorType._
 
 case class WarriorViewNames(possibleWarriors:Map[(WarriorType, WarriorCompetence), String]) {

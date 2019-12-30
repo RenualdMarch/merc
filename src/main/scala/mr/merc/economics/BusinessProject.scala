@@ -2,7 +2,8 @@ package mr.merc.economics
 
 import MapUtil.FloatOperations._
 import Products.{IndustryProduct, Product}
-import mr.merc.army.WarriorType.WarriorCompetence
+import mr.merc.army.WarriorCompetence
+import mr.merc.army.WarriorCompetence.{Militia, Professional}
 import mr.merc.army.{Warrior, WarriorType}
 import mr.merc.economics.SpendingPolicy.{Army, Construction, Spending}
 import mr.merc.politics.State

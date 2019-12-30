@@ -18,7 +18,7 @@ class ProvinceView(val province: Province, field: TerrainHexField, view: Terrain
     val alreadyHousesGroups = alreadyHouses.groupBy(_.mapObj.get).mapValues(_.size).asInstanceOf[Map[House, Int]]
 
     val newHousesCount = province.regionPopulation.cultureMembers.map { case (cul, count) =>
-      cul.houseStyle -> (count / HousePerPopulation + 1)
+      House(cul) -> (count / HousePerPopulation + 1)
     }
 
     val changes = newHousesCount |-| alreadyHousesGroups

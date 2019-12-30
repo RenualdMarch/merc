@@ -7,7 +7,7 @@ import mr.merc.map.GameField
 import scalafx.scene.paint.Color
 
 import scala.util.Random
-import mr.merc.army.{Warrior, WarriorType}
+import mr.merc.army.{Warrior, WarriorCompetence, WarriorType}
 import mr.merc.economics.{Culture, PoliticalSystem}
 import mr.merc.politics.{Party, State}
 import mr.merc.util.MercUtils._
@@ -20,7 +20,7 @@ class QuickGameGenerator(player1: Player = Player("Human", Color.Yellow),
 
   private def soldiersList(state: State): List[Soldier] = {
     val types = state.primeCulture.warriorViewNames.possibleWarriors.keySet.map(_._1).toList
-    val warriors = types.map(wt => new Warrior(wt, WarriorType.Militia, state.primeCulture, state))
+    val warriors = types.map(wt => new Warrior(wt, WarriorCompetence.Militia, state.primeCulture, state))
     val shuffled = Random.shuffle(warriors)
     shuffled.map(_.soldier)
   }

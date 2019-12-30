@@ -41,4 +41,17 @@ object MercUtils {
   def colorToStyle(color: Color):String = {
     s"rgb(${(color.red * 255).toInt},${(color.green * 255).toInt},${(color.blue * 255).toInt})"
   }
+
+  implicit class MedianFinder[T](points:Traversable[(T, T)])(implicit numeric: Numeric[T], ordering: Ordering[T]) {
+    def medianBySquares:(T, T) = {
+      import numeric._
+      points.map{ case (x, y) =>
+          val sum = points.map { case (x1, y1) =>
+            abs(x - x1) + abs(y - y1)
+          }.sum
+        ((x, y), sum)
+      }.minBy(_._2)._1
+    }
+
+  }
 }
