@@ -55,7 +55,7 @@ class Minimap(field: TerrainHexField, pane: ScrollPaneLike, factor: Double) exte
 
   def minimapSize = MinimapSize(field.width, field.height, width.intValue, height.intValue)
 
-  private def refreshMapCanvas() {
+  def refreshMapCanvas() {
     val gc = mapCanvas.graphicsContext2D
     gc.save()
     gc.fill = Color.Black

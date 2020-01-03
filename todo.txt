@@ -3,11 +3,11 @@ Current battle issues:
 * Damage numbers not cleared in highest points
 * Redraw bugs during fast movement
 
-
-//"-Dglass.win.uiScale=100%"
-battles
-reputation and relations
-separate peace
++reputation and relations
++after battle is finished logic(change controller, move warriors)
+strategy world map AI
+add battles with results to UI
+separate peace(+badboy)
 when 1 and 2 are in alliance and 2 and 3 too, and 1 declares war on 3
 add war targets to going war
 province claims must be understandable
@@ -20,7 +20,7 @@ add state selection screen with offlane word generation
 allow hire people from other cultures with some political configurations
 when hiring soldiers, use actual population
 when showing tooltip, if it is big, find way to show it more when size is too big(recruit soldier tooltip)
-terrain season changes
+end turn newspaper with events of previous turn
 
 add more cultures:
 Marashy culture as indian?
@@ -34,7 +34,7 @@ soldiers and battles and wars
 tests for balancing warrior types
 when armies move they should try move near middle borders
 
-
+//"-Dglass.win.uiScale=100%"
 
 For M8 game polishing and AI
 
@@ -54,7 +54,7 @@ army supply
 change cursor while drag&drop
 
 Dreams:
-
+terrain season changes
 strange wooden bridges placement during map creation(MapObject placement)
 water animation
 windmill animation

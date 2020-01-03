@@ -1,7 +1,7 @@
 package mr.merc.ui.world
 
 import javafx.event.EventHandler
-import mr.merc.economics.{WorldGenerator, WorldState}
+import mr.merc.economics.{Battle, WorldGenerator, WorldState}
 import mr.merc.log.Logging
 import mr.merc.map.hex.view.ProvinceView
 import mr.merc.map.hex.view.TerrainHexFieldView.WorldMapViewMode
@@ -14,6 +14,8 @@ import scalafx.scene.input.{KeyCode, KeyEvent, MouseEvent}
 import scalafx.Includes._
 import javafx.scene.input.{KeyEvent => JKeyEvent}
 import javafx.scene.input.{KeyCode => JKeyCode}
+import mr.merc.ai.BattleAI
+import mr.merc.ui.battle.BattleFrame
 import mr.merc.ui.dialog.WaitDialog
 import org.tbee.javafx.scene.layout.MigPane
 import scalafx.scene.paint.Color
@@ -41,12 +43,10 @@ class WorldFrame(sceneManager: SceneManager, worldState:WorldState) extends Pane
       new ProvinceView(p, worldState.worldHexField, mapView.terrainView)
     }
   }
-  val provinceViewsMap = provinceViews.map(p => p.province -> p).toMap
-  provinceViews.foreach(_.refreshCity())
-  provinceViews.foreach(_.refreshSoldiers())
-  mapView.terrainView.refreshTerrainDirt()
-  private val worldCanvas = new CanvasLayers(mapView.canvasBattleLayers, new Rectangle2D(0, 0, mapView.pixelWidth, mapView.pixelHeight))
 
+  val provinceViewsMap = provinceViews.map(p => p.province -> p).toMap
+
+  private val worldCanvas = new CanvasLayers(mapView.canvasBattleLayers, new Rectangle2D(0, 0, mapView.pixelWidth, mapView.pixelHeight))
   private val interfacePane = new WorldInterfacePane(this, worldCanvas, worldState.worldHexField, factor)
 
   menu.prefWidth <== this.width - this.stateLabel.width
@@ -70,6 +70,16 @@ class WorldFrame(sceneManager: SceneManager, worldState:WorldState) extends Pane
       })
       interfacePane.setRightTopPanel(pane)
     }
+  }
+
+  totalRefresh()
+
+  def totalRefresh(): Unit = {
+    provinceViews.foreach(_.refreshCity())
+    provinceViews.foreach(_.refreshSoldiers())
+    mapView.terrainView.refreshTerrainDirt()
+    worldCanvas.redraw()
+    interfacePane.refreshMinimap()
   }
 
   def showPopulationPane(province: Province) {
@@ -140,13 +150,12 @@ class WorldFrame(sceneManager: SceneManager, worldState:WorldState) extends Pane
     Future {
       worldState.nextTurn()
     }.onComplete {
-      case Success(_) =>
-        Platform.runLater(
-          waitDialog.close())
+      case Success(battles) =>
+        Platform.runLater(waitDialog.close())
+        playBattles(battles)
       case Failure(ex) =>
         error(ex.getMessage, ex)
-        Platform.runLater(
-          waitDialog.close())
+        Platform.runLater(waitDialog.close())
     }
 
     waitDialog.showDialog(sceneManager.stage)
@@ -194,6 +203,23 @@ class WorldFrame(sceneManager: SceneManager, worldState:WorldState) extends Pane
         worldCanvas.hvalue.value = v
       case _ => // do nothing
     }
+  }
+
+  def playBattles(battles: List[Battle]): Unit = {
+    def callbackFunction(remainingBattles:List[Battle])(): Unit = {
+      remainingBattles match {
+        case Nil =>
+          battles.foreach(worldState.concludePlayerBattle)
+          totalRefresh()
+          sceneManager.showFrame(this)
+        case some :: rem =>
+          val ai = some.gameField.players.map(_ -> BattleAI()).toMap - worldState.playerState.toPlayer
+          val battleFrame = new BattleFrame(sceneManager, some.gameField, ai, callbackFunction(rem))
+          sceneManager.showFrame(battleFrame)
+      }
+    }
+
+    callbackFunction(battles)()
   }
 
   class PlayerStateData(state: State) extends MigPane("center") with WorldInterfaceJavaNode {

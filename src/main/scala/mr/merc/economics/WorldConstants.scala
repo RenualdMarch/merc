@@ -188,6 +188,17 @@ object WorldConstants {
 
     val WarriorPowerMultiplier = 1000
     val GDPPowerMultiplier = 1
+
+    val BadBoyTurnRecovery = 1
+    val BadBoyToRelationsPenalty = -5
+    val SeparatePeaceBadBoy = 3
+    val NoCasusBelliWarBadBoy = 3
+    val RefuseAllyCallBadBoy = 5
+    val AnnexedProvinceWithoutClaimBadBoy = 5
+    val AnnexedState = 10
+    val CrackedState = 5
+    val VassalizedState = 3
+    val LiberateCulture = 2
   }
 
   object AI {

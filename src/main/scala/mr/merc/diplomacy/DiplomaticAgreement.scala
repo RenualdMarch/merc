@@ -215,6 +215,10 @@ object DiplomaticAgreement {
       (attackers & states).nonEmpty && (defenders & states).nonEmpty
     }
 
+    def containsSides(side1:Set[State], side2:Set[State]):Boolean = {
+      (side1.subsetOf(attackers) && side2.subsetOf(defenders)) || (side2.subsetOf(attackers) && side1.subsetOf(defenders))
+    }
+
     def onSameSide(states: Set[State]): Boolean = {
       states.subsetOf(attackers) || states.subsetOf(defenders)
     }

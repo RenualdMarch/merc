@@ -1,13 +1,16 @@
 package mr.merc.economics
 
+import mr.merc.ai.BattleAI
 import mr.merc.army.{Warrior, WarriorCompetence, WarriorType}
 import mr.merc.army.WarriorCompetence.{Militia, Professional}
+import mr.merc.battle.BattleModel
 import mr.merc.diplomacy.Claim.{StrongProvinceClaim, VassalizationClaim, WeakProvinceClaim}
 import mr.merc.diplomacy.DiplomaticAgreement.{AllianceAgreement, WarAgreement}
 import mr.merc.diplomacy.DiplomaticAgreement.WarAgreement.TakeMoney
 import mr.merc.diplomacy.DiplomaticMessage._
 import mr.merc.diplomacy.WorldDiplomacy.RelationshipBonus
 import mr.merc.diplomacy._
+import mr.merc.economics.BattleReport.ReportBattleResult
 import mr.merc.economics.Products.IndustryProduct
 import mr.merc.economics.TaxPolicy.Income
 import mr.merc.economics.WorldConstants.Army.SoldierRecruitmentCost
@@ -22,6 +25,8 @@ import scalafx.beans.property.ObjectProperty
 import mr.merc.util.FxPropertyUtils.PropertyBindingMap
 import scalafx.scene.paint.Color
 
+import scala.collection.mutable.ArrayBuffer
+
 class WorldState(val regions: List[Province], val playerState: State, val worldHexField: TerrainHexField,
                  val namesGenerators:Map[Culture, NamesGenerator], var colorStream:Stream[Color], var turn: Int = 0)
   extends WorldStateParliamentActions
@@ -29,6 +34,10 @@ class WorldState(val regions: List[Province], val playerState: State, val worldH
     with WorldStateEnterpriseActions
     with WorldStateArmyActions
     with WorldStateDiplomacyActions {
+
+  private val thisTurnBattles = ArrayBuffer[BattleReport]()
+
+  def battleReports:List[BattleReport] = thisTurnBattles.toList
 
   def playerRegions: List[Province] = regions.filter(_.owner == playerState)
 
@@ -38,7 +47,9 @@ class WorldState(val regions: List[Province], val playerState: State, val worldH
     this.aiTurn(onlyAnswer = false)
   }
 
-  def nextTurn(): Unit = {
+  def nextTurn(): List[Battle] = {
+    thisTurnBattles.clear()
+
     turn = turn + 1
     val day = new WorldMarketDay(this, turn)
     day.trade()
@@ -49,10 +60,31 @@ class WorldState(val regions: List[Province], val playerState: State, val worldH
 
     this.processUnansweredMessages()
     this.aiTurn(onlyAnswer = false)
+    this.diplomacyEngine.improveBadBoyOverTime()
 
+    val battlesResolver = new MovementAndBattlesResolver(this)
+    val battles = battlesResolver.moveAndPrepareBattles()
+    processAiBattles(battles)
+    battles
     // TODO add migrations
   }
 
+  def processAiBattles(battles:List[Battle]): Unit = {
+    battles.filterNot(_.participants.contains(playerState)).foreach { b =>
+      val model = new BattleModel(b.gameField)
+      while(!model.isOver) {
+        val event = BattleAI().nextTurn(model)
+        model.handleEvent(event)
+      }
+      thisTurnBattles += b.concludeBattle(this)
+    }
+  }
+
+  def concludePlayerBattle(battle:Battle): BattleReport = {
+    val result = battle.concludeBattle(this)
+    thisTurnBattles += result
+    result
+  }
 
 }
 

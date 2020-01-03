@@ -1,10 +1,11 @@
 package mr.merc.diplomacy
 
-import mr.merc.diplomacy.DiplomaticAgreement.WarAgreement.WarTarget
+import mr.merc.diplomacy.DiplomaticAgreement.WarAgreement._
 import mr.merc.diplomacy.DiplomaticAgreement.{AllianceAgreement, VassalAgreement, WarAgreement}
 import mr.merc.diplomacy.RelationshipEvent._
 import mr.merc.local.Localization
 import mr.merc.politics.State
+import mr.merc.economics.WorldConstants.Diplomacy._
 
 sealed trait DiplomaticMessage {
   def from: State
@@ -206,6 +207,24 @@ object DiplomaticMessage {
       diplomacy.addAgreement(w)
       war = Some(w)
 
+      // TODO extract this code???
+      target match {
+        case w:TakeProvince => if (!diplomacy.hasClaimOverProvince(from, w.province)) {
+          diplomacy.increaseBadBoy(from, NoCasusBelliWarBadBoy)
+        }
+        case lc:LiberateCulture => if (lc.culture != from.primeCulture) {
+          diplomacy.increaseBadBoy(from, NoCasusBelliWarBadBoy)
+        }
+        case cs:CrackState => if (!diplomacy.hasClaimOverState(from, to)) {
+          diplomacy.increaseBadBoy(from, NoCasusBelliWarBadBoy)
+        }
+        case _:TakeMoney => diplomacy.increaseBadBoy(from, NoCasusBelliWarBadBoy)
+
+        case v:Vassalize => if (!diplomacy.hasClaimOverState(from, to)) {
+          diplomacy.increaseBadBoy(from, NoCasusBelliWarBadBoy)
+        }
+      }
+
       callAlliesToJoin(from, diplomacy, currentTurn, attackerAllies)
     }
 
@@ -264,6 +283,7 @@ object DiplomaticMessage {
       }.foreach { a =>
         diplomacy.cancelAgreement(to, a, currentTurn)
       }
+      diplomacy.increaseBadBoy(to, RefuseAllyCallBadBoy)
     }
 
     override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean = {

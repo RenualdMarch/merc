@@ -2,7 +2,7 @@ package mr.merc.diplomacy
 
 import mr.merc.diplomacy.DiplomaticAgreement.{AllianceAgreement, VassalAgreement, WarAgreement}
 import mr.merc.diplomacy.DiplomaticAgreement.WarAgreement._
-import mr.merc.diplomacy.Claim.{ProvinceClaim, StrongProvinceClaim, WeakProvinceClaim}
+import mr.merc.diplomacy.Claim.{ProvinceClaim, StrongProvinceClaim, VassalizationClaim, WeakProvinceClaim}
 import mr.merc.diplomacy.DiplomaticMessage.DeclareWar
 import mr.merc.diplomacy.WorldDiplomacy.RelationshipBonus
 import mr.merc.politics.{Province, State}
@@ -19,14 +19,42 @@ class WorldDiplomacy(actions:WorldStateDiplomacyActions) {
   private var agreements: List[DiplomaticAgreement] = Nil
   private var events: List[RelationshipEvent] = Nil
 
+  private var badBoy:Map[State, Double] = Map()
+
   private var mailbox:Map[State, List[DiplomaticMessage]] = Map()
 
   private var claims: List[Claim] = Nil
 
   def allClaims:List[Claim] = claims
 
+  def hasClaimOverProvince(state: State, province: Province): Boolean = {
+    claims(state).collect {
+      case w:WeakProvinceClaim => w.province
+      case s:StrongProvinceClaim => s.province
+    }.toSet.contains(province)
+  }
+
+  def hasClaimOverState(state: State, targetState: State): Boolean = {
+    val set = claims(state).collect {
+      case v:VassalizationClaim => v.targetState
+    }.toSet
+    set.contains(targetState) || actions.regions.filter(_.owner == targetState).forall(p => hasClaimOverProvince(state, p))
+  }
+
   def addEvent(event: RelationshipEvent): Unit = {
     events ::= event
+  }
+
+  def improveBadBoyOverTime(): Unit = {
+    badBoy = badBoy.map { case (k, v) =>
+      val newV = if (v > BadBoyTurnRecovery) v - BadBoyTurnRecovery else 0
+      k -> newV
+    }.withDefaultValue(0d)
+  }
+
+  def increaseBadBoy(state: State, value: Double): Unit = {
+    val current = badBoy.getOrElse(state, 0d) + value
+    badBoy = badBoy + (state -> current)
   }
 
   def addAgreement(agreement: DiplomaticAgreement): Unit = {
@@ -158,6 +186,12 @@ class WorldDiplomacy(actions:WorldStateDiplomacyActions) {
     }
   }
 
+  def reputationBonuses(from: State):List[RelationshipBonus] = {
+    badBoy.filter(_._1 != from).map { case (state, bb) =>
+      RelationshipBonus(from, state, (bb * BadBoyToRelationsPenalty).toInt, Localization("diplomacy.reputation"))
+    }.toList
+  }
+
   def raceAndCultureBonuses(from:State, to:State):RelationshipBonus = {
     (from.primeCulture, to.primeCulture) match {
       case (a, b) if a == b => RelationshipBonus(from, to, SameCultureRelationshipBonus, Localization("diplomacy.sameCulture", from.name, to.name))
@@ -179,7 +213,7 @@ class WorldDiplomacy(actions:WorldStateDiplomacyActions) {
   def relationshipsDescribed(state: State, currentTurn: Int): Map[State, List[RelationshipBonus]] = {
     val bonuses = events(state).map(_.relationshipsChange(currentTurn)) ++
       agreements(state).flatMap(_.relationshipBonus).filter(_.from == state) ++
-      claimsBonuses(state) ++ (states - state).map(s => raceAndCultureBonuses(state, s))
+      claimsBonuses(state) ++ reputationBonuses(state) ++ (states - state).map(s => raceAndCultureBonuses(state, s))
     bonuses.groupBy(_.to)
   }
 
@@ -256,10 +290,14 @@ class WorldDiplomacy(actions:WorldStateDiplomacyActions) {
     agreements = agreements.filterNot(_ == wa)
     val newAgreements = targets.flatMap(_.validTarget(wa, this)).flatMap {
       case tp:TakeProvince =>
+        if (!hasClaimOverProvince(tp.demander, tp.province)) {
+          increaseBadBoy(tp.demander, AnnexedProvinceWithoutClaimBadBoy)
+        }
         tp.province.owner = tp.demander
         tp.province.controller = tp.demander
         Nil
       case lc:LiberateCulture =>
+        increaseBadBoy(lc.demander, LiberateCulture)
         val newState = actions.generateNewState(lc.culture, lc.demander.rulingParty)
         lc.provinces.foreach { p =>
           p.owner = newState
@@ -267,6 +305,9 @@ class WorldDiplomacy(actions:WorldStateDiplomacyActions) {
         }
         Nil
       case cs:CrackState =>
+        if (!hasClaimOverState(cs.demander, cs.giver)) {
+          increaseBadBoy(cs.demander, CrackedState)
+        }
         val provinces = actions.regions.filter(_.owner == cs.giver)
         val max = provinces.maxBy(_.regionPopulation.populationCount)
         max.controller = max.owner
@@ -281,6 +322,9 @@ class WorldDiplomacy(actions:WorldStateDiplomacyActions) {
         tm.demander.budget.receiveMoneyFromReparations(money)
         Nil
       case v:Vassalize =>
+        if (!hasClaimOverState(v.demander, v.giver)) {
+          increaseBadBoy(v.demander, VassalizedState)
+        }
         List(new VassalAgreement(v.demander, v.giver, currentTurn))
     }
 

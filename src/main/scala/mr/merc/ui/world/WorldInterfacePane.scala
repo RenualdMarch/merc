@@ -9,7 +9,8 @@ import scalafx.Includes._
 
 
 class WorldInterfacePane(frame: WorldFrame, val worldCanvas: CanvasLayers, terrainField: TerrainHexField, factor:Double) extends Pane {
-  private val minimap: Pane = new MinimapParent(new Minimap(terrainField, worldCanvas, factor))
+  private val minimapChild = new Minimap(terrainField, worldCanvas, factor)
+  private val minimap: Pane = new MinimapParent(minimapChild)
   private val endTurnButton = BigButton(Localization("next.turn"))
   endTurnButton.onAction = { e =>
     frame.nextTurn()
@@ -87,8 +88,12 @@ class WorldInterfacePane(frame: WorldFrame, val worldCanvas: CanvasLayers, terra
     rebindMinimapAndEndTurn(false)
   }
 
-  def hideMinimap(): Unit ={
+  def hideMinimap(): Unit = {
     rebindMinimapAndEndTurn(true)
+  }
+
+  def refreshMinimap(): Unit = {
+    minimapChild.refreshMapCanvas()
   }
 
   def setFacePanel(pane: Pane): Unit = {

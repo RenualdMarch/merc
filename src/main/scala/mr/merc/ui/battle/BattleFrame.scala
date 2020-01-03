@@ -34,7 +34,7 @@ import mr.merc.ui.common.CanvasLayers
 import mr.merc.ui.world.{BigButton, BigText}
 
 // TODO move all styling to css
-class BattleFrame(sceneManager: SceneManager, gameField:GameField, ai:Map[Player, BattleAI]) extends BorderPane with BattleControllerParent with Logging {
+class BattleFrame(sceneManager: SceneManager, gameField:GameField, ai:Map[Player, BattleAI], battleOverCallback:() => Unit) extends BorderPane with BattleControllerParent with Logging {
 
   val scaling = Conf.double("BattleMapScaling")
 
@@ -155,7 +155,7 @@ class BattleFrame(sceneManager: SceneManager, gameField:GameField, ai:Map[Player
 
   def showBattleOverDialog(result: BattleResult) {
     battleIsOverDialogShown = true
-    val dialog = new BattleResultDialog(result, sceneManager)
+    val dialog = new BattleResultDialog(result, sceneManager, battleOverCallback)
     dialog.initModality(Modality.WindowModal)
     dialog.initOwner(sceneManager.stage)
     dialog.centerOnScreen()

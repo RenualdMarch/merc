@@ -11,7 +11,7 @@ import scalafx.scene.control.Button
 import scalafx.scene.Scene
 import scalafx.event.ActionEvent
 
-class BattleResultDialog(result: BattleResult, sceneManager: SceneManager) extends Stage {
+class BattleResultDialog(result: BattleResult, sceneManager: SceneManager, battleOverCallback:() => Unit) extends Stage {
   title = Localization("attack.battleResult.title")
 
   val line = result.winningAlliance.map(_.name).mkString(", ")
@@ -23,7 +23,7 @@ class BattleResultDialog(result: BattleResult, sceneManager: SceneManager) exten
     text = Localization("common.ok")
     onAction = { e: ActionEvent =>
       BattleResultDialog.this.close()
-      sceneManager.showMainMenu
+      battleOverCallback()
     }
   }
   this.scene = new Scene {

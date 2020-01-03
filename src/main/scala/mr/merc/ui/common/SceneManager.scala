@@ -11,14 +11,15 @@ import mr.merc.ui.menu.MainMenu
 import mr.merc.log.Logging
 import mr.merc.ui.menu.OptionsMenu
 import mr.merc.ui.world.WorldFrame
+import scalafx.scene.layout.Pane
 
 class SceneManager(val stage: Stage) extends Logging {
 
-  def startNewBattle() {
+  def startNewBattle(callbackFunction:() => Unit) {
     info("starting new battle")
     val gameField = new QuickGameGenerator().generateGame
     val map = Map(gameField.players.find(_.name.contains("AI")).get -> BattleAI())
-    sceneRoot = new BattleFrame(this, gameField, map)
+    sceneRoot = new BattleFrame(this, gameField, map, callbackFunction)
   }
 
   def startNewWorld(): Unit = {
@@ -34,6 +35,11 @@ class SceneManager(val stage: Stage) extends Logging {
   def showOptionsMenu() {
     info("showing options menu")
     sceneRoot = new OptionsMenu(this)
+  }
+
+  def showFrame(pane:Pane): Unit = {
+    info(s"showing frame $pane")
+    sceneRoot = pane
   }
 
   def exit() {
