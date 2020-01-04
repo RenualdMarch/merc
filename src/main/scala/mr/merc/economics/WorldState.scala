@@ -62,6 +62,12 @@ class WorldState(val regions: List[Province], val playerState: State, val worldH
     this.aiTurn(onlyAnswer = false)
     this.diplomacyEngine.improveBadBoyOverTime()
 
+    states.keysIterator.filterNot(_ == playerState).foreach { state =>
+      val soldierMovementAI = new SoldierMovementAI(this, state)
+      soldierMovementAI.orderSoldiers()
+      soldierMovementAI.moveSoldiers()
+    }
+
     val battlesResolver = new MovementAndBattlesResolver(this)
     val battles = battlesResolver.moveAndPrepareBattles()
     processAiBattles(battles)
@@ -457,8 +463,11 @@ trait WorldStateDiplomacyActions {
 
 
   def canPlanMoveArmy(from:Province, to:Province, warriorOwner:State) : Boolean = {
-    from.economicNeighbours.contains(to) &&
-      (from.owner == to.owner || inWarAgainst(warriorOwner, to.owner) || inWarTogether(warriorOwner, to.owner) ||
-        allies(warriorOwner).contains(to.owner) || vassals(warriorOwner).contains(to.owner))
+    from.economicNeighbours.contains(to) && canAccessProvince(warriorOwner, to)
+  }
+
+  def canAccessProvince(state: State, province:Province): Boolean = {
+    state == province.owner || inWarAgainst(state, province.owner) || inWarTogether(state, province.owner) ||
+      allies(state).contains(province.owner) || vassals(state).contains(province.owner)
   }
 }

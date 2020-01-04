@@ -3,29 +3,58 @@ Current battle issues:
 * Damage numbers not cleared in highest points
 * Redraw bugs during fast movement
 
-+reputation and relations
-+after battle is finished logic(change controller, move warriors)
-strategy world map AI
-add battles with results to UI
 separate peace(+badboy)
 when 1 and 2 are in alliance and 2 and 3 too, and 1 declares war on 3
 add war targets to going war
-province claims must be understandable
+province claims must be understandable on UI
 create claims diplomatically
 check conditional AI logic - unused expression
 1 season per turn, 4 turns per year
 elections
-idle animation for soldiers on world map
+order warriors for strategy AI after production balancing
 add state selection screen with offlane word generation
-allow hire people from other cultures with some political configurations
 when hiring soldiers, use actual population
 when showing tooltip, if it is big, find way to show it more when size is too big(recruit soldier tooltip)
 end turn newspaper with events of previous turn
+allow army movement through territory diplomacy
+add battles with results to UI
+idle animation for soldiers on world map
+allow hire people from other cultures with some political configurations
 
 add more cultures:
 Marashy culture as indian?
 Vikings culture as scandinavian?
 chinese?
++_Forestfolk
+
+Elves
+- wood elves \elves-wood
+- deep elves \ Deep Elves ???
+- desert elves \ Desert Elves
+- dark elves \  Darkelves
+- more dark elves \ Tharis
+
+Orcs
+- northern orcs \orcs
+- latin orcs \ _Orcei Gladiatores
+- more northern orcs \ _Northern Orcs
+
+Undead
+- base undead
+???
+
+Dwarfs
+- base dwarfs
+???
+
++Aquana
++Minotaurs
++Frozen
++Drakes
++Saurian
++Nagas
++Merfolks
++Trolls
 
 Polishing:
 issues - balance production and needs multipliers

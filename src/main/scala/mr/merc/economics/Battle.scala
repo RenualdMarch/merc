@@ -169,7 +169,7 @@ abstract sealed class Battle(worldHexField:TerrainHexField) {
       } match {
         case Some(tp) => tp.demander
         case None =>
-          val armyPower = allWarriors.groupBy(_.owner).map{case (k,v) => k -> v.map(_.soldierType.level).sum}.filterKeys(winners.contains)
+          val armyPower = allWarriors.groupBy(_.owner).map{case (k,v) => k -> v.map(_.warriorWeight).sum}.filterKeys(winners.contains)
           val state = armyPower.maxBy(_._2)._1
           actions.diplomacyEngine.getOverlord(state).getOrElse(state)
       }
