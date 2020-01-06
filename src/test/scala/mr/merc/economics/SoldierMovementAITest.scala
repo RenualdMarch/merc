@@ -8,6 +8,7 @@ import mr.merc.map.hex.{TerrainHex, TerrainHexField}
 import mr.merc.map.terrain.GreenGrass
 import mr.merc.politics.{Party, Province, State}
 import org.scalatest.{BeforeAndAfter, FunSuite, Matchers}
+import mr.merc.map.terrain.FourSeasonsTerrainTypes._
 
 class SoldierMovementAITest extends FunSuite with Matchers with BeforeAndAfter {
 
@@ -29,7 +30,7 @@ class SoldierMovementAITest extends FunSuite with Matchers with BeforeAndAfter {
     province1.regionWarriors.receiveWarriors(warriors)
 
     val worldState = new WorldState(List(province1, province2, province3, province4), state2,
-      new TerrainHexField(1, 1, (x,y) => new TerrainHex(x, y, GreenGrass)), Map(), Stream())
+      new FourSeasonsTerrainHexField(1, 1, (x,y) => new FourSeasonsTerrainHex(x, y, FourSeasonsGrass)), Map(), Stream())
 
     val soldierMovementAI = new SoldierMovementAI(worldState, state1)
     soldierMovementAI.moveSoldiers()
@@ -51,7 +52,7 @@ class SoldierMovementAITest extends FunSuite with Matchers with BeforeAndAfter {
     province1.regionWarriors.receiveWarriors(warriors)
 
     val worldState = new WorldState(List(province1, province2, province3, province4), state2,
-      new TerrainHexField(1, 1, (x,y) => new TerrainHex(x, y, GreenGrass)), Map(), Stream())
+      new FourSeasonsTerrainHexField(1, 1, (x,y) => new FourSeasonsTerrainHex(x, y, FourSeasonsGrass)), Map(), Stream())
 
     worldState.diplomacyEngine.addAgreement(new WarAgreement(Set(state1), Set(state2), state1, state2, 0,
       Set(new TakeProvince(state1, state2, province3))))
@@ -82,7 +83,7 @@ class SoldierMovementAITest extends FunSuite with Matchers with BeforeAndAfter {
     province3.regionWarriors.receiveWarriors(w2)
 
     val worldState = new WorldState(List(province1, province2, province3, province4), state2,
-      new TerrainHexField(1, 1, (x,y) => new TerrainHex(x, y, GreenGrass)), Map(), Stream())
+      new FourSeasonsTerrainHexField(1, 1, (x,y) => new FourSeasonsTerrainHex(x, y, FourSeasonsGrass)), Map(), Stream())
 
     worldState.diplomacyEngine.addAgreement(new WarAgreement(Set(state1), Set(state2), state1, state2, 0,
       Set(new TakeProvince(state1, state2, province3))))
@@ -113,7 +114,7 @@ class SoldierMovementAITest extends FunSuite with Matchers with BeforeAndAfter {
     province3.regionPopulation.pop(Population.Aristocrats, LatinHuman).applyMovers(PopulationMovers(WorldConstants.Population.HousePerPopulation * 4, 0))
 
     val worldState = new WorldState(List(province1, province2, province3, province4), state2,
-      new TerrainHexField(1, 1, (x,y) => new TerrainHex(x, y, GreenGrass)), Map(), Stream())
+      new FourSeasonsTerrainHexField(1, 1, (x,y) => new FourSeasonsTerrainHex(x, y, FourSeasonsGrass)), Map(), Stream())
 
     worldState.diplomacyEngine.addAgreement(new WarAgreement(Set(state1), Set(state2), state1, state2, 0,
       Set(new TakeProvince(state1, state2, province3))))
@@ -132,13 +133,13 @@ class SoldierMovementAITest extends FunSuite with Matchers with BeforeAndAfter {
 
   def init4ProvinceHexField():Unit = {
     province1 = new Province("1", state1, new RegionMarket(Map()), new RegionPopulation(Nil),
-      Set(), new TerrainHex(0, 0, GreenGrass))
+      Set(), new FourSeasonsTerrainHex(0, 0, FourSeasonsGrass))
     province2 = new Province("2", state1, new RegionMarket(Map()), new RegionPopulation(Nil),
-      Set(), new TerrainHex(0, 0, GreenGrass))
+      Set(), new FourSeasonsTerrainHex(0, 0, FourSeasonsGrass))
     province3 = new Province("3", state2, new RegionMarket(Map()), new RegionPopulation(Nil),
-      Set(), new TerrainHex(0, 0, GreenGrass))
+      Set(), new FourSeasonsTerrainHex(0, 0, FourSeasonsGrass))
     province4 = new Province("4", state2, new RegionMarket(Map()), new RegionPopulation(Nil),
-      Set(), new TerrainHex(0, 0, GreenGrass))
+      Set(), new FourSeasonsTerrainHex(0, 0, FourSeasonsGrass))
 
     province1.initNeighbours(Set(province2))
     province2.initNeighbours(Set(province1, province3))

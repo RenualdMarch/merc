@@ -2,11 +2,12 @@ package mr.merc.economics
 
 import mr.merc.army.Warrior
 import mr.merc.diplomacy.DiplomaticAgreement.WarAgreement
+import mr.merc.log.Logging
 import mr.merc.map.UniversalGrid
 import mr.merc.map.pathfind.PathFinder
 import mr.merc.politics.{Province, State}
 
-class SoldierMovementAI(worldState: WorldState, state: State) {
+class SoldierMovementAI(worldState: WorldState, state: State) extends Logging{
   private val advantageToAttack = 2d
 
   private val stateRegions = worldState.regions.filter(_.owner == state)
@@ -18,6 +19,7 @@ class SoldierMovementAI(worldState: WorldState, state: State) {
   }
 
   def moveSoldiers(): Unit = {
+    debug(s"${state.name} in moving soldiers now")
     val grid = new UniversalGrid[Province] {
       override def heuristic(from: Province, to: Province): Double = 0
 
@@ -34,9 +36,11 @@ class SoldierMovementAI(worldState: WorldState, state: State) {
 
     worldState.diplomacyEngine.wars(state) match {
       case Nil =>
+        debug(s"${state.name} in not in wars")
         returnSoldiersHome(grid)
         divideSoldiersEquallyAmongProvinces()
       case wars =>
+        debug(s"${state.name} is in war")
         moveWarriorsToBorderProvinces(wars, grid)
         attackIfAdvantage(wars)
     }
@@ -58,6 +62,7 @@ class SoldierMovementAI(worldState: WorldState, state: State) {
       if (borders.nonEmpty) {
         borders.minBy(_._2.size)._2.tail.headOption.foreach { target =>
           val stateSoldiers = p.regionWarriors.allWarriors.filter(_.owner == state)
+          debug(s"In ${p.name} plans move $stateSoldiers to province ${target.name}")
           worldState.planMoveArmy(p, Some(target), stateSoldiers)
         }
       }
@@ -79,6 +84,7 @@ class SoldierMovementAI(worldState: WorldState, state: State) {
       val stateWarriors = allyWarriors.filter(_.owner == state)
       if (stateWarriors.nonEmpty) {
         provinceToAttack.foreach { pa =>
+          debug(s"In ${p.name} plans move $stateWarriors to province ${pa.name}")
           worldState.planMoveArmy(p, Some(pa), stateWarriors)
         }
       }
@@ -99,11 +105,15 @@ class SoldierMovementAI(worldState: WorldState, state: State) {
       val neigs = r.neighbours.filter(_.owner == state)
       neigs match {
         case Nil => // do nothing
-        case List(one) => worldState.planMoveArmy(r, Some(one), ew)
+          debug(s"No plans for ${r.name}")
+        case List(one) =>
+          debug(s"In ${r.name} plans move $ew to province ${one.name}")
+          worldState.planMoveArmy(r, Some(one), ew)
         case others =>
           val regionsToSend = others.filter(r => warriorsSum(r) < levelSumPerProvince)
           if (regionsToSend.nonEmpty) {
             regionsToSend.zip(divideWarriors(ew, regionsToSend.size)).foreach { case (n, list) =>
+              debug(s"In ${r.name} plans move $list to province ${n.name}")
               worldState.planMoveArmy(r, Some(n), list)
             }
           }

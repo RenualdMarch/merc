@@ -232,7 +232,7 @@ class WarriorTypeInfoPane(example: Warrior) extends MigPane("") with WorldInterf
   private val st = example.soldierType
 
   val defenceAndResistances: Pane = {
-    val migPane = new MigPane("wrap 3")
+    val migPane = new MigPane("wrap 6")
     val pairs = List[(DefenceType, TerrainKind, String)](
       (WaterDefence, WaterKind, "coast"),
       (ForestDefence, ForestKind, "forest"),
@@ -241,9 +241,12 @@ class WarriorTypeInfoPane(example: Warrior) extends MigPane("") with WorldInterf
       (MountainDefence, MountainKind, "mountains"),
       (SandDefence, SandKind, "desert"),
       (GrassDefence, GrassKind, "grass"),
-      (BuildingDefence, WallsKind, "village"))
+      (BuildingDefence, WallsKind, "village"),
+      (SnowDefence, SnowKind, "snow"),
+      (IceDefence, IceKind, "ice"))
 
-    List("soldier.terrain", "soldier.defence", "soldier.movement").foreach { k =>
+    List("soldier.terrain", "soldier.defence", "soldier.movement",
+      "soldier.terrain", "soldier.defence", "soldier.movement").foreach { k =>
       migPane.add(MediumText(Localization(k)))
     }
     pairs.foreach { case (dt, tk, tt) =>
@@ -338,12 +341,13 @@ class SelectRecruitWarriorDialog(possibleChoices: List[RecruitWarriorOrder]) ext
     MercTooltip.applyTooltip(this, new WarriorTypeInfoPane(child.warrior))
   }
 
-  val gridPane = new MigPane("wrap 4", "")
-  possibleChoices.foreach { c =>
-    gridPane.add(new ParentWarriorPane(c), "grow")
+  override protected def dialogContent: Node = {
+    val gridPane = new MigPane("wrap 4", "")
+    possibleChoices.foreach { c =>
+      gridPane.add(new ParentWarriorPane(c), "grow")
+    }
+    gridPane
   }
-
-  override protected def dialogContent: Node = gridPane
 
   override protected def css: Option[String] = Some("/css/partyPane.css")
 }

@@ -72,11 +72,14 @@ object Attack {
     } else if (hex.mapObj.contains(WoodenBridge) || hex.terrain.isOneOf(RoadKind, GrassKind)) {
       SoldierDefence(soldier.soldierType.defence(GrassDefence))
     } else {
-      val d = List[(TerrainKind, DefenceType)](MountainKind -> MountainDefence,
+      val d = List[(TerrainKind, DefenceType)](
+        MountainKind -> MountainDefence,
         WaterKind -> WaterDefence,
         SwampKind -> SwampDefence,
         ForestKind -> ForestDefence,
         HillKind -> HillDefence,
+        SnowKind -> SnowDefence,
+        IceKind -> IceDefence,
         SandKind -> SandDefence).find(x => hex.terrain.is(x._1)).map(_._2).
         getOrElse(sys.error(s"Failed to find defence for terrain type ${hex.terrain} for soldier type ${soldier.soldierType.name}"))
       SoldierDefence(soldier.soldierType.defence(d))

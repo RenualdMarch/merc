@@ -45,7 +45,8 @@ class BattleFrame(sceneManager: SceneManager, gameField:GameField, ai:Map[Player
 
   val mapView = controller.battleView.mapView
   private val battleCanvas = new CanvasLayers(mapView.canvasBattleLayers, new Rectangle2D(0, 0, mapView.pixelWidth, mapView.pixelHeight))
-  private val minimap = new Minimap(gameField.hexField, battleCanvas, scaling)
+  private val minimap = new Minimap(gameField.hexField, battleCanvas, scaling, mapView.pixelWidth, mapView.pixelHeight, false
+  )
   private val soldierName = new BigText()
   private val soldierLevel = new BigText()
   private val soldierHP = new BigText()

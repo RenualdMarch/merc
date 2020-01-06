@@ -9,6 +9,7 @@ import mr.merc.map.hex.TerrainHexField
 import mr.merc.map.hex.TerrainHex
 import mr.merc.map.terrain._
 import mr.merc.map.objects._
+import mr.merc.map.terrain.FourSeasonsMapObjects.FourSeasonsHouse
 
 class PathFinderTest extends FunSuite {
   val finder = PathFinder
@@ -91,7 +92,7 @@ class PathFinderTest extends FunSuite {
     } else if (y == 2) {
       new TerrainHex(x, y, DecForest)
     } else if (x == 4 && y == 3) {
-      new TerrainHex(x, y, GreenGrass, Some(House(LatinHuman)))
+      new TerrainHex(x, y, GreenGrass, Some(SummerHouse(LatinHuman)))
     } else {
       new TerrainHex(x, y, DesertSand)
     }

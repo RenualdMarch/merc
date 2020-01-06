@@ -5,9 +5,10 @@ import mr.merc.army.{Warrior, WarriorViewNames}
 import mr.merc.army.WarriorType.{HeavyBladeInfantry, HeavyMaceInfantry}
 import mr.merc.economics.Culture._
 import mr.merc.economics.Population.Humans
+import mr.merc.economics.Seasons.Summer
 import mr.merc.economics._
 import mr.merc.map.hex.{TerrainHex, TerrainHexField}
-import mr.merc.map.terrain.{Castle, ShallowWater}
+import mr.merc.map.terrain.{Castle, FourSeasonsTerrainTypes, ShallowWater}
 import mr.merc.map.view.SoldiersDrawer
 import mr.merc.politics.{Party, Province, State}
 import mr.merc.unit.Soldier
@@ -17,14 +18,15 @@ import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
 import mr.merc.economics.WorldConstants.Population._
 import mr.merc.map.objects.House
+import mr.merc.map.terrain.FourSeasonsMapObjects.FourSeasonsHouse
 import scalafx.scene.paint.Color
 
 class ProvinceViewTest extends FunSuite with MockitoSugar with BeforeAndAfter with Inspectors with Matchers {
 
-  val field = new TerrainHexField(5, 5, TerrainHex.grassInit)
-  field.hex(3, 1).terrain = ShallowWater
-  field.hex(3, 2).terrain = ShallowWater
-  field.hex(2, 2).terrain = Castle
+  val field = new FourSeasonsTerrainHexField(5, 5, (x, y) => new FourSeasonsTerrainHex(x, y, FourSeasonsTerrainTypes.FourSeasonsGrass))
+  field.hex(3, 1).terrainMap = FourSeasonsTerrainTypes.FourSeasonsRiver
+  field.hex(3, 2).terrainMap = FourSeasonsTerrainTypes.FourSeasonsRiver
+  field.hex(2, 2).terrainMap = FourSeasonsTerrainTypes.FourSeasonsCastle
 
   val province = mock[Province]
   val population = mock[RegionPopulation]
@@ -51,31 +53,31 @@ class ProvinceViewTest extends FunSuite with MockitoSugar with BeforeAndAfter wi
 
 
     when(population.cultureMembers).thenReturn(firstMap, secondMap, thirdMap, fourthMap)
-    val provinceView = new ProvinceView(province, field, new TerrainHexFieldView(field, new SoldiersDrawer[SoldierView], 1))
+    val provinceView = new ProvinceView(Summer, province, field, field.buildTerrainHexField(Summer), new TerrainHexFieldView(field.buildTerrainHexField(Seasons.Summer), new SoldiersDrawer[SoldierView], 1))
 
     provinceView.refreshCity()
-    val houses1 = field.hexes.filter(_.mapObj.exists(_.isInstanceOf[House]))
+    val houses1 = field.hexes.filter(_.mapObj.exists(_.isInstanceOf[FourSeasonsHouse]))
     assert(houses1.size === 4)
-    assert(houses1.forall(_.mapObj.contains(House(LatinHuman))))
+    assert(houses1.forall(_.mapObj.contains(FourSeasonsHouse(LatinHuman))))
     assert(field.hex(3, 1).mapObj.isEmpty)
     assert(field.hex(3, 2).mapObj.isEmpty)
     provinceView.refreshCity()
 
-    val houses2 = field.hexes.filter(_.mapObj.exists(_.isInstanceOf[House]))
+    val houses2 = field.hexes.filter(_.mapObj.exists(_.isInstanceOf[FourSeasonsHouse]))
     assert(houses2.size === 5)
-    val latinHouses2 = houses2.filter(_.mapObj.contains(House(LatinHuman)))
-    val westHouses2 = houses2.filter(_.mapObj.contains(House(FrenchHuman)))
+    val latinHouses2 = houses2.filter(_.mapObj.contains(FourSeasonsHouse(LatinHuman)))
+    val westHouses2 = houses2.filter(_.mapObj.contains(FourSeasonsHouse(FrenchHuman)))
     assert(latinHouses2.size === 4)
     assert(westHouses2.size === 1)
 
     assert(latinHouses2 === houses1)
 
     provinceView.refreshCity()
-    val houses3 = field.hexes.filter(_.mapObj.exists(_.isInstanceOf[House]))
+    val houses3 = field.hexes.filter(_.mapObj.exists(_.isInstanceOf[FourSeasonsHouse]))
     assert(houses3.size === 5)
 
-    val latinHouses3 = houses3.filter(_.mapObj.contains(House(LatinHuman)))
-    val westHouses3 = houses3.filter(_.mapObj.contains(House(FrenchHuman)))
+    val latinHouses3 = houses3.filter(_.mapObj.contains(FourSeasonsHouse(LatinHuman)))
+    val westHouses3 = houses3.filter(_.mapObj.contains(FourSeasonsHouse(FrenchHuman)))
 
     assert(latinHouses3.size === 3)
     assert(westHouses3.size === 2)
@@ -84,10 +86,10 @@ class ProvinceViewTest extends FunSuite with MockitoSugar with BeforeAndAfter wi
     assert(westHouses2.toSet.subsetOf(westHouses3.toSet))
 
     provinceView.refreshCity()
-    val houses4 = field.hexes.filter(_.mapObj.exists(_.isInstanceOf[House]))
+    val houses4 = field.hexes.filter(_.mapObj.exists(_.isInstanceOf[FourSeasonsHouse]))
     assert(houses4.size === 6)
-    val latinHouses4 = houses4.filter(_.mapObj.contains(House(LatinHuman)))
-    val westHouses4 = houses4.filter(_.mapObj.contains(House(FrenchHuman)))
+    val latinHouses4 = houses4.filter(_.mapObj.contains(FourSeasonsHouse(LatinHuman)))
+    val westHouses4 = houses4.filter(_.mapObj.contains(FourSeasonsHouse(FrenchHuman)))
 
     assert(latinHouses4.size === 4)
     assert(westHouses4.size === 2)
@@ -109,7 +111,7 @@ class ProvinceViewTest extends FunSuite with MockitoSugar with BeforeAndAfter wi
     when(population.cultureMembers).thenReturn(firstMap)
 
     val sd = new SoldiersDrawer[SoldierView]()
-    val provinceView = new ProvinceView(province, field, new TerrainHexFieldView(field, sd, 1))
+    val provinceView = new ProvinceView(Summer, province, field, field.buildTerrainHexField(Summer), new TerrainHexFieldView(field.buildTerrainHexField(Summer), sd, 1))
 
     forAll(field.hexes) { h =>
       h.soldier shouldBe None

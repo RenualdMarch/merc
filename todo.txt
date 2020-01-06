@@ -3,6 +3,16 @@ Current battle issues:
 * Damage numbers not cleared in highest points
 * Redraw bugs during fast movement
 
+Important core stuff
+Message framework
+Elections and initial
+Resources and production balancing
+order warriors for strategy AI after production balancing
+Revolutions/civil wars
+Technologies
+migrations
+
+
 separate peace(+badboy)
 when 1 and 2 are in alliance and 2 and 3 too, and 1 declares war on 3
 add war targets to going war
@@ -20,6 +30,7 @@ allow army movement through territory diplomacy
 add battles with results to UI
 idle animation for soldiers on world map
 allow hire people from other cultures with some political configurations
+make cultures for castles/walls
 
 add more cultures:
 Marashy culture as indian?

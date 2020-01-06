@@ -3,11 +3,11 @@ package mr.merc.economics
 import mr.merc.army.{Warrior, WarriorCompetence, WarriorType}
 import mr.merc.diplomacy.DiplomaticAgreement.WarAgreement
 import mr.merc.diplomacy.DiplomaticAgreement.WarAgreement.TakeProvince
-import mr.merc.map.hex.{TerrainHex, TerrainHexField}
-import mr.merc.map.terrain.GreenGrass
+import mr.merc.map.terrain.FourSeasonsTerrainTypes
 import mr.merc.players.{ColorGenerator, NamesGenerator}
 import mr.merc.politics.{Party, Province, State}
 import org.scalatest.{FunSuite, Matchers}
+import FourSeasonsTerrainTypes._
 
 class MovementAndBattlesResolverTest extends FunSuite with Matchers {
 
@@ -455,13 +455,13 @@ class MovementAndBattlesResolverTest extends FunSuite with Matchers {
 
   def build4ProvinceWorldState():WorldState = {
     province1 = new Province("1", state1, new RegionMarket(Map()), new RegionPopulation(Nil),
-      Set(new TerrainHex(0, 0, GreenGrass)), new TerrainHex(0, 0, GreenGrass))
+      Set(new FourSeasonsTerrainHex(0, 0, FourSeasonsGrass)), new FourSeasonsTerrainHex(0, 0, FourSeasonsGrass))
     province2 = new Province("2", state2, new RegionMarket(Map()), new RegionPopulation(Nil),
-      Set(new TerrainHex(0, 0, GreenGrass)), new TerrainHex(0, 0, GreenGrass))
+      Set(new FourSeasonsTerrainHex(0, 0, FourSeasonsGrass)), new FourSeasonsTerrainHex(0, 0, FourSeasonsGrass))
     province3 = new Province("3", state3, new RegionMarket(Map()), new RegionPopulation(Nil),
-      Set(new TerrainHex(0, 0, GreenGrass)), new TerrainHex(0, 0, GreenGrass))
+      Set(new FourSeasonsTerrainHex(0, 0, FourSeasonsGrass)), new FourSeasonsTerrainHex(0, 0, FourSeasonsGrass))
     province4 = new Province("4", state4, new RegionMarket(Map()), new RegionPopulation(Nil),
-      Set(new TerrainHex(0, 0, GreenGrass)), new TerrainHex(0, 0, GreenGrass))
+      Set(new FourSeasonsTerrainHex(0, 0, FourSeasonsGrass)), new FourSeasonsTerrainHex(0, 0, FourSeasonsGrass))
 
     province1.initNeighbours(Set(province2, province3, province4))
     province2.initNeighbours(Set(province1, province3, province4))
@@ -473,8 +473,8 @@ class MovementAndBattlesResolverTest extends FunSuite with Matchers {
       c -> new NamesGenerator(c.cultureInfo)
     } toMap
 
-    val worldState = new WorldState(List(province1, province2, province3, province4), state1, new TerrainHexField(1, 1,
-      (_, _) => new TerrainHex(0, 0, GreenGrass)), namesGenerators, colorStream)
+    val worldState = new WorldState(List(province1, province2, province3, province4), state1, new FourSeasonsTerrainHexField(1, 1,
+      (_, _) => new FourSeasonsTerrainHex(0, 0, FourSeasonsTerrainTypes.FourSeasonsGrass)), namesGenerators, colorStream)
     worldState
   }
 }

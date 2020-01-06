@@ -8,8 +8,8 @@ import scalafx.scene.layout.Pane
 import scalafx.Includes._
 
 
-class WorldInterfacePane(frame: WorldFrame, val worldCanvas: CanvasLayers, terrainField: TerrainHexField, factor:Double) extends Pane {
-  private val minimapChild = new Minimap(terrainField, worldCanvas, factor)
+class WorldInterfacePane(frame: WorldFrame, val worldCanvas: CanvasLayers, terrainField: TerrainHexField, factor:Double, pixelWidth:Int, pixelHeight:Int) extends Pane {
+  private val minimapChild = new Minimap(terrainField, worldCanvas, factor, pixelWidth, pixelHeight, false)
   private val minimap: Pane = new MinimapParent(minimapChild)
   private val endTurnButton = BigButton(Localization("next.turn"))
   endTurnButton.onAction = { e =>
@@ -92,7 +92,8 @@ class WorldInterfacePane(frame: WorldFrame, val worldCanvas: CanvasLayers, terra
     rebindMinimapAndEndTurn(true)
   }
 
-  def refreshMinimap(): Unit = {
+  def refreshMinimap(field:TerrainHexField): Unit = {
+    minimapChild.terrainHexField = field
     minimapChild.refreshMapCanvas()
   }
 

@@ -1,9 +1,8 @@
 package mr.merc.map.generator
 
-import mr.merc.economics.WorldGenerator
+import mr.merc.economics.{FourSeasonsTerrainHex, FourSeasonsTerrainHexField, WorldGenerator}
 import mr.merc.map.ShortestGrid
 import mr.merc.map.hex._
-import mr.merc.map.objects.{Flowers, WoodenBridge}
 import mr.merc.map.pathfind.PathFinder
 import mr.merc.map.terrain._
 
@@ -11,8 +10,11 @@ import scala.collection.mutable
 import scala.math.{abs, max, pow}
 import scala.util.Random
 import mr.merc.economics.WorldGenerationConstants._
+import FourSeasonsTerrainTypes._
+import FourSeasonsMapObjects._
 
 object WorldMapGenerator {
+
 
   def generateWorldMap(width: Int, height: Int, provinces: Int): WorldMap = {
     val terrainNoise = Noise(5).add(0.5, Noise(10)).add(0.25, Noise(20)).applyFunction { case ((x, y), n) =>
@@ -22,27 +24,27 @@ object WorldMapGenerator {
 
     val biomeNoise = Noise(10).add(0.5, Noise(40)).add(0.25, Noise(80))
 
-    def biome(x: Int, y: Int): TerrainType = {
+    def biome(x: Int, y: Int): FourSeasonsTerrainType = {
       biomeNoise(x, width, y, height) match {
         //case n if n < biomeNoise.percentageBelow(0.2) => DesertSand
-        case n if n < biomeNoise.percentageBelow(0.6) => GreenGrass
-        case n if n < biomeNoise.percentageBelow(0.85) => DecForest
-        case n if n < biomeNoise.percentageBelow(0.98) => BasicHill
-        case _ => BasicMountain
+        case n if n < biomeNoise.percentageBelow(0.6) => FourSeasonsGrass
+        case n if n < biomeNoise.percentageBelow(0.85) => FourSeasonsDecForest
+        case n if n < biomeNoise.percentageBelow(0.98) => FourSeasonsHill
+        case _ => FourSeasonsMountain
       }
     }
 
-    def f(x: Int, y: Int): TerrainHex = {
+    def f(x: Int, y: Int): FourSeasonsTerrainHex = {
       val n = terrainNoise(x, width, y, height)
-      if (n > terrainNoise.percentageBelow(1 - LandPercentage)) new TerrainHex(x, y, biome(x, y))
-      else new TerrainHex(x, y, ShallowWater)
+      if (n > terrainNoise.percentageBelow(1 - LandPercentage)) new FourSeasonsTerrainHex(x, y, biome(x, y))
+      else new FourSeasonsTerrainHex(x, y, FourSeasonsWater)
     }
 
-    val terrainField = new TerrainHexField(width, height, f)
+    val terrainField = new FourSeasonsTerrainHexField(width, height, f)
 
     val provincesMap = divideIntoProvinces(terrainField, provinces)
     provincesMap.keys.foreach { h =>
-      terrainField.hex(h.x, h.y).terrain = Castle
+      terrainField.hex(h.x, h.y).terrainMap = FourSeasonsCastle
     }
 
     addRivers(terrainField)
@@ -58,8 +60,8 @@ object WorldMapGenerator {
     })
   }
 
-  def divideIntoProvinces(field: HexField[TerrainHex], provinces: Int): Map[TerrainHex, Set[TerrainHex]] = {
-    val totalHexes = field.hexes.filterNot(_.terrain.is(WaterKind))
+  def divideIntoProvinces(field: HexField[FourSeasonsTerrainHex], provinces: Int): Map[FourSeasonsTerrainHex, Set[FourSeasonsTerrainHex]] = {
+    val totalHexes = field.hexes.filterNot(_.terrainMap == FourSeasonsWater)
     val firstCapitals = Random.shuffle(totalHexes).take(provinces)
     val division = 0.until(10).foldLeft(MapDivision(firstCapitals.toSet, totalHexes.toSet)) { case (div, _) =>
       val newCapitals = div.lloydRelaxationCapitals
@@ -69,7 +71,7 @@ object WorldMapGenerator {
     MapDivision(division.capitals, field.hexes.toSet).voronoiDivision
   }
 
-  def addRivers(field: TerrainHexField): Unit = {
+  def addRivers(field: FourSeasonsTerrainHexField): Unit = {
     val riversCount = (field.width + field.height) / 3
     val hexesPerCurve = 4
 
@@ -78,9 +80,9 @@ object WorldMapGenerator {
       val y = Random.nextInt(field.height - 1)
       val from = field.hex(x, y)
 
-      field.findClosest(from, _.terrain.is(WaterKind)).flatMap { target =>
-        field.findPath(from, target, h => h.terrain == Castle ||
-          field.neighbours(h).exists(_.terrain == Castle))
+      field.findClosest(from, x => x.terrainMap == FourSeasonsWater || x.terrainMap == FourSeasonsRiver).flatMap { target =>
+        field.findPath(from, target, h => h.terrainMap == FourSeasonsCastle ||
+          field.neighbours(h).exists(_.terrainMap == FourSeasonsCastle))
       }
     }
     val blocks = initialRivers.flatMap { river =>
@@ -89,16 +91,16 @@ object WorldMapGenerator {
 
     val initialRiversHexes = initialRivers.flatten.toSet.seq -- blocks
 
-    val pathGrid = new ShortestGrid[TerrainHex] {
-      override def heuristic(from: TerrainHex, to: TerrainHex): Double = {
+    val pathGrid = new ShortestGrid[FourSeasonsTerrainHex] {
+      override def heuristic(from: FourSeasonsTerrainHex, to: FourSeasonsTerrainHex): Double = {
         math.abs(from.x - to.x) + math.abs(from.y - to.y)
       }
 
-      override def isBlocked(t: TerrainHex): Boolean = t.terrain == Castle || neighbours(t).exists(_.terrain == Castle) || blocks.contains(t)
+      override def isBlocked(t: FourSeasonsTerrainHex): Boolean = t.terrainMap == FourSeasonsCastle || neighbours(t).exists(_.terrainMap == FourSeasonsCastle) || blocks.contains(t)
 
-      override def price(from: TerrainHex, to: TerrainHex): Double = if (initialRiversHexes.contains(to)) 0.1 else 1
+      override def price(from: FourSeasonsTerrainHex, to: FourSeasonsTerrainHex): Double = if (initialRiversHexes.contains(to)) 0.1 else 1
 
-      override def neighbours(t: TerrainHex): List[TerrainHex] = field.neighbours(t)
+      override def neighbours(t: FourSeasonsTerrainHex): List[FourSeasonsTerrainHex] = field.neighbours(t)
     }
 
     val riverHexes = initialRivers.par.flatMap { river =>
@@ -108,59 +110,59 @@ object WorldMapGenerator {
     }
 
     riverHexes.foreach { h =>
-      h.terrain = ShallowWater
+      h.terrainMap = FourSeasonsRiver
     }
   }
 
-  def connectCitiesByRoads(field: TerrainHexField, provincesMap: Map[TerrainHex, Set[TerrainHex]]): Unit = {
+  def connectCitiesByRoads(field: FourSeasonsTerrainHexField, provincesMap: Map[FourSeasonsTerrainHex, Set[FourSeasonsTerrainHex]]): Unit = {
     val connectivityMap = WorldGenerator.buildConnectivityMap(field, provincesMap)
     val connections = connectivityMap.flatMap { case (capital, neigs) =>
       neigs.map(h => Set(capital, h))
     }.toSet
 
     connections.map(_.toList).foreach { case List(from, to) =>
-      val grid = new ShortestGrid[TerrainHex] {
-        override def heuristic(from: TerrainHex, to: TerrainHex): Double = price(from, to)
+      val grid = new ShortestGrid[FourSeasonsTerrainHex] {
+        override def heuristic(from: FourSeasonsTerrainHex, to: FourSeasonsTerrainHex): Double = price(from, to)
 
-        override def isBlocked(t: TerrainHex): Boolean = !provincesMap(from).contains(t) && !provincesMap(to).contains(t)
+        override def isBlocked(t: FourSeasonsTerrainHex): Boolean = !provincesMap(from).contains(t) && !provincesMap(to).contains(t)
 
-        override def price(from: TerrainHex, to: TerrainHex): Double =
-          if (to.terrain.is(RoadKind)) 0.5
-          else if (to.mapObj.contains(WoodenBridge)) 0.7
-          else if (to.terrain.is(WaterKind)) 3
+        override def price(from: FourSeasonsTerrainHex, to: FourSeasonsTerrainHex): Double =
+          if (to.terrainMap == FourSeasonsRoad) 0.5
+          else if (to.mapObj.contains(FourSeasonsWoodenBridge)) 0.7
+          else if (to.terrainMap == FourSeasonsWater || to.terrainMap == FourSeasonsRiver) 3
           else 1
 
-        override def neighbours(t: TerrainHex): List[TerrainHex] = field.neighbours(t)
+        override def neighbours(t: FourSeasonsTerrainHex): List[FourSeasonsTerrainHex] = field.neighbours(t)
       }
 
       PathFinder.findPath(grid, from, to).foreach { path =>
         path.foreach { h =>
-          if (h.terrain.is(WaterKind)) {
-            h.mapObj = Some(WoodenBridge)
-          } else if (h.terrain != Castle) {
-            h.terrain = GrassyRoad
+          if (h.terrainMap == FourSeasonsWater || h.terrainMap == FourSeasonsRiver) {
+            h.mapObj = Some(FourSeasonsWoodenBridge)
+          } else if (h.terrainMap != FourSeasonsCastle) {
+            h.terrainMap = FourSeasonsRoad
           }
         }
       }
     }
   }
 
-  def makeRoadAroundCapitals(field: TerrainHexField, capital:TerrainHex): Unit = {
+  def makeRoadAroundCapitals(field: FourSeasonsTerrainHexField, capital:FourSeasonsTerrainHex): Unit = {
     field.hexRing(capital, 1).foreach { h =>
-      if (h.terrain.isNot(WaterKind)) {
-        h.terrain = GrassyRoad
+      if (h.terrainMap != FourSeasonsWater && h.terrainMap != FourSeasonsRiver) {
+        h.terrainMap = FourSeasonsRoad
       }
     }
   }
 
-  def addFlowers(field: TerrainHexField): Unit = {
-    field.hexes.filter(_.terrain.is(GrassKind)).filter(_.mapObj.isEmpty).grouped(10).map(_.head).foreach {
-      h => h.mapObj = Some(Flowers)
+  def addFlowers(field: FourSeasonsTerrainHexField): Unit = {
+    field.hexes.filter(_.terrainMap == FourSeasonsGrass).filter(_.mapObj.isEmpty).grouped(10).map(_.head).foreach {
+      h => h.mapObj = Some(FourSeasonsFlowers)
     }
   }
 }
 
-case class WorldMap(terrain: TerrainHexField, provinces: Map[TerrainHex, Set[TerrainHex]])
+case class WorldMap(terrain: FourSeasonsTerrainHexField, provinces: Map[FourSeasonsTerrainHex, Set[FourSeasonsTerrainHex]])
 
 case class MapDivision[T <: Hex](capitals: Set[T], allHexes: Set[T]) {
 

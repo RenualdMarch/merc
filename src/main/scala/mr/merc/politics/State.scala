@@ -36,7 +36,7 @@ class State(val initialName: String, val primeCulture:Culture, startingMoney: Do
 }
 
 class Province(val name: String, var owner: State, val regionMarket: RegionMarket,
-               val regionPopulation: RegionPopulation, val hexes: Set[TerrainHex], val capital: TerrainHex) extends EconomicRegion {
+               val regionPopulation: RegionPopulation, val hexes: Set[FourSeasonsTerrainHex], val capital: FourSeasonsTerrainHex) extends EconomicRegion {
 
   private var neighbourProvinces:Option[Set[Province]] = None
 

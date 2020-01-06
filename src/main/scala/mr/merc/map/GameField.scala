@@ -3,6 +3,7 @@ package mr.merc.map
 import mr.merc.map.hex.TerrainHexField
 import mr.merc.players.Player
 import mr.merc.map.hex.TerrainHex
+import mr.merc.map.terrain.{Empty, EmptyKind}
 import mr.merc.unit.Soldier
 import mr.merc.unit.Skirmisher
 
@@ -13,7 +14,7 @@ class GameField(val hexField: TerrainHexField, val players: List[Player], val si
       private val mustStopHere = if (soldier.soldierType.attributes.contains(Skirmisher)) {
         Set.empty[TerrainHex]
       } else {
-        players.filterNot(_ == soldier.owner).map(zoneOfControlFor).reduce(_ ++ _)
+        players.filterNot(_ == soldier.owner).flatMap(zoneOfControlFor).toSet
       }
 
       override def isBlocked(t: TerrainHex) = isBlockedFor(soldier, t)
@@ -31,7 +32,7 @@ class GameField(val hexField: TerrainHexField, val players: List[Player], val si
   }
 
   def isBlockedFor(soldier: Soldier, t: TerrainHex): Boolean = {
-    t.soldier.exists(s => areEnemies(s.owner, soldier.owner))
+    t.soldier.exists(s => areEnemies(s.owner, soldier.owner)) || t.terrain == Empty
   }
 
   def zoneOfControlFor(player: Player): Set[TerrainHex] = {

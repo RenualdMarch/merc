@@ -3,7 +3,7 @@ package mr.merc.diplomacy
 import mr.merc.economics.Culture.{FrenchHuman, GermanHuman, LatinHuman}
 import mr.merc.economics._
 import mr.merc.map.hex.TerrainHex
-import mr.merc.map.terrain.GreenGrass
+import mr.merc.map.terrain.{FourSeasonsTerrainTypes, GreenGrass}
 import mr.merc.players.{ColorGenerator, NamesGenerator}
 import mr.merc.politics.{Party, Province, State}
 import org.scalatest.{BeforeAndAfter, FunSuite, Matchers}
@@ -60,7 +60,7 @@ class AbstractDiplomacyTest extends FunSuite with Matchers with BeforeAndAfter {
   def generateRegions(): List[Province] = {
     val allRegions = generateStates().toList.flatMap { s =>
       (0 until provincePerState).map { i =>
-        val hex = new TerrainHex(0, 0, GreenGrass)
+        val hex = new FourSeasonsTerrainHex(0, 0, FourSeasonsTerrainTypes.FourSeasonsGrass)
         new Province(i.toString, s, new RegionMarket(Map()), regionPopulationFor(s, i), Set(hex), hex)
       }
     }

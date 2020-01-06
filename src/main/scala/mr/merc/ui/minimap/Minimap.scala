@@ -5,27 +5,25 @@ import mr.merc.map.hex.TerrainHexField
 import scalafx.scene.paint.Color
 import mr.merc.map.hex.TerrainHex
 import mr.merc.map.terrain._
-
 import scalafx.scene.layout.Pane
-import mr.merc.map.view.MapView
 import mr.merc.ui.common.ScrollPaneLike
 import scalafx.Includes._
+
 import scalafx.scene.input.MouseEvent
 
-class Minimap(field: TerrainHexField, pane: ScrollPaneLike, factor: Double) extends Pane {
+class Minimap(private var field: TerrainHexField, pane: ScrollPaneLike, factor: Double, pixelWidth:Int, pixelHeight:Int, battleMode:Boolean) extends Pane {
   private val mapCanvas = new Canvas()
   private val scrollCanvas = new Canvas()
   children = List(mapCanvas, scrollCanvas)
-  private val mapView = new MapView(field, factor)
   private var updateOnPaneChange = true
 
   private def xOffset = (width.value - minimapSize.minimapUsefulWidth) / 2
 
   private def yOffset = (height.value - minimapSize.minimapUsefulHeight) / 2
 
-  private def visiblePartWidth = Math.min(1, pane.width.value / mapView.pixelWidth)
+  private def visiblePartWidth = Math.min(1, pane.width.value / pixelWidth)
 
-  private def visiblePartHeight = Math.min(1, pane.height.value / mapView.pixelHeight)
+  private def visiblePartHeight = Math.min(1, pane.height.value / pixelHeight)
 
   private def rectWidth = visiblePartWidth * minimapSize.minimapUsefulWidth
 
@@ -34,6 +32,12 @@ class Minimap(field: TerrainHexField, pane: ScrollPaneLike, factor: Double) exte
   private def scrollableWidth = minimapSize.minimapUsefulWidth - rectWidth
 
   private def scrollableHeight = minimapSize.minimapUsefulHeight - rectHeight
+
+  def terrainHexField:TerrainHexField = field
+
+  def terrainHexField_=(field:TerrainHexField): Unit = {
+    this.field = field
+  }
 
   private var rectPosX = 0d
   private var rectPosY = 0d
@@ -67,10 +71,12 @@ class Minimap(field: TerrainHexField, pane: ScrollPaneLike, factor: Double) exte
       val y = hex.y * side + offset.ceil + yOffset
       gc.fill = color(hex)
       gc.fillRect(x, y, side, side)
-      hex.province.foreach { p =>
-        if (hex.terrain.isNot(WaterKind)) {
-          gc.fill = p.owner.color.opacity(0.7f)
-          gc.fillRect(x, y, side, side)
+      if (!battleMode) {
+        hex.province.foreach { p =>
+          if (hex.terrain.isNot(WaterKind)) {
+            gc.fill = p.owner.color.opacity(0.7f)
+            gc.fillRect(x, y, side, side)
+          }
         }
       }
     }
@@ -188,18 +194,19 @@ class Minimap(field: TerrainHexField, pane: ScrollPaneLike, factor: Double) exte
 
 
   private def color(hex: TerrainHex): Color = {
-    if (hex.soldier.nonEmpty) {
+    if (hex.soldier.nonEmpty && battleMode) {
       hex.soldier.get.owner.color
     } else {
       hex.terrain.kind match {
         case GrassKind => Color.Green
-        case WaterKind => Color.Blue
+        case WaterKind | IceKind => Color.Blue
         case HillKind => Color.Gray
         case MountainKind => Color.Black
         case SandKind => Color.Yellow
         case SwampKind => Color.Brown
         case ForestKind => Color.DarkGreen
         case RoadKind => Color.LightGray
+        case SnowKind => Color.White
         case _ => Color.Black
       }
     }

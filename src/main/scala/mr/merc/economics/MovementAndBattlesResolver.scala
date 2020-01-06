@@ -1,14 +1,7 @@
 package mr.merc.economics
 
-import mr.merc.army.{Warrior, WarriorCompetence}
-import mr.merc.map.hex.{TerrainHex, TerrainHexField}
-import mr.merc.map.objects.House
-import mr.merc.map.terrain.Empty
-import mr.merc.politics.{Province, State}
-import mr.merc.unit.Soldier
-import mr.merc.army.WarriorCompetence._
-import mr.merc.map.GameField
-import mr.merc.util.MercUtils._
+import mr.merc.army.Warrior
+import mr.merc.politics.Province
 
 class MovementAndBattlesResolver(state: WorldState) {
 
@@ -91,7 +84,7 @@ class MovementAndBattlesResolver(state: WorldState) {
             (add.from, warriors.toList)
           }.filter(_._2.nonEmpty).toMap
 
-          new OneProvinceBattle(state.worldHexField, mv.to, additionalAttackers + (mv.from -> attackersSoldiers.toList),
+          new OneProvinceBattle(state.worldHexField.buildTerrainHexField(state.seasonOfYear.season), mv.to, additionalAttackers + (mv.from -> attackersSoldiers.toList),
             defendersSoldiers, additionalDefenders)
         }
       } else Nil
@@ -100,7 +93,7 @@ class MovementAndBattlesResolver(state: WorldState) {
     val twoProvinceBattles = for {
       first <- singleAttacks
       second <- singleAttacks if first.attackers.contains(second.province) && second.attackers.contains(first.province)
-    } yield new TwoProvinceBattle(state.worldHexField, first.province, second.province, first.attackers,
+    } yield new TwoProvinceBattle(state.worldHexField.buildTerrainHexField(state.seasonOfYear.season), first.province, second.province, first.attackers,
       first.defenders, first.additionalDefenders, second.attackers, second.defenders,
       second.additionalDefenders)
 

@@ -17,6 +17,14 @@ class Election(currentParty: Party, primaryCulture: Culture, possibleParties: Li
     }
     StateElectionReport(reports)
   }
+
+  def totalPopulationPopularity(regions:List[EconomicRegion]): StateElectionReport = {
+    val reports = regions.map { r =>
+      val reports = r.regionPopulation.pops.map(_.choose(Party.allParties))
+      RegionElectionReport(r, reports)
+    }
+    StateElectionReport(reports)
+  }
 }
 
 object Election {

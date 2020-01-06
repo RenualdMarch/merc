@@ -31,7 +31,8 @@ object SoldierView {
 
 }
 
-class SoldierView(val soldier: Soldier, factor: Double, drawOval: Boolean = true, drawCircleState:Boolean = true) extends AbstractSoldierView(SoldierTypeViewInfo(soldier.soldierType.viewName, soldier.owner.color), factor) {
+class SoldierView(val soldier: Soldier, factor: Double, drawOval: Boolean = true, drawCircleState:Boolean = true)
+  extends AbstractSoldierView(SoldierTypeViewInfo(soldier.soldierType.viewName, soldier.owner.color), factor) {
 
   private val maxHp = 100
   private val healthBarHeight = Math.min(soldier.soldierType.hp, maxHp) * 2 * TerrainHexView.side(factor) / 3 / maxHp

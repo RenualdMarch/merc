@@ -4,8 +4,9 @@ import mr.merc.image.MImage
 import mr.merc.util.MercUtils
 
 object TerrainType {
-  def list:List[TerrainType] = List(GreenGrass, DryGrass, SemidryGrass, ShallowWater, BasicMountain, DesertSand,
-    BasicHill, CleanRoad, OldRoad, DirtRoad, GrassyRoad, DecForest, PineForest, MixedForest, Castle, Mud, LeafLitter)
+  def list:List[TerrainType] = List(GreenGrass, DryGrass, SemidryGrass, ShallowWater, BasicMountain, BasicMountainSnow, DesertSand,
+    BasicHill, BasicHillSnow, CleanRoad, OldRoad, DirtRoad, GrassyRoad, DecForest, DecForestFall, DecForestWinter,
+    PineForest, MixedForest, Castle, Mud, LeafLitter, Snow, Ice)
 
   def helperTypesList:List[TerrainType] = List(BankInside, BankOutside)
 }
@@ -46,6 +47,8 @@ case object RoadKind extends TerrainKind
 case object ForestKind extends TerrainKind
 case object WallsKind extends TerrainKind
 case object SwampKind extends TerrainKind
+case object SnowKind extends TerrainKind
+case object IceKind extends TerrainKind
 case object EmptyKind extends TerrainKind
 
 case object GreenGrass extends TerrainType("green", GrassKind)
@@ -60,9 +63,12 @@ case object BankInside extends TerrainType("bankInside", WaterKind)
 case object BankOutside extends TerrainType("bankOutside", WaterKind)
 
 case object BasicMountain extends TerrainType("mountain", MountainKind,belowTerrainType = Some(BasicHill))
+case object BasicMountainSnow extends TerrainType("mountainSnow", MountainKind,belowTerrainType = Some(BasicHillSnow))
+
 
 case object DesertSand extends TerrainType("sand", SandKind)
 case object BasicHill extends TerrainType("hill", HillKind)
+case object BasicHillSnow extends TerrainType("hillSnow", HillKind)
 
 case object CleanRoad extends TerrainType("cleanRoad", RoadKind)
 case object OldRoad extends TerrainType("oldRoad", RoadKind)
@@ -70,8 +76,16 @@ case object DirtRoad extends TerrainType("dirt", RoadKind)
 case object GrassyRoad extends TerrainType("grassyRoad", RoadKind)
 
 case object DecForest extends TerrainType("decForest", ForestKind, belowTerrainType = Some(GreenGrass))
+case object DecForestFall extends TerrainType("decForestFall", ForestKind, belowTerrainType = Some(DryGrass))
+case object DecForestWinter extends TerrainType("decForestWinter", ForestKind, belowTerrainType = Some(Snow))
+
+
 case object PineForest extends TerrainType("pineForest", ForestKind, belowTerrainType = Some(GreenGrass))
 case object MixedForest extends TerrainType("mixedForest", ForestKind, belowTerrainType = Some(GreenGrass))
+
+case object Snow extends TerrainType("snow", SnowKind)
+
+case object Ice extends TerrainType("ice", SnowKind)
 
 case object Castle extends TerrainType("cobbles", WallsKind) {
   override lazy val imagePaths: Vector[MImage] = {

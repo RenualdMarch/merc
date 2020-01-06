@@ -63,7 +63,7 @@ abstract sealed class Battle(worldHexField:TerrainHexField) {
 
   def putWarriorsToProvince(warriors:List[Warrior], province: Province, hexField: TerrainHexField): Unit = {
     val (x, y) = hexField.hexes.filter(_.province.contains(province)).map(h => (h.x, h.y)).medianBySquares
-    hexField.closest(hexField.hex(x, y)).filter(h => h.soldier.isEmpty).zip(warriors).foreach { case (hex, warrior: Warrior) =>
+    hexField.closest(hexField.hex(x, y)).filter(h => h.soldier.isEmpty).filter(_.terrain != Empty).zip(warriors).foreach { case (hex, warrior: Warrior) =>
       hex.soldier = Some(warrior.soldier)
     }
   }
@@ -72,15 +72,15 @@ abstract sealed class Battle(worldHexField:TerrainHexField) {
     val intersection = hexField.hexes.filter(_.province.contains(province)).toSet
     require(intersection.nonEmpty, s"province $province doesn't belong to hexField $hexField")
 
-    hexField.closest(intersection).filter(_.soldier.isEmpty).zip(warriors).foreach { case (hex, warrior) =>
+    hexField.closest(intersection).filter(_.soldier.isEmpty).filter(_.terrain != Empty).zip(warriors).foreach { case (hex, warrior) =>
       hex.soldier = Some(warrior.soldier)
     }
   }
 
   def terrainHexFieldFromProvinces(worldHexField:TerrainHexField):TerrainHexField = {
-    val provinceHexes = provinces.flatMap(_.hexes).toSet
+    val provinceHexes = provinces.flatMap(_.hexes).map(f => worldHexField.hex(f.x, f.y)).toSet
     val neigs = provinceHexes.flatMap(p => worldHexField.neighboursSet(p))
-    val additionalHexes = additionalProvinces.flatMap(_.hexes).toSet & neigs
+    val additionalHexes = additionalProvinces.flatMap(_.hexes).map(f => worldHexField.hex(f.x, f.y)).toSet & neigs
     val allHexes = provinceHexes ++ additionalHexes
 
     val minX = allHexes.minBy(_.x).x
@@ -116,6 +116,13 @@ abstract sealed class Battle(worldHexField:TerrainHexField) {
   def sides:(Set[State], Set[State])
 
   def concludeBattle(actions: WorldStateDiplomacyActions): BattleReport = {
+    provinces.foreach { p =>
+      val alreadyInProvince = p.regionWarriors.allWarriors.toSet
+      val inBattle = this.allWarriors.toSet
+      val takeFromProvince = alreadyInProvince & inBattle
+      p.regionWarriors.takeWarriors(takeFromProvince.toList)
+    }
+
     val model = new BattleModel(gameField)
     require(model.isOver, "battle must be over")
 

@@ -6,7 +6,7 @@ import mr.merc.map.hex.TerrainHexField
 import mr.merc.map.terrain.{DesertSand, SandKind, WallsKind}
 import org.scalatest.BeforeAndAfter
 import mr.merc.map.hex.TerrainHex
-import mr.merc.map.objects.House
+import mr.merc.map.objects.{House, SummerHouse}
 import mr.merc.players.Player
 
 class HealingAtVillageTest extends FunSuite with BeforeAndAfter {
@@ -17,7 +17,7 @@ class HealingAtVillageTest extends FunSuite with BeforeAndAfter {
 
   before {
     field = new TerrainHexField(10, 10, (x, y) => if (x == 5 && y == 5)
-      new TerrainHex(x, y, DesertSand, Some(House(LatinHuman)))
+      new TerrainHex(x, y, DesertSand, Some(SummerHouse(LatinHuman)))
     else new TerrainHex(x, y, DesertSand))
   }
 

@@ -66,7 +66,8 @@ object WarriorType {
 
     override def moveCost: Map[TerrainKind, Int] = Map(
       WaterKind -> 3, ForestKind -> 2, SwampKind -> 3, HillKind -> 2,
-      MountainKind -> 3, SandKind -> 2, GrassKind -> 1, WallsKind -> 1)
+      MountainKind -> 3, SandKind -> 2, GrassKind -> 1, WallsKind -> 1,
+      SnowKind -> 3, IceKind -> movement)
 
     override def baseAttacks = List(Attack(0, 8, 4, Blade, ranged = false))
 
@@ -74,7 +75,8 @@ object WarriorType {
 
     override def defence: Map[DefenceType, Int] = Map(
       WaterDefence -> 20, ForestDefence -> 50, SwampDefence -> 20, HillDefence -> 50,
-      MountainDefence -> 60, SandDefence -> 30, GrassDefence -> 40, BuildingDefence -> 60)
+      MountainDefence -> 60, SandDefence -> 30, GrassDefence -> 40, BuildingDefence -> 60,
+      SnowDefence -> 20, IceDefence -> 10)
 
     override def resistance: Map[AttackType, Int] = Map(
       Blade -> 20, Pierce -> 0, Impact -> 20, Fire -> 0, Cold -> 0, Arcane -> 20)
@@ -93,11 +95,12 @@ object WarriorType {
 
     override def moveCost: Map[TerrainKind, Int] = Map(
       WaterKind -> 4, ForestKind -> 2, SwampKind -> 4, HillKind -> 3,
-      MountainKind -> 4, SandKind -> 2, GrassKind -> 1, WallsKind -> 1)
+      MountainKind -> 4, SandKind -> 2, GrassKind -> 1, WallsKind -> 1, SnowKind -> 3, IceKind -> movement)
 
     override def defence: Map[DefenceType, Int] =  Map(
       WaterDefence -> 20, ForestDefence -> 40, SwampDefence -> 20, HillDefence -> 40,
-      MountainDefence -> 50, SandDefence -> 20, GrassDefence -> 30, BuildingDefence -> 40)
+      MountainDefence -> 50, SandDefence -> 20, GrassDefence -> 30, BuildingDefence -> 40,
+      SnowDefence -> 20, IceDefence -> 10)
 
     override def resistance: Map[AttackType, Int] = Map(
       Blade -> 50, Pierce -> 40, Impact -> 10, Fire -> -10, Cold -> -10, Arcane -> 20)
@@ -114,11 +117,13 @@ object WarriorType {
 
     override def moveCost: Map[TerrainKind, Int] = Map(
       WaterKind -> 3, ForestKind -> 2, SwampKind -> 3, HillKind -> 2,
-      MountainKind -> 3, SandKind -> 2, GrassKind -> 1, WallsKind -> 1)
+      MountainKind -> 3, SandKind -> 2, GrassKind -> 1, WallsKind -> 1,
+      SnowKind -> 3, IceKind -> movement)
 
     override def defence: Map[DefenceType, Int] =  Map(
       WaterDefence -> 20, ForestDefence -> 50, SwampDefence -> 20, HillDefence -> 50,
-      MountainDefence -> 60, SandDefence -> 30, GrassDefence -> 40, BuildingDefence -> 60)
+      MountainDefence -> 60, SandDefence -> 30, GrassDefence -> 40, BuildingDefence -> 60,
+      SnowDefence -> 20, IceDefence -> 10)
 
     override def resistance: Map[AttackType, Int] = Map(
       Blade -> 0, Pierce -> 40, Impact -> 0, Fire -> 0, Cold -> 0, Arcane -> 20)
@@ -135,11 +140,13 @@ object WarriorType {
 
     override def moveCost: Map[TerrainKind, Int] = Map(
       WaterKind -> 2, ForestKind -> 2, SwampKind -> 2, HillKind -> 2,
-      MountainKind -> 3, SandKind -> 2, GrassKind -> 1, WallsKind -> 1)
+      MountainKind -> 3, SandKind -> 2, GrassKind -> 1, WallsKind -> 1,
+      SnowKind -> 2, IceKind -> 3)
 
     override def defence: Map[DefenceType, Int] = Map(
       WaterDefence -> 40, ForestDefence -> 70, SwampDefence -> 40, HillDefence -> 70,
-      MountainDefence -> 70, SandDefence -> 40, GrassDefence -> 60, BuildingDefence -> 70)
+      MountainDefence -> 70, SandDefence -> 40, GrassDefence -> 60, BuildingDefence -> 70,
+      SnowDefence -> 40, IceDefence -> 30)
 
     override def resistance: Map[AttackType, Int] = Map(
       Blade -> -30, Pierce -> -20, Impact -> -20, Fire -> 0, Cold -> 10, Arcane -> 20)
@@ -158,11 +165,13 @@ object WarriorType {
 
     override def moveCost: Map[TerrainKind, Int] = Map(
       WaterKind -> 3, ForestKind -> 2, SwampKind -> 3, HillKind -> 2,
-      MountainKind -> 3, SandKind -> 2, GrassKind -> 1, WallsKind -> 1)
+      MountainKind -> 3, SandKind -> 2, GrassKind -> 1, WallsKind -> 1,
+      SnowKind -> 3, IceKind -> 4)
 
     override def defence: Map[DefenceType, Int] = Map(
       WaterDefence -> 20, ForestDefence -> 50, SwampDefence -> 20, HillDefence -> 50,
-      MountainDefence -> 60, SandDefence -> 30, GrassDefence -> 40, BuildingDefence -> 70)
+      MountainDefence -> 60, SandDefence -> 30, GrassDefence -> 40, BuildingDefence -> 70,
+      SnowDefence -> 20, IceDefence -> 20)
 
     override def resistance: Map[AttackType, Int] = Map(
       Blade -> 0, Pierce -> 0, Impact -> 0, Fire -> 0, Cold -> 0, Arcane -> 20)
@@ -177,15 +186,17 @@ object WarriorType {
 
     override def baseAttacks: List[Attack] = List(
       Attack(0, 8, 2, Impact, ranged = false),
-      Attack(1, 10, 3, Pierce, ranged = true))
+      Attack(1, 10, 3, Impact, ranged = true))
 
     override def moveCost: Map[TerrainKind, Int] = Map(
       WaterKind -> 3, ForestKind -> 2, SwampKind -> 3, HillKind -> 2,
-      MountainKind -> 3, SandKind -> 2, GrassKind -> 1, WallsKind -> 1)
+      MountainKind -> 3, SandKind -> 2, GrassKind -> 1, WallsKind -> 1,
+      SnowKind -> 3, IceKind -> 4)
 
     override def defence: Map[DefenceType, Int] = Map(
       WaterDefence -> 20, ForestDefence -> 50, SwampDefence -> 20, HillDefence -> 50,
-      MountainDefence -> 60, SandDefence -> 30, GrassDefence -> 40, BuildingDefence -> 70)
+      MountainDefence -> 60, SandDefence -> 30, GrassDefence -> 40, BuildingDefence -> 70,
+      SnowDefence -> 20, IceDefence -> 20)
 
     override def resistance: Map[AttackType, Int] = Map(
       Blade -> 0, Pierce -> 0, Impact -> 0, Fire -> 0, Cold -> 0, Arcane -> 20)
@@ -202,11 +213,13 @@ object WarriorType {
 
     override def moveCost: Map[TerrainKind, Int] = Map(
       WaterKind -> 4, ForestKind -> 3, SwampKind -> 4, HillKind -> 2,
-      MountainKind -> 9, SandKind -> 2, GrassKind -> 1, WallsKind -> 1)
+      MountainKind -> 9, SandKind -> 2, GrassKind -> 1, WallsKind -> 1,
+      SnowKind -> 2, IceKind -> 3)
 
     override def defence: Map[DefenceType, Int] = Map(
       WaterDefence -> 20, ForestDefence -> 30, SwampDefence -> 20, HillDefence -> 40,
-      MountainDefence -> 40, SandDefence -> 30, GrassDefence -> 40, BuildingDefence -> 40)
+      MountainDefence -> 40, SandDefence -> 30, GrassDefence -> 40, BuildingDefence -> 40,
+      SnowDefence -> 30, IceDefence -> 20)
 
     override def resistance: Map[AttackType, Int] = Map(
       Blade -> 30, Pierce -> -20, Impact -> 40, Fire -> 0, Cold -> 20, Arcane -> 20)
@@ -223,11 +236,13 @@ object WarriorType {
 
     override def moveCost: Map[TerrainKind, Int] = Map(
       WaterKind -> 4, ForestKind -> 3, SwampKind -> 4, HillKind -> 2,
-      MountainKind -> 8, SandKind -> 2, GrassKind -> 1, WallsKind -> 1)
+      MountainKind -> 8, SandKind -> 2, GrassKind -> 1, WallsKind -> 1,
+      SnowKind -> 2, IceKind -> 3)
 
     override def defence: Map[DefenceType, Int] = Map(
       WaterDefence -> 20, ForestDefence -> 30, SwampDefence -> 20, HillDefence -> 40,
-      MountainDefence -> 40, SandDefence -> 30, GrassDefence -> 40, BuildingDefence -> 40)
+      MountainDefence -> 40, SandDefence -> 30, GrassDefence -> 40, BuildingDefence -> 40,
+      SnowDefence -> 30, IceDefence -> 20)
 
     override def resistance: Map[AttackType, Int] = Map(
       Blade -> 20, Pierce -> -20, Impact -> 30, Fire -> 0, Cold -> 0, Arcane -> 20)
@@ -246,11 +261,13 @@ object WarriorType {
 
     override def moveCost: Map[TerrainKind, Int] = Map(
       WaterKind -> 3, ForestKind -> 2, SwampKind -> 3, HillKind -> 2,
-      MountainKind -> 3, SandKind -> 2, GrassKind -> 1, WallsKind -> 1)
+      MountainKind -> 3, SandKind -> 2, GrassKind -> 1, WallsKind -> 1,
+      SnowKind -> 3, IceKind -> 4)
 
     override def defence: Map[DefenceType, Int] = Map(
       WaterDefence -> 20, ForestDefence -> 50, SwampDefence -> 20, HillDefence -> 50,
-      MountainDefence -> 60, SandDefence -> 30, GrassDefence -> 40, BuildingDefence -> 60)
+      MountainDefence -> 60, SandDefence -> 30, GrassDefence -> 40, BuildingDefence -> 60,
+      SnowDefence -> 20, IceDefence -> 20)
 
     override def resistance: Map[AttackType, Int] = Map(
       Blade -> 0, Pierce -> 0, Impact -> 0, Fire -> 10, Cold -> 0, Arcane -> 20)

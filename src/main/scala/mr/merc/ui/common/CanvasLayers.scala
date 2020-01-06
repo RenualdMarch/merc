@@ -8,15 +8,36 @@ import scalafx.geometry.Rectangle2D
 import mr.merc.util.FxPropertyUtils._
 
 // TODO handle case when CanvasLayer is resized - image shouldn't change position
-class CanvasLayers(layers: List[CanvasLayer], fullMapSize: Rectangle2D) extends Pane with ScrollPaneLike {
+// TODO update canvas count in case layers count change
+class CanvasLayers(private var _layers: List[CanvasLayer], fullMapSize: Rectangle2D) extends Pane with ScrollPaneLike {
   style = "-fx-background-color: black"
-  val canvasList = layers map (l => (l, new Canvas()))
 
-  canvasList foreach { case (_, c) =>
-    c.width <== this.width
-    c.height <== this.height
-    children.add(c)
+  def layers:List[CanvasLayer] = _layers
+
+  def layers_=(layers:List[CanvasLayer]):Unit = {
+    if (layers.size != _layers.size) {
+      this.children.clear()
+      _layers = layers
+      canvasList = initCanvasLists()
+    } else {
+      _layers = layers
+      canvasList = canvasList.zip(layers).map { case ((_, c), cl) => (cl, c)}
+    }
   }
+
+  private var canvasList = initCanvasLists()
+
+  def initCanvasLists():List[(CanvasLayer, Canvas)] = {
+    val result = layers map (l => (l, new Canvas()))
+    result foreach { case (_, c) =>
+      c.width <== this.width
+      c.height <== this.height
+      children.add(c)
+    }
+    result
+  }
+
+  initCanvasLists()
 
   def redraw() {
     canvasList foreach {

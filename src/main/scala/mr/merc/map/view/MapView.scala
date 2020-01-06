@@ -13,7 +13,10 @@ import mr.merc.politics.Province
 class MapView(field: TerrainHexField, factor: Double, val soldiersDrawer: SoldiersDrawer[SoldierView] = new SoldiersDrawer[SoldierView](), mode:FieldViewMode = BattleFieldViewMode) extends Logging {
   val terrainView = new TerrainHexFieldView(field, soldiersDrawer, factor, mode)
 
-  createSoldiers foreach (soldiersDrawer.addSoldier)
+  if (mode == BattleFieldViewMode) {
+    createSoldiers foreach (soldiersDrawer.addSoldier)
+  }
+
 
   def hexByPixel(x: Int, y: Int):Option[TerrainHexView] = terrainView.hexByPixelCoords(x, y)
 

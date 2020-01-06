@@ -13,8 +13,7 @@ import mr.merc.battle.event.AttackModelEventResult
 import mr.merc.battle.event.MovementModelEvent
 import mr.merc.battle.event.MovementModelEventResult
 import mr.merc.economics.Culture.LatinHuman
-import mr.merc.map.objects.House._
-import mr.merc.map.objects.{House, WoodenBridge}
+import mr.merc.map.objects.{House, SummerHouse, WoodenBridge}
 
 class BattleModelTest extends FunSuite with BeforeAndAfter {
   var field: TerrainHexField = _
@@ -378,7 +377,7 @@ class BattleModelTest extends FunSuite with BeforeAndAfter {
     def terrainHex(x: Int, y: Int) = if (x == 1 && y == 0) {
       new TerrainHex(x, y, OldRoad)
     } else if (x == 0 && y == 1) {
-      new TerrainHex(x, y, ShallowWater, Some(House(LatinHuman)))
+      new TerrainHex(x, y, ShallowWater, Some(SummerHouse(LatinHuman)))
     } else {
       new TerrainHex(x, y, DesertSand)
     }

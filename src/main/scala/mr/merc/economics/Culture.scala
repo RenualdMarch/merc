@@ -27,6 +27,8 @@ object Culture {
   */
   // good words: alliance, protectorate, tribe, army, despotia
 
+  // desertCity awful in winter - need to put it in desert
+
   case class StateForm(monarchy: String, democracy: String)
 
   case class CultureInfo(stateForm: StateForm, cities: List[String], states: List[String])
@@ -352,7 +354,7 @@ object Culture {
         "Prussian"))
   }
 
-  case object SlavicHuman extends Culture("slavic", Humans, "humanCottage", Color.Violet) {
+  case object SlavicHuman extends Culture("slavic", Humans, "humanHut", Color.Violet) {
     val warriorViewNames: WarriorViewNames = WarriorViewNames.WolfCulture
 
     val cultureInfo: CultureInfo = CultureInfo(StateForm("principality", "republic"),
@@ -403,7 +405,7 @@ object Culture {
         "Podolian"))
   }
 
-  case object ArabHuman extends Culture("arab", Humans, "desertCity", Color.Green) {
+  case object ArabHuman extends Culture("arab", Humans, "humanCottage", Color.Green) {
     override val warriorViewNames: WarriorViewNames = WarriorViewNames.ArabCulture
 
     override val cultureInfo: CultureInfo = CultureInfo(StateForm("caliphate", "republic"),
@@ -461,7 +463,7 @@ object Culture {
     )
   }
 
-  case object SpainHuman extends Culture("spanish", Humans, "humanVillage", Color.Orange) {
+  case object SpainHuman extends Culture("spanish", Humans, "humanHill", Color.Orange) {
     override val warriorViewNames: WarriorViewNames = WarriorViewNames.LuzCulture
 
     override val cultureInfo: CultureInfo = CultureInfo(StateForm("kingdom", "republic"),

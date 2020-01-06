@@ -146,7 +146,7 @@ class AttackTest extends FunSuite with BeforeAndAfter {
 
   test("village defence is separate thing") {
     val hex1 = new TerrainHex(0, 0, DesertSand)
-    val hex2 = new TerrainHex(0, 0, DesertSand, Some(House(LatinHuman)))
+    val hex2 = new TerrainHex(0, 0, DesertSand, Some(SummerHouse(LatinHuman)))
 
     val someType = new SoldierType("type1", 1, 10, 1, 10, 1,
       List(), Map(), Map(SandDefence -> 50, BuildingDefence -> 60),

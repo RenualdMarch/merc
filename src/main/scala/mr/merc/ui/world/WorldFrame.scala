@@ -1,7 +1,7 @@
 package mr.merc.ui.world
 
 import javafx.event.EventHandler
-import mr.merc.economics.{Battle, WorldGenerator, WorldState}
+import mr.merc.economics.{Battle, SeasonOfYear, WorldGenerator, WorldState}
 import mr.merc.log.Logging
 import mr.merc.map.hex.view.ProvinceView
 import mr.merc.map.hex.view.TerrainHexFieldView.WorldMapViewMode
@@ -15,6 +15,8 @@ import scalafx.Includes._
 import javafx.scene.input.{KeyEvent => JKeyEvent}
 import javafx.scene.input.{KeyCode => JKeyCode}
 import mr.merc.ai.BattleAI
+import mr.merc.economics.Seasons.Season
+import mr.merc.map.hex.TerrainHexField
 import mr.merc.ui.battle.BattleFrame
 import mr.merc.ui.dialog.WaitDialog
 import org.tbee.javafx.scene.layout.MigPane
@@ -22,6 +24,7 @@ import scalafx.scene.paint.Color
 import scalafx.scene.shape.Rectangle
 import mr.merc.ui.dialog.ModalDialog._
 import scalafx.application.Platform
+import scalafx.beans.property.ObjectProperty
 
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.Future
@@ -31,32 +34,48 @@ object WorldFrame {
   val PixelsPerScroll = 200
 }
 
-class WorldFrame(sceneManager: SceneManager, worldState:WorldState) extends Pane with Logging {
+class WorldFrame(sceneManager: SceneManager, worldState: WorldState) extends Pane with Logging {
   val factor = 1d
 
-  val mapView = new MapView(worldState.worldHexField, factor, mode = WorldMapViewMode)
-  val menu = new WorldMenu(this)
-  val stateLabel:Pane = new PlayerStateData(worldState.playerState)
+  private val dateProperty = ObjectProperty(worldState.seasonOfYear)
 
-  val provinceViews = worldState.states.flatMap { case (_, pList) =>
-    pList.map { p =>
-      new ProvinceView(p, worldState.worldHexField, mapView.terrainView)
+  private var prevCurrentMap:(Season, TerrainHexField) =
+    (worldState.seasonOfYear.season, worldState.worldHexField.buildTerrainHexField(worldState.seasonOfYear.season))
+  def currentMap:TerrainHexField = {
+    if (worldState.seasonOfYear.season != prevCurrentMap._1) {
+      prevCurrentMap = (worldState.seasonOfYear.season, worldState.worldHexField.buildTerrainHexField(worldState.seasonOfYear.season))
     }
+    prevCurrentMap._2
   }
 
-  val provinceViewsMap = provinceViews.map(p => p.province -> p).toMap
+  private var mapView = initMapView()
+  private var provinceViewsMap = initProvinceViews()
+
+  def initMapView(): MapView = new MapView(currentMap, factor, mode = WorldMapViewMode)
+
+  def initProvinceViews(): Map[Province, ProvinceView] = worldState.states.flatMap { case (_, pList) =>
+    pList.map { p =>
+      new ProvinceView(worldState.seasonOfYear.season, p, worldState.worldHexField, currentMap, mapView.terrainView)
+    }
+  }.map(p => p.province -> p).toMap
+
+  val menu = new WorldMenu(this)
+  val stateLabel: Pane = new PlayerStateData(worldState.playerState)
+  val dateLabel: Pane = new TurnData(dateProperty)
 
   private val worldCanvas = new CanvasLayers(mapView.canvasBattleLayers, new Rectangle2D(0, 0, mapView.pixelWidth, mapView.pixelHeight))
-  private val interfacePane = new WorldInterfacePane(this, worldCanvas, worldState.worldHexField, factor)
+  private val interfacePane = new WorldInterfacePane(this, worldCanvas, currentMap, factor, mapView.pixelWidth, mapView.pixelHeight)
 
-  menu.prefWidth <== this.width - this.stateLabel.width
+  menu.prefWidth <== this.width - this.stateLabel.width - this.dateLabel.width
   menu.layoutX <== this.stateLabel.width
   stateLabel.prefHeight <== menu.height
+  dateLabel.prefHeight <== menu.height
+  dateLabel.layoutX <== this.width - this.dateLabel.width
   interfacePane.layoutY <== menu.height
   interfacePane.prefWidth <== this.width
   interfacePane.prefHeight <== this.height - menu.height
 
-  this.children = List(stateLabel, menu, interfacePane)
+  this.children = List(stateLabel, menu, dateLabel, interfacePane)
 
   worldCanvas.onMouseClicked = (event: MouseEvent) => {
     info(s"clicked on (${event.x}, ${event.y})")
@@ -75,11 +94,18 @@ class WorldFrame(sceneManager: SceneManager, worldState:WorldState) extends Pane
   totalRefresh()
 
   def totalRefresh(): Unit = {
-    provinceViews.foreach(_.refreshCity())
-    provinceViews.foreach(_.refreshSoldiers())
-    mapView.terrainView.refreshTerrainDirt()
+    hideFullPane()
+    hideFacePane()
+    this.mapView = initMapView()
+    this.provinceViewsMap = initProvinceViews()
+    this.provinceViewsMap.foreach { case (_, pv) =>
+      pv.refreshCity()
+      pv.refreshSoldiers()
+    }
+    worldCanvas.layers = mapView.canvasBattleLayers
     worldCanvas.redraw()
-    interfacePane.refreshMinimap()
+    interfacePane.refreshMinimap(currentMap)
+    dateProperty.value = worldState.seasonOfYear
   }
 
   def showPopulationPane(province: Province) {
@@ -122,7 +148,7 @@ class WorldFrame(sceneManager: SceneManager, worldState:WorldState) extends Pane
     interfacePane.setFullPanel(new InterfacePane(pane, () => hideFullPane()))
   }
 
-  def showMailPane(): Unit ={
+  def showMailPane(): Unit = {
     val pane = new MailPane(worldState.playerState, worldState)
     interfacePane.setFullPanel(new InterfacePane(pane, () => hideFullPane()))
   }
@@ -206,7 +232,7 @@ class WorldFrame(sceneManager: SceneManager, worldState:WorldState) extends Pane
   }
 
   def playBattles(battles: List[Battle]): Unit = {
-    def callbackFunction(remainingBattles:List[Battle])(): Unit = {
+    def callbackFunction(remainingBattles: List[Battle])(): Unit = {
       remainingBattles match {
         case Nil =>
           battles.foreach(worldState.concludePlayerBattle)
@@ -230,6 +256,17 @@ class WorldFrame(sceneManager: SceneManager, worldState:WorldState) extends Pane
     add(rect)
     add(text)
   }
+
+  class TurnData(property: ObjectProperty[SeasonOfYear]) extends MigPane("center") with WorldInterfaceJavaNode {
+
+    import mr.merc.util.FxPropertyUtils._
+
+    val date = new BigText {
+      text <== property.map(_.localizedString)
+    }
+    add(date)
+  }
+
 }
 
 

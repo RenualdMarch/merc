@@ -146,6 +146,13 @@ class ParliamentPie(worldState: WorldStateParliamentActions) extends TabPane {
     }
   }
 
+  private val votersPopularityTab = new Tab() {
+    text = Localization("parliament.votersPopularity")
+    content <== worldState.playerPoliticalSystemProperty.map { _ =>
+      pieByVotes(worldState.partyPopularityAmongVoters(worldState.playerState)).delegate
+    }
+  }
+
   private val popularityTab = new Tab() {
     text = Localization("parliament.popularity")
     content <== worldState.playerPoliticalSystemProperty.map { _ =>
@@ -153,7 +160,7 @@ class ParliamentPie(worldState: WorldStateParliamentActions) extends TabPane {
     }
   }
 
-  this.tabs.addAll(parliamentTab, popularityTab)
+  this.tabs.addAll(parliamentTab, votersPopularityTab, popularityTab)
   this.tabClosingPolicy = TabClosingPolicy.Unavailable
 }
 

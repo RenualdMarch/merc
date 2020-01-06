@@ -2,9 +2,8 @@ package mr.merc.economics
 
 import mr.merc.army.{Warrior, WarriorCompetence, WarriorType}
 import mr.merc.economics.Culture.SlavicHuman
-import mr.merc.map.hex.{TerrainHex, TerrainHexField}
-import mr.merc.map.objects.House
-import mr.merc.map.terrain.GreenGrass
+import mr.merc.map.terrain.FourSeasonsMapObjects.FourSeasonsHouse
+import mr.merc.map.terrain.FourSeasonsTerrainTypes
 import mr.merc.politics.{Party, Province, State}
 import org.scalatest.{FunSuite, Matchers}
 
@@ -27,9 +26,9 @@ class BuildBattleTest extends FunSuite with Matchers {
     val w4 = List(new Warrior(WarriorType.HeavyBladeInfantry, WarriorCompetence.Professional, state4.primeCulture, state4))
 
     val hexField = build4ProvinceHexField()
-    hexField.hex(0, 0).mapObj = Some(House(SlavicHuman))
+    hexField.hex(0, 0).mapObj = Some(FourSeasonsHouse(SlavicHuman))
 
-    val oneProvinceBattle = new OneProvinceBattle(hexField, province1, Map(province3 -> w3), w1 ++ w2, Map(province4 -> w4))
+    val oneProvinceBattle = new OneProvinceBattle(hexField.buildTerrainHexField(Seasons.Summer), province1, Map(province3 -> w3), w1 ++ w2, Map(province4 -> w4))
     val gameField = oneProvinceBattle.gameField
 
     gameField.players.toSet shouldBe Set(state1, state2, state3, state4).map(_.toPlayer)
@@ -55,16 +54,16 @@ class BuildBattleTest extends FunSuite with Matchers {
 
   test("build two-province battle (one owner != controller)") {
     val hexField = build4ProvinceHexField()
-    hexField.hex(4, 3).mapObj = Some(House(SlavicHuman))
+    hexField.hex(4, 3).mapObj = Some(FourSeasonsHouse(SlavicHuman))
     province2.controller = state1
-    hexField.hex(4, 1).mapObj = Some(House(SlavicHuman))
+    hexField.hex(4, 1).mapObj = Some(FourSeasonsHouse(SlavicHuman))
 
     val w1 = List(new Warrior(WarriorType.HeavyBladeInfantry, WarriorCompetence.Professional, state1.primeCulture, state1))
     val w2 = List(new Warrior(WarriorType.HeavyBladeInfantry, WarriorCompetence.Professional, state2.primeCulture, state2))
     val w3 = List(new Warrior(WarriorType.HeavyBladeInfantry, WarriorCompetence.Professional, state3.primeCulture, state3))
     val w4 = List(new Warrior(WarriorType.HeavyBladeInfantry, WarriorCompetence.Professional, state4.primeCulture, state4))
 
-    val twoProvinceBattle = new TwoProvinceBattle(hexField, province4, province2, Map(province2 -> w4), w2,
+    val twoProvinceBattle = new TwoProvinceBattle(hexField.buildTerrainHexField(Seasons.Summer), province4, province2, Map(province2 -> w4), w2,
       Map(province3 -> w3), Map(province4 -> w1), Nil, Map())
     val gameField = twoProvinceBattle.gameField
 
@@ -93,10 +92,10 @@ class BuildBattleTest extends FunSuite with Matchers {
     province4Hexes.flatMap(_.soldier).toSet shouldBe (w1 ++ w2).map(_.soldier).toSet + expectedMilitia
   }
 
-  def build4ProvinceHexField():TerrainHexField = {
-    val grid = new TerrainHexField(6, 6, (x, y) => new TerrainHex(x, y, GreenGrass))
+  def build4ProvinceHexField():FourSeasonsTerrainHexField = {
+    val grid = new FourSeasonsTerrainHexField(6, 6, (x, y) => new FourSeasonsTerrainHex(x, y, FourSeasonsTerrainTypes.FourSeasonsGrass))
 
-    def hexesFromTo(minX:Int, minY:Int, maxX:Int, maxY:Int):List[TerrainHex] = {
+    def hexesFromTo(minX:Int, minY:Int, maxX:Int, maxY:Int):List[FourSeasonsTerrainHex] = {
       grid.hexes.filter(h => h.x >= minX && h.x < maxX && h.y >= minY && h.y < maxY).toList
     }
 

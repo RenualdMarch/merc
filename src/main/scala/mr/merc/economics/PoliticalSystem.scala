@@ -1,11 +1,24 @@
 package mr.merc.economics
 
 import mr.merc.politics.{Party, Regime, StateElectionReport}
-
 import MapUtil.FloatOperations._
+import mr.merc.politics.VotersPolicy.NoVoting
 
 class PoliticalSystem(startingRulingParty: Party) {
   private val ElectionThreshold = 0.03
+
+  private var lastElectionTurn = -1
+
+  def nextElectionTurn:Option[Int] =
+    if(rulingParty.votersPolicy == NoVoting) None
+    else Some(lastElectionTurn + 5 * 4)
+
+  def isElectionNow(turn:Int):Boolean = nextElectionTurn.contains(turn)
+
+  def doElectionsNow(turn:Int): Unit = {
+    lastElectionTurn = turn
+    ???
+  }
 
   private var _rulingParty = startingRulingParty
 
@@ -49,7 +62,6 @@ class PoliticalSystem(startingRulingParty: Party) {
 
         diffs.max
     }
-
   }
 
   def changeAbsoluteRulingParty(newParty: Party): Unit = {
@@ -85,8 +97,6 @@ class PoliticalSystem(startingRulingParty: Party) {
       sys.error(s"party $newParty instad of $rulingParty is incorrect giving up power")
     }
   }
-
-
 }
 
 case class ParliamentParties(parties:Map[Party, Double], coalition: Set[Party])

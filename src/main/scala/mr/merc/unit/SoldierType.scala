@@ -97,6 +97,8 @@ object DefenceType {
     "Mountain" -> MountainDefence,
     "Sand" -> SandDefence,
     "Grass" -> GrassDefence,
+    "Snow" -> SnowDefence,
+    "Ice" -> IceDefence,
     "Building" -> BuildingDefence).get(name)
 }
 
@@ -108,3 +110,5 @@ case object MountainDefence extends DefenceType
 case object SandDefence extends DefenceType
 case object GrassDefence extends DefenceType
 case object BuildingDefence extends DefenceType
+case object SnowDefence extends DefenceType
+case object IceDefence extends DefenceType

@@ -2,7 +2,6 @@ package mr.merc.economics
 
 import mr.merc.ai.BattleAI
 import mr.merc.army.{Warrior, WarriorCompetence, WarriorType}
-import mr.merc.army.WarriorCompetence.{Militia, Professional}
 import mr.merc.battle.BattleModel
 import mr.merc.diplomacy.Claim.{StrongProvinceClaim, VassalizationClaim, WeakProvinceClaim}
 import mr.merc.diplomacy.DiplomaticAgreement.{AllianceAgreement, WarAgreement}
@@ -10,13 +9,12 @@ import mr.merc.diplomacy.DiplomaticAgreement.WarAgreement.TakeMoney
 import mr.merc.diplomacy.DiplomaticMessage._
 import mr.merc.diplomacy.WorldDiplomacy.RelationshipBonus
 import mr.merc.diplomacy._
-import mr.merc.economics.BattleReport.ReportBattleResult
 import mr.merc.economics.Products.IndustryProduct
 import mr.merc.economics.TaxPolicy.Income
 import mr.merc.economics.WorldConstants.Army.SoldierRecruitmentCost
 import mr.merc.economics.WorldGenerationConstants.StateStartingMoney
-import mr.merc.economics.WorldStateEnterpriseActions.{FactoryCommand, PopExpandFactoryCommand, StateExpandFactoryCommand}
-import mr.merc.map.hex.TerrainHexField
+import mr.merc.economics.WorldStateEnterpriseActions.{FactoryCommand, StateExpandFactoryCommand}
+import mr.merc.log.Logging
 import mr.merc.players.NamesGenerator
 import mr.merc.politics.IssuePosition.{EconomyPosition, RegimePosition}
 import mr.merc.politics.Regime.{Absolute, Constitutional, Democracy}
@@ -27,13 +25,14 @@ import scalafx.scene.paint.Color
 
 import scala.collection.mutable.ArrayBuffer
 
-class WorldState(val regions: List[Province], val playerState: State, val worldHexField: TerrainHexField,
-                 val namesGenerators:Map[Culture, NamesGenerator], var colorStream:Stream[Color], var turn: Int = 0)
+class WorldState(val regions: List[Province], val playerState: State, val worldHexField: FourSeasonsTerrainHexField,
+                 val namesGenerators:Map[Culture, NamesGenerator], var colorStream:Stream[Color], var turn: Int = 2)
   extends WorldStateParliamentActions
     with WorldStateBudgetActions
     with WorldStateEnterpriseActions
     with WorldStateArmyActions
-    with WorldStateDiplomacyActions {
+    with WorldStateDiplomacyActions
+    with Logging {
 
   private val thisTurnBattles = ArrayBuffer[BattleReport]()
 
@@ -46,6 +45,8 @@ class WorldState(val regions: List[Province], val playerState: State, val worldH
   def initialAiDiplomacy(): Unit = {
     this.aiTurn(onlyAnswer = false)
   }
+
+  def seasonOfYear:SeasonOfYear = Seasons.date(turn)
 
   def nextTurn(): List[Battle] = {
     thisTurnBattles.clear()
@@ -77,12 +78,16 @@ class WorldState(val regions: List[Province], val playerState: State, val worldH
 
   def processAiBattles(battles:List[Battle]): Unit = {
     battles.filterNot(_.participants.contains(playerState)).foreach { b =>
+      info(s"Battle between ${b.gameField.sides}")
       val model = new BattleModel(b.gameField)
+      val aiMap = b.gameField.players.map(p => p -> BattleAI()).toMap
       while(!model.isOver) {
-        val event = BattleAI().nextTurn(model)
+        val event = aiMap(model.currentPlayer).nextTurn(model)
         model.handleEvent(event)
       }
-      thisTurnBattles += b.concludeBattle(this)
+      val report = b.concludeBattle(this)
+      info(s"Battle in ${report.provincesInBattle.map(_.name)} with result ${report.result}: side1 is ${report.side1.map(_.name)}, side2 is ${report.side2.map(_.name)}")
+      thisTurnBattles += report
     }
   }
 
@@ -142,9 +147,14 @@ trait WorldStateParliamentActions {
   def possibleParties(system: PoliticalSystem): List[Party] = Party.allParties.filter(r =>
     possiblePartiesRegime(system.rulingParty.regime).contains(r.regime))
 
-  def partyPopularity(state: State): Map[Party, Double] = {
+  def partyPopularityAmongVoters(state: State): Map[Party, Double] = {
     val election = new Election(state.rulingParty, state.primeCulture, Party.allParties)
     election.doElections(states(state)).votes
+  }
+
+  def partyPopularity(state: State): Map[Party, Double] = {
+    val election = new Election(state.rulingParty, state.primeCulture, Party.allParties)
+    election.totalPopulationPopularity(states(state)).votes
   }
 
   val playerCanChangeRulingParty: ObjectProperty[Boolean] = playerPoliticalSystemProperty.map(_.rulingParty.regime == Absolute)

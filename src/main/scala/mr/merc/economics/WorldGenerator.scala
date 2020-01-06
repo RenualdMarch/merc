@@ -4,33 +4,30 @@ import mr.merc.economics.Population.{Lower, Middle, Upper}
 import mr.merc.economics.Products._
 import mr.merc.log.Logging
 import mr.merc.map.generator.WorldMapGenerator
-import mr.merc.map.hex.{TerrainHex, TerrainHexField}
-import mr.merc.map.terrain.WaterKind
 import mr.merc.players.{ColorGenerator, NamesGenerator}
 import mr.merc.politics.{Party, PoliticalViews, Province, State}
 import mr.merc.util.WeightedRandom
 import WorldConstants.Enterprises._
 import WorldGenerationConstants._
-import mr.merc.army.WarriorCompetence.{Militia, Professional}
+import mr.merc.army.WarriorCompetence.Professional
 import mr.merc.army.{Warrior, WarriorType}
 import mr.merc.diplomacy.Claim.{StrongProvinceClaim, WeakProvinceClaim}
-import mr.merc.diplomacy.DiplomaticAgreement.WarAgreement.CrackState
-import mr.merc.diplomacy.DiplomaticMessage.DeclareWar
+import mr.merc.map.terrain.FourSeasonsTerrainTypes._
 
 import scala.util.Random
 
-class WorldGenerator(field:TerrainHexField) {
+class WorldGenerator(field:FourSeasonsTerrainHexField) {
 
-  type ConnectivityMap = Map[TerrainHex, Set[TerrainHex]]
+  type ConnectivityMap = Map[FourSeasonsTerrainHex, Set[FourSeasonsTerrainHex]]
 
   implicit class ImplicitConnectivityMap(map:ConnectivityMap) {
-    def minusConnectivity(set: Set[TerrainHex]):ConnectivityMap = {
+    def minusConnectivity(set: Set[FourSeasonsTerrainHex]):ConnectivityMap = {
       map.transform {case (_, s) =>
         s -- set
       } -- set
     }
 
-    def retainConnectivity(set: Set[TerrainHex]):ConnectivityMap = {
+    def retainConnectivity(set: Set[FourSeasonsTerrainHex]):ConnectivityMap = {
       map.transform {case (_, s) =>
           s & set
       }.filterKeys(set.contains)
@@ -135,7 +132,7 @@ class WorldGenerator(field:TerrainHexField) {
     resultList.reverse
   }
 
-  private def generateCultureStateDivisions(connectivityMap: Map[TerrainHex, Set[TerrainHex]]):List[(State, List[TerrainHex])] = {
+  private def generateCultureStateDivisions(connectivityMap: Map[FourSeasonsTerrainHex, Set[FourSeasonsTerrainHex]]):List[(State, List[FourSeasonsTerrainHex])] = {
     import mr.merc.util.Divide.DivideIntegral
     val provincesPerCulture = Culture.cultures zip (connectivityMap.size divList Culture.cultures.size)
     val raceSizes = provincesPerCulture.groupBy(_._1.race).toList.map {case (race, list) =>
@@ -163,7 +160,7 @@ class WorldGenerator(field:TerrainHexField) {
     }
   }
 
-  def generateStateAndProvinces(provincesHexes: Map[TerrainHex, Set[TerrainHex]]): Map[State, List[Province]] = {
+  def generateStateAndProvinces(provincesHexes: Map[FourSeasonsTerrainHex, Set[FourSeasonsTerrainHex]]): Map[State, List[Province]] = {
     val connectivityMap = WorldGenerator.buildConnectivityMap(field, provincesHexes)
     val divisions = generateCultureStateDivisions(connectivityMap)
 
@@ -185,7 +182,7 @@ class WorldGenerator(field:TerrainHexField) {
     result
   }
 
-  private def extractContinuousPart(connectivityMap:ConnectivityMap, extractionSize:Int):Set[TerrainHex] = {
+  private def extractContinuousPart(connectivityMap:ConnectivityMap, extractionSize:Int):Set[FourSeasonsTerrainHex] = {
     require(isContinuousPiece(connectivityMap), "Connectivity map must be continuous piece")
     require(connectivityMap.nonEmpty, "connectivity map must be non-empty")
     require(connectivityMap.size >= extractionSize, s"Connectivity map size is ${connectivityMap.size} but extraction is $extractionSize")
@@ -194,19 +191,19 @@ class WorldGenerator(field:TerrainHexField) {
       return connectivityMap.keySet
     }
 
-    class Step(parent: Option[Step], selectedHex: TerrainHex) {
+    class Step(parent: Option[Step], selectedHex: FourSeasonsTerrainHex) {
 
       lazy val depth: Int = parent match {
         case None => 1
         case Some(p) => 1 + p.depth
       }
 
-      lazy val allHexes: Set[TerrainHex] = parent match {
+      lazy val allHexes: Set[FourSeasonsTerrainHex] = parent match {
         case None => Set(selectedHex)
         case Some(s) => s.allHexes + selectedHex
       }
 
-      lazy val allNeighbours:Set[TerrainHex] = {
+      lazy val allNeighbours:Set[FourSeasonsTerrainHex] = {
         allHexes.flatMap(connectivityMap) -- allHexes
       }
 
@@ -255,12 +252,12 @@ class WorldGenerator(field:TerrainHexField) {
 
   // everyone with everyone
   private def isContinuousPiece(connectivityMap:ConnectivityMap): Boolean = {
-    var currentSet:Set[TerrainHex] = connectivityMap.headOption match {
+    var currentSet:Set[FourSeasonsTerrainHex] = connectivityMap.headOption match {
       case None => Set()
       case Some((capital, _)) => Set(capital)
     }
 
-    var prevSet = Set[TerrainHex]()
+    var prevSet = Set[FourSeasonsTerrainHex]()
     while (currentSet != prevSet) {
       prevSet = currentSet
       currentSet = currentSet.flatMap(connectivityMap) ++ currentSet
@@ -298,9 +295,9 @@ object WorldGenerator extends Logging {
     }
   }
 
-  def buildConnectivityMap(field:TerrainHexField, map:Map[TerrainHex, Set[TerrainHex]]):Map[TerrainHex, Set[TerrainHex]] = {
+  def buildConnectivityMap(field:FourSeasonsTerrainHexField, map:Map[FourSeasonsTerrainHex, Set[FourSeasonsTerrainHex]]):Map[FourSeasonsTerrainHex, Set[FourSeasonsTerrainHex]] = {
     map.map { case (capital, provinceHexes) =>
-      val allNeigs = provinceHexes.filterNot(_.terrain.is(WaterKind)).flatMap(h => field.neighbours(h)) -- provinceHexes
+      val allNeigs = provinceHexes.filterNot(_.terrainMap == FourSeasonsWater).flatMap(h => field.neighbours(h)) -- provinceHexes
       capital -> allNeigs.flatMap {n =>
         map.find(_._2.contains(n)).map(_._1)
       }

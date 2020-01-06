@@ -20,7 +20,7 @@ class RandomTerrainGenerator(houseChance: Double = 0.1, bridgeChance: Double = 0
       val terrain = terrainTypes(random.nextInt(terrainTypes.size))
       val mapObj = if (terrain.is(GrassKind)) {
         if (random.nextDouble < houseChance) {
-          Some(new House(LatinHuman))
+          Some(SummerHouse(LatinHuman))
         } else {
           None
         }

@@ -9,11 +9,13 @@ import scalafx.scene.text.Text
 import scalafx.scene.Node
 import scalafx.scene.paint.Color
 
-class ProvinceDetailsPane(province: Province, parent: WorldFrame) extends MigPane("", "") with Logging {
+class ProvinceDetailsPane(province: Province, parent: WorldFrame) extends MigPane("", "", "") with Logging {
 
     add(BigText(province.name), "span,center,wrap")
     add(MediumText(Localization("owner")))
     add(new StatePropertyNode(province.owner), "wrap")
+    add(MediumText(Localization("controller")))
+    add(new StatePropertyNode(province.controller), "wrap")
     add(MediumText(Localization("populationCount")))
     add(populationCountText, "wrap")
     add(MediumText(Localization("bureaucratsPercentage")), "")
@@ -52,7 +54,7 @@ class ProvinceDetailsPane(province: Province, parent: WorldFrame) extends MigPan
   }
 }
 
-class StatePropertyNode(state: State) extends MigPane("") {
+class StatePropertyNode(state: State) extends MigPane("insets 0 0 0 0, fill") {
   private val colorSquare = new Rectangle()
   colorSquare.layoutX = 0
   colorSquare.layoutY = 0
