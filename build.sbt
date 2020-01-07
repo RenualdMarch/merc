@@ -44,11 +44,11 @@ libraryDependencies += "org.typelevel" %% "cats-core" % "2.0.0"
 
 libraryDependencies += "com.typesafe" % "config" % "1.3.2"
 
-libraryDependencies += "org.kordamp.ikonli" % "ikonli-javafx" % "11.0.0"
+libraryDependencies += "org.kordamp.ikonli" % "ikonli-javafx" % "11.3.4"
 
-libraryDependencies += "org.kordamp.ikonli" % "ikonli-fontawesome-pack" % "11.0.0"
+libraryDependencies += "org.kordamp.ikonli" % "ikonli-fontawesome-pack" % "11.3.4"
 
-libraryDependencies += "org.kordamp.ikonli" % "ikonli-entypo-pack" % "11.0.0"
+libraryDependencies += "org.kordamp.ikonli" % "ikonli-entypo-pack" % "11.3.4"
 
 libraryDependencies += "com.object-refinery" % "orsoncharts" % "1.7"
 
@@ -56,3 +56,8 @@ scalacOptions ++= Seq("-feature", "-deprecation", "-language:postfixOps",
   "-language:implicitConversions", "-language:reflectiveCalls", "-Ypartial-unification")
 
 fork := true
+
+assemblyMergeStrategy in assembly := {
+  case PathList("META-INF", xs @ _*) => MergeStrategy.discard
+  case x => MergeStrategy.first
+}

@@ -58,9 +58,6 @@ case object LeafLitter extends TerrainType(name="leafLitter", GrassKind)
 case object Farm extends TerrainType("farm", GrassKind, belowTerrainType = Some(LeafLitter))
 
 case object ShallowWater extends TerrainType("water", WaterKind)
-// helper types
-case object BankInside extends TerrainType("bankInside", WaterKind)
-case object BankOutside extends TerrainType("bankOutside", WaterKind)
 
 case object BasicMountain extends TerrainType("mountain", MountainKind,belowTerrainType = Some(BasicHill))
 case object BasicMountainSnow extends TerrainType("mountainSnow", MountainKind,belowTerrainType = Some(BasicHillSnow))
@@ -85,13 +82,17 @@ case object MixedForest extends TerrainType("mixedForest", ForestKind, belowTerr
 
 case object Snow extends TerrainType("snow", SnowKind)
 
-case object Ice extends TerrainType("ice", SnowKind)
+case object Ice extends TerrainType("ice", IceKind)
 
 case object Castle extends TerrainType("cobbles", WallsKind) {
   override lazy val imagePaths: Vector[MImage] = {
     Vector("/images/terrain/walls/cobbles.png").map(MImage.apply)
   }
 }
+
+// helper types
+case object BankInside extends TerrainType("bankInside", WaterKind)
+case object BankOutside extends TerrainType("bankOutside", WaterKind)
 
 // TODO work on it
 case object Mud extends TerrainType("swamp", SwampKind)
