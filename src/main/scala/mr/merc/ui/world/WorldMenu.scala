@@ -1,15 +1,11 @@
 package mr.merc.ui.world
 
+import javafx.event.{Event, EventHandler}
 import mr.merc.local.Localization
-import mr.merc.politics.State
-import mr.merc.util.MercUtils
-import org.tbee.javafx.scene.layout.MigPane
-import scalafx.scene.control.{CustomMenuItem, Menu, MenuBar, MenuItem}
-import scalafx.scene.paint.Color
-import scalafx.scene.shape.Rectangle
+import scalafx.scene.control.{Menu, MenuBar, MenuItem}
+
 
 import scala.collection.JavaConverters._
-import scalafx.Includes._
 
 class WorldMenu(parent: WorldFrame) extends MenuBar {
   this.stylesheets.add("/css/worldMenu.css")
@@ -19,18 +15,29 @@ class WorldMenu(parent: WorldFrame) extends MenuBar {
   val gameMenu = new Menu(Localization("menu.game"))
   val viewMenu = new Menu(Localization("menu.view"))
 
-  this.menus.addAll(politicsMenu, diplomacyMenu, viewMenu, gameMenu)
+  val email = new Menu(Localization("menu.mail")) {
+    val menuItem = new MenuItem()
+    this.items.add(menuItem)
+    val self = this
+    this.delegate.addEventHandler(javafx.scene.control.Menu.ON_SHOWN, new EventHandler[Event] {
+      override def handle(t: Event): Unit = self.hide()
+    })
+    this.delegate.addEventHandler(javafx.scene.control.Menu.ON_SHOWING, new EventHandler[Event] {
+      override def handle(t: Event): Unit = self.fire()
+    })
+    this.onAction = {_ =>
+      parent.showMailPane()
+    }
+  }
+
+  this.menus.addAll(politicsMenu, diplomacyMenu, email, viewMenu, gameMenu)
 
   val army = new MenuItem(Localization("menu.defence"))
   val relations = new MenuItem(Localization("menu.relations"))
   relations.onAction = {_ =>
     parent.showDiplomacyPane()
   }
-  val email = new MenuItem(Localization("menu.mail"))
-  email.onAction = {_ =>
-    parent.showMailPane()
-  }
-  diplomacyMenu.items.addAll(email, relations, army)
+  diplomacyMenu.items.addAll(relations, army)
 
   val budgetMenu = new MenuItem(Localization("menu.budget"))
   budgetMenu.onAction = { _ =>

@@ -122,10 +122,8 @@ class PartyViewPane(party: ReadOnlyObjectProperty[Party]) extends BorderPane wit
   }
 }
 
-class ParliamentPie(worldState: WorldStateParliamentActions) extends TabPane {
-  style = Components.mediumFontStyle
-
-  private def pieByVotes(votes: Map[Party, Double]): Node = {
+object ParliamentPie {
+  def pieByVotes(votes: Map[Party, Double]): Node = {
     import mr.merc.economics.MapUtil.FloatOperations.MapWithFloatOperations
 
     val percentage = votes.scaleToSum(1d)
@@ -136,6 +134,12 @@ class ParliamentPie(worldState: WorldStateParliamentActions) extends TabPane {
     }
     PieChartBuilder.build(pies)
   }
+}
+
+class ParliamentPie(worldState: WorldStateParliamentActions) extends TabPane {
+  import ParliamentPie._
+
+  style = Components.mediumFontStyle
 
   private val parliamentTab = new Tab {
     text = Localization("parliament.parliament")

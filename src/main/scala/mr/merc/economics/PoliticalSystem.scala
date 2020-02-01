@@ -1,12 +1,11 @@
 package mr.merc.economics
 
-import mr.merc.politics.{Party, Regime, StateElectionReport}
+import mr.merc.politics.{Election, Party, Province, Regime, StateElectionReport}
 import MapUtil.FloatOperations._
 import mr.merc.politics.VotersPolicy.NoVoting
+import WorldConstants.Population._
 
 class PoliticalSystem(startingRulingParty: Party) {
-  private val ElectionThreshold = 0.03
-
   private var lastElectionTurn = -1
 
   def nextElectionTurn:Option[Int] =
@@ -15,9 +14,14 @@ class PoliticalSystem(startingRulingParty: Party) {
 
   def isElectionNow(turn:Int):Boolean = nextElectionTurn.contains(turn)
 
-  def doElectionsNow(turn:Int): Unit = {
+  def doElectionsNow(turn:Int, primaryCulture:Culture, possibleParties:List[Party], regions:List[Province]): StateElectionReport = {
     lastElectionTurn = turn
-    ???
+
+    val fairElections = new Election(rulingParty, primaryCulture, possibleParties).doElections(regions)
+    val riggedElections = fairElections.riggedElections(rulingParty, RiggedElectionsQ(rulingParty.regime))
+
+    applyElectionResults(riggedElections)
+    riggedElections
   }
 
   private var _rulingParty = startingRulingParty
@@ -32,7 +36,7 @@ class PoliticalSystem(startingRulingParty: Party) {
   def rulingParty: Party = _rulingParty
 
   def applyElectionResults(election: StateElectionReport): Unit = {
-    val resultsAfterThreshold = election.votes.filter(_._2 >= ElectionThreshold).scaleToSum(1d)
+    val resultsAfterThreshold = election.votes.scaleToSum(1d).filter(_._2 >= ElectionThreshold).scaleToSum(1d)
     val coalition = findCoalition(resultsAfterThreshold)
     _rulingParty = coalition.maxBy(resultsAfterThreshold)
     _parliament = Some(ParliamentParties(resultsAfterThreshold, coalition))
@@ -77,14 +81,15 @@ class PoliticalSystem(startingRulingParty: Party) {
     } else if(newParty.regime == Regime.Constitutional && rulingParty.regime == Regime.Democracy) {
       _rulingParty = newParty
       _parliament = _parliament.map {p =>
-        ParliamentParties((p.parties + (newParty -> 1.05)).scaleToSum(1d), Set(newParty))
+        ParliamentParties((p.parties + (newParty -> 1.1)).scaleToSum(1d), Set(newParty))
       }
     } else {
       sys.error(s"party $newParty instad of $rulingParty is incorrect usurpation")
     }
   }
 
-  def giveUpPower(newParty: Party): Unit = {
+  def giveUpPower(newParty: Party, turn:Int): Unit = {
+    lastElectionTurn = turn
     if (newParty.regime == Regime.Constitutional && rulingParty.regime == Regime.Absolute) {
       _rulingParty = newParty
       _parliament = Some(ParliamentParties(Map(newParty -> 1.0d), Set(newParty)))
@@ -94,7 +99,7 @@ class PoliticalSystem(startingRulingParty: Party) {
         ParliamentParties((p.parties + (newParty -> 1.05)).scaleToSum(1d), Set(newParty))
       }
     } else {
-      sys.error(s"party $newParty instad of $rulingParty is incorrect giving up power")
+      sys.error(s"party $newParty instead of $rulingParty is incorrect giving up power")
     }
   }
 }

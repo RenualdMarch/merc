@@ -76,7 +76,7 @@ class PoliticalSystemTest extends FunSuite {
 
   test("giveUpPower to constitutional") {
     val politicalSystem = new PoliticalSystem(benevolent)
-    politicalSystem.giveUpPower(magocratic)
+    politicalSystem.giveUpPower(magocratic, 2)
     assert(politicalSystem.parliament.isDefined === true)
     assert(politicalSystem.parliament.get.coalition === Set(magocratic))
     assert(politicalSystem.parliament.get.parties ===Map(magocratic -> 1d))
@@ -84,14 +84,14 @@ class PoliticalSystemTest extends FunSuite {
 
     intercept[RuntimeException] {
       val ps2 = new PoliticalSystem(benevolent)
-      ps2.giveUpPower(conservative)
+      ps2.giveUpPower(conservative, 2)
     }
 
   }
 
   test("giveUpPower to democracy") {
     val politicalSystem = new PoliticalSystem(magocratic)
-    politicalSystem.giveUpPower(conservative)
+    politicalSystem.giveUpPower(conservative, 2)
     assert(politicalSystem.parliament.isDefined === true)
     assert(politicalSystem.parliament.get.coalition === Set(conservative))
     assert(politicalSystem.parliament.get.parties(conservative) > 0.5)
@@ -99,7 +99,7 @@ class PoliticalSystemTest extends FunSuite {
 
     intercept[RuntimeException] {
       val ps2 = new PoliticalSystem(magocratic)
-      ps2.giveUpPower(benevolent)
+      ps2.giveUpPower(benevolent,2)
     }
   }
 

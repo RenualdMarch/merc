@@ -4,6 +4,7 @@ import javafx.scene.control.SelectionMode
 import mr.merc.diplomacy.DiplomaticMessage.DeclareWar
 import mr.merc.diplomacy.{DiplomaticDeclaration, DiplomaticMessage, DiplomaticProposal}
 import mr.merc.economics.WorldStateDiplomacyActions
+import mr.merc.economics.message.{DomesticMessage, InformationDomesticMessage}
 import mr.merc.local.Localization
 import mr.merc.politics.State
 import org.tbee.javafx.scene.layout.MigPane
@@ -13,36 +14,52 @@ import scalafx.Includes._
 import scalafx.scene.layout.{BorderPane, Pane}
 import mr.merc.util.FxPropertyUtils._
 import scalafx.collections.ObservableBuffer
-import scalafx.scene.Node
 import scalafx.scene.paint.Color
 import scalafx.scene.shape.Rectangle
+import MailPane.RowType
+import scalafx.scene.Node
 
 class MailPane(playerState:State, actions: WorldStateDiplomacyActions) extends PaneWithTwoHorizontalChildren(0.4) {
   val titles = new MailTitles(playerState, actions)
-  val mail = new MailView(actions, titles.selectedMessage, () => titles.refresh())
+  val mail = new MailView(actions, playerState, titles.selectedMessage, () => titles.refresh())
   setTwoChildren(titles, mail)
+}
+
+object MailPane {
+  type RowType = Either[DiplomaticMessage, DomesticMessage]
 }
 
 class MailTitles(playerState:State, actions: WorldStateDiplomacyActions) extends BorderPane {
 
-  private val tableView = new TableView[DiplomaticMessage]()
+
+  private val tableView = new TableView[RowType]()
   tableView.style = Components.largeFontStyle
 
   center = tableView
 
-  private val senderColumn = new TableColumn[DiplomaticMessage, StateComponentColorName] {
-    cellFactory = p => new javafx.scene.control.TableCell[DiplomaticMessage, StateComponentColorName] {
-      override def updateItem(t: StateComponentColorName, b: Boolean): Unit = {
+  private val senderColumn = new TableColumn[RowType, Node] {
+    cellFactory = p => new javafx.scene.control.TableCell[RowType, Node] {
+      override def updateItem(t: Node, b: Boolean): Unit = {
         super.updateItem(t, b)
         setGraphic(t)
       }
     }
-    cellValueFactory = p => ObjectProperty(new StateComponentColorName(p.value.from))
+    cellValueFactory = p => p.value match {
+      case Right(dm) => ObjectProperty(BigText(dm.from))
+      case Left(dm) =>
+        val node:Node = new StateComponentColorName(dm.from)
+        ObjectProperty(node)
+    }
+
     editable = false
   }
 
-  private val titleColumn = new TableColumn[DiplomaticMessage, String] {
-    cellValueFactory = p => StringProperty(p.value.messageTitle)
+  private val titleColumn = new TableColumn[RowType, String] {
+    cellValueFactory = p => p.value match {
+      case Right(dm) =>StringProperty(dm.title)
+      case Left(dm) => StringProperty(dm.messageTitle)
+    }
+
     editable = false
   }
 
@@ -52,27 +69,35 @@ class MailTitles(playerState:State, actions: WorldStateDiplomacyActions) extends
   tableView.delegate.getSelectionModel.setSelectionMode(SelectionMode.SINGLE)
   tableView.delegate.getSelectionModel.clearAndSelect(0)
 
-  def selectedMessage: ReadOnlyObjectProperty[DiplomaticMessage] =
+  def selectedMessage: ReadOnlyObjectProperty[RowType] =
     tableView.delegate.getSelectionModel.selectedItemProperty
 
 
   def refresh(): Unit = {
-    tableView.items = ObservableBuffer() ++ actions.mailbox(playerState)
+    tableView.items = ObservableBuffer() ++ actions.mailbox(playerState).map(Left.apply) ++ playerState.mailBox.allMessages.map(Right.apply)
   }
 }
 
-class MailView(actions: WorldStateDiplomacyActions, selectedMessage: ReadOnlyObjectProperty[DiplomaticMessage], refreshTable: () => Unit) extends BorderPane {
+class MailView(actions: WorldStateDiplomacyActions, playerState:State, selectedMessage: ReadOnlyObjectProperty[RowType], refreshTable: () => Unit) extends BorderPane {
 
    val prop = selectedMessage.map(Option.apply).map {
     case None => new Pane()
-    case Some(x) => x match {
+    case Some(Left(x)) => x match {
       case d: DiplomaticDeclaration => new DeclarationMessageView(actions, d, refreshTable)
       case q: DiplomaticProposal => new QuestionMessageView(actions, q, refreshTable)
       case dw: DeclareWar => new DeclareWarMessageView(actions, dw, refreshTable)
     }
-  }.map(_.delegate)
+    case Some(Right(x)) => x match {
+      case dm:InformationDomesticMessage => dm.body
+    }
+  }
 
-  center <== prop
+  center = prop.value
+  prop.onChange {
+    center = prop.value
+  }
+
+
 }
 
 class MessageViewParent(message:DiplomaticMessage) extends BorderPane {

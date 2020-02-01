@@ -14,11 +14,14 @@ import mr.merc.economics.TaxPolicy.Income
 import mr.merc.economics.WorldConstants.Army.SoldierRecruitmentCost
 import mr.merc.economics.WorldGenerationConstants.StateStartingMoney
 import mr.merc.economics.WorldStateEnterpriseActions.{FactoryCommand, StateExpandFactoryCommand}
+import mr.merc.economics.message.InformationDomesticMessage
+import mr.merc.local.Localization
 import mr.merc.log.Logging
 import mr.merc.players.NamesGenerator
 import mr.merc.politics.IssuePosition.{EconomyPosition, RegimePosition}
 import mr.merc.politics.Regime.{Absolute, Constitutional, Democracy}
 import mr.merc.politics.{Election, Party, Province, State}
+import mr.merc.ui.world.ElectionResultsPane
 import scalafx.beans.property.ObjectProperty
 import mr.merc.util.FxPropertyUtils.PropertyBindingMap
 import scalafx.scene.paint.Color
@@ -26,7 +29,7 @@ import scalafx.scene.paint.Color
 import scala.collection.mutable.ArrayBuffer
 
 class WorldState(val regions: List[Province], val playerState: State, val worldHexField: FourSeasonsTerrainHexField,
-                 val namesGenerators:Map[Culture, NamesGenerator], var colorStream:Stream[Color], var turn: Int = 2)
+                 val namesGenerators:Map[Culture, NamesGenerator], var colorStream:Stream[Color], var turn: Int = 1)
   extends WorldStateParliamentActions
     with WorldStateBudgetActions
     with WorldStateEnterpriseActions
@@ -50,6 +53,7 @@ class WorldState(val regions: List[Province], val playerState: State, val worldH
 
   def nextTurn(): List[Battle] = {
     thisTurnBattles.clear()
+    this.states.keysIterator.foreach(_.mailBox.clearMessages())
 
     turn = turn + 1
     val day = new WorldMarketDay(this, turn)
@@ -58,6 +62,8 @@ class WorldState(val regions: List[Province], val playerState: State, val worldH
       val ppd = new PopulationPromotionDemotion(r.regionPopulation)
       ppd.promoteOrDemote()
     }
+
+    this.handlePossibleElections()
 
     this.processUnansweredMessages()
     this.aiTurn(onlyAnswer = false)
@@ -135,6 +141,8 @@ trait WorldStateParliamentActions {
 
   def states: Map[State, List[Province]]
 
+  def turn:Int
+
   val playerPoliticalSystemProperty: ObjectProperty[PoliticalSystem] =
     ObjectProperty(playerState.politicalSystem)
 
@@ -148,7 +156,7 @@ trait WorldStateParliamentActions {
     possiblePartiesRegime(system.rulingParty.regime).contains(r.regime))
 
   def partyPopularityAmongVoters(state: State): Map[Party, Double] = {
-    val election = new Election(state.rulingParty, state.primeCulture, Party.allParties)
+    val election = new Election(state.rulingParty, state.primeCulture, possibleParties(state.politicalSystem))
     election.doElections(states(state)).votes
   }
 
@@ -177,13 +185,25 @@ trait WorldStateParliamentActions {
     _.regime == state.rulingParty.regime.unfreerRegime.get)
 
   def giveUpPower(state: State, newParty: Party): Unit = {
-    state.politicalSystem.giveUpPower(newParty)
+    state.politicalSystem.giveUpPower(newParty, this.turn)
     playerPoliticalSystemProperty.forceInvalidation()
   }
 
   def possiblePartiesForGivingUpPower(state: State): List[Party] = Party.allParties.filter(
     _.regime == state.rulingParty.regime.freerRegime.get)
 
+  def handlePossibleElections(): Unit = {
+    import scalafx.Includes._
+
+    states.keysIterator.foreach { state =>
+      if(state.politicalSystem.isElectionNow(turn)) {
+        val electionResults = state.politicalSystem.doElectionsNow(turn,
+          state.primeCulture, possibleParties(state.politicalSystem), states(state))
+        state.mailBox.addMessage(new InformationDomesticMessage(Localization("election.commission"),
+          Localization("election.results"), new ElectionResultsPane(electionResults, state)))
+      }
+    }
+  }
 }
 
 object WorldStateEnterpriseActions {

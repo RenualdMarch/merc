@@ -4,8 +4,6 @@ Current battle issues:
 * Redraw bugs during fast movement
 
 Important core stuff
-Message framework
-Elections and initial
 Resources and production balancing
 order warriors for strategy AI after production balancing
 Revolutions/civil wars

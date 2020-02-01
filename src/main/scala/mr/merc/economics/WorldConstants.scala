@@ -5,6 +5,8 @@ import mr.merc.economics.Population._
 import mr.merc.economics.Products.{Cement, Clothes, Fabric, Furniture, Glass, Liquor, Lumber, Paper, Steel, Weapons, Wine, _}
 import MapUtil.FloatOperations._
 import mr.merc.army.WarriorCompetence
+import mr.merc.politics.IssuePosition.RegimePosition
+import mr.merc.politics.Regime.{Absolute, Constitutional, Democracy}
 
 object WorldConstants {
 
@@ -45,6 +47,9 @@ object WorldConstants {
     val PromotionOptionalPart = 0.03 // change pop if things go rough or very good
     val MaxHappinessToDemote = 0.2
     val MinHappinessToPromote = 0.7
+
+    val RiggedElectionsQ:Map[RegimePosition, Double] = Map(Constitutional -> 0.3, Democracy -> 0.15)
+    val ElectionThreshold = 0.03
 
     val maxPop: Map[PopulationType, Double] = Map(
       Craftsmen -> 0.5,

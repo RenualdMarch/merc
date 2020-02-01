@@ -3,16 +3,20 @@ package mr.merc.politics
 import mr.merc.economics.Culture
 import mr.merc.economics.TaxPolicy._
 import mr.merc.economics._
+import mr.merc.economics.message.DomesticMailBox
 import mr.merc.local.Localization
 import mr.merc.map.hex.TerrainHex
 import mr.merc.players.Player
 import scalafx.scene.paint.Color
 
-class State(val initialName: String, val primeCulture:Culture, startingMoney: Double, val politicalSystem: PoliticalSystem, val color: Color = Color.Black) {
+class State(val initialName: String, val primeCulture:Culture, startingMoney: Double,
+            val politicalSystem: PoliticalSystem, val color: Color = Color.Black) {
   def name: String = {
     val governmentType = Localization(primeCulture.cultureInfo.stateForm.monarchy)
     s"$initialName $governmentType"
   }
+
+  val mailBox:DomesticMailBox = new DomesticMailBox()
 
   def rulingParty:Party = politicalSystem.rulingParty
 
