@@ -1,6 +1,6 @@
 package mr.merc.economics
 
-import mr.merc.economics.MapUtil.NumericOperations.MapWithOperations
+import mr.merc.economics.MapUtil.NumericOperations.{InnerMapWithOperations, MapWithOperations}
 
 object MapUtil {
 
@@ -47,16 +47,41 @@ object MapUtil {
 
       def sumValues:V = map.values.sum
     }
+
+    implicit class InnerMapWithOperations[K1, K2, V](map: Map[K1, Map[K2, V]])(implicit  num: Numeric[V]) {
+      def |++| (other:Map[K1, Map[K2, V]]):Map[K1, Map[K2, V]] = {
+        val keysInMapOnly = map.keySet -- other.keySet
+        val keysInOtherOnly = other.keySet -- map.keySet
+        val intersectingKeys = map.keySet ++ other.keySet -- keysInMapOnly -- keysInOtherOnly
+        val sumMap = intersectingKeys.map { k =>
+          k -> (map(k) |+| other(k))
+        }.toMap
+        map.filterKeys(keysInMapOnly.contains) ++ other.filterKeys(keysInOtherOnly.contains) ++ sumMap
+      }
+
+      def |**|(q: V):Map[K1, Map[K2, V]] = {
+        map.transform { case (_, v1) =>
+          v1.transform { case (_, v2) =>
+            num.times(v2, q)
+          }
+        }
+      }
+    }
   }
 
   object FloatOperations {
-    implicit class MapWithFloatOperations[K, V](map: Map[K, V])(implicit  num: Fractional[V]) extends MapWithOperations[K, V](map){
+
+    implicit class MapWithFloatOperations[K, V](map: Map[K, V])(implicit num: Fractional[V]) extends MapWithOperations[K, V](map) {
 
       def scaleToSum(sum: V): Map[K, V] = {
         val currentSum = map.values.sum(num)
         val mult = num.div(sum, currentSum)
         map.transform { case (_, v) => num.times(v, mult) }
       }
+    }
+
+    implicit class InnerMapWithFloatOperations[K1, K2, V](map: Map[K1, Map[K2, V]])(implicit num: Fractional[V]) extends InnerMapWithOperations(map) {
+
     }
   }
 

@@ -33,16 +33,28 @@ trait EconomicRegion {
     }
   }
 
-  def moneyToFulfillNeeds(population: Population): Map[PopulationNeedsType, Double] =
-    moneyToFulfillNeeds(population.populationType.populationClass, population.culture) |*| population.totalPopEfficiency
-
   def moneyToFulfillNeeds(populationType: PopulationType): Map[PopulationNeedsType, Double] = {
-    regionPopulation.pops.filter(_.populationType == populationType).map(moneyToFulfillNeeds).
-      fold(Map(LifeNeeds -> 0d, RegularNeeds -> 0d, LuxuryNeeds -> 0d))(_ |+| _)
+    val pops = regionPopulation.pops.filter(_.populationType == populationType)
+    val currentMoney = pops.map(_.moneyReserves).sum
+    val map = regionPopulation.pops.filter(_.populationType == populationType).map(moneyToFulfillNeeds).
+      foldLeft(Map[PopulationNeedsType, Double]())(_ |+| _).withDefaultValue(0d)
+
+    if (currentMoney <= map(LifeNeeds)) {
+      val rem = map(LifeNeeds) - currentMoney
+      map + (LifeNeeds -> rem)
+    } else if (currentMoney <= map(LifeNeeds) + map(RegularNeeds)) {
+      val rem = map(LifeNeeds) + map(RegularNeeds) - currentMoney
+      map + (LifeNeeds -> 0d) + (RegularNeeds -> rem)
+    } else if (currentMoney <= map.values.sum) {
+      val rem = map.values.sum - currentMoney
+      Map(LifeNeeds -> 0d, RegularNeeds -> 0d, LuxuryNeeds -> rem)
+    } else {
+      Map(LifeNeeds -> 0d, RegularNeeds -> 0d, LuxuryNeeds -> 0d)
+    }
   }
 
-  def moneyToFulfillNeeds(populationClass: PopulationClass, culture:Culture): Map[PopulationNeedsType, Double] = {
-    culture.needs(populationClass).transform { case (_, needs) =>
+  def moneyToFulfillNeeds(population: Population): Map[PopulationNeedsType, Double] = {
+    population.needs.transform { case (_, needs) =>
       needs dot regionMarket.currentPrices
     }
   }
@@ -58,6 +70,7 @@ trait EconomicRegion {
     this.projects = notFinished
     finished.foreach { p =>
       p.returnNotSpentMoneyToInvestor()
+      p.executeProjectAim()
     }
     notFinished.foreach { p =>
       p.takeMoreMoneyFromInvestorIfNeeded(regionMarket.currentPrices)
@@ -65,6 +78,14 @@ trait EconomicRegion {
   }
 
   def removeBankruptFactories(): Unit = {
+    enterprises.collect {
+      case e:IndustrialFactory if e.isBankrupt => e
+    }.foreach { f =>
+      if (f.level > 1) {
+        f.decreaseLevel()
+      }
+    }
+
     enterprises = enterprises.collect {
       case f:IndustrialFactory if !f.isBankrupt => f
       case x => x
@@ -244,6 +265,16 @@ class RegionMarket(initialPrices:Map[Product, Double]) {
 
   def doTrade(products:List[Product]): Unit = {
     products.map(marketDaysForProduct).foreach(_.calculateSupplyAndDemand())
+  }
+
+  def transferMoneyFromDemandsToSupply(): Unit = {
+    val totalMoneyOnBuying = fulfilledDemands.values.flatten.map(_.currentSpentMoney).sum
+    val totalMoneyOnSelling = fulfilledSupply.values.flatten.map(_.receivedMoney).sum
+    require(Math.abs(totalMoneyOnBuying - totalMoneyOnSelling) < 0.01,
+      s"Buying and selling differ, buying is $totalMoneyOnBuying, selling is $totalMoneyOnSelling")
+
+    fulfilledDemands.values.flatten.foreach(_.currentSpentMoney = 0)
+    fulfilledSupply.values.flatten.foreach (s => s.currentSpentMoney = s.receivedMoney)
   }
 
   def endOfMarketDay(turn:Int): Unit = {

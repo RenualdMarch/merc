@@ -7,12 +7,14 @@ import mr.merc.economics.TaxPolicy.CorporateTax
 
 abstract class ResourceGathering[Prod <: GatheredProduct](val product: Prod, val region: EconomicRegion, startingProducts: Double, gatheringEfficiencyMultiplier: Double) extends Enterprise {
 
-  private val profitPartToOwners = 0.5
-  private val profitPartToWorkers = 0.5
+  private val profitPartToOwners = 0.1
+  private val profitPartToWorkers = 0.9
 
   require(profitPartToOwners + profitPartToWorkers == 1, "Resource gathering is losing money!")
 
   private val RecordsMax = 30
+
+  private var moneyAccount:Double = 0
 
   private var unsold = startingProducts
 
@@ -58,17 +60,23 @@ abstract class ResourceGathering[Prod <: GatheredProduct](val product: Prod, val
       moneyOnOwnersPayment = earns * (1 - currentTax) * profitPartToOwners
     )
 
+    moneyAccount -= currentRecord.moneyOnWorkforceSalary
     paySalaryProportionallyToEfficiency(currentRecord.peopleResources, currentRecord.moneyOnWorkforceSalary)
+    moneyAccount -= currentRecord.moneyOnOwnersPayment
     paySalaryProportionallyToEfficiency(owners.map(p => p -> p.populationCount.toDouble).toMap, currentRecord.moneyOnOwnersPayment)
   }
 
-  override def payTaxes(): TaxData =
-    TaxData(CorporateTax, currentRecord.earnings, currentRecord.corporateTax)
+  override def payTaxes(): Unit = {
+    this.moneyAccount -= currentRecord.corporateTax
+    region.owner.budget.receiveTaxes(TaxData(CorporateTax, currentRecord.earnings, currentRecord.corporateTax))
+  }
 
   override def receiveSellingResultAndMoney(region: EconomicRegion, profit:FulfilledSupplyRequestProfit): Unit = {
     currentRecord = currentRecord.copy(sold = currentRecord.sold + (region -> profit))
     unsold = unsold - profit.request.sold
-    supplyDecider.receiveSupplyResults(Map(region -> profit.request))
+    val receivedMoney = profit.profitPerItem * profit.request.sold
+    profit.request.currentSpentMoney -= receivedMoney
+    moneyAccount += receivedMoney
   }
 
   override def receiveWorkforceRequest(result: Map[Population, Double]): Unit = {
@@ -82,7 +90,8 @@ abstract class ResourceGathering[Prod <: GatheredProduct](val product: Prod, val
   }
 
   override def workforceEfficiencyDemand(prices: Map[Products.Product, Double]): Double = {
-    region.regionPopulation.getPopTotalEfficiency(possibleWorkers)
+    val totalEfficiency = region.regionPopulation.getPopTotalEfficiency(possibleWorkers)
+    if (unsold > totalEfficiency) 0 else totalEfficiency
   }
 
   override def endOfDay(): Unit = {
@@ -112,7 +121,7 @@ abstract class ResourceGathering[Prod <: GatheredProduct](val product: Prod, val
     throw new IllegalStateException("This method shouldn't be called for resource gatherings since they don't have demands")
   }
 
-  def currentMoneyBalance: Double = 0
+  def currentMoneyBalance: Double = moneyAccount
 
 }
 
@@ -141,6 +150,5 @@ class MagicGuild(region: EconomicRegion, startingMoney: Double,  startingProduct
   extends ResourceGathering(Magic, region, startingProducts, gatheringEfficiencyMultiplier) {
 
   override val possibleWorkers: PopulationType = Mages
-
-  override def owners: List[Population] = region.regionPopulation.pops.filter(_.populationType == MagicalAristocrats)
+  override def owners: List[Population] = region.regionPopulation.pops.filter(_.populationType == Mages)
 }

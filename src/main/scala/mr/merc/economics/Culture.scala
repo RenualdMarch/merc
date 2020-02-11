@@ -7,9 +7,11 @@ import mr.merc.economics.WorldConstants.Population.needsQ
 import scalafx.scene.paint.Color
 import MapUtil.FloatOperations._
 
+import scala.collection.mutable
+
 object Culture {
 
-  def cultures: List[Culture] = List(LatinHuman, FrenchHuman, DarkHuman, GreekHuman, GermanHuman, ArabHuman, SlavicHuman, SpainHuman)
+  def cultures: List[Culture] = List(LatinHuman, FrenchHuman /*, DarkHuman, GreekHuman, GermanHuman, ArabHuman, SlavicHuman, SpainHuman*/)
 
   //, HighElf, DarkElf, BarbarianOrc, RockDwarf, GreenSaurian, OldDrakes, Forsaken, RedDemons)
 
@@ -517,35 +519,48 @@ object Culture {
         "Balearic"))
   }
 
-  private def scaleNeeds(needsToScale: PopulationNeeds): PopulationNeeds = {
-    needsToScale.transform { case (popClass, classNeedsMap) =>
-      classNeedsMap.transform { case (popNeedsType, needsMap) =>
-        val q = needsQ(popClass)(popNeedsType)
-        needsMap.scaleToSum(q)
+  private def scaleNeeds(needsToScale: CornerPopulationNeeds): CornerPopulationNeeds = {
+      needsToScale.transform { case (popClass, classNeedsMap) =>
+        classNeedsMap.transform { case (popNeedsType, needsMap) =>
+          val q = needsQ(popClass)(popNeedsType)
+          needsMap.scaleToSum(q)
+        }
       }
-    }
   }
 
-  private def defaultHumanNeeds(culture: Culture): PopulationNeeds = Map(
+  private def defaultIlliterateHumanNeeds(culture: Culture): CornerPopulationNeeds = Map(
     Lower -> Map(
-      LifeNeeds -> Map(Grain -> 3, Fruit -> 1, Cattle -> 1),
-      RegularNeeds -> Map(Tea -> 1, Clothes -> 1, Liquor -> 1, Furniture -> 1, Coal -> 1,
-        Lumber -> 1, Ritual(culture) -> 1),
-      LuxuryNeeds -> Map(Magic -> 1, Paper -> 1, Coffee -> 1, Weapons -> 1, Wine -> 1, Medicine -> 1)
+      LifeNeeds -> Map(Grain -> 4, Coal -> 1),
+      RegularNeeds -> Map(Coal -> 1, Magic -> 1, Cotton -> 1, Ritual(culture) -> 1),
+      LuxuryNeeds -> Map(Iron -> 1, Timber -> 1, Magic -> 1, Ritual(culture) -> 1, Coal -> 1)
     ),
     Middle -> Map(
-      LifeNeeds -> Map(Grain -> 2, Fruit -> 1, Cattle -> 1),
-      RegularNeeds -> Map(Tea -> 1, Clothes -> 1, Liquor -> 1, Furniture -> 1, Coal -> 1, Ritual(culture) -> 1,
-        Glass -> 1, Wine -> 1, Magic -> 1, Medicine -> 1, Paper -> 1, Weapons -> 1, Cement -> 1),
-      LuxuryNeeds -> Map(Wine -> 1, Magic -> 1, Medicine -> 1,
-        Furniture -> 1, Opium -> 1, Paper -> 1, Jewelry -> 1)
+      LifeNeeds -> Map(Grain -> 3, Coal -> 1),
+      RegularNeeds -> Map(Coal -> 1, Magic -> 1, Cotton -> 1, Ritual(culture) -> 1),
+      LuxuryNeeds -> Map(Iron -> 1, Timber -> 1, Magic -> 1, Ritual(culture) -> 1, Coal -> 1)
     ),
     Upper -> Map(
-      LifeNeeds -> Map(Grain -> 1, Fruit -> 1, Cattle -> 2),
-      RegularNeeds -> Map(Tea -> 5, Clothes -> 5, Liquor -> 5, Furniture -> 5, Coal -> 10, Cement -> 5,
-        Glass -> 5, Wine -> 10, Magic -> 10, Medicine -> 5, Paper -> 10, Jewelry -> 5, Weapons -> 5, Opium -> 5, Ritual(culture) -> 1),
-      LuxuryNeeds -> Map(Furniture -> 5, Coal -> 5, Paper -> 5, Magic -> 5,
-        Medicine -> 5, Weapons -> 5, Cement -> 5, Opium -> 5, Ritual(culture) -> 2, Jewelry -> 5)
+      LifeNeeds -> Map(Grain -> 3, Coal -> 1),
+      RegularNeeds -> Map(Coal -> 1, Magic -> 1, Cotton -> 1, Ritual(culture) -> 1),
+      LuxuryNeeds -> Map(Iron -> 1, Timber -> 1, Magic -> 1, Ritual(culture) -> 1, Coal -> 1)
+    )
+  )
+
+  private def defaultLiterateHumanNeeds(culture: Culture): CornerPopulationNeeds = Map(
+    Lower -> Map(
+      LifeNeeds -> Map(Grain -> 3, Liquor -> 1, Coal -> 1),
+      RegularNeeds -> Map(Coal -> 1, Magic -> 1, Clothes -> 1, Ritual(culture) -> 1),
+      LuxuryNeeds -> Map(Weapons -> 1, Timber -> 1, Magic -> 1, Ritual(culture) -> 1, Coal -> 1)
+    ),
+    Middle -> Map(
+      LifeNeeds -> Map(Grain -> 3, Liquor -> 1, Coal -> 1),
+      RegularNeeds -> Map(Coal -> 1, Magic -> 1, Clothes -> 1, Ritual(culture) -> 1),
+      LuxuryNeeds -> Map(Weapons -> 1, Timber -> 1, Magic -> 1, Ritual(culture) -> 1, Coal -> 1)
+    ),
+    Upper -> Map(
+      LifeNeeds -> Map(Grain -> 3, Liquor -> 1, Coal -> 1),
+      RegularNeeds -> Map(Coal -> 1, Magic -> 1, Clothes -> 1, Ritual(culture) -> 1),
+      LuxuryNeeds -> Map(Weapons -> 1, Timber -> 1, Magic -> 1, Ritual(culture) -> 1, Coal -> 1)
     )
   )
 }
@@ -554,7 +569,9 @@ abstract class Culture(val name: String, val race: Race, val houseStyle: String,
 
   import Culture._
 
-  def needs: PopulationNeeds = scaleNeeds(defaultHumanNeeds(this))
+  def needs: PopulationNeeds = PopulationNeeds(
+    scaleNeeds(defaultIlliterateHumanNeeds(this)),
+    scaleNeeds(defaultLiterateHumanNeeds(this)))
 
   def cultureNameKey: String = "culture." + name
 

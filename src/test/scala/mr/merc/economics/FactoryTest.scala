@@ -12,7 +12,13 @@ import org.scalatest.{BeforeAndAfter, FunSuite, Inside, Matchers}
 
 class FactoryTest extends FunSuite with BeforeAndAfter with MockitoSugar with Matchers with Inside {
 
+  case object FruitTest extends FarmProduct
+  case object CoalTest extends ResourceProduct
+  case object GlassTest extends IndustryProduct(CoalTest -> 1)
+  case object WineTest extends IndustryProduct(GlassTest -> 0.4, FruitTest -> 0.6)
+
   var capitalists: Population = _
+  var craftsmen: Population = _
   var region1:EconomicRegion = _
   var region2:EconomicRegion = _
   var region3:EconomicRegion = _
@@ -25,16 +31,19 @@ class FactoryTest extends FunSuite with BeforeAndAfter with MockitoSugar with Ma
   before {
     capitalists = new Population(LatinHuman, Capitalists, 1000, 0, 0, PoliticalViews.averagePoliticalViews)
     capitalists.newDay(zeroTaxes, 1)
-    owner = new State("", FrenchHuman, 0, new PoliticalSystem(Party.absolute)) {
-      override val taxPolicy: TaxPolicy = TaxPolicy.zeroTaxes
-    }
+    craftsmen = new Population(LatinHuman, Craftsmen, 1000, 0, 0, PoliticalViews.averagePoliticalViews)
+    craftsmen.newDay(zeroTaxes, 1)
+    owner = new State("", FrenchHuman, 0, new PoliticalSystem(Party.absolute))
+    owner.taxPolicy.set(TaxPolicy.zeroTaxes.taxPolicyValues)
+    owner.budget.refreshTaxPolicy()
+
     testRegionMarket = mock[RegionMarket]
 
     region1 = new EconomicRegion {
       override def economicNeighbours: Set[EconomicRegion] = Set(region2, region1)
 
       override val regionMarket: RegionMarket = testRegionMarket
-      override val regionPopulation: RegionPopulation = new RegionPopulation(List(capitalists))
+      override val regionPopulation: RegionPopulation = new RegionPopulation(List(capitalists, craftsmen))
       override val regionWarriors: RegionWarriors = null
       override def toString: String = "region1"
 
@@ -65,26 +74,24 @@ class FactoryTest extends FunSuite with BeforeAndAfter with MockitoSugar with Ma
   }
 
   test("factory usage general flow - happy path") {
-    val factory = new IndustrialFactory(region1, Wine, 2, 1000000, 40000, 20, 1) {
-      override val requiredMaintenance: Map[Product, Double] = Map(Coal -> 1000)
-    }
+    val factory = new IndustrialFactory(region1, WineTest, 2, 1000000, 40000, 20, 1)
 
-    val prices = Map[Product, Double](Glass -> 10, Fruit -> 5, Coal -> 1)
+    val prices = Map[Product, Double](GlassTest -> 10, FruitTest -> 5)
 
     when(testRegionMarket.currentPrices).thenReturn(prices)
 
     factory.newDay(new TaxPolicy(Map(CorporateTax -> 0.1)), 1, 1)
     assert(factory.dayRecords === Vector())
     val requests = factory.componentDemandRequests(prices)
-    assert(requests.mapValues(_.count) === Map(Glass -> 16000, Fruit -> 24000, Coal -> 1000))
+    assert(requests.mapValues(_.count) === Map(GlassTest -> 16000, FruitTest -> 24000))
 
     assert(factory.factoryStorage.unsoldProducts === 40000)
     assert(factory.factoryStorage.unusedProducts.forall(_._2 == 0),
       s"${factory.factoryStorage.unusedProducts} must be empty")
 
-    val sell = factory.sellProduct(Map(region1 -> EconomicRegionDemand(40000, 100),
+    val sell = factory.sellProduct(Map(region1 -> EconomicRegionDemand(40000, 150),
       region2 -> EconomicRegionDemand(40000, 50)))
-    assert(sell.mapValues(_.count) === Map(region1 -> 40000))
+    assert(sell.mapValues(_.count) === Map(region1 -> 30000, region2 -> 10000))
 
     val fulfilledRequests = requests.map { case (p, r) =>
       FulfilledDemandRequest(r.count, prices(p), r)
@@ -92,9 +99,9 @@ class FactoryTest extends FunSuite with BeforeAndAfter with MockitoSugar with Ma
 
     assert(factory.currentMoneyBalance === 1000000)
     factory.buyDemandedProducts(fulfilledRequests)
-    assert(factory.factoryStorage.unusedProducts === Map(Glass -> 16000, Fruit -> 24000, Coal -> 1000))
+    assert(factory.factoryStorage.unusedProducts === Map(GlassTest -> 16000, FruitTest -> 24000))
 
-    val moneySpentOnResources = 16000 * 10 + 24000 * 5 + 1000
+    val moneySpentOnResources = 16000 * 10 + 24000 * 5
     val moneyEarned = 40000 * 100
 
     assert(factory.currentMoneyBalance === 1000000 - moneySpentOnResources)
@@ -114,11 +121,11 @@ class FactoryTest extends FunSuite with BeforeAndAfter with MockitoSugar with Ma
 
     factory.payMoneyToPops()
     val taxes = (moneyEarned - moneySpentOnResources) * 0.1
-    val payTaxes  = factory.payTaxes()
-    payTaxes.tax shouldBe CorporateTax
-    payTaxes.gross shouldBe 3719000d +- 0.0001
-    payTaxes.taxed shouldBe 371900d +- 0.0001
-    val maxReserves = 16000 * prices(Glass) + 24000 * prices(Fruit) + 1000 * prices(Coal)
+    factory.payTaxes()
+    owner.budget.dayReport.income(CorporateTax) shouldBe 372000d +- 0.0001
+    owner.budget.dayReport.grossIncome(CorporateTax) shouldBe 3720000d +- 0.0001
+
+    val maxReserves = 16000 * prices(GlassTest) + 24000 * prices(FruitTest)
     assert(factory.maxMoneyReserves === maxReserves)
     val moneyToSpend = moneyBalanceAfterDemand + moneyEarned - taxes - maxReserves
 
@@ -155,46 +162,44 @@ class FactoryTest extends FunSuite with BeforeAndAfter with MockitoSugar with Ma
   }
 
   test("factory usage general flow - deficit path") {
-    val factory = new IndustrialFactory(region1, Wine, 2, 2000, 40000, 20, 1) {
-      override val requiredMaintenance: Map[Product, Double] = Map(Coal -> 1000)
-    }
-    val prices = Map[Product, Double](Glass -> 1, Fruit -> 1, Coal -> 1)
+    val factory = new IndustrialFactory(region1, WineTest, 2, 1000, 10, 20, 1)
+    val prices = Map[Product, Double](GlassTest -> 1, FruitTest -> 1)
     when(testRegionMarket.currentPrices).thenReturn(prices)
 
     factory.newDay(new TaxPolicy(Map(CorporateTax -> 0.1)), 1, 1)
     assert(factory.dayRecords === Vector())
     val requests = factory.componentDemandRequests(prices)
-    assert(requests.mapValues(_.count) === Map(Glass -> 400, Fruit -> 600, Coal -> 1000))
+    assert(requests.mapValues(_.count) === Map(GlassTest -> 400, FruitTest -> 600))
 
-    assert(factory.factoryStorage.unsoldProducts === 40000)
+    assert(factory.factoryStorage.unsoldProducts === 10)
     assert(factory.factoryStorage.unusedProducts.forall(_._2 == 0),
       s"${factory.factoryStorage.unusedProducts} must be empty")
 
     val sell = factory.sellProduct(Map(region1 -> EconomicRegionDemand(1000, 10),
-      region2 -> EconomicRegionDemand(1000, 5)))
-    assert(sell.mapValues(_.count) === Map(region1 -> 20000, region2 -> 20000))
+      region2 -> EconomicRegionDemand(1000, 10)))
+    assert(sell.mapValues(_.count) === Map(region1 -> 5, region2 -> 5))
 
     val fulfilledRequests = requests.map { case (p, r) =>
       FulfilledDemandRequest(r.count / 2 , prices(p), r)
     } toList
 
-    assert(factory.currentMoneyBalance === 2000)
+    assert(factory.currentMoneyBalance === 1000)
     factory.buyDemandedProducts(fulfilledRequests)
-    assert(factory.factoryStorage.unusedProducts === Map(Glass -> 200, Fruit -> 300, Coal -> 500))
+    assert(factory.factoryStorage.unusedProducts === Map(GlassTest -> 200, FruitTest -> 300))
 
-    val moneySpentOnResources = 1000
+    val moneySpentOnResources = 500
     val moneyEarned = 100
-    assert(factory.factoryStorage.unsoldProducts === 40000)
-    val profit1 = FulfilledSupplyRequestProfit(FulfilledSupplyRequest(50, 0, sell.head._2), 2)
+    assert(factory.factoryStorage.unsoldProducts === 10)
+    val profit1 = FulfilledSupplyRequestProfit(FulfilledSupplyRequest(5, 0, sell.head._2), 20)
     val profit2 = FulfilledSupplyRequestProfit(FulfilledSupplyRequest(0, 0, sell.head._2), 5)
     factory.receiveSellingResultAndMoney(region1, profit1)
-    assert(factory.currentMoneyBalance === 2000 - moneySpentOnResources + moneyEarned)
-    assert(factory.factoryStorage.unsoldProducts === 39950)
+    assert(factory.currentMoneyBalance === 1000 - moneySpentOnResources + moneyEarned)
+    assert(factory.factoryStorage.unsoldProducts === 5)
     factory.receiveSellingResultAndMoney(region2, profit2)
-    assert(factory.factoryStorage.unsoldProducts === 39950)
-    assert(factory.currentMoneyBalance === 2000 - moneySpentOnResources + moneyEarned)
+    assert(factory.factoryStorage.unsoldProducts === 5)
+    assert(factory.currentMoneyBalance === 1000 - moneySpentOnResources + moneyEarned)
 
-    assert(factory.workforceEfficiencyDemand(prices) === 2.5)
+    assert(factory.workforceEfficiencyDemand(prices) === 30)
 
     val workers = new Population(LatinHuman, Craftsmen, 10000, 0, 0, PoliticalViews.averagePoliticalViews)
     workers.newDay(zeroTaxes, 1)
@@ -203,25 +208,28 @@ class FactoryTest extends FunSuite with BeforeAndAfter with MockitoSugar with Ma
     factory.receiveWorkforceRequest(Map(workers -> 2.5))
 
     factory.payMoneyToPops()
-    assert(factory.payTaxes() === TaxData(CorporateTax,0,0))
+    factory.payTaxes()
+    owner.budget.dayReport.income(CorporateTax) shouldBe 0
+    owner.budget.dayReport.grossIncome(CorporateTax) shouldBe 0
+
     assert(capitalists.moneyReserves === 0)
     assert(workers.moneyReserves === 0)
 
-    assert(factory.factoryStorage.unsoldProducts === 39950)
+    assert(factory.factoryStorage.unsoldProducts === 5)
     factory.produce()
 
-    assert(factory.factoryStorage.unusedProducts === Map(Glass -> 183.0, Fruit -> 274.5, Coal -> 0.0))
-    assert(factory.factoryStorage.unsoldProducts === 39992.5)
+    assert(factory.factoryStorage.unusedProducts === Map(GlassTest -> 180.0, FruitTest -> 270.0))
+    assert(factory.factoryStorage.unsoldProducts === 55)
 
     factory.endOfDay()
 
     assert(factory.dayRecords === Vector(FactoryRecord(
-      produced = 42.5,
+      produced = 50,
       moneySpentOnResources = moneySpentOnResources,
       moneyOnWorkforceSalary = 0,
       moneyOnOwnersPayment = 0,
       corporateTax = 0,
-      moneyToFactoryBudget = 0,
+      moneyToFactoryBudget = -400,
       peopleResources = Map(workers -> 2.5),
       sold = Map(region1 -> profit1, region2 -> profit2),
       bought = fulfilledRequests,
@@ -231,24 +239,22 @@ class FactoryTest extends FunSuite with BeforeAndAfter with MockitoSugar with Ma
 
   test("no workers came, factory sold from storage") {
     val startingMoney = 1000000
-    val factory = new IndustrialFactory(region1, Wine, 2, startingMoney, 40000, 20, 1) {
-      override val requiredMaintenance: Map[Product, Double] = Map(Coal -> 1000)
-    }
+    val factory = new IndustrialFactory(region1, WineTest, 2, startingMoney, 40000, 20, 1)
 
-    val prices = Map[Product, Double](Glass -> 10, Fruit -> 5, Coal -> 1)
+    val prices = Map[Product, Double](GlassTest -> 10, FruitTest -> 5)
     when(testRegionMarket.currentPrices).thenReturn(prices)
 
     factory.newDay(new TaxPolicy(Map(CorporateTax -> 0.1)), 1, 1)
     assert(factory.dayRecords === Vector())
     val requests = factory.componentDemandRequests(prices)
-    assert(requests.mapValues(_.count) === Map(Glass -> 16000, Fruit -> 24000, Coal -> 1000))
+    assert(requests.mapValues(_.count) === Map(GlassTest -> 16000, FruitTest -> 24000))
 
     assert(factory.factoryStorage.unsoldProducts === 40000)
     assert(factory.factoryStorage.unusedProducts.forall(_._2 == 0),
       s"${factory.factoryStorage.unusedProducts} must be empty")
 
     val sell = factory.sellProduct(Map(region1 -> EconomicRegionDemand(40000, 100),
-      region2 -> EconomicRegionDemand(40000, 50)))
+      region2 -> EconomicRegionDemand(40000, 0)))
     assert(sell.mapValues(_.count) === Map(region1 -> 40000))
 
     val fulfilledRequests = requests.map { case (p, r) =>
@@ -257,9 +263,9 @@ class FactoryTest extends FunSuite with BeforeAndAfter with MockitoSugar with Ma
 
     assert(factory.currentMoneyBalance === 1000000)
     factory.buyDemandedProducts(fulfilledRequests)
-    assert(factory.factoryStorage.unusedProducts === Map(Glass -> 16000, Fruit -> 24000, Coal -> 1000))
+    assert(factory.factoryStorage.unusedProducts === Map(GlassTest -> 16000, FruitTest -> 24000))
 
-    val moneySpentOnResources = 16000 * 10 + 24000 * 5 + 1000
+    val moneySpentOnResources = 16000 * 10 + 24000 * 5
     val moneyEarned = 40000 * 100
 
     assert(factory.currentMoneyBalance === startingMoney - moneySpentOnResources)
@@ -275,14 +281,14 @@ class FactoryTest extends FunSuite with BeforeAndAfter with MockitoSugar with Ma
 
     factory.payMoneyToPops()
     val taxes = (moneyEarned - moneySpentOnResources) * 0.1
-    inside(factory.payTaxes()) { case TaxData(CorporateTax, g, t) =>
-      g shouldBe (taxes * 10) +- 0.00001
-      t shouldBe taxes +- 0.00001
-    }
+    factory.payTaxes()
+    owner.budget.dayReport.income(CorporateTax) shouldBe taxes +- 0.00001
+    owner.budget.dayReport.grossIncome(CorporateTax) shouldBe (taxes * 10) +- 0.00001
+
 
     factory.produce()
 
-    assert(factory.factoryStorage.unusedProducts === Map(Glass -> 16000.0, Fruit -> 24000.0, Coal -> 0.0) )
+    assert(factory.factoryStorage.unusedProducts === Map(GlassTest -> 16000.0, FruitTest -> 24000.0) )
     assert(factory.factoryStorage.unsoldProducts === 0)
 
     factory.endOfDay()
@@ -309,25 +315,23 @@ class FactoryTest extends FunSuite with BeforeAndAfter with MockitoSugar with Ma
   }
 
   test("factory usage general flow - happy path with output multiplier") {
-    val factory = new IndustrialFactory(region1, Wine, 2, 1000000, 40000, 20, 10) {
-      override val requiredMaintenance: Map[Product, Double] = Map(Coal -> 1000)
-    }
+    val factory = new IndustrialFactory(region1, WineTest, 2, 1000000, 40000, 20, 10)
 
-    val prices = Map[Product, Double](Glass -> 10, Fruit -> 5, Coal -> 1)
+    val prices = Map[Product, Double](GlassTest -> 10, FruitTest -> 5)
 
     when(testRegionMarket.currentPrices).thenReturn(prices)
 
     factory.newDay(new TaxPolicy(Map(CorporateTax -> 0.1)), 1, 1)
     assert(factory.dayRecords === Vector())
     val requests = factory.componentDemandRequests(prices)
-    assert(requests.mapValues(_.count) === Map(Glass -> 16000, Fruit -> 24000, Coal -> 1000))
+    assert(requests.mapValues(_.count) === Map(GlassTest -> 16000, FruitTest -> 24000))
 
     assert(factory.factoryStorage.unsoldProducts === 40000)
     assert(factory.factoryStorage.unusedProducts.forall(_._2 == 0),
       s"${factory.factoryStorage.unusedProducts} must be empty")
 
     val sell = factory.sellProduct(Map(region1 -> EconomicRegionDemand(40000, 100),
-      region2 -> EconomicRegionDemand(400000, 50)))
+      region2 -> EconomicRegionDemand(400000, 0)))
     assert(sell.mapValues(_.count) === Map(region1 -> 40000))
 
     val fulfilledRequests = requests.map { case (p, r) =>
@@ -336,9 +340,9 @@ class FactoryTest extends FunSuite with BeforeAndAfter with MockitoSugar with Ma
 
     assert(factory.currentMoneyBalance === 1000000)
     factory.buyDemandedProducts(fulfilledRequests)
-    assert(factory.factoryStorage.unusedProducts === Map(Glass -> 16000, Fruit -> 24000, Coal -> 1000))
+    assert(factory.factoryStorage.unusedProducts === Map(GlassTest -> 16000, FruitTest -> 24000))
 
-    val moneySpentOnResources = 16000 * 10 + 24000 * 5 + 1000
+    val moneySpentOnResources = 16000 * 10 + 24000 * 5
     val moneyEarned = 40000 * 100
 
     assert(factory.currentMoneyBalance === 1000000 - moneySpentOnResources)
@@ -358,11 +362,12 @@ class FactoryTest extends FunSuite with BeforeAndAfter with MockitoSugar with Ma
 
     factory.payMoneyToPops()
     val taxes = (moneyEarned - moneySpentOnResources) * 0.1
-    inside(factory.payTaxes()) { case TaxData(CorporateTax, gross, taxed) =>
-      taxes shouldBe taxes +- 0.0001
-      gross shouldBe taxes * 10 +- 0.0001
-    }
-    val maxReserves = 16000 * prices(Glass) + 24000 * prices(Fruit) + 1000 * prices(Coal)
+    factory.payTaxes()
+    owner.budget.dayReport.income(CorporateTax) shouldBe taxes +- 0.00001
+    owner.budget.dayReport.grossIncome(CorporateTax) shouldBe (taxes * 10) +- 0.00001
+
+
+    val maxReserves = 16000 * prices(GlassTest) + 24000 * prices(FruitTest)
     assert(factory.maxMoneyReserves === maxReserves)
     val moneyToSpend = moneyBalanceAfterDemand + moneyEarned - taxes - maxReserves
 
@@ -398,13 +403,9 @@ class FactoryTest extends FunSuite with BeforeAndAfter with MockitoSugar with Ma
   }
 
   test("bankrupt factory") {
-    val factory1 = new IndustrialFactory(region1, Wine, 2, 1000000, 40000, 20, 10) {
-      override val requiredMaintenance: Map[Product, Double] = Map(Coal -> 1000)
-    }
+    val factory1 = new IndustrialFactory(region1, WineTest, 2, 1000000, 40000, 20, 10)
 
-    val factory2 = new IndustrialFactory(region1, Wine, 2, 0, 0, 20, 10) {
-      override val requiredMaintenance: Map[Product, Double] = Map(Coal -> 1000)
-    }
+    val factory2 = new IndustrialFactory(region1, WineTest, 2, 0, 0, 20, 10)
 
     assert(factory1.isBankrupt === false)
     assert(factory2.isBankrupt === true)

@@ -20,7 +20,7 @@ class State(val initialName: String, val primeCulture:Culture, startingMoney: Do
 
   def rulingParty:Party = politicalSystem.rulingParty
 
-  val taxPolicy: TaxPolicy = {
+  final val taxPolicy: TaxPolicy = {
     val policy = rulingParty.economy
     new TaxPolicy(Map(
       LowSalaryTax -> policy.salaryTax.min,

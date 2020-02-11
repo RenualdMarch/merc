@@ -62,17 +62,19 @@ class ArmySupplyPane(controller: ArmyPaneController, stage: Stage) extends PaneW
   val warriorsTable = new WarriorsTablePane(controller)
   val recruitmentPane = new WarriorRecruitmentPane(controller, stage)
   val leftPane = PaneWithTwoVerticalChildren(warriorsTable, recruitmentPane, 0.6)
-  val eitherProperty = bindTwoProperties(warriorsTable.selectedWarrior, recruitmentPane.projectsPane.selectedRow).map(Option.apply)
+  val eitherProperty = bindTwoProperties(warriorsTable.selectedWarrior, recruitmentPane.projectsPane.selectedRow)
 
-  val rightPane = new PropertyDependentPane[Option[Either[Warrior, BusinessProject]]](eitherProperty, {
+  private def f(either:Either[Warrior, BusinessProject]) = Option(either) match {
     case Some(Left(warrior)) =>
       recruitmentPane.projectsPane.projectsTable.delegate.getSelectionModel.clearSelection()
-      new WarriorInfoPane(warrior)
+      new WarriorInfoPane(warrior).delegate
     case Some(Right(project)) =>
       warriorsTable.table.delegate.getSelectionModel.clearSelection()
       new ProjectPane(project)
-    case None => new Pane with WorldInterfaceWhiteNode
-  })
+    case None => new MigPane() with WorldInterfaceJavaNode
+  }
+
+  val rightPane = new PropertyDependentPane[Either[Warrior, BusinessProject]](eitherProperty, f)
   setTwoChildren(leftPane, rightPane)
 }
 

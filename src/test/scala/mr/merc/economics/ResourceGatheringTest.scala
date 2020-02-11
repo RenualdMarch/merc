@@ -10,7 +10,6 @@ import org.scalatest.{BeforeAndAfter, FunSuite, Matchers}
 class ResourceGatheringTest extends FunSuite with BeforeAndAfter with Matchers {
 
   var aristocrats: Population = _
-  var magicalAristocrats: Population = _
   var workers: Population = _
   var region1:EconomicRegion = _
   var region2:EconomicRegion = _
@@ -22,19 +21,17 @@ class ResourceGatheringTest extends FunSuite with BeforeAndAfter with Matchers {
   before {
     aristocrats = new Population(LatinHuman, Aristocrats, 1000, 0, 0, PoliticalViews.averagePoliticalViews)
     aristocrats.newDay(zeroPolicy, 1)
-    magicalAristocrats = new Population(LatinHuman, MagicalAristocrats, 600, 0, 0, PoliticalViews.averagePoliticalViews)
-    magicalAristocrats.newDay(zeroPolicy, 1)
     workers = new Population(LatinHuman, Farmers, 4000, 0, 0, PoliticalViews.averagePoliticalViews)
     workers.newDay(zeroPolicy,1)
-    country = new State("", FrenchHuman, 0, new PoliticalSystem(Party.absolute)) {
-      override val taxPolicy: TaxPolicy = TaxPolicy.zeroTaxes
-    }
+    country = new State("", FrenchHuman, 0, new PoliticalSystem(Party.absolute))
+    country.taxPolicy.set(TaxPolicy.zeroTaxes.taxPolicyValues)
+    country.budget.refreshTaxPolicy()
 
     region1 = new EconomicRegion {
       override def economicNeighbours: Set[EconomicRegion] = Set(region2, region1)
 
       override val regionMarket: RegionMarket = null
-      override val regionPopulation: RegionPopulation = new RegionPopulation(List(aristocrats, magicalAristocrats, workers))
+      override val regionPopulation: RegionPopulation = new RegionPopulation(List(aristocrats, workers))
       override val regionWarriors: RegionWarriors = null
       override def toString: String = "region1"
 
@@ -76,7 +73,7 @@ class ResourceGatheringTest extends FunSuite with BeforeAndAfter with Matchers {
     assert(resourceGathering.unsoldProducts === 1000)
 
     val sell = resourceGathering.sellProduct(Map(region1 -> EconomicRegionDemand(1000, 100),
-      region2 -> EconomicRegionDemand(1000, 50)))
+      region2 -> EconomicRegionDemand(1000, 0)))
     assert(sell.mapValues(_.count) === Map(region1 -> 1000))
 
     val profit = FulfilledSupplyRequestProfit(
@@ -90,14 +87,13 @@ class ResourceGatheringTest extends FunSuite with BeforeAndAfter with Matchers {
     resourceGathering.receiveWorkforceRequest(Map(workers -> 10000))
 
     resourceGathering.payMoneyToPops()
-    aristocrats.moneyReserves shouldBe 45000d +- 000.1
-    assert(magicalAristocrats.moneyReserves === 0)
-    workers.moneyReserves shouldBe 45000d +- 000.1
+    aristocrats.moneyReserves shouldBe 9000d +- 000.1
+    workers.moneyReserves shouldBe 81000d +- 000.1
 
-    val payTaxes = resourceGathering.payTaxes()
-    payTaxes.tax shouldBe CorporateTax
-    payTaxes.taxed shouldBe 10*1000d +- 0.0001
-    payTaxes.gross shouldBe 100000d +- 0.0001
+    resourceGathering.payTaxes()
+
+    country.budget.dayReport.income(CorporateTax) shouldBe 10*1000d +- 0.0001
+    country.budget.dayReport.grossIncome(CorporateTax) shouldBe 100000d +- 0.0001
 
     resourceGathering.produce()
 

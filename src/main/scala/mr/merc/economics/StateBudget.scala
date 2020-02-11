@@ -15,7 +15,7 @@ class StateBudget(startingMoney: Double, val taxPolicy: TaxPolicy) {
 
   var spendingPolicyConfig: SpendingPolicyConfig = SpendingPolicyConfig(0, 0, 0, 0)
 
-  private var currentReport: BudgetDayReport = BudgetDayReport(Map(), Map(), Map())
+  private var currentReport: BudgetDayReport = BudgetDayReport(taxPolicy.taxPolicyValues, Map(), Map(), Map())
 
   private var historyReports: Vector[BudgetDayReport] = Vector()
 
@@ -27,10 +27,14 @@ class StateBudget(startingMoney: Double, val taxPolicy: TaxPolicy) {
 
   def dayReport: BudgetDayReport = currentReport
 
+  def refreshTaxPolicy(): Unit = {
+    currentReport = currentReport.copy(taxLevel = taxPolicy.taxPolicyValues)
+  }
+
   def endDay(): Unit = {
     historyReports :+= currentReport
     historyReports = historyReports.takeRight(recordsMax)
-    currentReport = BudgetDayReport(Map(), Map(), Map())
+    currentReport = BudgetDayReport(taxPolicy.taxPolicyValues, Map(), Map(), Map())
   }
 
   def receiveTaxes(taxData: TaxData): Unit = {
@@ -61,7 +65,7 @@ class StateBudget(startingMoney: Double, val taxPolicy: TaxPolicy) {
     payBureacracySalary(regions, primaryCulture, spending.bureaucratsSalary)
     payPensions(regions, primaryCulture, spending.pensions)
 
-    currentMoney -= spending.pensions + spending.bureaucratsSalary + spending.bureaucratsSalary
+    currentMoney -= spending.pensions + spending.bureaucratsSalary + spending.scholarsSalary
   }
 
   private def scholarsMoneyPerNeeds(regions: List[EconomicRegion]): Map[PopulationNeedsType, Double] = {
@@ -137,7 +141,7 @@ class StateBudget(startingMoney: Double, val taxPolicy: TaxPolicy) {
   }
 
   def projectIncomeFunction(income: Income): Double => Double = {
-    history.lastOption.map(_.projectionFunction(income)).getOrElse { case _ => 0d }
+    history.lastOption.map(_.projectionFunction(income)).getOrElse { _ => 0d }
   }
 
   private def divideAccordingToEfficiency(regions: List[EconomicRegion], popType: PopulationType,
@@ -206,12 +210,18 @@ class StateBudget(startingMoney: Double, val taxPolicy: TaxPolicy) {
   }
 }
 
-case class BudgetDayReport(income: Map[Income, Double],
+case class BudgetDayReport(taxLevel:Map[Income, Double],
+                           income: Map[Income, Double],
                            grossIncome: Map[Income, Double],
                            expenses: Map[Spending, Double]) {
 
-  def projectionFunction(income: Income): Double => Double = {
-    d => grossIncome.getOrElse(income, 0d) * d
+  def projectionFunction(inc: Income): Double => Double = {
+    d =>
+      if (taxLevel(inc) == 0) 0
+      else {
+        val diff = d / taxLevel(inc)
+        income.getOrElse(inc, 0d) * diff
+      }
   }
 }
 

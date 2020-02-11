@@ -23,8 +23,10 @@ case class SpendingPolicy(scholarsSalary: Double, bureaucratsSalary: Double, pen
   def scaleSpendingPolicy(actualMoney: Double):SpendingPolicy = {
     val sum = scholarsSalary + bureaucratsSalary + pensions
 
-    if (sum <= actualMoney || sum == 0) this
-    else {
+    if (sum <= actualMoney) this
+    else if (sum <= 0) {
+      SpendingPolicy(0, 0, 0)
+    } else {
       val m = actualMoney / sum
       SpendingPolicy(scholarsSalary * m, bureaucratsSalary * m, pensions * m)
     }

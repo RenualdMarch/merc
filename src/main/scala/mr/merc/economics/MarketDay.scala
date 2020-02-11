@@ -2,8 +2,8 @@ package mr.merc.economics
 
 import scala.collection.mutable
 import Products.Product
-import WorldConstants.Market._
 import mr.merc.army.Warrior
+import mr.merc.economics.WorldConstants.Market
 
 class MarketDay(product: Product, val price: Double, val turn: Int) {
 
@@ -27,15 +27,17 @@ class MarketDay(product: Product, val price: Double, val turn: Int) {
 
   def noPriorityDemandSize:Double = noPriorityDemands.map(_.count).sum
 
-  private def priorityDemands:List[BusinessDemandRequest] = {
+  private def priorityDemands:List[DemandRequest] = {
     demand.collect {
       case bd:BusinessDemandRequest => bd
+      case w:WarriorDemandRequest => w
     } toList
   }
 
   private def noPriorityDemands: List[DemandRequest] = {
     demand.collect {
       case bd:BusinessDemandRequest => None
+      case w:WarriorDemandRequest => None
       case x => Some(x)
     }.flatten.toList
   }
@@ -46,7 +48,7 @@ class MarketDay(product: Product, val price: Double, val turn: Int) {
     if (supply.isEmpty && demand.isEmpty) {
       _fulfilledSupply = Some(List())
       _fulfilledDemands = Some(List())
-      _tomorrowPrice = Some(price)
+      _tomorrowPrice = Some(price * Market.priceChange(totalSupply, totalDemand))
       return
     }
 
@@ -60,14 +62,7 @@ class MarketDay(product: Product, val price: Double, val turn: Int) {
         FulfilledSupplyRequest(sold, price, s)
       } toList
 
-      import scala.math.max
-
       _fulfilledSupply = Some(fulfilledSupplyMap)
-      if (totalDemand > 0) {
-        _tomorrowPrice = Some(max(price * PriceDecrease, LowestPossiblePrice))
-      } else {
-        _tomorrowPrice = Some(max(price * EmptyDemandPriceDecrease, LowestPossiblePrice))
-      }
     } else {
       _fulfilledSupply = Some(supply.map(s =>
         FulfilledSupplyRequest(s.count, price, s)).toList)
@@ -88,16 +83,8 @@ class MarketDay(product: Product, val price: Double, val turn: Int) {
       }
 
       _fulfilledDemands = Some(fulfilledDemands)
-
-      if (totalSupply == totalDemand) {
-        _tomorrowPrice = Some(price)
-      } else if (totalSupply > 0) {
-        _tomorrowPrice = Some(price * PriceIncrease)
-      } else {
-        _tomorrowPrice = Some(price * EmptySupplyPriceIncrease)
-      }
-
     }
+    _tomorrowPrice = Some(price * Market.priceChange(totalSupply, totalDemand))
   }
 
   def acceptRequests(r: MarketRequest*): Unit = {
@@ -140,12 +127,12 @@ case class BusinessDemandRequest(project: BusinessProject, override val product:
 case class WarriorDemandRequest(warrior: Warrior, override val product: Product, override val count: Double) extends DemandRequest(product, count)
 case class EnterpriseSupplyRequest(enterprise: Enterprise, override val product: Product, override val count: Double) extends SupplyRequest(product, count)
 
-case class FulfilledDemandRequest(bought: Double, price: Double, request: DemandRequest) {
+case class FulfilledDemandRequest(bought: Double, price: Double, request: DemandRequest, var currentSpentMoney:Double = 0) {
   def shortage: Double = request.count - bought
   def spentMoney:Double = price * bought
   def product: Product = request.product
 }
-case class FulfilledSupplyRequest(sold: Double, price: Double, request: SupplyRequest) {
+case class FulfilledSupplyRequest(sold: Double, price: Double, request: SupplyRequest, var currentSpentMoney:Double = 0) {
   def excess: Double = request.count - sold
   def receivedMoney:Double = sold * price
   def product: Product = request.product

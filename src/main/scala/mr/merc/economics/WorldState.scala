@@ -69,10 +69,12 @@ class WorldState(val regions: List[Province], val playerState: State, val worldH
     this.aiTurn(onlyAnswer = false)
     this.diplomacyEngine.improveBadBoyOverTime()
 
+    info(s"Total money is $totalMoney")
+
     states.keysIterator.filterNot(_ == playerState).foreach { state =>
       val soldierMovementAI = new SoldierMovementAI(this, state)
       soldierMovementAI.orderSoldiers()
-      soldierMovementAI.moveSoldiers()
+      //soldierMovementAI.moveSoldiers()
     }
 
     val battlesResolver = new MovementAndBattlesResolver(this)
@@ -112,7 +114,8 @@ trait WorldStateBudgetActions {
 
   def playerRegions: List[Province]
 
-  def totalMoney: Double = totalBudgetMoney + totalPopMoney + totalEnterpriseMoney
+  def totalMoney: Double = totalBudgetMoney + totalPopMoney + totalEnterpriseMoney + totalProjectsMoney +
+    totalDemandsMoney + totalSupplyMoney
 
   def totalBudgetMoney: Double = {
     regions.map(_.owner).distinct.map(_.budget.moneyReserve).sum
@@ -126,8 +129,21 @@ trait WorldStateBudgetActions {
     regions.flatMap(_.enterprises).map(_.currentMoneyBalance).sum
   }
 
+  def totalProjectsMoney: Double = {
+    regions.flatMap(_.projects).map(_.remainingMoney).sum
+  }
+
+  def totalDemandsMoney: Double = regions.flatMap { p =>
+    p.regionMarket.fulfilledDemands.flatMap(_._2).map(_.currentSpentMoney)
+  }.sum
+
+  def totalSupplyMoney: Double = regions.flatMap { p =>
+    p.regionMarket.fulfilledSupply.flatMap(_._2).map(_.currentSpentMoney)
+  }.sum
+
   def setStateTax(state: State, tax: Income, amount: Double): Unit = {
     state.taxPolicy.set(tax, amount)
+    state.budget.refreshTaxPolicy()
   }
 
   def setStateSpending(state: State, spending: SpendingPolicyConfig): Unit = {

@@ -63,6 +63,7 @@ class Warrior(val warriorType: WarriorType, val competence: WarriorCompetence, v
   def buyDemand(demand:FulfilledDemandRequest): Unit = {
     owner.budget.spendMoneyOnArmySupply(demand.spentMoney)
     currentNeeds |+|= demand.product -> demand.bought
+    demand.currentSpentMoney += demand.spentMoney
   }
 
   def allNeedsReceived(turn:Int): Unit = {

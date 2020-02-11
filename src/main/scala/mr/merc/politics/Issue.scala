@@ -322,7 +322,7 @@ object VotersPolicy extends Issue[VotersPolictyPosition] {
 
     override def positionNumber: Int = 1
 
-    override def canVote(populationType: PopulationType, primaryCulture: Boolean): Boolean = Set(Mages, MagicalAristocrats).contains(populationType)
+    override def canVote(populationType: PopulationType, primaryCulture: Boolean): Boolean = Mages == populationType
   }
 
   case object ClericsOnly extends VotersPolictyPosition {
@@ -482,8 +482,6 @@ object PoliticalViews {
       case Capitalists =>
         PoliticalViews(migration, regime, aristocraticPolicy, capitalistEconomy, upperSocial, upperVoters)
       case Aristocrats =>
-        PoliticalViews(migration, regime, aristocraticPolicy, aristorcraticEconomy, upperSocial, upperVoters)
-      case MagicalAristocrats =>
         PoliticalViews(migration, regime, aristocraticPolicy, aristorcraticEconomy, upperSocial, upperVoters)
     }
   }

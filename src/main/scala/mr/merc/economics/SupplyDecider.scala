@@ -2,67 +2,24 @@ package mr.merc.economics
 
 class SupplyDecider {
 
-  private var yesterdayResults: Option[Map[EconomicRegion, FulfilledSupplyRequest]] = None
-
-  private val positiveCorrection = 1.25
-  private val regionsForRemainder = 3
+  private val maxSupply = 10
 
   def decideSupply(produced: Double, profits: Map[EconomicRegion, EconomicRegionDemand]): Map[EconomicRegion, Double] = {
-    import scala.math.min
     if (profits.isEmpty) {
       return Map()
     }
 
-    val sortedByProfit = profits.filter(_._2.profit > 0).toList.sortBy(_._2.profit).reverse
+    val sortedByProfit = profits.filter(_._2.profit > 0).toList.sortBy(-_._2.profit).take(maxSupply)
 
-    val resultMap = sortedByProfit.foldLeft(Map[EconomicRegion, Double]()) {
-      case (map, (region, demand)) =>
-        val sum = map.values.sum
-        val remained = produced - sum
-        if (remained <= 0) map else {
-          val yesterdayResult = yesterdayResults.flatMap(_.get(region))
-          val supply = yesterdayResult match {
-            case None => min(remained, demand.count)
-            case Some(result) => if (result.excess > 0) min(result.sold, remained)
-            else min(result.sold * positiveCorrection, remained)
-          }
-          map + (region -> supply)
-        }
-    }
+    val profitSum = sortedByProfit.map(_._2.profit).sum
 
-    if (resultMap.values.sum < produced) {
-      val remain = produced - resultMap.values.sum
-      val mostProfitableRegions = sortedByProfit.take(regionsForRemainder).map(_._1)
-      val supplyList = mostProfitableRegions.map(resultMap)
-      val totalSupply = supplyList.sum
-
-      val corrections = if (totalSupply == 0) {
-        Map()
-      } else {
-        supplyList.zip(mostProfitableRegions).map { case (currentSupply, region) =>
-          val newSupply = currentSupply + remain * currentSupply / totalSupply
-          region -> newSupply
-        } toMap
-      }
-
-      resultMap ++ corrections
-    } else resultMap
+    sortedByProfit.map { case (region, demand) =>
+      region -> (demand.profit / profitSum * produced)
+    }.toMap
   }
 
-  def receiveSupplyResults(fulfilledSupply: Map[EconomicRegion, FulfilledSupplyRequest]): Unit = {
-    yesterdayResults = Some(yesterdayResults.getOrElse(Map()) ++ fulfilledSupply)
-  }
-
-  def decideProduction(capacity: Double): Double = {
-    yesterdayResults match {
-      case None => capacity
-      case Some(yesterday) =>
-        val sold = yesterday.map { case (_, fulfilledRequest) =>
-          if (fulfilledRequest.excess > 0) fulfilledRequest.sold
-          else fulfilledRequest.sold * positiveCorrection
-        }.sum
-        scala.math.min(sold, capacity)
-    }
+  def decideProduction(capacity: Double, inStorage:Double): Double = {
+    if (inStorage > capacity) 0 else capacity
   }
 }
 

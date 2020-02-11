@@ -3,10 +3,11 @@ package mr.merc.economics
 import mr.merc.economics.Population.{Clergy, Traders}
 import mr.merc.economics.TaxPolicy._
 import mr.merc.economics.ai.FactoryBuildingAI
+import mr.merc.log.Logging
 import mr.merc.map.pathfind.PathFinder
-import mr.merc.politics.State
+import mr.merc.politics.{Province, State}
 
-class WorldMarketDay(worldState: WorldStateEnterpriseActions, turn:Int) {
+class WorldMarketDay(worldState: WorldStateEnterpriseActions, turn:Int) extends Logging {
   type PathCache = Map[EconomicRegion, Map[EconomicRegion, List[EconomicRegion]]]
 
   private val regions:List[EconomicRegion] = worldState.regions
@@ -22,10 +23,18 @@ class WorldMarketDay(worldState: WorldStateEnterpriseActions, turn:Int) {
     }.seq.toMap
   }
 
+  private val worldLog = new WorldStateBudgetActions {
+    override def regions: List[Province] = worldState.regions.map(_.asInstanceOf[Province])
+
+    override def playerState: State = worldState.playerState
+
+    override def playerRegions: List[Province] = regions.filter(_.owner == playerState)
+  }
+
   def trade(): Unit = {
     currentPathCache = newPathCache()
 
-    val states = regions.map(_.owner)
+    val states = regions.map(_.owner).distinct
 
     // initialize factories and pops
     regions.foreach { r =>
@@ -42,7 +51,6 @@ class WorldMarketDay(worldState: WorldStateEnterpriseActions, turn:Int) {
     regions.foreach { r =>
       val popDemands = r.regionPopulation.generatePopDemands(r.regionMarket.currentPrices)
       r.regionMarket.acceptDemands(popDemands)
-
       val enterpriseDemands = r.enterprises.flatMap(_.componentDemandRequests(r.regionMarket.currentPrices).values)
       r.regionMarket.acceptDemands(enterpriseDemands.toList)
 
@@ -82,6 +90,7 @@ class WorldMarketDay(worldState: WorldStateEnterpriseActions, turn:Int) {
         }
       }
 
+      r.regionMarket.transferMoneyFromDemandsToSupply()
       // all taxes on supply side
       r.regionMarket.fulfilledSupply.foreach { case (product, supplies) =>
         supplies.foreach { supply =>
@@ -90,9 +99,12 @@ class WorldMarketDay(worldState: WorldStateEnterpriseActions, turn:Int) {
           val supplyInfo = buildSupplyInfoForProductAndRegion(product, region, r).get
           val count = supply.sold
           request.enterprise.receiveSellingResultAndMoney(r, FulfilledSupplyRequestProfit(supply, supplyInfo.tradeProfit))
-
-          supplyInfo.price.extractions.foreach(_.payMoney(count))
+          supplyInfo.price.extractions.foreach(_.payMoney(count, supply))
         }
+      }
+
+      r.regionMarket.fulfilledSupply.values.flatten.foreach { fs =>
+        require(Math.abs(fs.currentSpentMoney) < 0.01, s"Spent money for supply != 0: $fs")
       }
     }
 
@@ -128,16 +140,15 @@ class WorldMarketDay(worldState: WorldStateEnterpriseActions, turn:Int) {
     regions.foreach { r =>
       val factoryCommands = FactoryBuildingAI().factoryCommands(r, worldState)
 
+
       r.enterprises.foreach{ e =>
         e.payMoneyToPops()
-        val money = e.payTaxes()
-        r.owner.budget.receiveTaxes(money)
+        e.payTaxes()
         e.endOfDay()
       }
 
       r.regionPopulation.pops.foreach { p =>
-        val money = p.payTaxes()
-        r.owner.budget.receiveTaxes(money)
+        p.payTaxes(r)
         p.endOfDay()
       }
 
@@ -148,7 +159,6 @@ class WorldMarketDay(worldState: WorldStateEnterpriseActions, turn:Int) {
       r.regionPopulation.learnLiteracy()
       r.regionPopulation.pops.foreach(_.grow())
     }
-
     states.foreach {s =>
       s.budget.spendBudgetMoney(regions.filter(_.owner == s), s.primeCulture)
       s.budget.endDay()
@@ -209,12 +219,14 @@ case class Price(finalPrice: Double, extractions:List[Extraction]) {
 
 sealed abstract class Extraction(val extractionPart: Double) {
   var extractionMoney: Double = 0
-  def payMoney(count: Double): Unit
+  def payMoney(count: Double, fulfilledSupplyRequest: FulfilledSupplyRequest): Unit
 }
 
 abstract class TradersExtraction(val tradersRegion: EconomicRegion, extractionPart: Double) extends Extraction(extractionPart) {
-  def payMoney(count: Double): Unit = {
-    tradersRegion.regionPopulation.receivePopSalary(Traders, count * extractionMoney)
+  def payMoney(count: Double, fulfilledSupplyRequest: FulfilledSupplyRequest): Unit = {
+    val money = count * extractionMoney
+    fulfilledSupplyRequest.currentSpentMoney -= money
+    tradersRegion.regionPopulation.receivePopSalary(Traders, money)
   }
 }
 
@@ -223,23 +235,29 @@ class TradersSalesPart(tradersRegion: EconomicRegion) extends TradersExtraction(
 class TradersTransitPart(tradersRegion: EconomicRegion) extends TradersExtraction(tradersRegion, 0.05)
 
 
-class StateTransitPart(val owner: State, region: EconomicRegion) extends Extraction(
+class StateTransitPart(val owner: State, region: EconomicRegion) extends Extraction (
   owner.taxPolicy.tax(TransitTax, region.bureaucratsPercentageFromMax)) {
-  override def payMoney(count: Double): Unit = {
-    owner.budget.receiveTaxes(TaxData(TransitTax, count, count * extractionMoney))
+  override def payMoney(count: Double, fulfilledSupplyRequest: FulfilledSupplyRequest): Unit = {
+    val money = count * extractionMoney
+    fulfilledSupplyRequest.currentSpentMoney -= money
+    owner.budget.receiveTaxes(TaxData(TransitTax, count, money))
   }
 }
 
 class StateTariffPart(val owner: State, region: EconomicRegion) extends Extraction(
   owner.taxPolicy.tax(TariffTax, region.bureaucratsPercentageFromMax)) {
-  override def payMoney(count: Double): Unit = {
-    owner.budget.receiveTaxes(TaxData(TariffTax, count, count * extractionMoney))
+  override def payMoney(count: Double, fulfilledSupplyRequest: FulfilledSupplyRequest): Unit = {
+    val money = count * extractionMoney
+    fulfilledSupplyRequest.currentSpentMoney -= money
+    owner.budget.receiveTaxes(TaxData(TariffTax, count, money))
   }
 }
 
 class StateSalesPart(val owner: State, region: EconomicRegion) extends Extraction(
   owner.taxPolicy.tax(SalesTax, region.bureaucratsPercentageFromMax)) {
-  override def payMoney(count: Double): Unit = {
-    owner.budget.receiveTaxes(TaxData(SalesTax, count, count * extractionMoney))
+  override def payMoney(count: Double, fulfilledSupplyRequest: FulfilledSupplyRequest): Unit = {
+    val money = count * extractionMoney
+    fulfilledSupplyRequest.currentSpentMoney -= money
+    owner.budget.receiveTaxes(TaxData(SalesTax, count, money))
   }
 }

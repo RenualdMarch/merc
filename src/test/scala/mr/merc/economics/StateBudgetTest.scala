@@ -19,7 +19,7 @@ class StateBudgetTest extends FunSuite {
       override val warriorViewNames: WarriorViewNames = null
       override val cultureInfo: Culture.CultureInfo = null
 
-      override val needs = Map(
+      private val map:CornerPopulationNeeds = Map(
         Lower -> Map(
           LifeNeeds -> Map(Grain -> 1),
           RegularNeeds -> Map(Grain -> 2),
@@ -35,6 +35,8 @@ class StateBudgetTest extends FunSuite {
           RegularNeeds -> Map(Grain -> 4),
           LuxuryNeeds -> Map(Grain -> 5)
         ))
+
+      override val needs = PopulationNeeds(map, map)
     }
 
     val traders = new Population(culture, Traders, 1000, 0, 0, PoliticalViews.averagePoliticalViews)
@@ -42,9 +44,10 @@ class StateBudgetTest extends FunSuite {
     val farmers = new Population(culture, Farmers, 10000, 0, 0, PoliticalViews.averagePoliticalViews)
 
     val region = new EconomicRegion {
-      override def owner: State = new State("testState", culture, 0, new PoliticalSystem(Party.absolute)) {
-        override val taxPolicy: TaxPolicy = TaxPolicy.zeroTaxes
-      }
+      override def owner: State = new State("testState", culture, 0, new PoliticalSystem(Party.absolute))
+      owner.taxPolicy.set(TaxPolicy.zeroTaxes.taxPolicyValues)
+      owner.budget.refreshTaxPolicy()
+
 
       override def economicNeighbours: Set[EconomicRegion] = Set()
       override val regionWarriors: RegionWarriors = null
@@ -60,7 +63,7 @@ class StateBudgetTest extends FunSuite {
     budget.receiveTaxes(TaxData(LowSalaryTax, 100000, 10000))
     budget.receiveTaxes(TaxData(CorporateTax, 500000, 5000))
 
-    assert(budget.dayReport === BudgetDayReport(Map(LowSalaryTax -> 10000, CorporateTax -> 5000),
+    assert(budget.dayReport === BudgetDayReport(budget.taxPolicy.taxPolicyValues, Map(LowSalaryTax -> 10000, CorporateTax -> 5000),
       Map(LowSalaryTax -> 100000, CorporateTax -> 500000), Map()))
     assert(budget.moneyReserve === 15000)
 
@@ -76,7 +79,7 @@ class StateBudgetTest extends FunSuite {
 
     budget.endDay()
     assert(budget.yesterdaySpendingPolicy === SpendingPolicy(0, 350, 500))
-    assert(budget.history === Vector(BudgetDayReport(Map(LowSalaryTax -> 10000, CorporateTax -> 5000),
+    assert(budget.history === Vector(BudgetDayReport(budget.taxPolicy.taxPolicyValues, Map(LowSalaryTax -> 10000, CorporateTax -> 5000),
       Map(LowSalaryTax -> 100000, CorporateTax -> 500000), Map(ScholarsSalary -> 0, BureaucratsSalary -> 350, Pensions-> 500))))
   }
 
@@ -87,7 +90,7 @@ class StateBudgetTest extends FunSuite {
       override val warriorViewNames: WarriorViewNames = null
       override val cultureInfo: Culture.CultureInfo = null
 
-      override val needs = Map(
+      private val map:CornerPopulationNeeds = Map(
         Lower -> Map(
           LifeNeeds -> Map(Grain -> 1),
           RegularNeeds -> Map(Grain -> 2),
@@ -103,6 +106,8 @@ class StateBudgetTest extends FunSuite {
           RegularNeeds -> Map(Grain -> 4),
           LuxuryNeeds -> Map(Grain -> 5)
         ))
+
+      override val needs = PopulationNeeds(map, map)
     }
 
     val scholars = new Population(culture, Scholars, 1000, 0, 0, PoliticalViews.averagePoliticalViews)
@@ -110,9 +115,9 @@ class StateBudgetTest extends FunSuite {
     val farmers = new Population(culture, Farmers, 10000, 0, 0, PoliticalViews.averagePoliticalViews)
 
     val region = new EconomicRegion {
-      override def owner: State = new State("testState", culture, 0, new PoliticalSystem(Party.absolute)) {
-        override val taxPolicy: TaxPolicy = TaxPolicy.zeroTaxes
-      }
+      override def owner: State = new State("testState", culture, 0, new PoliticalSystem(Party.absolute))
+      owner.taxPolicy.set(TaxPolicy.zeroTaxes.taxPolicyValues)
+      owner.budget.refreshTaxPolicy()
 
       override def economicNeighbours: Set[EconomicRegion] = Set()
       override val regionWarriors: RegionWarriors = null
@@ -129,7 +134,7 @@ class StateBudgetTest extends FunSuite {
     budget.receiveTaxes(TaxData(LowSalaryTax, 100000, 10000))
     budget.receiveTaxes(TaxData(CorporateTax, 500000, 5000))
 
-    assert(budget.dayReport === BudgetDayReport(Map(LowSalaryTax -> 10000, CorporateTax -> 5000),
+    assert(budget.dayReport === BudgetDayReport(budget.taxPolicy.taxPolicyValues, Map(LowSalaryTax -> 10000, CorporateTax -> 5000),
       Map(LowSalaryTax -> 100000, CorporateTax -> 500000), Map()))
     assert(budget.moneyReserve === 15000)
 
@@ -143,7 +148,7 @@ class StateBudgetTest extends FunSuite {
 
     budget.endDay()
     assert(budget.yesterdaySpendingPolicy === SpendingPolicy(200, 350, 500))
-    assert(budget.history === Vector(BudgetDayReport(Map(LowSalaryTax -> 10000, CorporateTax -> 5000),
+    assert(budget.history === Vector(BudgetDayReport(budget.taxPolicy.taxPolicyValues, Map(LowSalaryTax -> 10000, CorporateTax -> 5000),
       Map(LowSalaryTax -> 100000, CorporateTax -> 500000), Map(ScholarsSalary -> 200, BureaucratsSalary -> 350, Pensions-> 500))))
   }
 
@@ -154,7 +159,7 @@ class StateBudgetTest extends FunSuite {
       override val warriorViewNames: WarriorViewNames = null
       override val cultureInfo: Culture.CultureInfo = null
 
-      override val needs = Map(
+      private val map:CornerPopulationNeeds = Map(
         Lower -> Map(
           LifeNeeds -> Map(Grain -> 1),
           RegularNeeds -> Map(Grain -> 2),
@@ -170,6 +175,8 @@ class StateBudgetTest extends FunSuite {
           RegularNeeds -> Map(Grain -> 4),
           LuxuryNeeds -> Map(Grain -> 5)
         ))
+
+      override val needs = PopulationNeeds(map, map)
     }
 
     val scholars = new Population(culture, Scholars, 1000, 0, 0, PoliticalViews.averagePoliticalViews)
@@ -177,9 +184,9 @@ class StateBudgetTest extends FunSuite {
     val farmers = new Population(culture, Farmers, 10000, 0, 0, PoliticalViews.averagePoliticalViews)
 
     val region = new EconomicRegion {
-      override def owner: State = new State("testState", culture, 0, new PoliticalSystem(Party.absolute)) {
-        override val taxPolicy: TaxPolicy = TaxPolicy.zeroTaxes
-      }
+      override def owner: State = new State("testState", culture, 0, new PoliticalSystem(Party.absolute))
+      owner.taxPolicy.set(TaxPolicy.zeroTaxes.taxPolicyValues)
+      owner.budget.refreshTaxPolicy()
 
       override def economicNeighbours: Set[EconomicRegion] = Set()
       override val regionWarriors: RegionWarriors = null
@@ -195,7 +202,7 @@ class StateBudgetTest extends FunSuite {
     budget.receiveTaxes(TaxData(LowSalaryTax, 100000, 500))
     budget.receiveTaxes(TaxData(CorporateTax, 500000, 25))
 
-    assert(budget.dayReport === BudgetDayReport(Map(LowSalaryTax -> 500, CorporateTax -> 25),
+    assert(budget.dayReport === BudgetDayReport(budget.taxPolicy.taxPolicyValues, Map(LowSalaryTax -> 500, CorporateTax -> 25),
       Map(LowSalaryTax -> 100000, CorporateTax -> 500000), Map()))
     assert(budget.moneyReserve === 525)
 
@@ -209,7 +216,7 @@ class StateBudgetTest extends FunSuite {
 
     budget.endDay()
     assert(budget.yesterdaySpendingPolicy === SpendingPolicy(100, 175, 250))
-    assert(budget.history === Vector(BudgetDayReport(Map(LowSalaryTax -> 500, CorporateTax -> 25),
+    assert(budget.history === Vector(BudgetDayReport(budget.taxPolicy.taxPolicyValues, Map(LowSalaryTax -> 500, CorporateTax -> 25),
       Map(LowSalaryTax -> 100000, CorporateTax -> 500000),
       Map(ScholarsSalary -> 100, BureaucratsSalary -> 175, Pensions-> 250))))
   }

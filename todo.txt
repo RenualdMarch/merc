@@ -4,13 +4,19 @@ Current battle issues:
 * Redraw bugs during fast movement
 
 Important core stuff
-Resources and production balancing
+
+migrations inside province
+migrations to other states
+mixed culture population in regions
+
+Additional resources and production
 order warriors for strategy AI after production balancing
 Revolutions/civil wars
 Technologies
-migrations
 
 
+
+bug: Battle between Set(Set(Player(Byzantine,[SFX]0xff00ffff)), Set())
 separate peace(+badboy)
 when 1 and 2 are in alliance and 2 and 3 too, and 1 declares war on 3
 add war targets to going war

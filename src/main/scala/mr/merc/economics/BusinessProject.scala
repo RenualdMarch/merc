@@ -45,13 +45,15 @@ abstract class BusinessProject(productsToBuy: Map[Product, Double]) {
     } toList
   }
 
-  def buyDemandedProducts(requests: List[FulfilledDemandRequest]): Double = {
+  def buyDemandedProducts(requests: List[FulfilledDemandRequest]): Unit = {
     val spentMoney = requests.map(_.spentMoney).sum
+    requests.foreach { r =>
+      r.currentSpentMoney += r.spentMoney
+    }
     notSpentMoney -= spentMoney
     alreadyBought |+|= requests.map { r =>
       r.request.product -> r.bought
     }.toMap
-    spentMoney
   }
 
   def isComplete: Boolean = remainingProducts.values.forall(_ <= 0)
@@ -59,7 +61,7 @@ abstract class BusinessProject(productsToBuy: Map[Product, Double]) {
   def takeMoreMoneyFromInvestorIfNeeded(futurePrices: Map[Product, Double]): Unit = {
     val mr = moneyRequired(futurePrices)
     if (mr > 0) {
-      takeMoreMoneyFromInvestor(mr)
+      notSpentMoney += takeMoreMoneyFromInvestor(mr)
     }
   }
 

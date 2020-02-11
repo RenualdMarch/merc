@@ -1,6 +1,6 @@
 package mr.merc.economics
 
-import mr.merc.economics.Population.{Lower, Middle, Upper}
+import mr.merc.economics.Population.{Craftsmen, Labourers, Lower, Middle, Upper}
 import mr.merc.economics.Products._
 import mr.merc.log.Logging
 import mr.merc.map.generator.WorldMapGenerator
@@ -65,7 +65,7 @@ class WorldGenerator(field:FourSeasonsTerrainHexField) {
 
   private def generateResources:List[GatheredProduct] = {
     val n = MinResourcesPerRegion + Random.nextInt(MaxResourcesPerRegion - MinResourcesPerRegion + 1)
-    List.fill(n)(resourceGenerator.nextRandomItem())
+    resourceGenerator.uniqueRandomItems(n).toList
   }
 
   private def generateProductsForFactories:List[IndustryProduct] = {
@@ -92,6 +92,8 @@ class WorldGenerator(field:FourSeasonsTerrainHexField) {
     val pops = Population.populationTypesByClass.flatMap { case (cls, tps) =>
       tps.map { tp =>
         val (moneyPerPerson, countMultiplier, literacy) = cls match {
+          case Lower if tp == Craftsmen => (PoorMoneyPerPerson, MiddleMultiplier, PoorLiteracy)
+          case Lower if tp == Labourers => (PoorMoneyPerPerson, 2 * MiddleMultiplier, PoorLiteracy)
           case Lower => (PoorMoneyPerPerson, PoorMultiplier, PoorLiteracy)
           case Middle => (MiddleMoneyPerPerson, MiddleMultiplier, MiddleLiteracy)
           case Upper => (RichMoneyPerPerson, RichMultiplier, RichLiteracy)

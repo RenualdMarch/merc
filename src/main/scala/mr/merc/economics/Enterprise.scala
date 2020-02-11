@@ -21,7 +21,7 @@ trait Enterprise {
 
   def payMoneyToPops()
 
-  def payTaxes(): TaxData
+  def payTaxes(): Unit
 
   def endOfDay()
 

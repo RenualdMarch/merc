@@ -2,11 +2,11 @@ package mr.merc.economics
 
 import mr.merc.army.WarriorCompetence.{Militia, Professional}
 import mr.merc.economics.Population._
-import mr.merc.economics.Products.{Cement, Clothes, Fabric, Furniture, Glass, Liquor, Lumber, Paper, Steel, Weapons, Wine, _}
+import mr.merc.economics.Products._
 import MapUtil.FloatOperations._
 import mr.merc.army.WarriorCompetence
 import mr.merc.politics.IssuePosition.RegimePosition
-import mr.merc.politics.Regime.{Absolute, Constitutional, Democracy}
+import mr.merc.politics.Regime.{Constitutional, Democracy}
 
 object WorldConstants {
 
@@ -24,8 +24,8 @@ object WorldConstants {
     val ChurchStartingResources = 1000
     val MagicGuildStartingResources = 1000
 
-    val FactoryBuildCost:Map[Products.Product, Double] = Map(Timber -> 10000, Iron -> 10000, Coal -> 10000)
-    val FactoryExpandCost:Map[Products.Product, Double] = Map(Timber -> 5000, Iron -> 5000, Coal -> 5000)
+    val FactoryBuildCost:Map[Products.Product, Double] = Map(Timber -> 100, Iron -> 100, Coal -> 100)
+    val FactoryExpandCost:Map[Products.Product, Double] = Map(Timber -> 50, Iron -> 50, Coal -> 50)
 
     val StateEconomicsInvestmentMultiplier:Double = 4
     val InterventionismInvestmentMultiplier:Double = 2
@@ -33,9 +33,6 @@ object WorldConstants {
 
     val ProfitPartToWorkers = 0.5
     val ProfitPartToOwners = 0.5
-    val NoMaintenancePenalty = 0.3
-    val FactoryMaintenancePerLevel: Map[Product, Double] = Map()
-
     val EfficiencyPerOneFactoryLevel = 1000
 
     val BankruptStorage = 0.1
@@ -61,25 +58,24 @@ object WorldConstants {
       Traders -> 0.05,
       Mages -> 0.3,
       Capitalists -> 0.02,
-      Aristocrats -> 0.02,
-      MagicalAristocrats -> 0.01
+      Aristocrats -> 0.02
     )
 
     val needsQ: Map[PopulationClass, Map[PopulationNeedsType, Double]] = Map(
       Lower -> Map(
-        LifeNeeds -> 1d,
-        RegularNeeds -> 1d,
+        LifeNeeds -> 0.125,
+        RegularNeeds -> 0.25,
         LuxuryNeeds -> 1d
       ),
       Middle -> Map(
-        LifeNeeds -> 1d,
-        RegularNeeds -> 1d,
+        LifeNeeds -> 0.125,
+        RegularNeeds -> 0.25,
         LuxuryNeeds -> 1d
       ),
       Upper -> Map(
         LifeNeeds -> 1d,
-        RegularNeeds -> 1d,
-        LuxuryNeeds -> 1d
+        RegularNeeds -> 2d,
+        LuxuryNeeds -> 4d
       )
     )
 
@@ -102,10 +98,25 @@ object WorldConstants {
   }
 
   object Market {
-    val PriceIncrease = 1.03
-    val EmptySupplyPriceIncrease = 1.5
-    val PriceDecrease = 0.97
-    val EmptyDemandPriceDecrease = 0.67
+    val EmptySupplyPriceIncrease: Double = 1.5
+    val EmptyDemandPriceDecrease: Double = 1 / EmptySupplyPriceIncrease
+
+    def priceChange(supply:Double, demand:Double):Double = {
+      val price = (supply, demand) match {
+        case (0, 0) => 1d
+        case (0, _) => EmptySupplyPriceIncrease
+        case (_, 0) => EmptyDemandPriceDecrease
+        case (s, d) =>
+          val q = s/d
+          if (q >= 1) {
+            EmptyDemandPriceDecrease + (1 - EmptyDemandPriceDecrease)/q
+          } else {
+            EmptySupplyPriceIncrease + (1 - EmptySupplyPriceIncrease) * q
+          }
+      }
+
+      if (price < LowestPossiblePrice) LowestPossiblePrice else price
+    }
 
     val LowestPossiblePrice = 0.001
   }
@@ -128,8 +139,8 @@ object WorldConstants {
   }
 
   object Army {
-    private val supply = Map(Weapons -> 100d, Clothes -> 100d, Grain -> 100d, Cattle -> 100d)
-    private val recruitmentCost = Map[Product, Double](Weapons -> 500d, Clothes -> 500d)
+    private val supply = Map(Weapons -> 10d, Clothes -> 10d, Grain -> 10d)
+    private val recruitmentCost = Map[Product, Double](Weapons -> 50d, Clothes -> 50d)
 
     val SoldierSupply:Map[WarriorCompetence, Map[Product, Double]] = Map(
       Professional -> (supply |*| 2),
@@ -223,40 +234,40 @@ object WorldConstants {
 object WorldGenerationConstants {
 
   val ResourcesRarity:Map[GatheredProduct, Double] = Map(
-    Grain -> 1,
-    //Fish -> 0.7,
+    Grain -> 2,
+    /*Fish -> 0.7,
     Fruit -> 0.7,
     Cattle -> 1,
     Tea -> 0.2,
     Coffee -> 0.2,
-    Opium -> 0.1,
-    Cotton -> 0.7,
-    Herbs -> 1,
-    Timber -> 0.5,
-    Coal -> 0.3,
-    Iron -> 0.6,
-    PreciousMetal -> 0.1
+    Opium -> 0.1,*/
+    Cotton -> 1,
+    //Herbs -> 1,
+    Timber -> 1,
+    Coal -> 1,
+    Iron -> 1,
+    //PreciousMetal -> 0.1
   )
 
-  val MaxResourcesPerRegion = 4
-  val MinResourcesPerRegion = 1
+  val MaxResourcesPerRegion = 3
+  val MinResourcesPerRegion = 2
 
   val FactoriesRarity: Map[Products.IndustryProduct, Double] = Map(
-    Lumber -> 1,
+    /*Lumber -> 1,
     Cement -> 1,
     Fabric -> 1,
     Paper -> 1,
     Glass -> 1,
     Steel -> 1,
-    Furniture -> 1,
+    Furniture -> 1,*/
     Liquor -> 1,
     Clothes -> 1,
-    Wine -> 1,
+    //Wine -> 1,
     Weapons -> 1
   )
 
-  val MinFactoriesPerRegion = 2
-  val MaxFactoriesPerRegion = 3
+  val MinFactoriesPerRegion = 1
+  val MaxFactoriesPerRegion = 2
 
   val FactoryStartingMoney = 10000
   val FactoryStartingLevel = 1
@@ -283,8 +294,8 @@ object WorldGenerationConstants {
   val TradeDaysBeforeStart = 1
   val WarriorPerPopulation = 10000
 
-  val WorldMapWidth = 50
-  val WorldMapHeight = 50
+  val WorldMapWidth = 25
+  val WorldMapHeight = 25
   val HexesPerProvince = 100
   val LandPercentage = 0.7
   val Provinces = (WorldMapHeight * WorldMapWidth * LandPercentage / HexesPerProvince).toInt

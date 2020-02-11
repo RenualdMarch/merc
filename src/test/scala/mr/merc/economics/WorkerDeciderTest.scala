@@ -43,7 +43,7 @@ class WorkerDeciderTest extends FunSuite with BeforeAndAfter {
 
     def payMoneyToPops() = ???
 
-    def payTaxes(): TaxData = ???
+    def payTaxes(): Unit = ???
 
     def endOfDay() = ???
 

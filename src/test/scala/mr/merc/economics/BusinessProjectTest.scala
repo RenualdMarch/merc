@@ -38,8 +38,8 @@ class BusinessProjectTest extends FunSuite {
       FulfilledDemandRequest(5, 1, grainRequest),
       FulfilledDemandRequest(5, 2, weaponsRequest)
     )
-    val bought = project.buyDemandedProducts(fulfilledRequsts)
-    assert(bought === 15)
+    project.buyDemandedProducts(fulfilledRequsts)
+    assert(fulfilledRequsts.map(_.currentSpentMoney).sum === 15)
     assert(project.remainingMoney === 10)
     assert(project.alreadyBoughtProducts === Map(Grain -> 5, Weapons -> 5))
     assert(project.remainingProducts === Map(Grain -> 5, Weapons -> 15))
@@ -55,8 +55,8 @@ class BusinessProjectTest extends FunSuite {
       FulfilledDemandRequest(15, 2, weaponsRequest2)
     )
 
-    val bought2 = project.buyDemandedProducts(fulfilledRequsts2)
-    assert(bought2 === 35)
+    project.buyDemandedProducts(fulfilledRequsts2)
+    assert(fulfilledRequsts2.map(_.currentSpentMoney).sum === 35)
     assert(project.remainingMoney === 25)
     assert(project.remainingProducts === Map(Grain -> 0, Weapons -> 0))
     assert(project.isComplete === true)
@@ -76,9 +76,8 @@ class BusinessProjectTest extends FunSuite {
 
     project.takeMoreMoneyFromInvestorIfNeeded(Map(Coal -> 1))
     val demand = project.demandRequests(Map(Coal -> 1))
-    val price = project.buyDemandedProducts(List(FulfilledDemandRequest(100, 1, demand.head)))
+    project.buyDemandedProducts(List(FulfilledDemandRequest(100, 1, demand.head)))
 
-    assert(price === 100)
     assert(pops(0).moneyReserves === 975)
     assert(pops(1).moneyReserves === 2925)
 
@@ -101,8 +100,7 @@ class BusinessProjectTest extends FunSuite {
     val project = new StateBuildFactory(region, Weapons, state, Map(Coal -> 100))
     project.takeMoreMoneyFromInvestorIfNeeded(Map(Coal -> 1))
     val demand = project.demandRequests(Map(Coal -> 1))
-    val price = project.buyDemandedProducts(List(FulfilledDemandRequest(100, 1, demand.head)))
-    assert(price === 100)
+    project.buyDemandedProducts(List(FulfilledDemandRequest(100, 1, demand.head)))
     assert(state.budget.moneyReserve === 900)
     assert(project.isComplete === true)
     project.executeProjectAim()

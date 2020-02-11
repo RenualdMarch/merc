@@ -21,16 +21,16 @@ class WorldMarketDayTest extends FunSuite with Matchers {
 
     // region1 produces grain and has liquor factory, region2 produces coal, region3 produces glass
 
-    val state1 = new State("", FrenchHuman, 0, new PoliticalSystem(Party.absolute)) {
-      override val taxPolicy: TaxPolicy = new TaxPolicy(Map(CorporateTax -> 0.2, LowSalaryTax -> 0.1, MiddleSalaryTax -> 0.1,
-        UpperSalaryTax -> 0.1,TariffTax -> 0.1, TransitTax -> 0.1))
-    }
+    val state1 = new State("", FrenchHuman, 0, new PoliticalSystem(Party.absolute))
+    state1.taxPolicy.set(Map(CorporateTax -> 0.2, LowSalaryTax -> 0.1, MiddleSalaryTax -> 0.1,
+      UpperSalaryTax -> 0.1,TariffTax -> 0.1, TransitTax -> 0.1))
+    state1.budget.refreshTaxPolicy()
 
     /*val state2 = new State(new StateBudget(), TaxPolicy(CorporateTaxPolicy(0),
       SalaryTaxPolicy(Map[PopulationClass, Double](Lower -> 0, Middle -> 0, Upper -> 0)),
       SalesTaxPolicy(0), TariffTax(0)))*/
 
-    val initialPrices = Products.AllProducts.map(_ -> 1000d).toMap ++ Map[Products.Product, Double](Grain -> 10, Coal -> 15, Glass -> 10, Liquor -> 100)
+    val initialPrices = Products.AllProducts.map(_ -> 1000d).toMap ++ Map[Products.Product, Double](Grain -> 10, Coal -> 15, Liquor -> 100)
 
     region1 = new EconomicRegion {
       override def owner: State = state1
@@ -77,7 +77,7 @@ class WorldMarketDayTest extends FunSuite with Matchers {
         new Population(FrenchHuman, Traders, 200, 300, 0, PoliticalViews.averagePoliticalViews)
       ))
 
-      enterprises = Vector(new IndustrialFactory(this, Glass, 1, 2000, 1000, 1, 1))
+      enterprises = Vector(new IndustrialFactory(this, Liquor, 1, 2000, 1000, 1, 1))
     }
     val regions = List(region1, region2, region3)
 

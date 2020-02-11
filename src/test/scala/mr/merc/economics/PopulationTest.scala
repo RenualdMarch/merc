@@ -3,9 +3,8 @@ package mr.merc.economics
 import mr.merc.army.WarriorViewNames
 import mr.merc.economics.Population._
 import Culture._
-import mr.merc.economics.Products.{Coal, Fruit, Grain}
+import mr.merc.economics.Products.{Coal, Grain, Liquor}
 import mr.merc.economics.TaxPolicy.MiddleSalaryTax
-import mr.merc.politics.ForeignPolicy.{Expansionism, Pacifism}
 import mr.merc.politics._
 import org.scalatest.{FunSuite, Matchers}
 import scalafx.scene.paint.Color
@@ -17,7 +16,7 @@ class PopulationTest extends FunSuite with Matchers {
   val smallNeeds:Map[PopulationNeedsType, Map[Products.Product, Double]] = Map(
     LifeNeeds -> Map(Grain -> 2.0, Coal -> 1.0),
     RegularNeeds -> Map(Grain -> 3.0, Coal -> 2.0),
-    LuxuryNeeds -> Map(Fruit -> 3.0))
+    LuxuryNeeds -> Map(Liquor -> 3.0))
 
   case object TestRace extends Race
   object TestCulture extends Culture("test",TestRace, "testHouse", Color.Black) {
@@ -25,7 +24,9 @@ class PopulationTest extends FunSuite with Matchers {
     override val warriorViewNames: WarriorViewNames = null
     override val cultureInfo: Culture.CultureInfo = null
 
-    override def needs: PopulationNeeds = Map(Upper -> smallNeeds, Middle -> smallNeeds, Lower -> smallNeeds)
+    private val map: CornerPopulationNeeds = Map(Upper -> smallNeeds, Middle -> smallNeeds, Lower -> smallNeeds)
+
+    override def needs: PopulationNeeds = PopulationNeeds(map, map)
   }
   def newPopulation(money: Double) = new Population(TestCulture, Traders, 1000, money, 0, PoliticalViews.averagePoliticalViews)
 
@@ -35,21 +36,21 @@ class PopulationTest extends FunSuite with Matchers {
       assert(pop.calculateDemands(prices) === demands)
     }
 
-    val prices1 = Map[Products.Product, Double](Grain -> 1.0, Fruit -> 2.0)
-    val prices2 = Map[Products.Product, Double](Grain -> 2.0, Fruit -> 1.0)
-    val prices3 = Map[Products.Product, Double](Grain -> 1.0, Fruit -> 2.0, Coal -> 0.5)
+    val prices1 = Map[Products.Product, Double](Grain -> 1.0, Liquor -> 2.0)
+    val prices2 = Map[Products.Product, Double](Grain -> 2.0, Liquor -> 1.0)
+    val prices3 = Map[Products.Product, Double](Grain -> 1.0, Liquor -> 2.0, Coal -> 0.5)
 
     assertDemands(0, prices1, Map())
     assertDemands(500, prices1, Map(Grain -> 500))
     assertDemands(1500, prices1, Map(Grain -> 1500))
     assertDemands(5000, prices1, Map(Grain -> 5000))
-    assertDemands(6000, prices1, Map(Grain -> 5000, Fruit -> 500))
-    assertDemands(11000, prices1, Map(Grain -> 5000, Fruit -> 3000))
-    assertDemands(12000, prices1, Map(Grain -> 5000, Fruit -> 3000))
+    assertDemands(6000, prices1, Map(Grain -> 5000, Liquor -> 500))
+    assertDemands(11000, prices1, Map(Grain -> 5000, Liquor -> 3000))
+    assertDemands(12000, prices1, Map(Grain -> 5000, Liquor -> 3000))
 
     assertDemands(5000, prices2, Map(Grain -> 2500))
     assertDemands(10000, prices2, Map(Grain -> 5000))
-    assertDemands(11000, prices2, Map(Grain -> 5000, Fruit -> 1000))
+    assertDemands(11000, prices2, Map(Grain -> 5000, Liquor -> 1000))
 
     assertDemands(500, prices3, Map(Coal -> 1000))
     assertDemands(1000, prices3, Map(Coal -> 1000, Grain -> 500))
@@ -58,17 +59,15 @@ class PopulationTest extends FunSuite with Matchers {
     assertDemands(3500, prices3, Map(Coal -> 3000, Grain -> 2000))
     assertDemands(4500, prices3, Map(Coal -> 3000, Grain -> 3000))
     assertDemands(6500, prices3, Map(Coal -> 3000, Grain -> 5000))
-    assertDemands(7500, prices3, Map(Coal -> 3000, Grain -> 5000, Fruit -> 500))
+    assertDemands(7500, prices3, Map(Coal -> 3000, Grain -> 5000, Liquor -> 500))
   }
 
   test("fulfill demands") {
     val pop1 = newPopulation(15000)
 
-    val price1 = pop1.buyDemandedProducts(List(FulfilledDemandRequest(5000, 1, PopulationDemandRequest(pop1, Grain, 5000)),
-      FulfilledDemandRequest(3000, 2, PopulationDemandRequest(pop1, Fruit, 3000)), FulfilledDemandRequest(3000, 0.5,
+    pop1.buyDemandedProducts(List(FulfilledDemandRequest(5000, 1, PopulationDemandRequest(pop1, Grain, 5000)),
+      FulfilledDemandRequest(3000, 2, PopulationDemandRequest(pop1, Liquor, 3000)), FulfilledDemandRequest(3000, 0.5,
         PopulationDemandRequest(pop1, Coal, 3000))))
-
-    assert(price1 === 12500)
 
     assert(pop1.moneyReserves === 2500)
 
@@ -76,22 +75,19 @@ class PopulationTest extends FunSuite with Matchers {
     assert(pop1.currentDayRecord.productFulfillment.needsFulfillment === Map(LifeNeeds -> 1, RegularNeeds -> 1, LuxuryNeeds -> 1))
 
     val pop2 = newPopulation(1000)
-    val price2 = pop2.buyDemandedProducts(List(FulfilledDemandRequest(0, 1, PopulationDemandRequest(pop2, Grain, 1000)),
-      FulfilledDemandRequest(0, 2, PopulationDemandRequest(pop2, Fruit, 1000)),
+   pop2.buyDemandedProducts(List(FulfilledDemandRequest(0, 1, PopulationDemandRequest(pop2, Grain, 1000)),
+      FulfilledDemandRequest(0, 2, PopulationDemandRequest(pop2, Liquor, 1000)),
       FulfilledDemandRequest(0, 0.5, PopulationDemandRequest(pop2, Coal, 1000))))
 
-    assert(price2 === 0)
     assert(pop2.moneyReserves === 1000)
     pop2.fulfillNeedsUsingAlreadyReceivedProducts()
     assert(pop2.currentDayRecord.productFulfillment.needsFulfillment === Map(LifeNeeds -> 0, RegularNeeds -> 0, LuxuryNeeds -> 0))
 
 
     val pop3 = newPopulation(15000)
-    val price3 = pop3.buyDemandedProducts(List(FulfilledDemandRequest(500, 1,  PopulationDemandRequest(pop3, Grain, 5000)),
-      FulfilledDemandRequest(1500, 2, PopulationDemandRequest(pop3, Fruit, 1500)),
+    pop3.buyDemandedProducts(List(FulfilledDemandRequest(500, 1,  PopulationDemandRequest(pop3, Grain, 5000)),
+      FulfilledDemandRequest(1500, 2, PopulationDemandRequest(pop3, Liquor, 1500)),
       FulfilledDemandRequest(2000, 0.5, PopulationDemandRequest(pop3, Coal, 3000))))
-
-    assert(price3 === 4500)
 
     assert(pop3.moneyReserves === 10500)
     pop3.fulfillNeedsUsingAlreadyReceivedProducts()
@@ -102,7 +98,7 @@ class PopulationTest extends FunSuite with Matchers {
     val pop = newPopulation(1000)
     pop.newDay(new TaxPolicy(Map(MiddleSalaryTax -> 0.1)), 1)
     pop.receiveSalary(10000)
-    assert(pop.moneyReserves === 10000)
+    assert(pop.moneyReserves === 11000)
     pop.endOfDay()
     assert(pop.salary.head.totalMoney === 10000)
     pop.salary.head.taxes shouldBe 1000d +- 0.00001
@@ -187,12 +183,12 @@ class PopulationTest extends FunSuite with Matchers {
 
 
     pop.buyDemandedProducts(List(FulfilledDemandRequest(6000, 1, PopulationDemandRequest(pop, Grain, 6000)),
-      FulfilledDemandRequest(4000, 2, PopulationDemandRequest(pop, Fruit, 4000)), FulfilledDemandRequest(4000, 0.5,
+      FulfilledDemandRequest(4000, 2, PopulationDemandRequest(pop, Liquor, 4000)), FulfilledDemandRequest(4000, 0.5,
         PopulationDemandRequest(pop, Coal, 4000))))
 
 
     pop2.buyDemandedProducts(List(FulfilledDemandRequest(600, 1, PopulationDemandRequest(pop2, Grain, 600)),
-      FulfilledDemandRequest(400, 2, PopulationDemandRequest(pop2, Fruit, 400)), FulfilledDemandRequest(400, 0.5,
+      FulfilledDemandRequest(400, 2, PopulationDemandRequest(pop2, Liquor, 400)), FulfilledDemandRequest(400, 0.5,
         PopulationDemandRequest(pop2, Coal, 400))))
 
     pop.fulfillNeedsUsingAlreadyReceivedProducts()
@@ -240,7 +236,7 @@ class PopulationTest extends FunSuite with Matchers {
 
 
     pop.buyDemandedProducts(List(FulfilledDemandRequest(6000, 1, PopulationDemandRequest(pop, Grain, 6000)),
-      FulfilledDemandRequest(4000, 2, PopulationDemandRequest(pop, Fruit, 4000)), FulfilledDemandRequest(4000, 0.5,
+      FulfilledDemandRequest(4000, 2, PopulationDemandRequest(pop, Liquor, 4000)), FulfilledDemandRequest(4000, 0.5,
         PopulationDemandRequest(pop, Coal, 4000))))
     pop2.buyDemandedProducts(Nil)
 
@@ -288,7 +284,7 @@ class PopulationTest extends FunSuite with Matchers {
 
     pop.buyDemandedProducts(Nil)
     pop2.buyDemandedProducts(List(FulfilledDemandRequest(600, 1, PopulationDemandRequest(pop2, Grain, 600)),
-      FulfilledDemandRequest(400, 2, PopulationDemandRequest(pop2, Fruit, 400)), FulfilledDemandRequest(400, 0.5,
+      FulfilledDemandRequest(400, 2, PopulationDemandRequest(pop2, Liquor, 400)), FulfilledDemandRequest(400, 0.5,
         PopulationDemandRequest(pop2, Coal, 400))))
 
 
@@ -326,7 +322,7 @@ class PopulationTest extends FunSuite with Matchers {
 
 
     pop.buyDemandedProducts(List(FulfilledDemandRequest(6000, 1, PopulationDemandRequest(pop, Grain, 6000)),
-      FulfilledDemandRequest(4000, 2, PopulationDemandRequest(pop, Fruit, 4000)), FulfilledDemandRequest(4000, 0.5,
+      FulfilledDemandRequest(4000, 2, PopulationDemandRequest(pop, Liquor, 4000)), FulfilledDemandRequest(4000, 0.5,
         PopulationDemandRequest(pop, Coal, 4000))))
 
 
@@ -352,10 +348,10 @@ class PopulationTest extends FunSuite with Matchers {
     val regionPopulation = new RegionPopulation(List(pop, pop2))
 
     pop.buyDemandedProducts(List(FulfilledDemandRequest(6000, 1, PopulationDemandRequest(pop, Grain, 6000)),
-      FulfilledDemandRequest(4000, 2, PopulationDemandRequest(pop, Fruit, 4000)), FulfilledDemandRequest(4000, 0.5,
+      FulfilledDemandRequest(4000, 2, PopulationDemandRequest(pop, Liquor, 4000)), FulfilledDemandRequest(4000, 0.5,
         PopulationDemandRequest(pop, Coal, 4000))))
     pop2.buyDemandedProducts(List(FulfilledDemandRequest(6000, 1, PopulationDemandRequest(pop2, Grain, 6000)),
-      FulfilledDemandRequest(4000, 2, PopulationDemandRequest(pop2, Fruit, 4000)), FulfilledDemandRequest(4000, 0.5,
+      FulfilledDemandRequest(4000, 2, PopulationDemandRequest(pop2, Liquor, 4000)), FulfilledDemandRequest(4000, 0.5,
         PopulationDemandRequest(pop2, Coal, 4000))))
 
 
@@ -429,7 +425,7 @@ class PopulationTest extends FunSuite with Matchers {
     val pop1 = new Population(TestCulture, Traders, 1000, 15000, 0, PoliticalViews.averagePoliticalViews)
 
     pop1.buyDemandedProducts(List(FulfilledDemandRequest(5000, 1, PopulationDemandRequest(pop1, Grain, 5000)),
-      FulfilledDemandRequest(3000, 2, PopulationDemandRequest(pop1, Fruit, 3000)), FulfilledDemandRequest(3000, 0.5,
+      FulfilledDemandRequest(3000, 2, PopulationDemandRequest(pop1, Liquor, 3000)), FulfilledDemandRequest(3000, 0.5,
         PopulationDemandRequest(pop1, Coal, 3000))))
 
     pop1.fulfillNeedsUsingAlreadyReceivedProducts()
@@ -437,7 +433,7 @@ class PopulationTest extends FunSuite with Matchers {
 
     val pop2 = new Population(TestCulture, Traders, 1000, 1000, 100, PoliticalViews.averagePoliticalViews)
     pop2.buyDemandedProducts(List(FulfilledDemandRequest(0, 1, PopulationDemandRequest(pop2, Grain, 1000)),
-      FulfilledDemandRequest(0, 2, PopulationDemandRequest(pop2, Fruit, 1000)),
+      FulfilledDemandRequest(0, 2, PopulationDemandRequest(pop2, Liquor, 1000)),
       FulfilledDemandRequest(0, 0.5, PopulationDemandRequest(pop2, Coal, 1000))))
     pop2.fulfillNeedsUsingAlreadyReceivedProducts()
     assert(pop2.currentDayRecord.productFulfillment.needsFulfillment === Map(LifeNeeds -> 0, RegularNeeds -> 0, LuxuryNeeds -> 0))

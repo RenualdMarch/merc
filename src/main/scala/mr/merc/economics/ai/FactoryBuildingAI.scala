@@ -22,12 +22,16 @@ class RandomFactoryBuildingAI extends FactoryBuildingAI {
 
   override def factoryCommands(currentRegion: EconomicRegion, state: WorldStateEnterpriseActions):List[FactoryCommand] = {
     val investors = currentRegion.regionPopulation.popsByType(Capitalists)
-    val totalMoney = investors.map(_.moneyReserves).sum
+    val moneyForNeeds = currentRegion.moneyToFulfillNeeds(Capitalists).values.sum
+    val totalMoney = Math.max(0, investors.map(_.moneyReserves).sum - moneyForNeeds)
     val prices = currentRegion.regionMarket.currentPrices
     val factoryBuildCost = state.factoryBuildCost(currentRegion.owner) dot prices
     val factoryExpandCost = state.factoryExpandCost(currentRegion.owner) dot prices
     val maxTask = Math.max(factoryBuildCost, factoryExpandCost)
-    val productsSize = (totalMoney / maxTask).toInt
+    val projects = currentRegion.projects.collect {
+      case p:PopulationBusinessProject => p
+    }.size
+    val productsSize = Math.max(0, (totalMoney / maxTask).toInt - projects)
     val random = new WeightedRandom(Products.IndustryProducts.map(p => p -> 1d).toMap)
     val productsToChange = random.nextRandomItems(productsSize).groupBy(identity).mapValues(_.size) -- noNeedToAddMore(currentRegion)
     val presentProducts = currentRegion.presentFactoriesAndProjects

@@ -27,8 +27,14 @@ class Population(val culture: Culture, val populationType: PopulationType, priva
 
   def populationCount: Int = count.toInt
 
-  def needs: Map[PopulationNeedsType, Map[Products.Product, Double]] = culture.needs(populationType.populationClass).
-    map { case (nt, m) => nt -> m.mapValues(_ * count * efficiency) }
+  def needs: Map[PopulationNeedsType, Map[Products.Product, Double]] = {
+    val illit = culture.needs.illiterateNeeds(populationType.populationClass)
+    val lit = culture.needs.literateNeeds(populationType.populationClass)
+
+    val total = (lit |**| literacy) |++| (illit |**| (1 - literacy))
+
+    total.map { case (nt, m) => nt -> m.mapValues(_ * count * efficiency) }
+  }
 
   def needsFulfillment(i: Int):Vector[ProductFulfillmentRecord] = populationDayRecords.takeRight(i).map(_.productFulfillment)
 
@@ -174,6 +180,7 @@ class Population(val culture: Culture, val populationType: PopulationType, priva
     this.tax = stateTaxPolicy.tax(taxPolicy, bureaucratsPercentage)
     this.currentPopulationDayRecord = PopulationDayRecord(populationCount, 0, 0, 0, 0,
       new ProductFulfillmentRecord(Map(), needs, Map()))
+    this.currentPrices = Map()
   }
 
   def endOfDay(): Unit = {
@@ -211,21 +218,19 @@ class Population(val culture: Culture, val populationType: PopulationType, priva
 
   private var alreadyReceivedProducts: List[FulfilledDemandRequest] = Nil
 
-  def buyDemandedProducts(requests: List[FulfilledDemandRequest]): Double = {
+  def buyDemandedProducts(requests: List[FulfilledDemandRequest]): Unit = {
     assert(requests.forall(r => r.request.asInstanceOf[PopulationDemandRequest].pop == this))
 
-    currentPrices = requests.map { f =>
+    currentPrices ++= requests.map { f =>
       f.request.product -> f.price
     }.toMap
 
     alreadyReceivedProducts ++= requests
 
-    val spentMoney = requests.foldLeft(0d) { case (sum, request) =>
-      sum + request.bought * request.price
+    requests.foreach { request =>
+      request.currentSpentMoney += request.spentMoney
+      currentMoney -= request.spentMoney
     }
-
-    currentMoney = currentMoney - spentMoney
-    spentMoney
   }
 
   def fulfillNeedsUsingAlreadyReceivedProducts(): Unit = {
@@ -235,18 +240,23 @@ class Population(val culture: Culture, val populationType: PopulationType, priva
 
     val productFulfillment = new ProductFulfillmentRecord(currentPrices, needs, receivedProductsMap)
     this.currentPopulationDayRecord = currentPopulationDayRecord.copy(productFulfillment = productFulfillment)
+    alreadyReceivedProducts = Nil
   }
 
   // TODO add info about salary sources
   def receiveSalary(salary: Double, payTax: Boolean = true): Unit = {
     val taxPart = if (payTax) tax * salary else 0
 
-    currentMoney = salary + currentMoney - taxPart
+    currentMoney = salary + currentMoney
     val r = this.currentPopulationDayRecord
-    this.currentPopulationDayRecord = this.currentPopulationDayRecord.copy(populationCount, r.receivedMoney + salary, currentMoney, r.taxes + taxPart)
+    this.currentPopulationDayRecord = this.currentPopulationDayRecord.copy(populationCount, r.receivedMoney + salary, currentMoney - taxPart, r.taxes + taxPart)
   }
 
-  def payTaxes(): TaxData = TaxData(taxPolicy, this.currentPopulationDayRecord.totalMoney, this.currentPopulationDayRecord.taxes)
+  def payTaxes(region:EconomicRegion): Unit = {
+    this.currentMoney -= this.currentPopulationDayRecord.taxes
+    val td = TaxData(taxPolicy, this.currentPopulationDayRecord.receivedMoney, this.currentPopulationDayRecord.taxes)
+    region.owner.budget.receiveTaxes(td)
+  }
 
 
   override def toString: String = s"$culture $populationType"
@@ -339,9 +349,6 @@ object Population {
   // They are also best soldiers
   case object Aristocrats extends PopulationType(Upper)
 
-  // same as usual aristocrats
-  case object MagicalAristocrats extends PopulationType(Upper)
-
   val PopulationPromotionDemotion: Map[PopulationType, List[PopulationType]] = Map(
     Craftsmen -> List(Farmers, Labourers, Bureaucrats, Traders, Clergy),
     Farmers -> List(Craftsmen, Labourers, Bureaucrats, Traders, Clergy),
@@ -349,23 +356,23 @@ object Population {
     Bureaucrats -> List(Farmers, Labourers, Craftsmen, Scholars, Traders, Clergy, Capitalists, Aristocrats),
     Scholars -> List(Bureaucrats, Traders, Capitalists, Aristocrats, Clergy),
     Clergy -> List(Craftsmen, Farmers, Labourers, Bureaucrats, Scholars, Traders, Capitalists, Aristocrats),
-    Mages -> List(MagicalAristocrats),
     Traders -> List(Craftsmen, Farmers, Labourers, Bureaucrats, Scholars, Clergy, Capitalists, Aristocrats),
     Capitalists -> List(Aristocrats, Traders, Clergy, Scholars, Bureaucrats),
-    Aristocrats -> List(Capitalists, Traders, Clergy, Scholars, Bureaucrats),
-    MagicalAristocrats -> List(Mages)
+    Aristocrats -> List(Capitalists, Traders, Clergy, Scholars, Bureaucrats)
   )
 
   def populationTypes: List[PopulationType] =
     List(Craftsmen, Farmers, Labourers, Bureaucrats, Clergy,
-      Scholars, Traders, Mages, Capitalists, Aristocrats, MagicalAristocrats)
+      Scholars, Traders, Mages, Capitalists, Aristocrats)
 
   def populationTypesByClass: Map[PopulationClass, List[PopulationType]] =
     populationTypes.groupBy(_.populationClass)
 
   type ProductBracket = Map[Products.Product, Double]
 
-  type PopulationNeeds = Map[PopulationClass, Map[PopulationNeedsType, ProductBracket]]
+  type CornerPopulationNeeds = Map[PopulationClass, Map[PopulationNeedsType, ProductBracket]]
+
+  case class PopulationNeeds(illiterateNeeds: CornerPopulationNeeds, literateNeeds: CornerPopulationNeeds)
 
   // removed sealed for test purposes only
   abstract class Race extends scala.Product with Serializable {

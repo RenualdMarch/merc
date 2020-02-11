@@ -91,9 +91,11 @@ class StatesTablePane(actions: WorldStateDiplomacyActions, currentState: State) 
 }
 
 class StateDiplomacyPane(currentState:State, selectedState:State, actions: WorldStateDiplomacyActions, stage: Stage) extends MigPane {
-  val relations = new StateRelationsPane(currentState, selectedState, actions)
-  val agreements = new StateAgreementsAndClaimsPane(selectedState, actions)
-  val stateActions = new StateActionsPane(currentState, selectedState, actions, stage)
+  private val relations = new StateRelationsPane(currentState, selectedState, actions)
+  private val agreements = new StateAgreementsAndClaimsPane(selectedState, actions)
+  private val stateActions = if (currentState == selectedState) new Pane().delegate
+  else new StateActionsPane(currentState, selectedState, actions, stage)
+
 
   add(relations, "grow")
   add(stateActions, "wrap")

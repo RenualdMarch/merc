@@ -23,9 +23,15 @@ class TaxPolicy(private var taxes:Map[Income, Double]) {
   def tax(income: Income, bureaucratsPercentage:Double): Double = taxes.getOrElse(income, 0d) *
     WorldConstants.Taxes.taxCollectionPart(bureaucratsPercentage)
 
+  def taxPolicyValues:Map[Income, Double] = taxes
+
   def taxPolicyValue(income: Income):Double = taxes(income)
 
   def set(income: Income, v: Double): Unit = {
     taxes += income -> v
+  }
+
+  def set(map:Map[Income, Double]): Unit ={
+    taxes ++= map
   }
 }
