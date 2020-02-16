@@ -66,7 +66,6 @@ object WorldConstants {
       )
     )
 
-    val HappinessDayCount = 5
     val HappinessLifeNeedsMultiplier = 1
     val HappinessRegularNeedsMultiplier = 1
     val HappinessLuxuryNeedsMultiplier = 1

@@ -39,20 +39,17 @@ class Population(val culture: Culture, val populationType: PopulationType, priva
 
   def needsFulfillment(i: Int):Vector[ProductFulfillmentRecord] = populationDayRecords.takeRight(i).map(_.productFulfillment)
 
-  // last $HappinessDayCount turns
   def consumptionHappiness: Double = {
-    val n = List(currentDayRecord.productFulfillment)//needsFulfillment(HappinessDayCount)
-    val sum = HappinessLifeNeedsMultiplier + HappinessRegularNeedsMultiplier + HappinessLuxuryNeedsMultiplier
+    if (populationCount == 0) return EmptyPopConsumptionHappiness
 
-    if (n.isEmpty) {
-      EmptyPopConsumptionHappiness
-    } else {
-      n.map { f =>
+    populationDayRecords.lastOption.map(_.productFulfillment) match {
+      case None => EmptyPopConsumptionHappiness
+      case Some(f) =>
+        val sum = HappinessLifeNeedsMultiplier + HappinessRegularNeedsMultiplier + HappinessLuxuryNeedsMultiplier
         val needs = f.needsFulfillment(LifeNeeds) * HappinessLifeNeedsMultiplier +
           f.needsFulfillment(RegularNeeds) * HappinessRegularNeedsMultiplier +
           f.needsFulfillment(LuxuryNeeds) * HappinessLuxuryNeedsMultiplier
         needs / sum
-      }.sum / n.size
     }
   }
 
