@@ -25,6 +25,9 @@ object EconomicLocalization {
   def localizePopulation(p: Population, province: Province): String = Localization("population.title",
     p.culture.race.name, p.culture.name, p.populationType.name, province.name)
 
+  def localizePopulation(p: Population): String = Localization("population.titleSmall",
+    p.culture.race.name, p.culture.name, p.populationType.name)
+
   def localizeProject(project:BusinessProject):String = {
     project match {
       case p:PopulationExpandFactory => Localization("project.private.expandFactory", Localization(p.factory.product.name))

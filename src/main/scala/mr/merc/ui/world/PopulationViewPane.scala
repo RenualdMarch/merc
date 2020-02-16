@@ -7,14 +7,15 @@ import mr.merc.local.Localization
 import mr.merc.politics._
 import mr.merc.ui.world.PieChartBuilder.PiePart
 import org.tbee.javafx.scene.layout.MigPane
-import scalafx.scene.layout.Pane
+import scalafx.scene.layout.{BorderPane, ColumnConstraints, GridPane, Pane}
 import scalafx.Includes._
 import scalafx.beans.property.{ReadOnlyObjectProperty, StringProperty}
 import scalafx.collections.ObservableBuffer
 import scalafx.scene.Node
 import scalafx.scene.control._
 import EconomicLocalization._
-import scalafx.geometry.Side
+import mr.merc.economics.PopulationMigrationInsideProvince.PopulationProvinceMovement
+import scalafx.geometry.{Pos, Side}
 import mr.merc.util.FxPropertyUtils._
 import scalafx.scene.control.TabPane.TabClosingPolicy
 
@@ -158,14 +159,18 @@ class PopDetailsPane(populationProperty: ReadOnlyObjectProperty[PopulationInfo],
     }
   }
 
-
+  private val migrationsPane = new Tab() {
+    text = Localization("migrations")
+    style = Components.largeFontStyle
+    content <== populationProperty.map(info => new PopulationMigrationsPane(info.population).delegate)
+  }
 
   private val tabPane = new TabPane() {
     style = Components.mediumFontStyle
     tabClosingPolicy = TabClosingPolicy.Unavailable
   }
 
-  tabPane.tabs = List(generalInfoPane, politicalViewsPane, populationNeedsPane())
+  tabPane.tabs = List(generalInfoPane, politicalViewsPane, populationNeedsPane(), migrationsPane)
 
   add(tabPane, "grow,push")
 
@@ -179,7 +184,6 @@ class PopDetailsPane(populationProperty: ReadOnlyObjectProperty[PopulationInfo],
 
   private def popToPie[T <: IssuePosition](f:PopulationInfo => Map[T, Double], issue:Issue[T]):Pane =
     new PropertyDependentPane[PopulationInfo](populationProperty, p => politicalPointsToPie(f(p), issue))
-
 
   private def politicalPointsToPie[T <: IssuePosition](position: Map[T, Double], issue:Issue[T]):Node = {
     val pies = position.map {case (k, v) => PiePart(k.color, k.name, v * 100, Some(k.name + " " + DoubleFormatter().format(v * 100) + "%"))}.toList
@@ -286,6 +290,59 @@ class PopulationInfo(val population:List[Population], province: Province) {
       case x :: _ if population.forall(_.populationType.populationClass == Middle) => Localization("population.title.middle", x.culture.race.name, x.culture.name, province.name)
       case x :: _ if population.forall(_.populationType.populationClass == Lower) => Localization("population.title.lower", x.culture.race.name, x.culture.name, province.name)
       case _ => Localization("population.title.all", province.name)
+    }
+  }
+}
+
+class PopulationMigrationsPane(val population:List[Population]) extends ScrollPane {
+  fitToWidth = true
+  content = new MigPane() {
+    add(BigText(Localization("migrations.province")), "wrap, center")
+    population.groupBy(_.populationType).foreach { case (pt, popList) =>
+      val provinceMovements = popList.flatMap(_.currentDayRecord.provinceMovements)
+      if (provinceMovements.nonEmpty) {
+        add(BigText(pt.name), "wrap, center, grow, push, span")
+        add(migrationTable(provinceMovements), "wrap, grow, span")
+      }
+    }
+  }
+
+  private def migrationTable(movements:List[PopulationProvinceMovement]): GridPane = {
+    def mediumText(label:String): Node = new BorderPane {
+      left = MediumText(label)
+      style = "-fx-border-color: black;-fx-border-width: 1 1 1 1; -fx-padding: 10 10 10 10;"
+    }
+
+    val colFrom = new ColumnConstraints {
+      percentWidth = 40
+      fitToWidth = true
+    }
+
+    val colTo = new ColumnConstraints {
+      percentWidth = 40
+      fitToWidth = true
+    }
+
+    val colCount  = new ColumnConstraints {
+      percentWidth = 20
+      fitToWidth = true
+    }
+
+    new GridPane {
+      style = Components.mediumFontStyle
+      alignment = Pos.Center
+
+      columnConstraints = List(colFrom, colTo, colCount)
+
+      add(mediumText(Localization("from")), 0, 0)
+      add(mediumText(Localization("to")), 1, 0)
+      add(mediumText(Localization("count")), 2, 0)
+
+      movements.zipWithIndex.foreach { case (m, i) =>
+        add(mediumText(EconomicLocalization.localizePopulation(m.from)), 0, i+1)
+        add(mediumText(EconomicLocalization.localizePopulation(m.to)), 1, i+1)
+        add(mediumText(m.count.toString), 2, i+1)
+      }
     }
   }
 }

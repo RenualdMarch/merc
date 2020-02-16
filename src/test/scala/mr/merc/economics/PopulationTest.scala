@@ -172,146 +172,6 @@ class PopulationTest extends FunSuite with Matchers {
     assert(m8.totalCount === 10)
   }
 
-  test("promotion") {
-    val random = new Random(0) {
-      override def nextInt(n: Int): Int = 0
-    }
-
-    val pop = new Population(TestCulture, Traders, 1000, 10000, 100, PoliticalViews.averagePoliticalViews)
-    val pop2 = new Population(TestCulture, Capitalists, 10, 1000, 10, PoliticalViews.averagePoliticalViews)
-    val regionPopulation = new RegionPopulation(List(pop, pop2))
-
-
-    pop.buyDemandedProducts(List(FulfilledDemandRequest(6000, 1, PopulationDemandRequest(pop, Grain, 6000)),
-      FulfilledDemandRequest(4000, 2, PopulationDemandRequest(pop, Liquor, 4000)), FulfilledDemandRequest(4000, 0.5,
-        PopulationDemandRequest(pop, Coal, 4000))))
-
-
-    pop2.buyDemandedProducts(List(FulfilledDemandRequest(600, 1, PopulationDemandRequest(pop2, Grain, 600)),
-      FulfilledDemandRequest(400, 2, PopulationDemandRequest(pop2, Liquor, 400)), FulfilledDemandRequest(400, 0.5,
-        PopulationDemandRequest(pop2, Coal, 400))))
-
-    pop.fulfillNeedsUsingAlreadyReceivedProducts()
-    pop2.fulfillNeedsUsingAlreadyReceivedProducts()
-
-    assert(pop.currentDayRecord.productFulfillment.needsFulfillment === Map(LifeNeeds -> 1, RegularNeeds -> 1, LuxuryNeeds -> 1))
-    assert(pop2.currentDayRecord.productFulfillment.needsFulfillment === Map(LifeNeeds -> 1, RegularNeeds -> 1, LuxuryNeeds -> 1))
-    assert(pop.consumptionHappiness === 1d)
-    assert(pop2.consumptionHappiness === 1d)
-
-
-    val ppd = new PopulationPromotionDemotion(regionPopulation, random, Map().withDefaultValue(1d))
-    ppd.promoteOrDemote()
-    val traders = regionPopulation.pop(Traders, TestCulture)
-    assert(traders.populationCount === 965)
-    assert(traders.literateCount === 70)
-
-    // promotion from traders
-    val capitalists = regionPopulation.pop(Capitalists, TestCulture)
-    assert(capitalists.populationCount === 39)
-    assert(capitalists.literateCount === 39)
-
-
-    // movement from capitalists
-    val aristocrats = regionPopulation.pop(Aristocrats, TestCulture)
-    assert(aristocrats.populationCount === 1)
-    assert(aristocrats.literateCount === 1)
-
-
-    // random movement from traders
-    val craftsmen = regionPopulation.pop(Craftsmen, TestCulture)
-    assert(craftsmen.populationCount === 5)
-    assert(craftsmen.literateCount === 0)
-
-  }
-
-  test("no promotion") {
-    val random = new Random(0) {
-      override def nextInt(n: Int): Int = 0
-    }
-
-    val pop = new Population(TestCulture, Traders, 1000, 10000, 100, PoliticalViews.averagePoliticalViews)
-    val pop2 = new Population(TestCulture, Capitalists, 10, 0, 10, PoliticalViews.averagePoliticalViews)
-    val regionPopulation = new RegionPopulation(List(pop, pop2))
-
-
-    pop.buyDemandedProducts(List(FulfilledDemandRequest(6000, 1, PopulationDemandRequest(pop, Grain, 6000)),
-      FulfilledDemandRequest(4000, 2, PopulationDemandRequest(pop, Liquor, 4000)), FulfilledDemandRequest(4000, 0.5,
-        PopulationDemandRequest(pop, Coal, 4000))))
-    pop2.buyDemandedProducts(Nil)
-
-
-    pop.fulfillNeedsUsingAlreadyReceivedProducts()
-    pop2.fulfillNeedsUsingAlreadyReceivedProducts()
-    regionPopulation.pops.foreach(_.endOfDay())
-    assert(pop.currentDayRecord.productFulfillment.needsFulfillment === Map(LifeNeeds -> 1, RegularNeeds -> 1, LuxuryNeeds -> 1))
-    assert(pop2.currentDayRecord.productFulfillment.needsFulfillment === Map(LifeNeeds -> 0, RegularNeeds -> 0, LuxuryNeeds -> 0))
-    assert(pop.consumptionHappiness === 1d)
-    assert(pop2.consumptionHappiness === 0d)
-
-    val ppd = new PopulationPromotionDemotion(regionPopulation, random, Map().withDefaultValue(1d))
-    ppd.promoteOrDemote()
-    val traders = regionPopulation.pop(Traders, TestCulture)
-    assert(traders.populationCount === 996)
-    assert(traders.literateCount === 101)
-
-    // promotion from traders
-    val capitalists = regionPopulation.pop(Capitalists, TestCulture)
-    assert(capitalists.populationCount === 8)
-    assert(capitalists.literateCount === 8)
-
-    // movement from capitalists
-    val aristocrats = regionPopulation.pop(Aristocrats, TestCulture)
-    assert(aristocrats.populationCount === 1)
-    assert(aristocrats.literateCount === 1)
-
-    // random movement from traders
-    val craftsmen = regionPopulation.pop(Craftsmen, TestCulture)
-    assert(craftsmen.populationCount === 5)
-    assert(craftsmen.literateCount === 0)
-  }
-
-  test("demotion") {
-    val random = new Random(0) {
-      override def nextInt(n: Int): Int = 0
-    }
-
-    val pop = new Population(TestCulture, Traders, 1000, 10000, 100, PoliticalViews.averagePoliticalViews)
-    val pop2 = new Population(TestCulture, Farmers, 10, 0, 0, PoliticalViews.averagePoliticalViews)
-
-    val regionPopulation = new RegionPopulation(List(pop, pop2))
-
-
-    pop.buyDemandedProducts(Nil)
-    pop2.buyDemandedProducts(List(FulfilledDemandRequest(600, 1, PopulationDemandRequest(pop2, Grain, 600)),
-      FulfilledDemandRequest(400, 2, PopulationDemandRequest(pop2, Liquor, 400)), FulfilledDemandRequest(400, 0.5,
-        PopulationDemandRequest(pop2, Coal, 400))))
-
-
-    pop.fulfillNeedsUsingAlreadyReceivedProducts()
-    pop2.fulfillNeedsUsingAlreadyReceivedProducts()
-    regionPopulation.pops.foreach(_.endOfDay())
-    assert(pop.currentDayRecord.productFulfillment.needsFulfillment === Map(LifeNeeds -> 0, RegularNeeds -> 0, LuxuryNeeds -> 0))
-    assert(pop2.currentDayRecord.productFulfillment.needsFulfillment === Map(LifeNeeds -> 1, RegularNeeds -> 1, LuxuryNeeds -> 1))
-    assert(pop.consumptionHappiness === 0d)
-    assert(pop2.consumptionHappiness === 1d)
-
-    val ppd = new PopulationPromotionDemotion(regionPopulation, random, Map().withDefaultValue(1d))
-    ppd.promoteOrDemote()
-    val traders = regionPopulation.pop(Traders, TestCulture)
-    assert(traders.populationCount === 965)
-    assert(traders.literateCount === 100)
-
-    val farmers = regionPopulation.pop(Farmers, TestCulture)
-    assert(farmers.populationCount === 39)
-    assert(farmers.literateCount === 0)
-
-    // random movement from traders and farmers
-    val craftsmen = regionPopulation.pop(Craftsmen, TestCulture)
-    assert(craftsmen.populationCount === 6)
-    assert(craftsmen.literateCount === 0)
-  }
-
   test("no promotion or demotion when nowhere to promote or demote") {
     val random = new Random(0) {
       override def nextInt(n: Int): Int = 0
@@ -325,56 +185,14 @@ class PopulationTest extends FunSuite with Matchers {
       FulfilledDemandRequest(4000, 2, PopulationDemandRequest(pop, Liquor, 4000)), FulfilledDemandRequest(4000, 0.5,
         PopulationDemandRequest(pop, Coal, 4000))))
 
-
-
     pop.fulfillNeedsUsingAlreadyReceivedProducts()
     regionPopulation.pops.foreach(_.endOfDay())
     assert(pop.currentDayRecord.productFulfillment.needsFulfillment === Map(LifeNeeds -> 1, RegularNeeds -> 1, LuxuryNeeds -> 1))
 
-    val ppd = new PopulationPromotionDemotion(regionPopulation, random, Map().withDefaultValue(0d))
-    ppd.promoteOrDemote()
+    val ppd = new PopulationMigrationInsideProvince(regionPopulation, random)
+    ppd.migrateInsideProvince()
     val traders = regionPopulation.pop(Traders, TestCulture)
     assert(traders.populationCount === 1000)
-  }
-
-  test("when max exceeded, then demotion is inevetable") {
-    val random = new Random(0) {
-      override def nextInt(n: Int): Int = 0
-    }
-
-    val pop = new Population(TestCulture, Traders, 1000, 100000, 100, PoliticalViews.averagePoliticalViews)
-    val pop2 = new Population(TestCulture, Farmers, 1000, 100000, 0, PoliticalViews.averagePoliticalViews)
-
-    val regionPopulation = new RegionPopulation(List(pop, pop2))
-
-    pop.buyDemandedProducts(List(FulfilledDemandRequest(6000, 1, PopulationDemandRequest(pop, Grain, 6000)),
-      FulfilledDemandRequest(4000, 2, PopulationDemandRequest(pop, Liquor, 4000)), FulfilledDemandRequest(4000, 0.5,
-        PopulationDemandRequest(pop, Coal, 4000))))
-    pop2.buyDemandedProducts(List(FulfilledDemandRequest(6000, 1, PopulationDemandRequest(pop2, Grain, 6000)),
-      FulfilledDemandRequest(4000, 2, PopulationDemandRequest(pop2, Liquor, 4000)), FulfilledDemandRequest(4000, 0.5,
-        PopulationDemandRequest(pop2, Coal, 4000))))
-
-
-    pop.fulfillNeedsUsingAlreadyReceivedProducts()
-    pop2.fulfillNeedsUsingAlreadyReceivedProducts()
-    regionPopulation.pops.foreach(_.endOfDay())
-    assert(pop.currentDayRecord.productFulfillment.needsFulfillment === Map(LifeNeeds -> 1, RegularNeeds -> 1, LuxuryNeeds -> 1))
-    assert(pop2.currentDayRecord.productFulfillment.needsFulfillment === Map(LifeNeeds -> 1, RegularNeeds -> 1, LuxuryNeeds -> 1))
-    assert(pop.consumptionHappiness === 1d)
-    assert(pop2.consumptionHappiness === 1d)
-
-
-    val ppd = new PopulationPromotionDemotion(regionPopulation, random, Map(Traders -> 0.1, Farmers -> 0.9).withDefaultValue(1d))
-    ppd.promoteOrDemote()
-
-    val traders = regionPopulation.pop(Traders, TestCulture)
-    assert(traders.populationCount === 965)
-    assert(traders.literateCount === 100)
-
-    val farmers = regionPopulation.pop(Farmers, TestCulture)
-    assert(farmers.populationCount === 1025)
-    assert(farmers.literateCount === 0)
-
   }
 
   test("literacy learning") {

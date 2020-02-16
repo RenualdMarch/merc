@@ -40,26 +40,13 @@ object WorldConstants {
   }
 
   object Population {
-    val PromotionRequiredPart = 0.005 // always change pop
-    val PromotionOptionalPart = 0.03 // change pop if things go rough or very good
-    val MaxHappinessToDemote = 0.2
-    val MinHappinessToPromote = 0.7
+    val MaxProvinceMigrationPart = 0.3
+    val ConsumptionHappinessToMigrateInsideProvince = 0.3
+    val EmptyPopConsumptionHappiness = 0.6
+    val BureaucratsPercentageForMaxEff = 0.02
 
     val RiggedElectionsQ:Map[RegimePosition, Double] = Map(Constitutional -> 0.3, Democracy -> 0.15)
     val ElectionThreshold = 0.03
-
-    val maxPop: Map[PopulationType, Double] = Map(
-      Craftsmen -> 0.5,
-      Farmers -> 0.5,
-      Labourers -> 0.5,
-      Bureaucrats -> 0.05,
-      Clergy -> 0.05,
-      Scholars -> 0.1,
-      Traders -> 0.05,
-      Mages -> 0.3,
-      Capitalists -> 0.02,
-      Aristocrats -> 0.02
-    )
 
     val needsQ: Map[PopulationClass, Map[PopulationNeedsType, Double]] = Map(
       Lower -> Map(

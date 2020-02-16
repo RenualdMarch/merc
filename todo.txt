@@ -5,16 +5,12 @@ Current battle issues:
 
 Important core stuff
 
-migrations inside province
 migrations to other states
 mixed culture population in regions
 
 Additional resources and production
 order warriors for strategy AI after production balancing
 Revolutions/civil wars
-Technologies
-
-
 
 bug: Battle between Set(Set(Player(Byzantine,[SFX]0xff00ffff)), Set())
 separate peace(+badboy)
@@ -23,12 +19,9 @@ add war targets to going war
 province claims must be understandable on UI
 create claims diplomatically
 check conditional AI logic - unused expression
-1 season per turn, 4 turns per year
-elections
 order warriors for strategy AI after production balancing
 add state selection screen with offlane word generation
 when hiring soldiers, use actual population
-when showing tooltip, if it is big, find way to show it more when size is too big(recruit soldier tooltip)
 end turn newspaper with events of previous turn
 allow army movement through territory diplomacy
 add battles with results to UI
@@ -96,6 +89,7 @@ world state unit testing
 ability to retreat from battle
 army supply
 change cursor while drag&drop
+Technologies?
 
 Dreams:
 terrain season changes

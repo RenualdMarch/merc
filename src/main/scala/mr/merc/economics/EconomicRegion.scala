@@ -98,7 +98,7 @@ trait EconomicRegion {
     if (totalPopulation == 0) 0
     else {
       val div = bureaucrats.toDouble / totalPopulation
-      val max = totalPopulation * WorldConstants.Population.maxPop(Bureaucrats)
+      val max = totalPopulation * WorldConstants.Population.BureaucratsPercentageForMaxEff
       div / max
     }
   }
@@ -202,6 +202,14 @@ class RegionPopulation(initialPops: List[Population]) {
         currentPops = pop :: currentPops
         pop
     }
+  }
+
+  def consumptionHappiness(populationType: PopulationType): Double = {
+    val pops = popsByType(populationType)
+    if (pops.nonEmpty) {
+      val sum = pops.map(_.populationCount).sum
+      pops.map(p => p.consumptionHappiness * p.populationCount).sum / sum
+    } else EmptyPopConsumptionHappiness
   }
 
   def getPopTotalEfficiency(populationType: PopulationType): Double =

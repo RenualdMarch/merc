@@ -59,8 +59,8 @@ class WorldState(val regions: List[Province], val playerState: State, val worldH
     val day = new WorldMarketDay(this, turn)
     day.trade()
     regions.foreach { r =>
-      val ppd = new PopulationPromotionDemotion(r.regionPopulation)
-      ppd.promoteOrDemote()
+      val ppd = new PopulationMigrationInsideProvince(r.regionPopulation)
+      ppd.migrateInsideProvince()
     }
 
     this.handlePossibleElections()

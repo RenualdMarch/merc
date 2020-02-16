@@ -6,6 +6,7 @@ import mr.merc.economics.MapUtil.FloatOperations._
 import mr.merc.economics.TaxPolicy.{LowSalaryTax, MiddleSalaryTax, UpperSalaryTax}
 import mr.merc.politics.{PoliticalViews, State}
 import WorldConstants.Population._
+import mr.merc.economics.PopulationMigrationInsideProvince.PopulationProvinceMovement
 
 import scala.util.Random
 
@@ -21,7 +22,7 @@ class Population(val culture: Culture, val populationType: PopulationType, priva
 
   private var tax: Double = 0d
   private var currentPopulationDayRecord: PopulationDayRecord = PopulationDayRecord(populationCount, 0, 0, 0, 0,
-    new ProductFulfillmentRecord(Map(), needs, Map()))
+    new ProductFulfillmentRecord(Map(), needs, Map()), Nil)
 
   def currentDayRecord: PopulationDayRecord = currentPopulationDayRecord
 
@@ -40,11 +41,11 @@ class Population(val culture: Culture, val populationType: PopulationType, priva
 
   // last $HappinessDayCount turns
   def consumptionHappiness: Double = {
-    val n = needsFulfillment(HappinessDayCount)
+    val n = List(currentDayRecord.productFulfillment)//needsFulfillment(HappinessDayCount)
     val sum = HappinessLifeNeedsMultiplier + HappinessRegularNeedsMultiplier + HappinessLuxuryNeedsMultiplier
 
     if (n.isEmpty) {
-      1
+      EmptyPopConsumptionHappiness
     } else {
       n.map { f =>
         val needs = f.needsFulfillment(LifeNeeds) * HappinessLifeNeedsMultiplier +
@@ -124,6 +125,10 @@ class Population(val culture: Culture, val populationType: PopulationType, priva
     this.literatePeople += movers.literateCount
   }
 
+  def addProvinceMovement(movement:PopulationProvinceMovement): Unit = {
+    this.movements = movement :: this.movements
+  }
+
   private var populationDayRecords = Vector[PopulationDayRecord]()
 
   def salary: Vector[PopulationDayRecord] = populationDayRecords
@@ -131,6 +136,8 @@ class Population(val culture: Culture, val populationType: PopulationType, priva
   private var currentPrices: Map[Product, Double] = Map()
 
   private var currentMoney = startingMoney
+
+  private var movements:List[PopulationProvinceMovement] = Nil
 
   def moneyReserves: Double = currentMoney
 
@@ -179,7 +186,8 @@ class Population(val culture: Culture, val populationType: PopulationType, priva
   def newDay(stateTaxPolicy: TaxPolicy, bureaucratsPercentage: Double): Unit = {
     this.tax = stateTaxPolicy.tax(taxPolicy, bureaucratsPercentage)
     this.currentPopulationDayRecord = PopulationDayRecord(populationCount, 0, 0, 0, 0,
-      new ProductFulfillmentRecord(Map(), needs, Map()))
+      new ProductFulfillmentRecord(Map(), needs, Map()), this.movements)
+    this.movements = Nil
     this.currentPrices = Map()
   }
 
@@ -349,17 +357,9 @@ object Population {
   // They are also best soldiers
   case object Aristocrats extends PopulationType(Upper)
 
-  val PopulationPromotionDemotion: Map[PopulationType, List[PopulationType]] = Map(
-    Craftsmen -> List(Farmers, Labourers, Bureaucrats, Traders, Clergy),
-    Farmers -> List(Craftsmen, Labourers, Bureaucrats, Traders, Clergy),
-    Labourers -> List(Craftsmen, Farmers, Bureaucrats, Traders, Clergy),
-    Bureaucrats -> List(Farmers, Labourers, Craftsmen, Scholars, Traders, Clergy, Capitalists, Aristocrats),
-    Scholars -> List(Bureaucrats, Traders, Capitalists, Aristocrats, Clergy),
-    Clergy -> List(Craftsmen, Farmers, Labourers, Bureaucrats, Scholars, Traders, Capitalists, Aristocrats),
-    Traders -> List(Craftsmen, Farmers, Labourers, Bureaucrats, Scholars, Clergy, Capitalists, Aristocrats),
-    Capitalists -> List(Aristocrats, Traders, Clergy, Scholars, Bureaucrats),
-    Aristocrats -> List(Capitalists, Traders, Clergy, Scholars, Bureaucrats)
-  )
+  val PopulationMigration: Map[PopulationType, List[PopulationType]] = populationTypes.map{pt =>
+    pt -> populationTypesByClass(pt.populationClass).filterNot(_ == pt)
+  }.toMap
 
   def populationTypes: List[PopulationType] =
     List(Craftsmen, Farmers, Labourers, Bureaucrats, Clergy,
@@ -450,8 +450,7 @@ object Population {
 
   // TODO add money source
   case class PopulationDayRecord(populationCount: Int, receivedMoney: Double, totalMoney: Double, taxes: Double,
-                                 investments: Double, productFulfillment: ProductFulfillmentRecord)
-
+                                 investments: Double, productFulfillment: ProductFulfillmentRecord, provinceMovements:List[PopulationProvinceMovement])
 }
 
 case class PopulationMovers(literateCount: Int, illiterateCount: Int) {
@@ -462,66 +461,35 @@ case class PopulationMovers(literateCount: Int, illiterateCount: Int) {
   def totalCount: Int = literateCount + illiterateCount
 }
 
-class PopulationPromotionDemotion(population: RegionPopulation, random: Random = Random, maxRatio: Map[PopulationType, Double] = maxPop) {
+object PopulationMigrationInsideProvince {
+  case class PopulationProvinceMovement(from: Population, to: Population, count: Int)
+}
 
-  private case class PopulationMovement(from: Population, to: Population, count: Int)
+class PopulationMigrationInsideProvince(population: RegionPopulation, random: Random = Random) {
 
-  private val maxPopulation: Map[PopulationType, Boolean] = {
-    val totalPopulation = population.pops.map(_.populationCount).sum
-    Population.populationTypes.map { pt =>
-      pt -> (population.pops.filter(_.populationType == pt).map(_.populationCount).sum >= totalPopulation * maxRatio(pt))
-    }.toMap
+  import PopulationMigrationInsideProvince._
+
+  private def insideProvinceMigrationPercentage(fromConsumption:Double, toConsumption: Double): Double = {
+    val difference = toConsumption - fromConsumption
+    if (difference > 0)
+      difference * MaxProvinceMigrationPart
+    else 0
   }
 
-  private def whereToPromote(population: Population, regionPopulation: RegionPopulation): Option[Population] = {
-    val possibleChanges = Population.PopulationPromotionDemotion(population.populationType)
-    val chances = possibleChanges.
-      filter(pc => population.populationType <= pc).
-      filter(pc => regionPopulation.pop(pc, population.culture).populationCount > 0).
-      filterNot(maxPopulation).
-      filter(pc => regionPopulation.pop(pc, population.culture).consumptionHappiness >= MaxHappinessToDemote).
-      map(p => regionPopulation.pop(p, population.culture)).sortBy(-_.consumptionHappiness)
-    chances.headOption
+  private def whereToMigrateInsideProvince(population: Population, regionPopulation: RegionPopulation): Option[PopulationProvinceMovement] = {
+    if (population.consumptionHappiness < ConsumptionHappinessToMigrateInsideProvince && Population.PopulationMigration(population.populationType).nonEmpty) {
+      val pt = Population.PopulationMigration(population.populationType).maxBy(p => regionPopulation.consumptionHappiness(p))
+      val targetPop = regionPopulation.pop(pt, population.culture)
+      val perc = insideProvinceMigrationPercentage(population.consumptionHappiness, targetPop.consumptionHappiness)
+      if (perc > 0.001) {
+        Some(PopulationProvinceMovement(population, targetPop, (population.populationCount * perc) toInt))
+      } else None
+    } else None
   }
 
-  def possibleRandomMovement: Set[PopulationType] = maxPopulation.filter(!_._2).keys.toSet
-
-  private def whereToDemote(population: Population, regionPopulation: RegionPopulation): Option[Population] = {
-    val possibleChanges = Population.PopulationPromotionDemotion(population.populationType)
-    val chances = possibleChanges.
-      filter(pc => population.populationType >= pc).
-      filter(pc => regionPopulation.pop(pc, population.culture).populationCount > 0).
-      filterNot(maxPopulation).
-      map(p => regionPopulation.pop(p, population.culture)).sortBy(-_.consumptionHappiness)
-    chances.headOption
-  }
-
-  def promoteOrDemote(): Unit = {
+  def migrateInsideProvince(): Unit = {
     val movements = population.pops.flatMap { p =>
-
-      val demotionOpt = if (p.consumptionHappiness < MaxHappinessToDemote || maxPopulation(p.populationType)) {
-        whereToDemote(p, population).map { target =>
-          val percentage = PromotionOptionalPart
-          PopulationMovement(p, target, (p.populationCount * percentage) toInt)
-        }
-      } else None
-
-      val promotionOpt = if (p.consumptionHappiness > MinHappinessToPromote) {
-        whereToPromote(p, population).map { target =>
-          val percentage = PromotionOptionalPart
-          PopulationMovement(p, target, (p.populationCount * percentage) toInt)
-        }
-      } else None
-
-      val randomChangePossibilities = Population.PopulationPromotionDemotion(p.populationType).filter(possibleRandomMovement.contains)
-      val randomPop = if (randomChangePossibilities.nonEmpty) {
-        val randomChange = randomChangePossibilities(random.nextInt(randomChangePossibilities.size))
-        val randomChangeCount = p.populationCount * PromotionRequiredPart
-        Some(PopulationMovement(p, population.pop(randomChange, p.culture), randomChangeCount.toInt))
-      } else None
-
-
-      promotionOpt ++ demotionOpt ++ randomPop
+      whereToMigrateInsideProvince(p, population)
     }
 
     movements.foreach { movement =>
@@ -535,6 +503,8 @@ class PopulationPromotionDemotion(population: RegionPopulation, random: Random =
           movement.from.extractRandomMovers(count)
         }
         movement.to.applyMovers(move)
+        movement.from.addProvinceMovement(movement)
+        movement.to.addProvinceMovement(movement)
       }
     }
   }
