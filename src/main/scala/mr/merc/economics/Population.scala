@@ -4,11 +4,12 @@ import mr.merc.economics.Population._
 import mr.merc.economics.Products._
 import mr.merc.economics.MapUtil.FloatOperations._
 import mr.merc.economics.TaxPolicy.{LowSalaryTax, MiddleSalaryTax, UpperSalaryTax}
-import mr.merc.politics.{PoliticalViews, State}
+import mr.merc.politics.{PoliticalViews, Province, State}
 import WorldConstants.Population._
 import mr.merc.economics.PopulationMigrationInsideProvince.PopulationProvinceMovement
-
-import scala.util.Random
+import mr.merc.economics.PopulationMigrationOutsideProvince.PopulationMovementBetweenProvinces
+import mr.merc.economics.WorldConstants.Enterprises.{ChurchRitualEfficiency, ChurchStartingResources}
+import mr.merc.politics.Migration.{ClosedBorders, OpenBorders}
 
 class Population(val culture: Culture, val populationType: PopulationType, private var count: Double,
                  startingMoney: Double, private val startingliterateCount: Int, val politicalViews: PoliticalViews) {
@@ -22,7 +23,7 @@ class Population(val culture: Culture, val populationType: PopulationType, priva
 
   private var tax: Double = 0d
   private var currentPopulationDayRecord: PopulationDayRecord = PopulationDayRecord(populationCount, 0, 0, 0, 0,
-    new ProductFulfillmentRecord(Map(), needs, Map()), Nil)
+    new ProductFulfillmentRecord(Map(), needs, Map()), Nil, Nil)
 
   def currentDayRecord: PopulationDayRecord = currentPopulationDayRecord
 
@@ -37,7 +38,7 @@ class Population(val culture: Culture, val populationType: PopulationType, priva
     total.map { case (nt, m) => nt -> m.mapValues(_ * count * efficiency) }
   }
 
-  def needsFulfillment(i: Int):Vector[ProductFulfillmentRecord] = populationDayRecords.takeRight(i).map(_.productFulfillment)
+  def needsFulfillment(i: Int): Vector[ProductFulfillmentRecord] = populationDayRecords.takeRight(i).map(_.productFulfillment)
 
   def consumptionHappiness: Double = {
     if (populationCount == 0) return EmptyPopConsumptionHappiness
@@ -53,7 +54,7 @@ class Population(val culture: Culture, val populationType: PopulationType, priva
     }
   }
 
-  def politicalHappiness(state:State):Double = {
+  def politicalHappiness(state: State): Double = {
     val popPositions = politicalViews.currentViews(this.literacy).pointsOfView
     val partyPos = state.rulingParty.politicalPosition
     val notAgreeingValue = popPositions.map { case (popPos, v) =>
@@ -67,7 +68,7 @@ class Population(val culture: Culture, val populationType: PopulationType, priva
     } else 0
   }
 
-  def growthRate:Double = {
+  def growthRate: Double = {
     populationDayRecords.lastOption.map { last =>
       val f = last.productFulfillment.needsFulfillment
       BasePopGrowth + f(LifeNeeds) * GrowthRatePerLifeNeed + f(RegularNeeds) * GrowthRatePerRegularNeed
@@ -122,8 +123,12 @@ class Population(val culture: Culture, val populationType: PopulationType, priva
     this.literatePeople += movers.literateCount
   }
 
-  def addProvinceMovement(movement:PopulationProvinceMovement): Unit = {
+  def addProvinceMovement(movement: PopulationProvinceMovement): Unit = {
     this.movements = movement :: this.movements
+  }
+
+  def addFromOtherProvinceMovement(movement: PopulationMovementBetweenProvinces): Unit = {
+    this.movementsBetweenProvinces = movement :: this.movementsBetweenProvinces
   }
 
   private var populationDayRecords = Vector[PopulationDayRecord]()
@@ -134,7 +139,8 @@ class Population(val culture: Culture, val populationType: PopulationType, priva
 
   private var currentMoney = startingMoney
 
-  private var movements:List[PopulationProvinceMovement] = Nil
+  private var movements: List[PopulationProvinceMovement] = Nil
+  private var movementsBetweenProvinces: List[PopulationMovementBetweenProvinces] = Nil
 
   def moneyReserves: Double = currentMoney
 
@@ -183,8 +189,9 @@ class Population(val culture: Culture, val populationType: PopulationType, priva
   def newDay(stateTaxPolicy: TaxPolicy, bureaucratsPercentage: Double): Unit = {
     this.tax = stateTaxPolicy.tax(taxPolicy, bureaucratsPercentage)
     this.currentPopulationDayRecord = PopulationDayRecord(populationCount, 0, 0, 0, 0,
-      new ProductFulfillmentRecord(Map(), needs, Map()), this.movements)
+      new ProductFulfillmentRecord(Map(), needs, Map()), this.movements, this.movementsBetweenProvinces)
     this.movements = Nil
+    this.movementsBetweenProvinces = Nil
     this.currentPrices = Map()
   }
 
@@ -257,7 +264,7 @@ class Population(val culture: Culture, val populationType: PopulationType, priva
     this.currentPopulationDayRecord = this.currentPopulationDayRecord.copy(populationCount, r.receivedMoney + salary, currentMoney - taxPart, r.taxes + taxPart)
   }
 
-  def payTaxes(region:EconomicRegion): Unit = {
+  def payTaxes(region: EconomicRegion): Unit = {
     this.currentMoney -= this.currentPopulationDayRecord.taxes
     val td = TaxData(taxPolicy, this.currentPopulationDayRecord.receivedMoney, this.currentPopulationDayRecord.taxes)
     region.owner.budget.receiveTaxes(td)
@@ -354,8 +361,12 @@ object Population {
   // They are also best soldiers
   case object Aristocrats extends PopulationType(Upper)
 
-  val PopulationMigration: Map[PopulationType, List[PopulationType]] = populationTypes.map{pt =>
+  val PopulationMigrationInSameProvince: Map[PopulationType, List[PopulationType]] = populationTypes.map { pt =>
     pt -> populationTypesByClass(pt.populationClass).filterNot(_ == pt)
+  }.toMap
+
+  val PopulationMigrationInNeighbourProvince: Map[PopulationType, List[PopulationType]] = populationTypes.map {
+    pt => pt -> List(pt)
   }.toMap
 
   def populationTypes: List[PopulationType] =
@@ -447,7 +458,9 @@ object Population {
 
   // TODO add money source
   case class PopulationDayRecord(populationCount: Int, receivedMoney: Double, totalMoney: Double, taxes: Double,
-                                 investments: Double, productFulfillment: ProductFulfillmentRecord, provinceMovements:List[PopulationProvinceMovement])
+                                 investments: Double, productFulfillment: ProductFulfillmentRecord,
+                                 provinceMovements: List[PopulationProvinceMovement], movementsBetweenProvinces: List[PopulationMovementBetweenProvinces])
+
 }
 
 case class PopulationMovers(literateCount: Int, illiterateCount: Int) {
@@ -459,25 +472,30 @@ case class PopulationMovers(literateCount: Int, illiterateCount: Int) {
 }
 
 object PopulationMigrationInsideProvince {
+
   case class PopulationProvinceMovement(from: Population, to: Population, count: Int)
+
 }
 
-class PopulationMigrationInsideProvince(population: RegionPopulation, random: Random = Random) {
+abstract class AbstractPopulationMigration(maxMigrationConstant: Double) {
+
+  protected def provinceMigrationPercentage(fromConsumption: Double, toConsumption: Double): Double = {
+    val difference = toConsumption - fromConsumption
+    if (difference > 0)
+      difference * maxMigrationConstant
+    else 0
+  }
+}
+
+class PopulationMigrationInsideProvince(regionPopulation: RegionPopulation) extends AbstractPopulationMigration(MaxProvinceMigrationPart) {
 
   import PopulationMigrationInsideProvince._
 
-  private def insideProvinceMigrationPercentage(fromConsumption:Double, toConsumption: Double): Double = {
-    val difference = toConsumption - fromConsumption
-    if (difference > 0)
-      difference * MaxProvinceMigrationPart
-    else 0
-  }
-
-  private def whereToMigrateInsideProvince(population: Population, regionPopulation: RegionPopulation): Option[PopulationProvinceMovement] = {
-    if (population.consumptionHappiness < ConsumptionHappinessToMigrateInsideProvince && Population.PopulationMigration(population.populationType).nonEmpty) {
-      val pt = Population.PopulationMigration(population.populationType).maxBy(p => regionPopulation.consumptionHappiness(p))
+  private def whereToMigrateInsideProvince(population: Population): Option[PopulationProvinceMovement] = {
+    if (population.consumptionHappiness < ConsumptionHappinessToMigrateInsideProvince && Population.PopulationMigrationInSameProvince(population.populationType).nonEmpty) {
+      val pt = Population.PopulationMigrationInSameProvince(population.populationType).maxBy(p => regionPopulation.consumptionHappiness(p))
       val targetPop = regionPopulation.pop(pt, population.culture)
-      val perc = insideProvinceMigrationPercentage(population.consumptionHappiness, targetPop.consumptionHappiness)
+      val perc = provinceMigrationPercentage(population.consumptionHappiness, targetPop.consumptionHappiness)
       if (perc > 0.001) {
         Some(PopulationProvinceMovement(population, targetPop, (population.populationCount * perc) toInt))
       } else None
@@ -485,24 +503,92 @@ class PopulationMigrationInsideProvince(population: RegionPopulation, random: Ra
   }
 
   def migrateInsideProvince(): Unit = {
-    val movements = population.pops.flatMap { p =>
-      whereToMigrateInsideProvince(p, population)
+    val movements = regionPopulation.pops.flatMap { p =>
+      whereToMigrateInsideProvince(p)
     }
 
     movements.foreach { movement =>
-      if (movement.from.populationCount != 0) {
-        val count = if (movement.count == 0) 1 else movement.count
+      if (movement.from.populationCount != 0 && movement.count != 0) {
         val move = if (movement.from.populationType > movement.to.populationType) {
-          movement.from.extractIlliterateThenLiterate(count)
+          movement.from.extractIlliterateThenLiterate(movement.count)
         } else if (movement.from.populationType < movement.to.populationType) {
-          movement.from.extractLiterateThenIlliterate(count)
+          movement.from.extractLiterateThenIlliterate(movement.count)
         } else {
-          movement.from.extractRandomMovers(count)
+          movement.from.extractRandomMovers(movement.count)
         }
         movement.to.applyMovers(move)
         movement.from.addProvinceMovement(movement)
         movement.to.addProvinceMovement(movement)
       }
+    }
+  }
+}
+
+object PopulationMigrationOutsideProvince {
+
+  case class PopulationMovementBetweenProvinces(from: Population, fromProvince: Province, to: Population, toProvince: Province, count: Int) {
+    def applyMovement(): Unit = {
+      if (count != 0 && from.populationCount != 0) {
+        val move = if (from.populationType > to.populationType) {
+          from.extractIlliterateThenLiterate(count)
+        } else if (from.populationType < to.populationType) {
+          from.extractLiterateThenIlliterate(count)
+        } else {
+          from.extractRandomMovers(count)
+        }
+        to.applyMovers(move)
+        from.addFromOtherProvinceMovement(this)
+        to.addFromOtherProvinceMovement(this)
+        addChurchIfNeeded()
+      }
+    }
+
+    private def addChurchIfNeeded(): Unit = {
+      if (to.populationType == Clergy) {
+        val culture = to.culture
+        val churchOpt = toProvince.enterprises.collectFirst {
+          case c:Church if c.product.culture == culture => c
+        }
+
+        if (churchOpt.isEmpty) {
+          val church = new Church(Ritual(culture), toProvince, ChurchStartingResources, ChurchRitualEfficiency)
+          toProvince.enterprises :+= church
+        }
+      }
+    }
+  }
+
+}
+
+class PopulationMigrationOutsideProvince(province: Province) extends AbstractPopulationMigration(MaxOutsideProvinceMigrationPart) {
+  private val policy = province.owner.politicalSystem.rulingParty.migration
+  private val allowedNeighbours = policy match {
+    case OpenBorders => province.neighbours.filter { p =>
+      p.owner.politicalSystem.rulingParty.migration == OpenBorders
+    }
+    case ClosedBorders => province.neighbours.filter(_.owner == province.owner)
+  }
+
+  private def whereToMigrate(population: Population): Option[(Province, Population, Int)] = {
+    if (population.consumptionHappiness < ConsumptionHappinessToMigrateOutsideProvince && Population.PopulationMigrationInNeighbourProvince(population.populationType).nonEmpty) {
+      val pt = Population.PopulationMigrationInNeighbourProvince(population.populationType)
+      val possible = allowedNeighbours.flatMap(n => pt.map(p => (n, p)))
+      if (possible.nonEmpty) {
+        val (province, populationType) = possible.maxBy { case (n, p) => n.regionPopulation.consumptionHappiness(p) }
+        val percentage = provinceMigrationPercentage(population.consumptionHappiness, province.regionPopulation.consumptionHappiness(populationType))
+        val count = (population.populationCount * percentage).toInt
+        if (count > 0) {
+          Some((province, province.regionPopulation.pop(populationType, population.culture), count))
+        } else None
+      } else None
+    } else None
+  }
+
+  def migrateToNeighbours(): List[PopulationMovementBetweenProvinces] = {
+    province.regionPopulation.pops.flatMap { pop =>
+      whereToMigrate(pop).map(tuple => pop -> tuple)
+    }.map { case (pop, (targetProvince, targetPop, count)) =>
+      PopulationMovementBetweenProvinces(pop, province, targetPop, targetProvince, count)
     }
   }
 }

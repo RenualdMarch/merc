@@ -5,9 +5,6 @@ Current battle issues:
 
 Important core stuff
 
-migrations to other states
-mixed culture population in regions
-
 Additional resources and production
 order warriors for strategy AI after production balancing
 Revolutions/civil wars

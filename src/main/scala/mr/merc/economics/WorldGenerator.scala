@@ -12,6 +12,7 @@ import WorldGenerationConstants._
 import mr.merc.army.WarriorCompetence.Professional
 import mr.merc.army.{Warrior, WarriorType}
 import mr.merc.diplomacy.Claim.{StrongProvinceClaim, WeakProvinceClaim}
+import mr.merc.economics.PopulationMigrationOutsideProvince.PopulationMovementBetweenProvinces
 import mr.merc.map.terrain.FourSeasonsTerrainTypes._
 
 import scala.util.Random
@@ -169,7 +170,7 @@ class WorldGenerator(field:FourSeasonsTerrainHexField) {
     val result = divisions.map{case (state, capitals) =>
       state -> capitals.map {capital =>
         val name = namesGenerators(state.primeCulture).cityNames.extract()
-        val p = new Province(name, state, generateRegionMarket,generateRegionPops(state.primeCulture), provincesHexes(capital), capital)
+        val p = new Province(name, state, generateRegionMarket, generateRegionPops(state.primeCulture), provincesHexes(capital), capital)
         p.enterprises = generateEnterprises(p).toVector
         p.regionWarriors.receiveWarriors(generateWarriors(p))
         provincesHexes(capital).foreach(_.province = Some(p))
@@ -181,7 +182,25 @@ class WorldGenerator(field:FourSeasonsTerrainHexField) {
       val neigs = connectivityMap(p.capital).map(c => provinces.find(_.capital == c).get)
       p.initNeighbours(neigs)
     }
+    (0 until PopMigrationsToNeighbours).foreach {_ =>
+      mixPopulations(provinces)
+    }
+
     result
+  }
+
+  private def mixPopulations(provinces:List[Province]): Unit = {
+    provinces.flatMap { province =>
+      province.regionPopulation.pops.flatMap { pop =>
+        val neigbours = province.neighbours
+        neigbours.map{ neig =>
+          val count = PopMigrationToNeighbourPercentage * pop.populationCount / neigbours.size
+          val targetPop = neig.regionPopulation.pop(pop.populationType, pop.culture)
+          PopulationMovementBetweenProvinces(pop, province, targetPop, neig, count.toInt)
+        }
+      }
+    }.foreach(_.applyMovement())
+
   }
 
   private def extractContinuousPart(connectivityMap:ConnectivityMap, extractionSize:Int):Set[FourSeasonsTerrainHex] = {

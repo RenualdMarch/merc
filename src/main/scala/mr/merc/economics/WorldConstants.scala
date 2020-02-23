@@ -41,7 +41,9 @@ object WorldConstants {
 
   object Population {
     val MaxProvinceMigrationPart = 0.3
+    val MaxOutsideProvinceMigrationPart = 0.1
     val ConsumptionHappinessToMigrateInsideProvince = 0.3
+    val ConsumptionHappinessToMigrateOutsideProvince = 0.2
     val EmptyPopConsumptionHappiness = 0.6
     val BureaucratsPercentageForMaxEff = 0.02
 
@@ -279,6 +281,9 @@ object WorldGenerationConstants {
 
   val TradeDaysBeforeStart = 1
   val WarriorPerPopulation = 10000
+
+  val PopMigrationToNeighbourPercentage = 0.2
+  val PopMigrationsToNeighbours = 1
 
   val WorldMapWidth = 25
   val WorldMapHeight = 25

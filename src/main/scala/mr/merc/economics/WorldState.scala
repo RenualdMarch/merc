@@ -63,6 +63,11 @@ class WorldState(val regions: List[Province], val playerState: State, val worldH
       ppd.migrateInsideProvince()
     }
 
+    regions.flatMap { r =>
+      val m = new PopulationMigrationOutsideProvince(r)
+      m.migrateToNeighbours()
+    }.foreach(_.applyMovement())
+
     this.handlePossibleElections()
 
     this.processUnansweredMessages()

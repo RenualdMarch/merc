@@ -15,6 +15,7 @@ import scalafx.scene.Node
 import scalafx.scene.control._
 import EconomicLocalization._
 import mr.merc.economics.PopulationMigrationInsideProvince.PopulationProvinceMovement
+import mr.merc.economics.PopulationMigrationOutsideProvince.PopulationMovementBetweenProvinces
 import scalafx.geometry.{Pos, Side}
 import mr.merc.util.FxPropertyUtils._
 import scalafx.scene.control.TabPane.TabClosingPolicy
@@ -302,12 +303,21 @@ class PopulationMigrationsPane(val population:List[Population]) extends ScrollPa
       val provinceMovements = popList.flatMap(_.currentDayRecord.provinceMovements)
       if (provinceMovements.nonEmpty) {
         add(BigText(pt.name), "wrap, center, grow, push, span")
-        add(migrationTable(provinceMovements), "wrap, grow, span")
+        add(migrationTableInsideProvince(provinceMovements), "wrap, grow, span")
+      }
+    }
+
+    add(BigText(Localization("migrations.outsideProvince")), "wrap, center")
+    population.groupBy(_.populationType).foreach { case (pt, popList) =>
+      val movements = popList.flatMap(_.currentDayRecord.movementsBetweenProvinces)
+      if (movements.nonEmpty) {
+        add(BigText(pt.name), "wrap, center, grow, push, span")
+        add(migrationTableOutsideProvince(movements), "wrap, grow, span")
       }
     }
   }
 
-  private def migrationTable(movements:List[PopulationProvinceMovement]): GridPane = {
+  private def migrationTableInsideProvince(movements:List[PopulationProvinceMovement]): GridPane = {
     def mediumText(label:String): Node = new BorderPane {
       left = MediumText(label)
       style = "-fx-border-color: black;-fx-border-width: 1 1 1 1; -fx-padding: 10 10 10 10;"
@@ -341,6 +351,45 @@ class PopulationMigrationsPane(val population:List[Population]) extends ScrollPa
       movements.zipWithIndex.foreach { case (m, i) =>
         add(mediumText(EconomicLocalization.localizePopulation(m.from)), 0, i+1)
         add(mediumText(EconomicLocalization.localizePopulation(m.to)), 1, i+1)
+        add(mediumText(m.count.toString), 2, i+1)
+      }
+    }
+  }
+
+  private def migrationTableOutsideProvince(movements:List[PopulationMovementBetweenProvinces]): GridPane = {
+    def mediumText(label:String): Node = new BorderPane {
+      left = MediumText(label)
+      style = "-fx-border-color: black;-fx-border-width: 1 1 1 1; -fx-padding: 10 10 10 10;"
+    }
+
+    val colFrom = new ColumnConstraints {
+      percentWidth = 40
+      fitToWidth = true
+    }
+
+    val colTo = new ColumnConstraints {
+      percentWidth = 40
+      fitToWidth = true
+    }
+
+    val colCount  = new ColumnConstraints {
+      percentWidth = 20
+      fitToWidth = true
+    }
+
+    new GridPane {
+      style = Components.mediumFontStyle
+      alignment = Pos.Center
+
+      columnConstraints = List(colFrom, colTo, colCount)
+
+      add(mediumText(Localization("from")), 0, 0)
+      add(mediumText(Localization("to")), 1, 0)
+      add(mediumText(Localization("count")), 2, 0)
+
+      movements.zipWithIndex.foreach { case (m, i) =>
+        add(mediumText(EconomicLocalization.localizePopulationTwoRows(m.from, m.fromProvince)), 0, i+1)
+        add(mediumText(EconomicLocalization.localizePopulationTwoRows(m.to, m.toProvince)), 1, i+1)
         add(mediumText(m.count.toString), 2, i+1)
       }
     }
