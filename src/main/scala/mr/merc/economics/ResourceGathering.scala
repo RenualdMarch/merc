@@ -98,6 +98,10 @@ abstract class ResourceGathering[Prod <: GatheredProduct](val product: Prod, val
     addCurrentRecord()
   }
 
+  override def reduceStorage(): Unit = {
+    this.unsold = this.unsold * WorldConstants.Enterprises.ResourceGatheringStorageReduction
+  }
+
   override def owners: List[Population] = region.regionPopulation.pops.filter(_.populationType == Aristocrats)
 
   override def componentDemandRequests(prices: Map[Products.Product, Double]): Map[Products.Product, DemandRequest] = Map()

@@ -48,7 +48,7 @@ class MarketDay(product: Product, val price: Double, val turn: Int) {
     if (supply.isEmpty && demand.isEmpty) {
       _fulfilledSupply = Some(List())
       _fulfilledDemands = Some(List())
-      _tomorrowPrice = Some(price * Market.priceChange(totalSupply, totalDemand))
+      _tomorrowPrice = Some(Market.newPrice(price, totalSupply, totalDemand))
       return
     }
 
@@ -84,7 +84,7 @@ class MarketDay(product: Product, val price: Double, val turn: Int) {
 
       _fulfilledDemands = Some(fulfilledDemands)
     }
-    _tomorrowPrice = Some(price * Market.priceChange(totalSupply, totalDemand))
+    _tomorrowPrice = Some(Market.newPrice(price, totalSupply, totalDemand))
   }
 
   def acceptRequests(r: MarketRequest*): Unit = {

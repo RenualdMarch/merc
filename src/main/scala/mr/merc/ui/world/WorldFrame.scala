@@ -178,7 +178,7 @@ class WorldFrame(sceneManager: SceneManager, worldState: WorldState) extends Pan
     }.onComplete {
       case Success(battles) =>
         Platform.runLater(waitDialog.close())
-        playBattles(battles)
+        Platform.runLater(playBattles(battles))
       case Failure(ex) =>
         error(ex.getMessage, ex)
         Platform.runLater(waitDialog.close())

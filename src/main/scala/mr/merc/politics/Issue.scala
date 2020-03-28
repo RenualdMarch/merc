@@ -3,8 +3,8 @@ package mr.merc.politics
 import scalafx.scene.paint.Color
 import mr.merc.economics.MapUtil.FloatOperations._
 import mr.merc.economics.Population._
+import mr.merc.economics.TaxPolicy._
 import mr.merc.politics.IssuePosition._
-
 import mr.merc.economics.WorldConstants.Enterprises._
 
 import scala.util.Random
@@ -42,6 +42,26 @@ object IssuePosition {
     val stateCanDestroyFactory: Boolean
 
     val investmentCostMultiplier: Double
+
+    def minTaxPolicy:Map[Income, Double] = Map(
+      CorporateTax -> corporateTax.min,
+      LowSalaryTax -> salaryTax.min,
+      MiddleSalaryTax -> salaryTax.min,
+      UpperSalaryTax -> salaryTax.min,
+      SalesTax -> salesTax.min,
+      TariffTax -> tariff.min,
+      TransitTax -> transit.min
+    )
+
+    def maxTaxPolicy:Map[Income, Double] = Map(
+      CorporateTax -> corporateTax.max,
+      LowSalaryTax -> salaryTax.max,
+      MiddleSalaryTax -> salaryTax.max,
+      UpperSalaryTax -> salaryTax.max,
+      SalesTax -> salesTax.max,
+      TariffTax -> tariff.max,
+      TransitTax -> transit.max
+    )
   }
 
   trait ForeignPolicyPosition extends IssuePosition

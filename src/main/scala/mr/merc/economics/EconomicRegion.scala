@@ -8,6 +8,7 @@ import mr.merc.politics.{PoliticalViews, State}
 import mr.merc.economics.MapUtil.FloatOperations.MapWithFloatOperations
 import WorldConstants.Population._
 import mr.merc.army.Warrior
+import mr.merc.log.Logging
 
 trait EconomicRegion {
 
@@ -183,8 +184,8 @@ class RegionPopulation(initialPops: List[Population]) {
   }
 
   def orderPops(populationType: PopulationType, culture: Option[Culture], orders: Map[Enterprise, Double]): Map[Enterprise, Map[Population, Double]] = {
-    val dc = new DistributionCalculator[Enterprise](0.5, 0.5,
-      e => e.dayRecords.lastOption.map(_.averageSalary).getOrElse(0d))
+    val dc = new DistributionCalculator[Enterprise](0.1, 0.9,
+      e => e.dayRecords.lastOption.map(_.moneyOnWorkforceSalary).getOrElse(0d))
 
     val totalEfficiency = popsByTypeAndCulture(populationType, culture).map(_.totalPopEfficiency).sum
 
@@ -232,7 +233,7 @@ class RegionPopulation(initialPops: List[Population]) {
   def populationCount: Int = pops.map(_.populationCount).sum
 }
 
-class RegionMarket(initialPrices:Map[Product, Double]) {
+class RegionMarket(initialPrices:Map[Product, Double]) extends Logging {
   private var historicalData = initialPrices.keys.map { p =>
     p -> Vector[MarketDay]()
   }.toMap
@@ -278,7 +279,15 @@ class RegionMarket(initialPrices:Map[Product, Double]) {
   def transferMoneyFromDemandsToSupply(): Unit = {
     val totalMoneyOnBuying = fulfilledDemands.values.flatten.map(_.currentSpentMoney).sum
     val totalMoneyOnSelling = fulfilledSupply.values.flatten.map(_.receivedMoney).sum
-    require(Math.abs(totalMoneyOnBuying - totalMoneyOnSelling) < 0.01,
+
+    val consistencyCheck = Math.abs(totalMoneyOnBuying - totalMoneyOnSelling) < 0.01
+
+    if (!consistencyCheck) {
+      warn("Fulfilled demands: " + fulfilledDemands.toString())
+      warn("Fulfilled supply: " +  fulfilledSupply.toString())
+    }
+
+    require(consistencyCheck,
       s"Buying and selling differ, buying is $totalMoneyOnBuying, selling is $totalMoneyOnSelling")
 
     fulfilledDemands.values.flatten.foreach(_.currentSpentMoney = 0)

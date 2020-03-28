@@ -75,6 +75,7 @@ class WorldState(val regions: List[Province], val playerState: State, val worldH
     this.diplomacyEngine.improveBadBoyOverTime()
 
     info(s"Total money is $totalMoney")
+    info(s"Budgets are: ${states.keySet.map(s => s.name -> s.budget.moneyReserve).toMap}")
 
     states.keysIterator.filterNot(_ == playerState).foreach { state =>
       val soldierMovementAI = new SoldierMovementAI(this, state)

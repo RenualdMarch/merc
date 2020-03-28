@@ -8,7 +8,7 @@ class DistributionCalculator[T](percentageEqual: Double, percentagePriority: Dou
 
   def divide(workers: Double, orders: Map[T, Double]):Map[T, Double] = {
     val afterEqual = divideEqualPart(workers * percentageEqual, Map(), orders)
-    dividePriorityPart(workers * percentagePriority, afterEqual, orders)
+    dividePriorityPart(workers * percentagePriority, afterEqual, (orders |-| afterEqual).filter(_._2 != 0))
   }
 
   private def divideEqualPart(workers: Double, alreadyDistributed: Map[T, Double], orders: Map[T, Double]):Map[T, Double] = {
@@ -29,13 +29,17 @@ class DistributionCalculator[T](percentageEqual: Double, percentagePriority: Dou
   }
 
   private def dividePriorityPart(workers: Double, alreadyDistributed: Map[T, Double], orders: Map[T, Double]): Map[T, Double] = {
-    val toDistribute = orders |-| alreadyDistributed filter(_._2 != 0)
-    if (workers == 0 || toDistribute.values.sum == 0) {
+     if (workers == 0 || orders.values.sum == 0) {
       alreadyDistributed
     } else {
-      val first = toDistribute.keys.toList.maxBy(priorityF)
-      val possibleWorkers = math.min(workers, toDistribute(first))
-      dividePriorityPart(workers - possibleWorkers, alreadyDistributed |+| Map(first -> possibleWorkers), orders)
+      val totalPriority = orders.keySet.map(priorityF).sum
+      if (totalPriority == 0) {
+        divideEqualPart(workers, alreadyDistributed, orders)
+      } else {
+        val first = orders.keys.toList.maxBy(priorityF)
+        val possibleWorkers = math.min(workers * priorityF(first) / totalPriority, orders(first))
+        dividePriorityPart(workers - possibleWorkers, alreadyDistributed |+| Map(first -> possibleWorkers), orders - first)
+      }
     }
   }
 }

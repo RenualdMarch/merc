@@ -131,6 +131,7 @@ class WorldMarketDay(worldState: WorldStateEnterpriseActions, turn:Int) extends 
         }
       }
 
+      r.enterprises.foreach(_.reduceStorage())
       r.enterprises.foreach(_.produce())
       r.regionPopulation.pops.foreach(_.fulfillNeedsUsingAlreadyReceivedProducts())
       r.regionWarriors.allWarriors.foreach(_.allNeedsReceived(turn))
@@ -139,7 +140,6 @@ class WorldMarketDay(worldState: WorldStateEnterpriseActions, turn:Int) extends 
     // let all pop receive salaries + taxes to budget and do end of day tasks
     regions.foreach { r =>
       val factoryCommands = FactoryBuildingAI().factoryCommands(r, worldState)
-
 
       r.enterprises.foreach{ e =>
         e.payMoneyToPops()

@@ -49,6 +49,10 @@ abstract class Factory[Producible <: IndustryProduct](val region: EconomicRegion
     storage.unsoldProducts <= BankruptStorage && storage.money <= BankruptMoney
   }
 
+  override def reduceStorage(): Unit = {
+    storage = storage.copy(unsoldProducts * WorldConstants.Enterprises.FactoriesStorageReduction)
+  }
+
   private[economics] def maxMoneyReserves: Double = {
     val neededForProduction = product.components.mapValues(_ * maxPossibleInputToUse)
     neededForProduction.map { case (p, c) =>

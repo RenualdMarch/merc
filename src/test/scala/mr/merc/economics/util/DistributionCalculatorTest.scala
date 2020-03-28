@@ -14,22 +14,22 @@ class DistributionCalculatorTest extends FunSuite {
   test("when workers less than demand") {
     val dc = new DistributionCalculator[String](0.6, 0.4, x => x.toDouble)
 
-    val result = dc.divide(100, Map("1" -> 100, "2" -> 200, "3" -> 200))
-    assert(result === Map("1" -> 20, "2" -> 20, "3" -> 60))
+    val result = dc.divide(100, Map("1" -> 100, "2" -> 200, "7" -> 200))
+    assert(result === Map("1" -> 24, "2" -> 28, "7" -> 48))
   }
 
   test("when order is less than equal distribution want to give") {
     val dc = new DistributionCalculator[String](0.6, 0.4, x => x.toDouble)
 
     val result = dc.divide(100, Map("1" -> 10, "2" -> 200, "3" -> 200))
-    assert(result === Map("1" -> 10, "2" -> 25, "3" -> 65))
+    assert(result === Map("1" -> 10, "2" -> 41, "3" -> 49))
   }
 
   test("when first prioritized is less that equal distribution want to give") {
     val dc = new DistributionCalculator[String](0.6, 0.4, x => x.toDouble)
 
     val result = dc.divide(100, Map("3" -> 30, "1" -> 200, "2" -> 200))
-    assert(result === Map("1" -> 20, "2" -> 50, "3" -> 30))
+    assert(result === Map("1" -> 30, "2" -> 40, "3" -> 30))
   }
 
   test("equal is 100%") {
@@ -42,8 +42,8 @@ class DistributionCalculatorTest extends FunSuite {
   test("priority is 100%") {
     val dc = new DistributionCalculator[String](0, 1.0, x => x.toDouble)
 
-    val result = dc.divide(300, Map("3" -> 50, "1" -> 200, "2" -> 200))
-    assert(result === Map("1" -> 50, "2" -> 200, "3" -> 50))
+    val result = dc.divide(400, Map("3" -> 50, "1" -> 200, "2" -> 200))
+    assert(result === Map("1" -> 150, "2" -> 200, "3" -> 50))
   }
 
   test("validation") {

@@ -45,6 +45,8 @@ trait Enterprise {
 
   def dayRecords:Vector[DayRecord]
 
+  def reduceStorage()
+
   protected def paySalaryProportionallyToEfficiency(map:Map[Population, Double], salary: Double): Unit = {
     (map.toList, salary) match {
       case (Nil, sum) =>

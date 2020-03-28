@@ -376,7 +376,7 @@ class FactoryPane(e: Factory[_], province: Province) extends EnterprisePane(e, p
   }
 
   budget()
-  inStorage()
+  //inStorage()
   produced()
   itemsSold()
   earnings()

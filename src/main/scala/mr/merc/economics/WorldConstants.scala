@@ -12,7 +12,7 @@ object WorldConstants {
 
   object Enterprises {
     val FactoryInputMultiplier = 1
-    val FactoryOutputMultiplier = 1
+    val FactoryOutputMultiplier = 2
     val FactoryStartingResources = 1000
 
     val ResourceExtractionEfficiency = 1
@@ -24,8 +24,8 @@ object WorldConstants {
     val ChurchStartingResources = 1000
     val MagicGuildStartingResources = 1000
 
-    val FactoryBuildCost:Map[Products.Product, Double] = Map(Timber -> 100, Iron -> 100, Coal -> 100)
-    val FactoryExpandCost:Map[Products.Product, Double] = Map(Timber -> 50, Iron -> 50, Coal -> 50)
+    val FactoryBuildCost:Map[Products.Product, Double] = Map(Wood -> 100, Iron -> 100, Coal -> 100)
+    val FactoryExpandCost:Map[Products.Product, Double] = Map(Wood -> 50, Iron -> 50, Coal -> 50)
 
     val StateEconomicsInvestmentMultiplier:Double = 4
     val InterventionismInvestmentMultiplier:Double = 2
@@ -37,6 +37,9 @@ object WorldConstants {
 
     val BankruptStorage = 0.1
     val BankruptMoney = 0.1
+
+    val ResourceGatheringStorageReduction = 0d//0.5
+    val FactoriesStorageReduction = 0d//0.5
   }
 
   object Population {
@@ -74,7 +77,7 @@ object WorldConstants {
     val PoliticalHappinessDisagreementMultiplier = 0.1
     val DifferentCulturePoliticalHappinessPenalty = 0.2
 
-    val ScholarsLiteracyLearningIncreaseMultiplier = 0.1
+    val ScholarsLiteracyLearningIncreaseMultiplier = 0.05
     val MaxLiteracyEfficiencyMultiplier = 10
 
     // 1% pop growth per year, to 2% per year max
@@ -86,11 +89,11 @@ object WorldConstants {
   }
 
   object Market {
-    val EmptySupplyPriceIncrease: Double = 1.5
+    val EmptySupplyPriceIncrease: Double = 1.2
     val EmptyDemandPriceDecrease: Double = 1 / EmptySupplyPriceIncrease
 
-    def priceChange(supply:Double, demand:Double):Double = {
-      val price = (supply, demand) match {
+    def newPrice(currentPrice: Double, supply:Double, demand:Double):Double = {
+      val price = ((supply, demand) match {
         case (0, 0) => 1d
         case (0, _) => EmptySupplyPriceIncrease
         case (_, 0) => EmptyDemandPriceDecrease
@@ -101,12 +104,15 @@ object WorldConstants {
           } else {
             EmptySupplyPriceIncrease + (1 - EmptySupplyPriceIncrease) * q
           }
-      }
+      }) * currentPrice
 
-      if (price < LowestPossiblePrice) LowestPossiblePrice else price
+      if (price < LowestPossiblePrice) LowestPossiblePrice
+      else if (price > MaxPossiblePrice) MaxPossiblePrice
+      else price
     }
 
-    val LowestPossiblePrice = 0.001
+    val LowestPossiblePrice = 0.1
+    val MaxPossiblePrice = 100
   }
 
   object Taxes {
@@ -223,39 +229,36 @@ object WorldGenerationConstants {
 
   val ResourcesRarity:Map[GatheredProduct, Double] = Map(
     Grain -> 2,
-    /*Fish -> 0.7,
+    //Fish -> 0.7,
     Fruit -> 0.7,
     Cattle -> 1,
-    Tea -> 0.2,
-    Coffee -> 0.2,
-    Opium -> 0.1,*/
+    Tea -> 0.4,
+    Coffee -> 0.4,
+    //Opium -> 0.1
     Cotton -> 1,
-    //Herbs -> 1,
-    Timber -> 1,
+    Herbs -> 1,
+    Wood -> 1,
     Coal -> 1,
     Iron -> 1,
-    //PreciousMetal -> 0.1
+    PreciousMetal -> 0.2
   )
 
-  val MaxResourcesPerRegion = 3
-  val MinResourcesPerRegion = 2
+  val MaxResourcesPerRegion = 10
+  val MinResourcesPerRegion = 3
 
   val FactoriesRarity: Map[Products.IndustryProduct, Double] = Map(
-    /*Lumber -> 1,
-    Cement -> 1,
-    Fabric -> 1,
     Paper -> 1,
-    Glass -> 1,
-    Steel -> 1,
-    Furniture -> 1,*/
+    Furniture -> 1,
+    Medicine -> 1,
     Liquor -> 1,
     Clothes -> 1,
-    //Wine -> 1,
+    Wine -> 1,
+    Jewelry -> 1,
     Weapons -> 1
   )
 
-  val MinFactoriesPerRegion = 1
-  val MaxFactoriesPerRegion = 2
+  val MinFactoriesPerRegion = 2
+  val MaxFactoriesPerRegion = 4
 
   val FactoryStartingMoney = 10000
   val FactoryStartingLevel = 1
