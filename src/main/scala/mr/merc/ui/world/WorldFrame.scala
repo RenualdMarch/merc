@@ -184,6 +184,18 @@ class WorldFrame(sceneManager: SceneManager, worldState: WorldState) extends Pan
         Platform.runLater(waitDialog.close())
     }
 
+    // TODO think how to do it in one method
+    Future {
+      worldState.processRebels()
+    }.onComplete {
+      case Success(battles) =>
+        Platform.runLater(waitDialog.close())
+        Platform.runLater(playBattles(battles))
+      case Failure(ex) =>
+        error(ex.getMessage, ex)
+        Platform.runLater(waitDialog.close())
+    }
+
     waitDialog.showDialog(sceneManager.stage)
   }
 

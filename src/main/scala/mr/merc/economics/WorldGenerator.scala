@@ -297,6 +297,7 @@ object WorldGenerator extends Logging {
     val r = (generator.generateStateAndProvinces(world.provinces), world.terrain)
     val playerState = r._1.keys.head
     val ws = new WorldState(r._1.values.flatten.toList, playerState, world.terrain, generator.namesGenerators, generator.colorStream)
+    // TODO battles are not played!!! possible source of errors
     0 until TradeDaysBeforeStart foreach(_ => ws.nextTurn())
     info(s"World generation took ${(System.currentTimeMillis() - timeBefore) / 1000d} seconds")
     addClaims(ws)

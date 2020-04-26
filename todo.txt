@@ -7,10 +7,7 @@ Important core stuff
 
 requirement failed: Buying and selling differ
 
-Revolutions/civil wars
 order warriors for strategy AI after production balancing
-capitalists behaviour
-
 
 bug: Battle between Set(Set(Player(Byzantine,[SFX]0xff00ffff)), Set())
 separate peace(+badboy)

@@ -1,6 +1,6 @@
 package mr.merc.economics.ai
 
-import mr.merc.economics.Population.{Capitalists, Craftsmen}
+import mr.merc.economics.Population.{Aristocrats, Capitalists, Craftsmen}
 import mr.merc.economics._
 import mr.merc.economics.WorldConstants.Enterprises._
 import mr.merc.economics.MapUtil.FloatOperations._
@@ -21,13 +21,21 @@ trait FactoryBuildingAI {
 class RandomFactoryBuildingAI extends FactoryBuildingAI {
 
   override def factoryCommands(currentRegion: EconomicRegion, state: WorldStateEnterpriseActions):List[FactoryCommand] = {
-    val investors = currentRegion.regionPopulation.popsByType(Capitalists)
-    val moneyForNeeds = currentRegion.moneyToFulfillNeeds(Capitalists).values.sum
-    val totalMoney = Math.max(0, investors.map(_.moneyReserves).sum - moneyForNeeds)
     val prices = currentRegion.regionMarket.currentPrices
     val factoryBuildCost = state.factoryBuildCost(currentRegion.owner) dot prices
     val factoryExpandCost = state.factoryExpandCost(currentRegion.owner) dot prices
     val maxTask = Math.max(factoryBuildCost, factoryExpandCost)
+
+    val capInvestors = currentRegion.regionPopulation.popsByType(Capitalists)
+    val capMoneyForNeeds = currentRegion.moneyToFulfillNeeds(Capitalists).values.sum
+    val capTotalMoney = Math.max(0, capInvestors.map(_.moneyReserves).sum - capMoneyForNeeds)
+    val (investors, totalMoney) = if (capTotalMoney / maxTask.toInt == 0) {
+      val investors = capInvestors ++ currentRegion.regionPopulation.popsByType(Aristocrats)
+      val moneyForNeeds = capMoneyForNeeds + currentRegion.moneyToFulfillNeeds(Aristocrats).values.sum
+      val totalMoney = Math.max(0, investors.map(_.moneyReserves).sum - moneyForNeeds)
+      (investors, totalMoney)
+    } else (capInvestors, capTotalMoney)
+
     val projects = currentRegion.projects.collect {
       case p:PopulationBusinessProject => p
     }.size

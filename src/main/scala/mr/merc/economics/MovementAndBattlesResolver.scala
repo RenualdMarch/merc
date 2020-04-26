@@ -9,7 +9,7 @@ class MovementAndBattlesResolver(state: WorldState) {
     val allMovers = extractAllMovers()
     val battles = calculateBattles(allMovers)
     val (successful, failed) = successfulAndFailedMovers(allMovers, battles)
-    moveSuccessfullMovers(successful)
+    moveSuccessfulMovers(successful)
     returnFailedMoversBack(failed)
     battles
   }
@@ -22,7 +22,7 @@ class MovementAndBattlesResolver(state: WorldState) {
     }
   }
 
-  def moveSuccessfullMovers(movers:List[MovementFromTo]): Unit ={
+  def moveSuccessfulMovers(movers:List[MovementFromTo]): Unit = {
     movers.foreach { mv =>
       mv.to.regionWarriors.receiveWarriors(mv.warriors)
     }

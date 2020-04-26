@@ -5,7 +5,7 @@ import mr.merc.army.{Warrior, WarriorCompetence, WarriorType}
 import mr.merc.battle.BattleModel
 import mr.merc.diplomacy.Claim.{StrongProvinceClaim, VassalizationClaim, WeakProvinceClaim}
 import mr.merc.diplomacy.DiplomaticAgreement.{AllianceAgreement, WarAgreement}
-import mr.merc.diplomacy.DiplomaticAgreement.WarAgreement.TakeMoney
+import mr.merc.diplomacy.DiplomaticAgreement.WarAgreement.{TakeMoney, TakeProvince, WarTarget}
 import mr.merc.diplomacy.DiplomaticMessage._
 import mr.merc.diplomacy.WorldDiplomacy.RelationshipBonus
 import mr.merc.diplomacy._
@@ -29,7 +29,7 @@ import scalafx.scene.paint.Color
 import scala.collection.mutable.ArrayBuffer
 
 class WorldState(val regions: List[Province], val playerState: State, val worldHexField: FourSeasonsTerrainHexField,
-                 val namesGenerators:Map[Culture, NamesGenerator], var colorStream:Stream[Color], var turn: Int = 1)
+                 val namesGenerators: Map[Culture, NamesGenerator], var colorStream: Stream[Color], var turn: Int = 1)
   extends WorldStateParliamentActions
     with WorldStateBudgetActions
     with WorldStateEnterpriseActions
@@ -39,7 +39,7 @@ class WorldState(val regions: List[Province], val playerState: State, val worldH
 
   private val thisTurnBattles = ArrayBuffer[BattleReport]()
 
-  def battleReports:List[BattleReport] = thisTurnBattles.toList
+  def battleReports: List[BattleReport] = thisTurnBattles.toList
 
   def playerRegions: List[Province] = regions.filter(_.owner == playerState)
 
@@ -49,7 +49,7 @@ class WorldState(val regions: List[Province], val playerState: State, val worldH
     this.aiTurn(onlyAnswer = false)
   }
 
-  def seasonOfYear:SeasonOfYear = Seasons.date(turn)
+  def seasonOfYear: SeasonOfYear = Seasons.date(turn)
 
   def nextTurn(): List[Battle] = {
     thisTurnBattles.clear()
@@ -80,22 +80,21 @@ class WorldState(val regions: List[Province], val playerState: State, val worldH
     states.keysIterator.filterNot(_ == playerState).foreach { state =>
       val soldierMovementAI = new SoldierMovementAI(this, state)
       soldierMovementAI.orderSoldiers()
-      //soldierMovementAI.moveSoldiers()
+      soldierMovementAI.moveSoldiers()
     }
 
     val battlesResolver = new MovementAndBattlesResolver(this)
     val battles = battlesResolver.moveAndPrepareBattles()
     processAiBattles(battles)
     battles
-    // TODO add migrations
   }
 
-  def processAiBattles(battles:List[Battle]): Unit = {
+  def processAiBattles(battles: List[Battle]): Unit = {
     battles.filterNot(_.participants.contains(playerState)).foreach { b =>
       info(s"Battle between ${b.gameField.sides}")
       val model = new BattleModel(b.gameField)
       val aiMap = b.gameField.players.map(p => p -> BattleAI()).toMap
-      while(!model.isOver) {
+      while (!model.isOver) {
         val event = aiMap(model.currentPlayer).nextTurn(model)
         model.handleEvent(event)
       }
@@ -105,10 +104,18 @@ class WorldState(val regions: List[Province], val playerState: State, val worldH
     }
   }
 
-  def concludePlayerBattle(battle:Battle): BattleReport = {
+  def concludePlayerBattle(battle: Battle): BattleReport = {
     val result = battle.concludeBattle(this)
     thisTurnBattles += result
     result
+  }
+
+  def processRebels(): List[Battle] = {
+    val rebellions = regions.flatMap(r => r.regionPopulation.rebellion(r))
+    val resolver = new RebellionBattlesResolver(this)
+    val battles = resolver.rebellions(rebellions).values.toList
+    processAiBattles(battles)
+    battles
   }
 
 }
@@ -163,7 +170,7 @@ trait WorldStateParliamentActions {
 
   def states: Map[State, List[Province]]
 
-  def turn:Int
+  def turn: Int
 
   val playerPoliticalSystemProperty: ObjectProperty[PoliticalSystem] =
     ObjectProperty(playerState.politicalSystem)
@@ -218,7 +225,7 @@ trait WorldStateParliamentActions {
     import scalafx.Includes._
 
     states.keysIterator.foreach { state =>
-      if(state.politicalSystem.isElectionNow(turn)) {
+      if (state.politicalSystem.isElectionNow(turn)) {
         val electionResults = state.politicalSystem.doElectionsNow(turn,
           state.primeCulture, possibleParties(state.politicalSystem), states(state))
         state.mailBox.addMessage(new InformationDomesticMessage(Localization("election.commission"),
@@ -233,13 +240,13 @@ object WorldStateEnterpriseActions {
   trait FactoryCommand {
     def buildBusinessProject(actions: WorldStateEnterpriseActions): BusinessProject
 
-    def state:State
+    def state: State
 
-    def economyPolicy:EconomyPosition = state.rulingParty.economy
+    def economyPolicy: EconomyPosition = state.rulingParty.economy
 
-    def isValid:Boolean
+    def isValid: Boolean
 
-    def region:EconomicRegion
+    def region: EconomicRegion
   }
 
   case class StateExpandFactoryCommand(state: State, factory: IndustrialFactory) extends FactoryCommand {
@@ -247,7 +254,7 @@ object WorldStateEnterpriseActions {
 
     override def isValid: Boolean = economyPolicy.stateCanExpandFactory
 
-    def region:EconomicRegion = factory.region
+    def region: EconomicRegion = factory.region
   }
 
   case class StateBuildFactoryCommand(state: State, product: IndustryProduct, region: EconomicRegion) extends FactoryCommand {
@@ -262,7 +269,7 @@ object WorldStateEnterpriseActions {
 
     override def isValid: Boolean = economyPolicy.capitalistsCanExpandFactory
 
-    def region:EconomicRegion = factory.region
+    def region: EconomicRegion = factory.region
   }
 
   case class PopBuildFactoryCommand(state: State, investors: List[Population], product: IndustryProduct, region: EconomicRegion) extends FactoryCommand {
@@ -282,23 +289,23 @@ trait WorldStateEnterpriseActions {
   import WorldConstants.Enterprises._
   import MapUtil.FloatOperations._
 
-  def stateCanExpandFactory(factory:IndustrialFactory):Boolean = {
+  def stateCanExpandFactory(factory: IndustrialFactory): Boolean = {
     StateExpandFactoryCommand(factory.region.owner, factory).isValid
   }
 
-  def stateCanBuildFactory(state: State):Boolean = {
+  def stateCanBuildFactory(state: State): Boolean = {
     state.rulingParty.economy.stateCanBuildFactory
   }
 
-  def factoryExpandCost(state:State):Map[Products.Product, Double] = {
+  def factoryExpandCost(state: State): Map[Products.Product, Double] = {
     FactoryExpandCost |*| state.rulingParty.economy.investmentCostMultiplier
   }
 
-  def factoryBuildCost(state:State):Map[Products.Product, Double] = {
+  def factoryBuildCost(state: State): Map[Products.Product, Double] = {
     FactoryBuildCost |*| state.rulingParty.economy.investmentCostMultiplier
   }
 
-  def applyCommand(command:FactoryCommand): Unit = {
+  def applyCommand(command: FactoryCommand): Unit = {
     if (command.isValid) {
       val project = command.buildBusinessProject(this)
       command.region.projects ::= project
@@ -311,9 +318,9 @@ trait WorldStateArmyActions {
 
   def regions: List[Province]
 
-  def canPlanMoveArmy(from:Province, to:Province, warriorOwner:State) : Boolean
+  def canPlanMoveArmy(from: Province, to: Province, warriorOwner: State): Boolean
 
-  def planMoveArmy(from:Province, to:Option[Province], warriors:List[Warrior]): Unit = {
+  def planMoveArmy(from: Province, to: Option[Province], warriors: List[Warrior]): Unit = {
     to match {
       case None => from.regionWarriors.planSendWarriors(warriors, None)
       case Some(p) =>
@@ -348,40 +355,42 @@ trait WorldStateDiplomacyActions {
 
   def states: Map[State, List[Province]]
 
-  def namesGenerators:Map[Culture, NamesGenerator]
+  def namesGenerators: Map[Culture, NamesGenerator]
 
-  def turn:Int
+  def turn: Int
 
-  var colorStream:Stream[Color]
+  var colorStream: Stream[Color]
 
   val diplomacyEngine = new WorldDiplomacy(this)
 
-  def addClaim(claim:Claim): Unit = {
+  def addClaim(claim: Claim): Unit = {
     diplomacyEngine.addClaim(claim)
   }
 
-  def claims(state:State):List[Claim] = diplomacyEngine.claims(state)
+  def claims(state: State): List[Claim] = diplomacyEngine.claims(state)
 
-  def notFulfilledClaims(state:State):List[Claim] = claims(state).filter {
-    case s:StrongProvinceClaim => s.province.owner != state
-    case w:WeakProvinceClaim => w.province.owner != state
-    case _:VassalizationClaim => true
+  def notFulfilledClaims(state: State): List[Claim] = claims(state).filter {
+    case s: StrongProvinceClaim => s.province.owner != state
+    case w: WeakProvinceClaim => w.province.owner != state
+    case _: VassalizationClaim => true
   }
 
-  def claimsAgainstStates(state: State):List[State] = notFulfilledClaims(state).map {
-    case s:StrongProvinceClaim => s.province.owner
-    case w:WeakProvinceClaim => w.province.owner
-    case v:VassalizationClaim => v.possibleVassal
+  def claimsAgainstStates(state: State): List[State] = notFulfilledClaims(state).map {
+    case s: StrongProvinceClaim => s.province.owner
+    case w: WeakProvinceClaim => w.province.owner
+    case v: VassalizationClaim => v.possibleVassal
   }.distinct
 
-  def generateNewState(culture: Culture, rulingParty:Party):State = {
+  def generateNewState(culture: Culture, rulingParty: Party, startingMoney:Int = StateStartingMoney, name:String = ""): State = {
     val color = colorStream.head
     colorStream = colorStream.tail
-    val name = namesGenerators(culture).stateNames.extract()
-    new State(name, culture, StateStartingMoney, new PoliticalSystem(rulingParty), color)
+    val stateName = if (name.isEmpty) {
+      namesGenerators(culture).stateNames.extract()
+    } else name
+    new State(stateName, culture, startingMoney, new PoliticalSystem(rulingParty), color)
   }
 
-  def isPossibleMessage(message: DiplomaticMessage):Boolean = message.isPossible(diplomacyEngine, turn)
+  def isPossibleMessage(message: DiplomaticMessage): Boolean = message.isPossible(diplomacyEngine, turn)
 
   def relationships(state: State): Map[State, Int] = diplomacyEngine.relationships(state, turn)
 
@@ -395,31 +404,31 @@ trait WorldStateDiplomacyActions {
     }
   }
 
-  def aiTurn(onlyAnswer:Boolean): Unit = {
+  def aiTurn(onlyAnswer: Boolean): Unit = {
     val aiStates = states.keySet - playerState
     val ais = aiStates.map(s => new DiplomaticAI(s, this))
 
-    ais.foreach (_.aiMove(onlyAnswer))
-    ais.foreach (_.aiMove(onlyAnswer = true))
+    ais.foreach(_.aiMove(onlyAnswer))
+    ais.foreach(_.aiMove(onlyAnswer = true))
   }
 
-  def mailbox(state:State):List[DiplomaticMessage] = {
+  def mailbox(state: State): List[DiplomaticMessage] = {
     diplomacyEngine.messages(state, turn)
   }
 
-  def acknowledgeMessage(declaration:DiplomaticDeclaration): Unit = {
+  def acknowledgeMessage(declaration: DiplomaticDeclaration): Unit = {
     diplomacyEngine.answerMessage(declaration, turn)
   }
 
-  def answerMessage(proposal:DiplomaticProposal, answerIsYes:Boolean): Unit = {
+  def answerMessage(proposal: DiplomaticProposal, answerIsYes: Boolean): Unit = {
     diplomacyEngine.answerMessage(proposal, answerIsYes, turn)
   }
 
-  def defaultCustomMessageAnswer(custom:CustomDiplomaticQuestion): Unit = {
+  def defaultCustomMessageAnswer(custom: CustomDiplomaticQuestion): Unit = {
     diplomacyEngine.defaultAnswerMessage(custom, turn)
   }
 
-  def answerDeclareWar(dw:DeclareWar, allies:Set[State]): Unit = {
+  def answerDeclareWar(dw: DeclareWar, allies: Set[State]): Unit = {
     diplomacyEngine.answerDeclareWarMessage(dw, turn, allies)
   }
 
@@ -427,55 +436,55 @@ trait WorldStateDiplomacyActions {
     diplomacyEngine.processAllUnansweredMessages(turn)
   }
 
-  def agreements(state: State):List[DiplomaticAgreement] = diplomacyEngine.agreements(state)
+  def agreements(state: State): List[DiplomaticAgreement] = diplomacyEngine.agreements(state)
 
-  def attackerLeader(warAgreement: WarAgreement):State = warAgreement.attackersLeader(diplomacyEngine)
+  def attackerLeader(warAgreement: WarAgreement): State = warAgreement.attackersLeader(diplomacyEngine)
 
-  def defendersLeader(warAgreement: WarAgreement):State = warAgreement.defendersLeader(diplomacyEngine)
+  def defendersLeader(warAgreement: WarAgreement): State = warAgreement.defendersLeader(diplomacyEngine)
 
-  def canDeclareWar(from:State, to:State): Boolean = {
+  def canDeclareWar(from: State, to: State): Boolean = {
     val message = new DeclareWar(from, to, new TakeMoney(from, to, 1), Set())
     isPossibleMessage(message)
   }
 
-  def canProposePeace(from:State, to:State): Boolean = {
+  def canProposePeace(from: State, to: State): Boolean = {
     diplomacyEngine.wars(from).find(_.sides.contains(to)).exists { wa =>
       val message = ProposePeace(from, to, wa, Set())
       isPossibleMessage(message)
     }
   }
 
-  def warsForWhichCanProposePeace(from:State, to:State):List[WarAgreement] = {
+  def warsForWhichCanProposePeace(from: State, to: State): List[WarAgreement] = {
     diplomacyEngine.wars.filter { wa =>
       val leaders = Set(wa.defendersLeader(diplomacyEngine), wa.attackersLeader(diplomacyEngine))
       leaders == Set(from, to)
     }
   }
 
-  def canProposeVassalization(from:State, to:State): Boolean = {
+  def canProposeVassalization(from: State, to: State): Boolean = {
     val message = new VassalizationProposal(from, to)
     isPossibleMessage(message)
   }
 
-  def canProposeOverlordship(from: State, to:State): Boolean = {
+  def canProposeOverlordship(from: State, to: State): Boolean = {
     val message = new OverlordshipProposal(from, to)
     isPossibleMessage(message)
   }
 
-  def canProposeAlliance(from: State, to:State): Boolean = {
+  def canProposeAlliance(from: State, to: State): Boolean = {
     val message = new AllianceProposal(from, to)
     isPossibleMessage(message)
   }
 
-  def possibleVassalizationWarTargets(state:State):List[State] = {
+  def possibleVassalizationWarTargets(state: State): List[State] = {
     state :: diplomacyEngine.getVassals(state)
   }
 
-  def possibleProvincesToTake(state: State):List[Province] = {
+  def possibleProvincesToTake(state: State): List[Province] = {
     regions.filter(p => p.owner == state)
   }
 
-  def possibleCulturesToLiberate(state: State):Set[Culture] = {
+  def possibleCulturesToLiberate(state: State): Set[Culture] = {
     regions.filter(_.owner == state).map(_.culture).toSet - state.primeCulture
   }
 
@@ -483,29 +492,29 @@ trait WorldStateDiplomacyActions {
     regions.filter(p => p.owner == state && p.culture == culture)
   }
 
-  def allies(state:State):List[State] = {
+  def allies(state: State): List[State] = {
     diplomacyEngine.agreements(state).collect {
-      case aa:AllianceAgreement => aa.sides - state
+      case aa: AllianceAgreement => aa.sides - state
     }.flatten
   }
 
-  def vassals(state:State):List[State] = {
+  def vassals(state: State): List[State] = {
     diplomacyEngine.getVassals(state)
   }
 
-  def inWarTogether(state1:State, state2:State):Boolean = {
+  def inWarTogether(state1: State, state2: State): Boolean = {
     diplomacyEngine.wars.exists(ag => ag.onSameSide(Set(state1, state2)))
   }
 
-  def inWarTogetherAgainst(state:State, together:State, against:State):Boolean = {
+  def inWarTogetherAgainst(state: State, together: State, against: State): Boolean = {
     diplomacyEngine.wars.exists(ag => ag.onSameSide(Set(state, together)) && ag.onDifferentSides(Set(state, against)))
   }
 
-  def inWarAgainst(state1: State, state2:State):Boolean = {
+  def inWarAgainst(state1: State, state2: State): Boolean = {
     diplomacyEngine.wars.exists(ag => ag.onDifferentSides(Set(state1, state2)))
   }
 
-  def mergeAttackersTogether(attackers:Set[State], defender:State):Set[Set[State]] = {
+  def mergeAttackersTogether(attackers: Set[State], defender: State): Set[Set[State]] = {
     val defenderWars = diplomacyEngine.wars(defender)
     defenderWars.map { war =>
       val oppositeSide = war.oppositeSideByState(defender)
@@ -513,13 +522,34 @@ trait WorldStateDiplomacyActions {
     }.filter(_.nonEmpty).toSet
   }
 
-
-  def canPlanMoveArmy(from:Province, to:Province, warriorOwner:State) : Boolean = {
+  def canPlanMoveArmy(from: Province, to: Province, warriorOwner: State): Boolean = {
     from.economicNeighbours.contains(to) && canAccessProvince(warriorOwner, to)
   }
 
-  def canAccessProvince(state: State, province:Province): Boolean = {
+  def canAccessProvince(state: State, province: Province): Boolean = {
     state == province.owner || inWarAgainst(state, province.owner) || inWarTogether(state, province.owner) ||
       allies(state).contains(province.owner) || vassals(state).contains(province.owner)
+  }
+
+  def newRebelStateArised(prevOwner: State, state: State, province: Province): Unit = {
+    def isTakeThisProvince(t:WarTarget): Boolean = t match {
+      case tp: TakeProvince => tp.province == province
+      case _ => false
+    }
+
+    diplomacyEngine.wars.filter(_.targets.exists(isTakeThisProvince)).foreach { war =>
+      val takeProvince = war.targets.find(isTakeThisProvince).get
+
+      val newEnemies = war.oppositeSideByState(prevOwner)
+      val newWar = new WarAgreement(newEnemies, Set(state), takeProvince.demander, state, turn,
+        Set(new TakeProvince(takeProvince.demander, state, province)))
+      diplomacyEngine.addAgreement(newWar)
+    }
+
+    val freedomWar = new WarAgreement(Set(prevOwner), Set(state), prevOwner, state, turn,
+      Set(new TakeProvince(prevOwner, state, province)))
+    diplomacyEngine.addAgreement(freedomWar)
+
+    diplomacyEngine.removeDisappearedStates()
   }
 }

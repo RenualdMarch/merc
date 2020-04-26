@@ -85,7 +85,19 @@ object WorldConstants {
     val GrowthRatePerLifeNeed:Double = 0.005 / 4
     val GrowthRatePerRegularNeed:Double = 0.005 / 4
 
+    val RebellionPopulationPart = 0.3
+
     val HousePerPopulation = 20000
+
+    def isPopRebelling(consumptionHappiness: Double, politicalHappiness: Double): Boolean = {
+      if (politicalHappiness > 0.5) false
+      else consumptionHappiness < 0.3
+    }
+
+    def popRebellingChance(consumptionHappiness: Double, politicalHappiness: Double): Double = {
+      if (!isPopRebelling(consumptionHappiness, politicalHappiness)) 0
+      else Math.max(0d, (0.3 - consumptionHappiness) / 0.3)
+    }
   }
 
   object Market {
@@ -133,11 +145,11 @@ object WorldConstants {
   }
 
   object Army {
-    private val supply = Map(Weapons -> 10d, Clothes -> 10d, Grain -> 10d)
-    private val recruitmentCost = Map[Product, Double](Weapons -> 50d, Clothes -> 50d)
+    private val supply = Map(Weapons -> 100d, Clothes -> 100d, Grain -> 100d)
+    private val recruitmentCost = Map[Product, Double](Weapons -> 500d, Clothes -> 500d)
 
     val SoldierSupply:Map[WarriorCompetence, Map[Product, Double]] = Map(
-      Professional -> (supply |*| 2),
+      Professional -> (supply |*| 4),
       Militia -> supply)
 
     val SoldierRecruitmentCost:Map[WarriorCompetence, Map[Product, Double]] = Map(
@@ -279,7 +291,7 @@ object WorldGenerationConstants {
   val RichMoneyPerPerson = 10
 
   val StateStartingMoney = 100000
-  val StateAvgProvinces = 2
+  val StateAvgProvinces = 3
   val StateShuffles = 20
 
   val TradeDaysBeforeStart = 1
@@ -288,8 +300,8 @@ object WorldGenerationConstants {
   val PopMigrationToNeighbourPercentage = 0.2
   val PopMigrationsToNeighbours = 1
 
-  val WorldMapWidth = 25
-  val WorldMapHeight = 25
+  val WorldMapWidth = 50
+  val WorldMapHeight = 50
   val HexesPerProvince = 100
   val LandPercentage = 0.7
   val Provinces = (WorldMapHeight * WorldMapWidth * LandPercentage / HexesPerProvince).toInt

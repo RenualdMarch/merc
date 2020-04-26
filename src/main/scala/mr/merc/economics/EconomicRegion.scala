@@ -4,11 +4,14 @@ import mr.merc.map.PossibleGrid
 import Products.{IndustryProduct, Product}
 import mr.merc.economics.Population._
 import mr.merc.economics.util.DistributionCalculator
-import mr.merc.politics.{PoliticalViews, State}
+import mr.merc.politics.{PoliticalViews, Province, State}
 import mr.merc.economics.MapUtil.FloatOperations.MapWithFloatOperations
 import WorldConstants.Population._
 import mr.merc.army.Warrior
+import mr.merc.economics.RegionPopulation.Rebellion
 import mr.merc.log.Logging
+
+import scala.util.Random
 
 trait EconomicRegion {
 
@@ -135,6 +138,18 @@ class EconomicGrid(region:EconomicRegion) extends PossibleGrid[EconomicRegion] {
   override def cellWhereMovementMustBeStopped(t: EconomicRegion): Boolean = false
 }
 
+object RegionPopulation {
+
+  case class Rebellion(province: Province, pops:List[Population]) {
+
+    require(pops.nonEmpty, "Rebeliion pops cann't be empty")
+    val rebellionCulture:Culture = pops.groupBy(_.culture).map{case (cul, list) => cul -> list.map(_.populationCount).sum}.maxBy(_._2)._1
+
+    val totalRebels:Int = pops.map(_.populationCount).sum
+    require(totalRebels > 0, s"Total rebels count cann't be $totalRebels")
+  }
+}
+
 class RegionPopulation(initialPops: List[Population]) {
 
   private var currentPops = initialPops
@@ -231,6 +246,33 @@ class RegionPopulation(initialPops: List[Population]) {
   }
 
   def populationCount: Int = pops.map(_.populationCount).sum
+
+  private def popsWhoWantToRebel(state: State, random: Random = Random): List[Population] = {
+    import WorldConstants.Population._
+    pops.filter(_.salary.size > 2).filter { p =>
+      val chance = popRebellingChance(p.consumptionHappiness, p.politicalHappiness(state))
+      random.nextDouble() < chance
+    }
+  }
+
+  private def partWantsToRebel(rebelPops:List[Population]):Double = {
+    val totalPops = pops.map(_.populationCount).sum
+    val rebels = rebelPops.map(_.populationCount).sum
+    if (totalPops != 0) rebels.toDouble / totalPops
+    else 0d
+  }
+
+  private def rebellionTakesPlace(rebelPops:List[Population]): Boolean = {
+    val parts = partWantsToRebel(rebelPops)
+    parts > WorldConstants.Population.RebellionPopulationPart
+  }
+
+  def rebellion(province: Province, random: Random = Random):Option[Rebellion] = {
+    val rebels = popsWhoWantToRebel(province.controller, random)
+    if (rebellionTakesPlace(rebels)) {
+      Some(Rebellion(province, rebels))
+    } else None
+  }
 }
 
 class RegionMarket(initialPrices:Map[Product, Double]) extends Logging {

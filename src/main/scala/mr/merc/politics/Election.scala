@@ -20,7 +20,7 @@ class Election(currentParty: Party, primaryCulture: Culture, possibleParties: Li
     StateElectionReport(reports)
   }
 
-  def totalPopulationPopularity(regions:List[EconomicRegion]): StateElectionReport = {
+  def totalPopulationPopularity(regions: List[EconomicRegion]): StateElectionReport = {
     val reports = regions.map { r =>
       val reports = r.regionPopulation.pops.map(_.choose(Party.allParties))
       RegionElectionReport(r, reports)
@@ -31,11 +31,15 @@ class Election(currentParty: Party, primaryCulture: Culture, possibleParties: Li
 
 object Election {
 
+  def mostPopularParty(pops: List[Population], allowedParties: List[Party]): Party = {
+    pops.map(_.choose(allowedParties)).map(_.votes).fold(Map(allowedParties.head -> 0d))(_ ++ _)
+    }.maxBy(_._2)._1
+
   implicit class PopulationElection(population: Population) {
 
     def choose(parties: List[Party]): PopulationElectionReport = {
       val groups = population.politicalViews.currentViews(population.literacy).pointsOfView |*| population.populationCount
-      val votesByGroups = groups.map {case (position, count) =>
+      val votesByGroups = groups.map { case (position, count) =>
         val diff = parties.groupBy(p => position.diffWithPosition(p.politicalPosition))
         val minKey = diff.keySet.min
         val mostPopularParties = diff(minKey)
@@ -43,7 +47,7 @@ object Election {
         mostPopularParties.map(_ -> countPerParty).toMap
       }.reduce(_ |+| _)
       val votes = votesByGroups.groupBy(_._1).map { case (p, list) =>
-          p -> list.values.sum
+        p -> list.values.sum
       }
       val zeros = (parties.toSet -- votes.keySet).map(_ -> 0d).toMap
       PopulationElectionReport(population, votes ++ zeros)
@@ -60,8 +64,8 @@ case class StateElectionReport(reports: List[RegionElectionReport]) extends Elec
 
   override val votes: Map[Party, Double] = reports.foldLeft(Map[Party, Double]())(_ |+| _.votes)
 
-  def riggedElections(party: Party, additionalPart:Double):StateElectionReport = {
-    def rigReport(r:RegionElectionReport):RegionElectionReport = {
+  def riggedElections(party: Party, additionalPart: Double): StateElectionReport = {
+    def rigReport(r: RegionElectionReport): RegionElectionReport = {
       val popReports = r.reports.map { popReport =>
         val allVotes = popReport.votes.values.sum
         val newVotes = allVotes * additionalPart
@@ -70,6 +74,7 @@ case class StateElectionReport(reports: List[RegionElectionReport]) extends Elec
       }
       RegionElectionReport(r.region, popReports)
     }
+
     StateElectionReport(reports.map(rigReport))
   }
 }

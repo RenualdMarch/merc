@@ -1,6 +1,6 @@
 package mr.merc.diplomacy
 
-import mr.merc.diplomacy.DiplomaticAgreement.{AllianceAgreement, VassalAgreement, WarAgreement}
+import mr.merc.diplomacy.DiplomaticAgreement.{AllianceAgreement, TruceAgreement, VassalAgreement, WarAgreement}
 import mr.merc.diplomacy.DiplomaticAgreement.WarAgreement._
 import mr.merc.diplomacy.Claim.{ProvinceClaim, StrongProvinceClaim, VassalizationClaim, WeakProvinceClaim}
 import mr.merc.diplomacy.DiplomaticMessage.DeclareWar
@@ -329,6 +329,49 @@ class WorldDiplomacy(actions:WorldStateDiplomacyActions) {
     }
 
     newAgreements.foreach(this.addAgreement)
+    removeDisappearedStates()
+  }
+
+  def removeDisappearedStates(): Unit = {
+    val actualStates = states
+    def actual(set:Set[State]):Set[State] = set & actualStates
+    val agreementsToDelete = agreements.flatMap {
+      case warAgreement: WarAgreement =>
+        warAgreement.attackers = actual(warAgreement.attackers)
+        warAgreement.defenders = actual(warAgreement.defenders)
+        warAgreement.targets = warAgreement.targets.flatMap(_.validTarget(warAgreement, this))
+        if (warAgreement.attackers.isEmpty || warAgreement.defenders.isEmpty || warAgreement.targets.isEmpty)
+          Some(warAgreement)
+        else None
+      case truceAgreement: TruceAgreement =>
+        if (truceAgreement.sides != actual(truceAgreement.sides)) Some(truceAgreement)
+        else None
+      case vassalAgreement: VassalAgreement =>
+        if (vassalAgreement.sides != actual(vassalAgreement.sides)) Some(vassalAgreement)
+        else None
+      case allianceAgreement: AllianceAgreement =>
+        if (allianceAgreement.sides != actual(allianceAgreement.sides)) Some(allianceAgreement)
+        else None
+    }.toSet
+
+    agreements = agreements.filterNot(agreementsToDelete.contains)
+
+    regions.foreach { p =>
+      if (!actualStates.contains(p.controller)) {
+        p.controller = p.owner
+      }
+
+      val lostWarriors = p.regionWarriors.allWarriors.filterNot(w => actualStates.contains(w.owner))
+      p.regionWarriors.takeWarriors(lostWarriors)
+    }
+
+    events = events.filter(e => actual(Set(e.fromState, e.toState)).size == 2)
+
+    badBoy = badBoy.filterKeys(actualStates.contains)
+
+    mailbox = mailbox.filterKeys(actualStates.contains)
+
+    claims = claims.filter(s => actualStates.contains(s.state))
   }
 
 }
