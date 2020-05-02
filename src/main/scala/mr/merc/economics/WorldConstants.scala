@@ -292,7 +292,7 @@ object WorldGenerationConstants {
   val RichMoneyPerPerson = 10
 
   val StateStartingMoney = 100000
-  val StateAvgProvinces = 3
+  val StateAvgProvinces = 2
   val StateShuffles = 20
 
   val TradeDaysBeforeStart = 1
@@ -301,8 +301,8 @@ object WorldGenerationConstants {
   val PopMigrationToNeighbourPercentage = 0.2
   val PopMigrationsToNeighbours = 1
 
-  val WorldMapWidth = 50
-  val WorldMapHeight = 50
+  val WorldMapWidth = 75
+  val WorldMapHeight = 75
   val HexesPerProvince = 100
   val LandPercentage = 0.7
   val Provinces = (WorldMapHeight * WorldMapWidth * LandPercentage / HexesPerProvince).toInt

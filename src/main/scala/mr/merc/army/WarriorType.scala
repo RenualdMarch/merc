@@ -60,7 +60,7 @@ object WarriorCompetence {
 object WarriorType {
 
   def allWarriorTypes:List[WarriorType] = List(HeavyBladeInfantry, LightBladeInfantry, BladeArcher, MaceArcher,
-    BladeCavalry, PikeCavalry, FireWizard, HeavyMaceInfantry, HeavyPikeInfantry)
+    BladeCavalry, PikeCavalry, FireWizard, HeavyMaceInfantry, HeavyPikeInfantry, ElvenFighter, ElvenArcher)
 
   case object HeavyBladeInfantry extends WarriorType("heavyBladeInfantry") {
 
@@ -257,7 +257,7 @@ object WarriorType {
 
     override def baseAttacks: List[Attack] = List(
       Attack(0, 6, 2, Impact, ranged = false, Set()),
-      Attack(0, 8, 4, Fire, ranged = true, Set(Magical)))
+      Attack(1, 8, 4, Fire, ranged = true, Set(Magical)))
 
     override def moveCost: Map[TerrainKind, Int] = Map(
       WaterKind -> 3, ForestKind -> 2, SwampKind -> 3, HillKind -> 2,
@@ -275,4 +275,53 @@ object WarriorType {
     override def attributes: Set[SoldierTypeAttribute] = Set()
   }
 
+  case object ElvenFighter extends WarriorType("elvenFighter") {
+    override def baseHp: Int = 33
+
+    override def movement: Int = 5
+
+    override def baseAttacks: List[Attack] = List(
+      Attack(0, 5, 4, Blade, ranged = false, Set()),
+      Attack(1, 3, 3, Pierce, ranged = true, Set()))
+
+    override def moveCost: Map[TerrainKind, Int] = Map(
+      WaterKind -> 3, ForestKind -> 1, SwampKind -> 2, HillKind -> 2,
+      MountainKind -> 3, SandKind -> 2, GrassKind -> 1, WallsKind -> 1,
+      SnowKind -> 2, IceKind -> 3)
+
+    override def defence: Map[DefenceType, Int] = Map(
+      WaterDefence -> 20, ForestDefence -> 60, SwampDefence -> 30, HillDefence -> 50,
+      MountainDefence -> 60, SandDefence -> 30, GrassDefence -> 40, BuildingDefence -> 60,
+      SnowDefence -> 30, IceDefence -> 20)
+
+    override def resistance: Map[AttackType, Int] = Map(
+      Blade -> 0, Pierce -> 0, Impact -> 0, Fire -> 0, Cold -> 0, Arcane -> -10)
+
+    override def attributes: Set[SoldierTypeAttribute] = Set()
+  }
+
+  case object ElvenArcher extends WarriorType("elvenArcher") {
+    override def baseHp: Int = 29
+
+    override def movement: Int = 6
+
+    override def baseAttacks: List[Attack] = List(
+      Attack(0, 5, 2, Blade, ranged = false, Set()),
+      Attack(1, 5, 4, Pierce, ranged = true, Set()))
+
+    override def moveCost: Map[TerrainKind, Int] = Map(
+      WaterKind -> 3, ForestKind -> 1, SwampKind -> 2, HillKind -> 2,
+      MountainKind -> 3, SandKind -> 2, GrassKind -> 1, WallsKind -> 1,
+      SnowKind -> 2, IceKind -> 3)
+
+    override def defence: Map[DefenceType, Int] = Map(
+      WaterDefence -> 20, ForestDefence -> 70, SwampDefence -> 30, HillDefence -> 50,
+      MountainDefence -> 60, SandDefence -> 30, GrassDefence -> 40, BuildingDefence -> 60,
+      SnowDefence -> 30, IceDefence -> 20)
+
+    override def resistance: Map[AttackType, Int] = Map(
+      Blade -> 0, Pierce -> 0, Impact -> 0, Fire -> 0, Cold -> 0, Arcane -> -10)
+
+    override def attributes: Set[SoldierTypeAttribute] = Set()
+  }
 }

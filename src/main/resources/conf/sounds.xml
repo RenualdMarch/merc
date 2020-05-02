@@ -26,4 +26,6 @@
 	<!-- pain -->
 	<sound name="horsePain" path="horse-die.ogg"/>
 	<sound name="humanPain1" path="human-die-1.ogg"/>
+	<sound name="elfPain1" path="elf-hit-1.ogg"/>
+	<sound name="elfPain2" path="elf-hit-2.ogg"/>
 </sounds>

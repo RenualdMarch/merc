@@ -11,7 +11,9 @@ object Culture {
 
   private val humanCultures = List(LatinHuman, FrenchHuman, DarkHuman, GreekHuman, GermanHuman, ArabHuman, SlavicHuman, SpainHuman)
 
-  val cultures: List[Culture] = humanCultures
+  private val elvishCultures = List(WoodElves, DesertElves)
+
+  val cultures: List[Culture] = humanCultures ++ elvishCultures
 
   //, HighElf, DarkElf, BarbarianOrc, RockDwarf, GreenSaurian, OldDrakes, Forsaken, RedDemons)
 
@@ -519,13 +521,102 @@ object Culture {
         "Balearic"))
   }
 
+  case object WoodElves extends Culture(name = "woodElves", Elves, "elvenHouse", Color.LightGreen) {
+    override val warriorViewNames: WarriorViewNames = WarriorViewNames.WoodElvesCulture
+
+    override val cultureInfo: CultureInfo = CultureInfo(StateForm("lordship", "federation"),
+      List("Asyhe Belanore",
+        "Alm Taesi",
+        "Galma Serine",
+        "Unfadorei",
+        "Sylnaneas",
+        "Nyll Asari",
+        "Nyneshys",
+        "Thaanalume",
+        "Thellion",
+        "Inma Ancalen",
+        "Thaath Entheas",
+        "Lelaenanaes",
+        "Eno Aethel",
+        "Iyhotalos",
+        "Famdorei",
+        "Y'aenaluna",
+        "Famemelle",
+        "Yllha Asari",
+        "Omyvenaes",
+        "Wnebel",
+        "Hyo Thalore",
+        "Eshalsera",
+        "Enn Allanar",
+        "Asathsari",
+        "Kefathemar",
+        "Nyalnore",
+        "Orobel",
+        "Oshhshara",
+        "Elyssari"),
+      List("Quendian",
+        "Eldarian",
+        "Avarian",
+        "Vanyarian",
+        "Noldorian",
+        "Telerian",
+        "Falmarian",
+        "Sindarian",
+        "Nandorian"))
+  }
+
+  case object DesertElves extends Culture("desertElves", Elves, "elvenHouse", Color.LightYellow) {
+    override val warriorViewNames: WarriorViewNames = WarriorViewNames.DesertElvesCulture
+
+    override val cultureInfo: CultureInfo = CultureInfo(StateForm("lordship", "federation"),
+      List("Ellne Esari",
+        "Mytren Themar",
+        "Emyrengroth",
+        "Shylvadell",
+        "Gahshara",
+        "Nenadorei",
+        "Shaaenalin",
+        "Nythrenlone",
+        "Aseththaes",
+        "Ylle Dorei",
+        "Kseshara",
+        "Iynehil",
+        "Ami Shaeras",
+        "Lella Dorei",
+        "Mylmneas",
+        "Selenserin",
+        "Hyse Serin",
+        "Inynlone",
+        "Selfatheas",
+        "Enyngroth",
+        "Nytlathyr",
+        "Inyf Anore",
+        "Erfe Esari",
+        "Yllnalona",
+        "Eskadi",
+        "Emyfmelle",
+        "Canedell",
+        "Anle Esari",
+        "Onnesari",
+        "Mef Caelora"
+      ),
+      List("Unarithan",
+        "Serinian",
+        "Fasenorian",
+        "Thylladoreian",
+        "Alorian",
+        "Ormedoreian",
+        "Ullholuman",
+        "Themarian"))
+  }
+
   private def scaleNeeds(needsToScale: CornerPopulationNeeds): CornerPopulationNeeds = {
-      needsToScale.transform { case (popClass, classNeedsMap) =>
-        classNeedsMap.transform { case (popNeedsType, needsMap) =>
-          val q = needsQ(popClass)(popNeedsType)
-          needsMap.scaleToSum(q)
-        }
+    needsToScale.transform { case (popClass, classNeedsMap) =>
+      classNeedsMap.transform { case (popNeedsType, needsMap) =>
+        val q = needsQ(popClass)(popNeedsType)
+        needsMap.scaleToSum(q)
       }
+    }
   }
 
   private def defaultIlliterateHumanNeeds(culture: Culture): CornerPopulationNeeds = Map(

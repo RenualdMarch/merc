@@ -33,11 +33,9 @@ chinese?
 +_Forestfolk
 
 Elves
-- wood elves \elves-wood
-- deep elves \ Deep Elves ???
-- desert elves \ Desert Elves
 - dark elves \  Darkelves
-- more dark elves \ Tharis
+- deep elves \ Deep Elves ???
+- more dark elves \ Tharis ???
 
 Orcs
 - northern orcs \orcs

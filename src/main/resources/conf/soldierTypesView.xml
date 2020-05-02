@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <views>
+    <!-- Humans -->
+
     <view name="HumanWesnoth-Horseman">
         <attack1 imageName="spear">
             <n>
@@ -1744,9 +1746,600 @@
         </sounds>
     </view>
 
-
-
-
-
-
+    <!-- Elves -->
+    <view name="ElvesWesnoth-Archer">
+        <attack1 imageName="sword-elven">
+            <all>
+                <succ>
+                    <image name="archer-sword"/>
+                    <image name="archer-sword-1"/>
+                    <image name="archer-sword-2"/>
+                    <image name="archer-sword-3"/>
+                    <image name="archer-sword-4"/>
+                </succ>
+            </all>
+        </attack1>
+        <attack2 imageName="bow-elven" projectile="Arrow">
+            <all>
+                <succ>
+                    <image name="archer-bow"/>
+                    <image name="archer-bow-attack1"/>
+                    <image name="archer-bow-attack2"/>
+                    <image name="archer-bow-attack3"/>
+                    <image name="archer-bow-attack4"/>
+                </succ>
+            </all>
+        </attack2>
+        <defence>
+            <image name="archer-bow-defend"/>
+        </defence>
+        <stand>
+            <image name="archer-bow"/>
+        </stand>
+        <idle>
+            <image name="archer-idle-1"/>
+            <image name="archer-idle-2"/>
+            <image name="archer-idle-3"/>
+            <image name="archer-idle-4"/>
+            <image name="archer-idle-5"/>
+            <image name="archer-idle-6"/>
+        </idle>
+        <death>
+            <image name="archer-die1"/>
+            <image name="archer-die2"/>
+            <image name="archer-die3"/>
+            <image name="archer-die4"/>
+        </death>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <attack2 succ="bow" fail="bowFail"/>
+            <pain sound="elfPain2"/>
+        </sounds>
+    </view>
+    <view name="ElvesWesnoth-Marksman">
+        <stand>
+            <image name="marksman"/>
+        </stand>
+        <attack1 imageName="sword-elven">
+            <all>
+                <succ>
+                    <image name="marksman-sword"/>
+                    <image name="marksman-sword-1"/>
+                    <image name="marksman-sword-2"/>
+                    <image name="marksman-sword-3"/>
+                </succ>
+            </all>
+        </attack1>
+        <attack2 imageName="bow-elven" projectile="Arrow">
+            <all>
+                <succ>
+                    <image name="marksman-bow"/>
+                    <image name="marksman-bow-attack1"/>
+                    <image name="marksman-bow-attack2"/>
+                    <image name="marksman-bow-attack3"/>
+                    <image name="marksman-bow-attack4"/>
+                </succ>
+            </all>
+        </attack2>
+        <defence>
+            <image name="marksman-bow-defend"/>
+        </defence>
+        <death>
+            <image name="marksman-die-1"/>
+            <image name="marksman-die-2"/>
+            <image name="marksman-die-3"/>
+            <image name="marksman-die-4"/>
+            <image name="marksman-die-5"/>
+        </death>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <attack2 succ="bow" fail="bowFail"/>
+            <pain sound="elfPain2"/>
+        </sounds>
+    </view> <!-- Not used -->
+    <view name="ElvesWesnoth-Sharpshooter">
+        <stand>
+            <image name="sharpshooter"/>
+        </stand>
+        <attack1 imageName="sword-elven">
+            <all>
+                <succ>
+                    <image name="sharpshooter-sword"/>
+                    <image name="sharpshooter-sword-1"/>
+                    <image name="sharpshooter-sword-2"/>
+                    <image name="sharpshooter-sword-3"/>
+                </succ>
+            </all>
+        </attack1>
+        <attack2 imageName="bow-elven" projectile="Arrow">
+            <all>
+                <succ>
+                    <image name="sharpshooter-bow"/>
+                    <image name="sharpshooter-bow-attack1"/>
+                    <image name="sharpshooter-bow-attack2"/>
+                    <image name="sharpshooter-bow-attack3"/>
+                    <image name="sharpshooter-bow-attack4"/>
+                    <image name="sharpshooter-bow-attack5"/>
+                </succ>
+            </all>
+        </attack2>
+        <defence>
+            <image name="sharpshooter-bow-defend"/>
+        </defence>
+        <death>
+            <image name="sharpshooter-die1"/>
+            <image name="sharpshooter-die2"/>
+            <image name="sharpshooter-die3"/>
+            <image name="sharpshooter-die4"/>
+        </death>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <attack2 succ="bow" fail="bowFail"/>
+            <pain sound="elfPain2"/>
+        </sounds>
+    </view>
+    <view name="ElvesWesnoth-Fighter">
+        <attack1 imageName="sword-elven">
+            <all>
+                <succ>
+                    <image name="fighter"/>
+                    <image name="fighter-melee-1"/>
+                    <image name="fighter-melee-2"/>
+                </succ>
+            </all>
+        </attack1>
+        <attack2 imageName="bow-elven" projectile="Arrow">
+            <all>
+                <succ>
+                    <image name="fighter-bow"/>
+                    <image name="fighter-bow-attack1"/>
+                    <image name="fighter-bow-attack2"/>
+                    <image name="fighter-bow-attack3"/>
+                    <image name="fighter-bow-attack4"/>
+                </succ>
+            </all>
+        </attack2>
+        <defence>
+            <image name="fighter-defend"/>
+        </defence>
+        <stand>
+            <image name="fighter"/>
+        </stand>
+        <idle>
+            <image name="fighter-idle-1"/>
+            <image name="fighter-idle-2"/>
+            <image name="fighter-idle-3"/>
+            <image name="fighter-idle-4"/>
+            <image name="fighter-idle-5"/>
+            <image name="fighter-idle-6"/>
+            <image name="fighter-idle-7"/>
+            <image name="fighter-idle-8"/>
+            <image name="fighter-idle-9"/>
+            <image name="fighter-idle-10"/>
+            <image name="fighter-idle-11"/>
+            <image name="fighter-idle-12"/>
+        </idle>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <attack2 succ="bow" fail="bowFail"/>
+            <pain sound="elfPain2"/>
+        </sounds>
+    </view>
+    <view name="ElvesWesnoth-Hero">
+        <attack1 imageName="sword-elven">
+            <all>
+                <succ>
+                    <image name="hero"/>
+                    <image name="hero-melee-1"/>
+                    <image name="hero-melee-2"/>
+                    <image name="hero-melee-3"/>
+                    <image name="hero-melee-4"/>
+                </succ>
+            </all>
+        </attack1>
+        <attack2 imageName="bow-elven" projectile="Arrow">
+            <all>
+                <succ>
+                    <image name="hero-bow"/>
+                    <image name="hero-bow-attack1"/>
+                    <image name="hero-bow-attack2"/>
+                    <image name="hero-bow-attack3"/>
+                    <image name="hero-bow-attack4"/>
+                </succ>
+            </all>
+        </attack2>
+        <defence>
+            <image name="hero-defend"/>
+        </defence>
+        <stand>
+            <image name="hero"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <attack2 succ="bow" fail="bowFail"/>
+            <pain sound="elfPain2"/>
+        </sounds>
+    </view>
+    <view name="ElvesWesnoth-Scout">
+        <attack1 imageName="sword-elven"/>
+        <defence>
+            <image name="scout-defend2"/>
+        </defence>
+        <stand>
+            <image name="scout"/>
+        </stand>
+        <idle>
+            <image name="scout-idle-1"/>
+            <image name="scout-idle-2"/>
+            <image name="scout-idle-3"/>
+            <image name="scout-idle-4"/>
+            <image name="scout-idle-5"/>
+            <image name="scout-idle-6"/>
+            <image name="scout-idle-7"/>
+            <image name="scout-idle-8"/>
+            <image name="scout-idle-9"/>
+            <image name="scout-idle-10"/>
+            <image name="scout-idle-11"/>
+            <image name="scout-idle-12"/>
+            <image name="scout-idle-13"/>
+            <image name="scout-idle-14"/>
+            <image name="scout-idle-15"/>
+            <image name="scout-idle-16"/>
+        </idle>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <move sound="horseMovement"/>
+            <pain sound="horsePain"/>
+        </sounds>
+    </view>
+    <view name="ElvesWesnoth-Outrider">
+        <attack1 imageName="sword-elven">
+            <all>
+                <succ>
+                    <image name="outrider-melee-0"/>
+                    <image name="outrider-melee-1"/>
+                    <image name="outrider-melee-2"/>
+                    <image name="outrider-melee-3"/>
+                    <image name="outrider-melee-4"/>
+                    <image name="outrider-melee-5"/>
+                    <image name="outrider-melee-6"/>
+                </succ>
+            </all>
+        </attack1>
+        <defence>
+            <image name="outrider-defend2"/>
+        </defence>
+        <stand>
+            <image name="outrider"/>
+        </stand>
+        <move>
+            <image name="outrider-moving"/>
+        </move>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <move sound="horseMovement"/>
+            <pain sound="horsePain"/>
+        </sounds>
+    </view>
+    <view name="ElvesWesnoth-Shaman">
+        <attack1 imageName="staff-elven">
+            <all>
+                <succ>
+                    <image name="shaman-attack"/>
+                    <image name="shaman-attack2"/>
+                </succ>
+            </all>
+        </attack1>
+        <attack2 imageName="fireball" projectile="Fireball">
+            <all>
+                <succ>
+                    <image name="shaman-heal1"/>
+                    <image name="shaman-heal2"/>
+                    <image name="shaman-heal3"/>
+                    <image name="shaman-heal4"/>
+                    <image name="shaman-heal5"/>
+                    <image name="shaman-heal6"/>
+                    <image name="shaman-heal7"/>
+                    <image name="shaman-heal8"/>
+                    <image name="shaman-heal9"/>
+                </succ>
+            </all>
+        </attack2>
+        <stand>
+            <image name="shaman"/>
+        </stand>
+        <defence>
+            <image name="shaman-defend"/>
+        </defence>
+        <sounds>
+            <attack1 succ="staff" fail="miss1"/>
+            <attack2 succ="magicAttack1" fail="magicAttack1Fail"/>
+            <pain sound="elfPain1"/>
+        </sounds>
+    </view>
+    <view name="ElvesWesnoth-Sylph">
+        <attack1 imageName="staff-elven"/>
+        <attack2 imageName="fireball" projectile="Fireball"/>
+        <stand>
+            <image name="sylph"/>
+        </stand>
+        <sounds>
+            <attack1 succ="staff" fail="miss1"/>
+            <attack2 succ="magicAttack1" fail="magicAttack1Fail"/>
+            <pain sound="elfPain1"/>
+        </sounds>
+    </view>
+    <view name="ElvesDesert-Archer">
+        <attack1 imageName="sword-elven">
+            <all>
+                <succ>
+                    <image name="archer-sword"/>
+                    <image name="archer-sword-1"/>
+                    <image name="archer-sword-2"/>
+                    <image name="archer-sword-3"/>
+                    <image name="archer-sword-4"/>
+                </succ>
+            </all>
+        </attack1>
+        <attack2 imageName="bow-elven" projectile="Arrow">
+            <all>
+                <succ>
+                    <image name="archer-bow"/>
+                    <image name="archer-bow-attack1"/>
+                    <image name="archer-bow-attack2"/>
+                    <image name="archer-bow-attack3"/>
+                    <image name="archer-bow-attack4"/>
+                </succ>
+            </all>
+        </attack2>
+        <defence>
+            <image name="archer-bow-defend"/>
+        </defence>
+        <stand>
+            <image name="archer-bow"/>
+        </stand>
+        <idle>
+            <image name="archer-idle-1"/>
+            <image name="archer-idle-2"/>
+            <image name="archer-idle-3"/>
+            <image name="archer-idle-4"/>
+            <image name="archer-idle-5"/>
+            <image name="archer-idle-6"/>
+        </idle>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <attack2 succ="bow" fail="bowFail"/>
+            <pain sound="elfPain2"/>
+        </sounds>
+    </view>
+    <view name="ElvesDesert-Sharpshooter">
+        <stand>
+            <image name="sharpshooter"/>
+        </stand>
+        <attack1 imageName="sword-elven">
+            <all>
+                <succ>
+                    <image name="sharpshooter-sword"/>
+                    <image name="sharpshooter-sword-1"/>
+                    <image name="sharpshooter-sword-2"/>
+                    <image name="sharpshooter-sword-3"/>
+                </succ>
+            </all>
+        </attack1>
+        <attack2 imageName="bow-elven" projectile="Arrow">
+            <all>
+                <succ>
+                    <image name="sharpshooter-bow"/>
+                    <image name="sharpshooter-bow-attack1"/>
+                    <image name="sharpshooter-bow-attack2"/>
+                    <image name="sharpshooter-bow-attack3"/>
+                    <image name="sharpshooter-bow-attack4"/>
+                    <image name="sharpshooter-bow-attack5"/>
+                </succ>
+            </all>
+        </attack2>
+        <defence>
+            <image name="sharpshooter-bow-defend"/>
+        </defence>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <attack2 succ="bow" fail="bowFail"/>
+            <pain sound="elfPain2"/>
+        </sounds>
+    </view>
+    <view name="ElvesDesert-Fighter">
+        <attack1 imageName="sword-elven">
+            <all>
+                <succ>
+                    <image name="fighter"/>
+                    <image name="fighter-melee-1"/>
+                    <image name="fighter-melee-2"/>
+                </succ>
+            </all>
+        </attack1>
+        <attack2 imageName="bow-elven" projectile="Arrow">
+            <all>
+                <succ>
+                    <image name="fighter-bow"/>
+                    <image name="fighter-bow-attack1"/>
+                    <image name="fighter-bow-attack2"/>
+                    <image name="fighter-bow-attack3"/>
+                    <image name="fighter-bow-attack4"/>
+                </succ>
+            </all>
+        </attack2>
+        <defence>
+            <image name="fighter-defend"/>
+        </defence>
+        <stand>
+            <image name="fighter"/>
+        </stand>
+        <idle>
+            <image name="fighter-idle-1"/>
+            <image name="fighter-idle-2"/>
+            <image name="fighter-idle-3"/>
+            <image name="fighter-idle-4"/>
+            <image name="fighter-idle-5"/>
+            <image name="fighter-idle-6"/>
+            <image name="fighter-idle-7"/>
+            <image name="fighter-idle-8"/>
+            <image name="fighter-idle-9"/>
+            <image name="fighter-idle-10"/>
+            <image name="fighter-idle-11"/>
+            <image name="fighter-idle-12"/>
+        </idle>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <attack2 succ="bow" fail="bowFail"/>
+            <pain sound="elfPain2"/>
+        </sounds>
+    </view>
+    <view name="ElvesDesert-Hero">
+        <attack1 imageName="sword-elven">
+            <all>
+                <succ>
+                    <image name="hero"/>
+                    <image name="hero-melee-1"/>
+                    <image name="hero-melee-2"/>
+                    <image name="hero-melee-3"/>
+                    <image name="hero-melee-4"/>
+                </succ>
+            </all>
+        </attack1>
+        <attack2 imageName="bow-elven" projectile="Arrow">
+            <all>
+                <succ>
+                    <image name="hero-bow"/>
+                    <image name="hero-bow-attack1"/>
+                    <image name="hero-bow-attack2"/>
+                    <image name="hero-bow-attack3"/>
+                    <image name="hero-bow-attack4"/>
+                </succ>
+            </all>
+        </attack2>
+        <defence>
+            <image name="hero-defend"/>
+        </defence>
+        <stand>
+            <image name="hero"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <attack2 succ="bow" fail="bowFail"/>
+            <pain sound="elfPain2"/>
+        </sounds>
+    </view>
+    <view name="ElvesDesert-Scout">
+        <attack1 imageName="sword-elven"/>
+        <defence>
+            <image name="scout-defend2"/>
+        </defence>
+        <stand>
+            <image name="scout"/>
+        </stand>
+        <move>
+            <image name="scout-moving"/>
+        </move>
+        <idle>
+            <image name="scout-idle-1"/>
+            <image name="scout-idle-2"/>
+            <image name="scout-idle-3"/>
+            <image name="scout-idle-4"/>
+            <image name="scout-idle-5"/>
+            <image name="scout-idle-6"/>
+            <image name="scout-idle-7"/>
+            <image name="scout-idle-8"/>
+            <image name="scout-idle-9"/>
+            <image name="scout-idle-10"/>
+            <image name="scout-idle-11"/>
+            <image name="scout-idle-12"/>
+            <image name="scout-idle-13"/>
+            <image name="scout-idle-14"/>
+            <image name="scout-idle-15"/>
+            <image name="scout-idle-16"/>
+        </idle>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <move sound="horseMovement"/>
+            <pain sound="horsePain"/>
+        </sounds>
+    </view>
+    <view name="ElvesDesert-Outrider">
+        <attack1 imageName="sword-elven">
+            <all>
+                <succ>
+                    <image name="outrider-melee-1"/>
+                    <image name="outrider-melee-2"/>
+                </succ>
+            </all>
+        </attack1>
+        <defence>
+            <image name="outrider-defend"/>
+        </defence>
+        <stand>
+            <image name="outrider"/>
+        </stand>
+        <move>
+            <image name="outrider-moving"/>
+        </move>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <move sound="horseMovement"/>
+            <pain sound="horsePain"/>
+        </sounds>
+    </view>
+    <view name="ElvesDesert-Shaman">
+        <attack1 imageName="staff-elven">
+            <all>
+                <succ>
+                    <image name="shaman-attack"/>
+                    <image name="shaman-attack2"/>
+                </succ>
+            </all>
+        </attack1>
+        <attack2 imageName="fireball" projectile="Fireball">
+            <all>
+                <succ>
+                    <image name="shaman"/>
+                </succ>
+            </all>
+        </attack2>
+        <stand>
+            <image name="shaman"/>
+        </stand>
+        <sounds>
+            <attack1 succ="staff" fail="miss1"/>
+            <attack2 succ="magicAttack1" fail="magicAttack1Fail"/>
+            <pain sound="elfPain1"/>
+        </sounds>
+    </view>
+    <view name="ElvesDesert-Druid">
+        <attack1 imageName="staff-elven">
+            <all>
+                <succ>
+                    <image name="druid"/>
+                    <image name="druid-attack"/>
+                    <image name="druid"/>
+                </succ>
+            </all>
+        </attack1>
+        <attack2 imageName="fireball" projectile="Fireball">
+            <all>
+                <succ>
+                    <image name="druid-magic-1"/>
+                    <image name="druid-magic-2"/>
+                    <image name="druid-magic-3"/>
+                    <image name="druid-magic-4"/>
+                </succ>
+            </all>
+        </attack2>
+        <stand>
+            <image name="druid"/>
+        </stand>
+        <sounds>
+            <attack1 succ="staff" fail="miss1"/>
+            <attack2 succ="magicAttack1" fail="magicAttack1Fail"/>
+            <pain sound="elfPain1"/>
+        </sounds>
+    </view>
 </views>

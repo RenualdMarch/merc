@@ -117,4 +117,26 @@ object WarriorViewNames {
     (HeavyPikeInfantry, Militia) -> "HumanLuz-Keeper",
     (HeavyPikeInfantry, Professional) -> "HumanLuz-Sentinel",
   ))
+
+  val WoodElvesCulture = WarriorViewNames(Map(
+    (ElvenArcher, Militia) -> "ElvesWesnoth-Archer",
+    (ElvenArcher, Professional) -> "ElvesWesnoth-Sharpshooter",
+    (ElvenFighter, Militia) -> "ElvesWesnoth-Fighter",
+    (ElvenFighter, Professional) -> "ElvesWesnoth-Hero",
+    (FireWizard, Militia) -> "ElvesWesnoth-Shaman",
+    (FireWizard, Professional) -> "ElvesWesnoth-Sylph",
+    (BladeCavalry, Militia) -> "ElvesWesnoth-Scout",
+    (BladeCavalry, Professional) -> "ElvesWesnoth-Outrider"
+  ))
+
+  val DesertElvesCulture = WarriorViewNames(Map(
+    (ElvenArcher, Militia) -> "ElvesDesert-Archer",
+    (ElvenArcher, Professional) -> "ElvesDesert-Sharpshooter",
+    (ElvenFighter, Militia) -> "ElvesDesert-Fighter",
+    (ElvenFighter, Professional) -> "ElvesDesert-Hero",
+    (FireWizard, Militia) -> "ElvesDesert-Shaman",
+    (FireWizard, Professional) -> "ElvesDesert-Druid",
+    (BladeCavalry, Militia) -> "ElvesDesert-Scout",
+    (BladeCavalry, Professional) -> "ElvesDesert-Outrider"
+  ))
 }
