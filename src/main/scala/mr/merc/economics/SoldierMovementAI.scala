@@ -1,11 +1,14 @@
 package mr.merc.economics
 
-import mr.merc.army.Warrior
+import mr.merc.army.{Warrior, WarriorCompetence, WarriorType}
 import mr.merc.diplomacy.DiplomaticAgreement.WarAgreement
+import mr.merc.economics.SpendingPolicy.Army
 import mr.merc.log.Logging
 import mr.merc.map.UniversalGrid
 import mr.merc.map.pathfind.PathFinder
 import mr.merc.politics.{Province, State}
+import MapUtil.FloatOperations._
+import mr.merc.util.MercUtils._
 
 class SoldierMovementAI(worldState: WorldState, state: State) extends Logging{
   private val advantageToAttack = 2d
@@ -14,8 +17,39 @@ class SoldierMovementAI(worldState: WorldState, state: State) extends Logging{
   private val allSoldiers = worldState.regions.flatMap(_.regionWarriors.allWarriors.filter(_.owner == state))
   private val warriorRegions = worldState.regions.filter(_.regionWarriors.allWarriors.exists(_.owner == state))
 
+  private def pricesForWarriors = worldState.states(state).map {
+    province =>
+      province -> List(WarriorCompetence.Militia, WarriorCompetence.Professional).map {
+        c =>
+          val price = province.regionMarket.currentPrices dot WorldConstants.Army.SoldierRecruitmentCost(c)
+          c -> price
+      }.toMap
+  }.toMap
+
+  private def randomWarriorType: WarriorType = state.primeCulture.warriorViewNames.possibleWarriors.randomElement()._1._1
+
   def orderSoldiers(): Unit = {
-    // TODO - fill later
+    state.budget.history.lastOption.foreach { report =>
+      val totalSpending = report.expenses.values.sum
+      val armySpending = report.expenses.getOrElse(Army, 0d)
+      if (totalSpending != 0) {
+        val targetPercentage = totalSpending * WorldConstants.AI.MaxBudgetSpendingOnWarriors
+        val actualPercentage = armySpending / totalSpending
+        if (actualPercentage < targetPercentage) {
+          val diff = (targetPercentage - actualPercentage) * totalSpending
+          val (militiaProvince, minPriceForMilitia) = pricesForWarriors.mapValues(_(WarriorCompetence.Militia)).minBy(_._2)
+          val (proProvince, minPriceForPro) =  pricesForWarriors.mapValues(_(WarriorCompetence.Professional)).minBy(_._2)
+          if (diff > minPriceForMilitia && diff < minPriceForPro) {
+            worldState.recruitSoldier(militiaProvince, WarriorCompetence.Militia, randomWarriorType, state.primeCulture)
+          } else if (diff > minPriceForPro) {
+            val count = (diff / minPriceForPro).toInt
+            (0 until count).foreach { _ =>
+              worldState.recruitSoldier(proProvince, WarriorCompetence.Professional, randomWarriorType, state.primeCulture)
+            }
+          }
+        }
+      }
+    }
   }
 
   def moveSoldiers(): Unit = {

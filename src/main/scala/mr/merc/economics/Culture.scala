@@ -9,7 +9,9 @@ import MapUtil.FloatOperations._
 
 object Culture {
 
-  def cultures: List[Culture] = List(LatinHuman, FrenchHuman/*, DarkHuman, GreekHuman, GermanHuman, ArabHuman, SlavicHuman, SpainHuman*/)
+  private val humanCultures = List(LatinHuman, FrenchHuman, DarkHuman, GreekHuman, GermanHuman, ArabHuman, SlavicHuman, SpainHuman)
+
+  val cultures: List[Culture] = humanCultures
 
   //, HighElf, DarkElf, BarbarianOrc, RockDwarf, GreenSaurian, OldDrakes, Forsaken, RedDemons)
 
