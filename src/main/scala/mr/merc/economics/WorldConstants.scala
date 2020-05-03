@@ -301,8 +301,8 @@ object WorldGenerationConstants {
   val PopMigrationToNeighbourPercentage = 0.2
   val PopMigrationsToNeighbours = 1
 
-  val WorldMapWidth = 75
-  val WorldMapHeight = 75
+  val WorldMapWidth = 50
+  val WorldMapHeight = 50
   val HexesPerProvince = 100
   val LandPercentage = 0.7
   val Provinces = (WorldMapHeight * WorldMapWidth * LandPercentage / HexesPerProvince).toInt

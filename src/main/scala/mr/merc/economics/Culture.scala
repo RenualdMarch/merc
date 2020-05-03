@@ -9,13 +9,24 @@ import MapUtil.FloatOperations._
 
 object Culture {
 
-  private val humanCultures = List(LatinHuman, FrenchHuman, DarkHuman, GreekHuman, GermanHuman, ArabHuman, SlavicHuman, SpainHuman)
+  private val humanCultures = List(LatinHuman, FrenchHuman/*, DarkHuman, GreekHuman, GermanHuman, ArabHuman, SlavicHuman, SpainHuman*/)
 
   private val elvishCultures = List(WoodElves, DesertElves)
 
-  val cultures: List[Culture] = humanCultures ++ elvishCultures
+  private val orcishCultures = List(WesnothOrcs)
 
-  //, HighElf, DarkElf, BarbarianOrc, RockDwarf, GreenSaurian, OldDrakes, Forsaken, RedDemons)
+  private val dwarfishCultures = List(WesnothDwarfes)
+
+  // + goblins
+  // + trolls
+  // + drakes
+  // + saurians
+  // + undead
+
+
+  val cultures: List[Culture] = humanCultures ++ elvishCultures ++ orcishCultures ++ dwarfishCultures
+
+  //HighElf, DarkElf, BarbarianOrc, RockDwarf, GreenSaurian, OldDrakes, Forsaken, RedDemons)
 
   //
   // DISABLED CULTURES
@@ -569,7 +580,8 @@ object Culture {
     override val warriorViewNames: WarriorViewNames = WarriorViewNames.DesertElvesCulture
 
     override val cultureInfo: CultureInfo = CultureInfo(StateForm("lordship", "federation"),
-      List("Ellne Esari",
+      List(
+        "Ellne Esari",
         "Mytren Themar",
         "Emyrengroth",
         "Shylvadell",
@@ -600,7 +612,8 @@ object Culture {
         "Onnesari",
         "Mef Caelora"
       ),
-      List("Unarithan",
+      List(
+        "Unarithan",
         "Serinian",
         "Fasenorian",
         "Thylladoreian",
@@ -608,6 +621,106 @@ object Culture {
         "Ormedoreian",
         "Ullholuman",
         "Themarian"))
+  }
+
+  case object WesnothOrcs extends Culture("orcs", Orcs, "orcCity", Color.DarkRed) {
+
+    override val warriorViewNames: WarriorViewNames = WarriorViewNames.WesnothOrcCulture
+
+    override val cultureInfo: CultureInfo = CultureInfo(StateForm("horde", "confederation"),
+      List(
+        "Ukh Murdrerd",
+        "Ez Noccokh",
+        "Zorbrard",
+        "Dashbag",
+        "Laldrerd",
+        "Bragvar",
+        "Barkurkrir",
+        "Dozdogan",
+        "Drulgrudh Gigh",
+        "Zrodkag Roz",
+        "Kard Qalbin",
+        "Derd Brodzokh",
+        "Dhigun",
+        "Bhurkron",
+        "Gerzu",
+        "Kodrord",
+        "Dredrurdrodh",
+        "Buccazzegh",
+        "Dugnodh Udh",
+        "Dulkal Ra",
+        "On Vrorgir",
+        "Bhadh Zrermad",
+        "Vulgrud",
+        "Zrodridh",
+        "Irdog",
+        "Lulgikh",
+        "Dralgashnad",
+        "Agrorbrod",
+        "Ugol Ghedh",
+        "Dhugga Vrod"
+      ),
+      List(
+        "Black Tooth Grin",
+        "Blackrock",
+        "Bleeding Hollow",
+        "Bonechewer",
+        "Burning Blade",
+        "Dragonmaw",
+        "Frostwolf",
+        "Laughing Skull",
+        "Mok'Nathal",
+        "Shadowmoon",
+        "Shattered Hand",
+        "Stormreaver",
+        "Thunderlord"))
+  }
+
+  case object WesnothDwarfes extends Culture("dwarfs", Dwarfs, "dwarfCity", Color.White) {
+    override val warriorViewNames: WarriorViewNames = WarriorViewNames.WesnothDwarfCulture
+    override val cultureInfo: CultureInfo = CultureInfo(StateForm("clan", "confederation"),
+      List(
+        "Bag Thurum",
+        "Khorn Boldihr",
+        "Kamburim",
+        "Girtorhm",
+        "Vonladuhr",
+        "Nig Faldur",
+        "Morborimm",
+        "Vagfarum",
+        "Khon Lodahr",
+        "Daluluhm",
+        "Khigh Buldohr",
+        "Kern Burim",
+        "Dhanbadur",
+        "Banbaduhr",
+        "Thimfaruhm",
+        "Gogh Buldahr",
+        "Vel Garuhm",
+        "Bam Kahldur",
+        "Khir Darohm",
+        "Khugboramm",
+        "Dumkohldur",
+        "Herdim",
+        "Keltorum",
+        "Han Thurim",
+        "Thalulur",
+        "Gigham",
+        "Vandarim",
+        "Mineduhr",
+        "Bhighbuldohr",
+        "Bontarum"
+      ),
+      List(
+        "Khazad-dum",
+        "Nogrod",
+        "Belegost",
+        "Iron Hills",
+        "Ironfists",
+        "Khaz Modan",
+        "Wildhammer",
+        "Grim Batol"
+      ))
   }
 
   private def scaleNeeds(needsToScale: CornerPopulationNeeds): CornerPopulationNeeds = {

@@ -139,4 +139,30 @@ object WarriorViewNames {
     (BladeCavalry, Militia) -> "ElvesDesert-Scout",
     (BladeCavalry, Professional) -> "ElvesDesert-Outrider"
   ))
+
+  val WesnothOrcCulture = WarriorViewNames(Map(
+    (BladeCavalry, Militia) -> "OrcsAgeless-Oxrider",
+    (BladeCavalry, Professional) -> "OrcsAgeless-Destrier",
+    (FireWizard, Militia) -> "OrcsAgeless-Drifter",
+    (FireWizard, Professional) -> "OrcsAgeless-Wanderer",
+    (HeavyBladeInfantry, Militia) -> "OrcsWesnoth-Grunt",
+    (HeavyBladeInfantry, Professional) -> "OrcsWesnoth-Warrior",
+    (LightBladeInfantry, Militia) -> "OrcsWesnoth-Assassin",
+    (LightBladeInfantry, Professional) -> "OrcsWesnoth-Slayer",
+    (BladeArcher, Militia) -> "OrcsWesnoth-Archer",
+    (BladeArcher, Professional) -> "OrcsWesnoth-Crossbow",
+  ))
+
+  val WesnothDwarfCulture = WarriorViewNames(Map(
+    (BladeCavalry, Militia) -> "DwarfWesnoth-Rider",
+    (BladeCavalry, Professional) -> "DwarfWesnoth-Master",
+    (FireWizard, Militia) -> "DwarfWesnoth-Runesmith",
+    (FireWizard, Professional) -> "DwarfWesnoth-Arcanister",
+    (HeavyBladeInfantry, Militia) -> "DwarfWesnoth-Fighter",
+    (HeavyBladeInfantry, Professional) -> "DwarfWesnoth-Steelclad",
+    (LightBladeInfantry, Militia) -> "DwarfWesnoth-Ulfserker",
+    (LightBladeInfantry, Professional) -> "DwarfWesnoth-Berserker",
+    (HeavyPikeInfantry, Militia) -> "DwarfWesnoth-Guardsman",
+    (HeavyPikeInfantry, Professional) -> "DwarfWesnoth-Sentinel",
+  ))
 }

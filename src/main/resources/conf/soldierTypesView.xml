@@ -1774,7 +1774,7 @@
             <image name="archer-bow-defend"/>
         </defence>
         <stand>
-            <image name="archer-bow"/>
+            <image name="archer"/>
         </stand>
         <idle>
             <image name="archer-idle-1"/>
@@ -2342,4 +2342,709 @@
             <pain sound="elfPain1"/>
         </sounds>
     </view>
+
+    <!-- orcs -->
+    <view name="OrcsWesnoth-Archer">
+        <attack1 imageName="sword-orcish">
+            <all>
+                <succ>
+                    <image name="archer-melee"/>
+                    <image name="archer-melee-1"/>
+                    <image name="archer-melee-2"/>
+                    <image name="archer-melee-3"/>
+                    <image name="archer-melee-4"/>
+                    <image name="archer-melee-5"/>
+                    <image name="archer-melee-6"/>
+                </succ>
+            </all>
+        </attack1>
+        <attack2 imageName="bow-orcish" projectile="Arrow">
+            <all>
+                <succ>
+                    <image name="archer-bow"/>
+                    <image name="archer-bow-attack-1"/>
+                    <image name="archer-bow-attack-2"/>
+                    <image name="archer-bow-attack-3"/>
+                    <image name="archer-bow-attack-4"/>
+                </succ>
+            </all>
+        </attack2>
+        <defence>
+            <image name="archer-bow-defend"/>
+        </defence>
+        <stand>
+            <image name="archer"/>
+        </stand>
+        <idle>
+            <image name="archer-idle-1"/>
+            <image name="archer-idle-2"/>
+            <image name="archer-idle-3"/>
+            <image name="archer-idle-4"/>
+            <image name="archer-idle-5"/>
+            <image name="archer-idle-6"/>
+        </idle>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <attack2 succ="bow" fail="bowFail"/>
+            <pain sound="orcPain2"/>
+        </sounds>
+    </view>
+    <view name="OrcsWesnoth-Crossbow">
+        <attack1 imageName="sword-orcish">
+            <all>
+                <succ>
+                    <image name="xbowman-melee"/>
+                    <image name="xbowman-melee-1"/>
+                    <image name="xbowman-melee-2"/>
+                    <image name="xbowman-melee-3"/>
+                    <image name="xbowman-melee-4"/>
+                </succ>
+            </all>
+        </attack1>
+        <attack2 imageName="crossbow-orcish" projectile="Arrow">
+            <all>
+                <succ>
+                    <image name="xbowman-ranged-1"/>
+                    <image name="xbowman-ranged-2"/>
+                </succ>
+            </all>
+        </attack2>
+        <defence>
+            <image name="xbowman-defend"/>
+        </defence>
+        <stand>
+            <image name="xbowman"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <attack2 succ="crossbow" fail="crossbowFail"/>
+            <pain sound="orcPain2"/>
+        </sounds>
+    </view>
+    <view name="OrcsWesnoth-Assassin">
+        <attack1 imageName="dagger-orcish">
+            <all>
+                <succ>
+                    <image name="assassin-attack-1"/>
+                    <image name="assassin-attack-2"/>
+                    <image name="assassin-attack-3"/>
+                    <image name="assassin-attack-4"/>
+                    <image name="assassin-attack-5"/>
+                    <image name="assassin-attack-6"/>
+                </succ>
+            </all>
+        </attack1>
+        <defence>
+            <image name="assassin-defend-1"/>
+            <image name="assassin-defend-2"/>
+        </defence>
+        <stand>
+            <image name="assassin"/>
+        </stand>
+        <idle>
+            <image name="assassin-idle-1"/>
+            <image name="assassin-idle-2"/>
+            <image name="assassin-idle-3"/>
+            <image name="assassin-idle-4"/>
+            <image name="assassin-idle-5"/>
+            <image name="assassin-idle-6"/>
+            <image name="assassin-idle-7"/>
+            <image name="assassin-idle-8"/>
+            <image name="assassin-idle-9"/>
+        </idle>
+        <death>
+            <image name="assassin-die-1"/>
+            <image name="assassin-die-2"/>
+            <image name="assassin-die-3"/>
+            <image name="assassin-die-4"/>
+            <image name="assassin-die-5"/>
+            <image name="assassin-die-6"/>
+            <image name="assassin-die-7"/>
+            <image name="assassin-die-8"/>
+            <image name="assassin-die-9"/>
+            <image name="assassin-die-10"/>
+        </death>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <pain sound="orcPain2"/>
+        </sounds>
+    </view>
+    <view name="OrcsWesnoth-Slayer">
+        <attack1 imageName="dagger-orcish">
+            <all>
+                <succ>
+                    <image name="slayer-attack-1"/>
+                    <image name="slayer-attack-2"/>
+                    <image name="slayer-attack-3"/>
+                    <image name="slayer-attack-4"/>
+                    <image name="slayer-attack-5"/>
+                    <image name="slayer-attack-6"/>
+                    <image name="slayer-attack-7"/>
+                    <image name="slayer-attack-8"/>
+                    <image name="slayer-attack-9"/>
+                    <image name="slayer-attack-10"/>
+                    <image name="slayer-attack-11"/>
+                    <image name="slayer-attack-12"/>
+                    <image name="slayer-attack-13"/>
+                    <image name="slayer-attack-14"/>
+                </succ>
+            </all>
+        </attack1>
+        <defence>
+            <image name="slayer-defend"/>
+        </defence>
+        <stand>
+            <image name="slayer"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <pain sound="orcPain2"/>
+        </sounds>
+    </view>
+    <view name="OrcsWesnoth-Grunt">
+        <attack1 imageName="greatsword-orcish">
+            <image name="grunt-attack-1"/>
+            <image name="grunt-attack-2"/>
+            <image name="grunt-attack-3"/>
+            <image name="grunt-attack-4"/>
+            <image name="grunt-attack-5"/>
+        </attack1>
+        <stand>
+            <image name="grunt"/>
+        </stand>
+        <defence>
+            <image name="grunt-defend-1"/>
+        </defence>
+        <death>
+            <image name="grunt-die-1"/>
+            <image name="grunt-die-2"/>
+            <image name="grunt-die-3"/>
+            <image name="grunt-die-4"/>
+            <image name="grunt-die-5"/>
+            <image name="grunt-die-6"/>
+            <image name="grunt-die-7"/>
+            <image name="grunt-die-8"/>
+        </death>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <pain sound="orcPain2"/>
+        </sounds>
+    </view>
+    <view name="OrcsWesnoth-Warrior">
+        <attack1 imageName="greatsword-orcish">
+            <image name="warrior-attack-1"/>
+            <image name="warrior-attack-2"/>
+            <image name="warrior-attack-3"/>
+            <image name="warrior-attack-4"/>
+            <image name="warrior-attack-5"/>
+        </attack1>
+        <stand>
+            <image name="warrior"/>
+        </stand>
+        <defence>
+            <image name="warrior-defend-1"/>
+        </defence>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <pain sound="orcPain2"/>
+        </sounds>
+    </view>
+    <view name="OrcsAgeless-Drifter">
+        <attack1 imageName="staff-magic"/>
+        <attack2 imageName="fireball" projectile="Fireball"/>
+        <stand>
+            <image name="drifter"/>
+        </stand>
+        <sounds>
+            <attack1 succ="staff" fail="miss1"/>
+            <attack2 succ="magicAttack1" fail="magicAttack1Fail"/>
+            <pain sound="orcPain2"/>
+        </sounds>
+    </view>
+    <view name="OrcsAgeless-Wanderer">
+        <attack1 imageName="staff-magic"/>
+        <attack2 imageName="fireball" projectile="Fireball"/>
+        <stand>
+            <image name="wanderer"/>
+        </stand>
+        <sounds>
+            <attack1 succ="staff" fail="miss1"/>
+            <attack2 succ="magicAttack1" fail="magicAttack1Fail"/>
+            <pain sound="orcPain2"/>
+        </sounds>
+    </view>
+    <view name="OrcsAgeless-Oxrider">
+        <attack1 imageName="greatsword-orcish">
+            <all>
+                <succ>
+                    <image name="oxrider-attack-0"/>
+                    <image name="oxrider-attack-1"/>
+                    <image name="oxrider-attack-2"/>
+                    <image name="oxrider-attack-3"/>
+                    <image name="oxrider-attack-4"/>
+                </succ>
+            </all>
+        </attack1>
+        <defence>
+            <image name="oxrider-defend-1"/>
+        </defence>
+        <stand>
+            <image name="oxrider"/>
+        </stand>
+        <move>
+            <image name="oxrider-move"/>
+        </move>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <move sound="horseMovement"/>
+            <pain sound="horsePain"/>
+        </sounds>
+    </view>
+    <view name="OrcsAgeless-Destrier">
+        <attack1 imageName="greatsword-orcish"/>
+        <stand>
+            <image name="destrier"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <move sound="horseMovement"/>
+            <pain sound="horsePain"/>
+        </sounds>
+    </view>
+
+    <!-- dwarfes -->
+    <view name="DwarfWesnoth-Fighter">
+        <attack1 imageName="axe">
+            <n>
+                <succ>
+                    <image name="fighter-ne"/>
+                    <image name="fighter-ne-axe1"/>
+                    <image name="fighter-ne-axe2"/>
+                    <image name="fighter-ne-axe3"/>
+                    <image name="fighter-ne-axe4"/>
+                    <image name="fighter-ne-axe5"/>
+                    <image name="fighter-ne-axe6"/>
+                    <image name="fighter-ne-axe7"/>
+                    <image name="fighter-ne-axe8"/>
+                    <image name="fighter-ne-axe9"/>
+                </succ>
+            </n>
+            <ne>
+                <succ>
+                    <image name="fighter-ne"/>
+                    <image name="fighter-ne-axe1"/>
+                    <image name="fighter-ne-axe2"/>
+                    <image name="fighter-ne-axe3"/>
+                    <image name="fighter-ne-axe4"/>
+                    <image name="fighter-ne-axe5"/>
+                    <image name="fighter-ne-axe6"/>
+                    <image name="fighter-ne-axe7"/>
+                    <image name="fighter-ne-axe8"/>
+                    <image name="fighter-ne-axe9"/>
+                </succ>
+            </ne>
+            <se>
+                <succ>
+                    <image name="fighter-se-axe1"/>
+                    <image name="fighter-se-axe2"/>
+                    <image name="fighter-se-axe3"/>
+                    <image name="fighter-se-axe4"/>
+                    <image name="fighter-se-axe5"/>
+                    <image name="fighter-se-axe6"/>
+                    <image name="fighter-se-axe7"/>
+                    <image name="fighter-se-axe8"/>
+                    <image name="fighter-se-axe9"/>
+                </succ>
+            </se>
+            <s>
+                <succ>
+                    <image name="fighter-se-axe1"/>
+                    <image name="fighter-se-axe2"/>
+                    <image name="fighter-se-axe3"/>
+                    <image name="fighter-se-axe4"/>
+                    <image name="fighter-se-axe5"/>
+                    <image name="fighter-se-axe6"/>
+                    <image name="fighter-se-axe7"/>
+                    <image name="fighter-se-axe8"/>
+                    <image name="fighter-se-axe9"/>
+                </succ>
+            </s>
+        </attack1>
+        <stand>
+            <image name="fighter"/>
+        </stand>
+        <defence>
+            <image name="fighter-se-defend2"/>
+        </defence>
+        <move>
+            <image name="fighter-se-run1"/>
+            <image name="fighter-se-run2"/>
+            <image name="fighter-se-run3"/>
+            <image name="fighter-se-run4"/>
+            <image name="fighter-se-run5"/>
+            <image name="fighter-se-run6"/>
+            <image name="fighter-se-run7"/>
+            <image name="fighter-se-run8"/>
+            <image name="fighter-se-run9"/>
+            <image name="fighter-se-run10"/>
+        </move>
+        <sounds>
+            <attack1 succ="axe" fail="miss3"/>
+            <pain sound="dwarfPain1"/>
+        </sounds>
+    </view>
+    <view name="DwarfWesnoth-Steelclad">
+        <attack1 imageName="axe">
+            <n>
+                <succ>
+                    <image name="steelclad-ne"/>
+                    <image name="steelclad-ne-axe1"/>
+                    <image name="steelclad-ne-axe2"/>
+                    <image name="steelclad-ne-axe3"/>
+                    <image name="steelclad-ne-axe4"/>
+                    <image name="steelclad-ne-axe5"/>
+                    <image name="steelclad-ne-axe6"/>
+                    <image name="steelclad-ne-axe7"/>
+                    <image name="steelclad-ne-axe8"/>
+                    <image name="steelclad-ne-axe9"/>
+                </succ>
+            </n>
+            <ne>
+                <succ>
+                    <image name="steelclad-ne"/>
+                    <image name="steelclad-ne-axe1"/>
+                    <image name="steelclad-ne-axe2"/>
+                    <image name="steelclad-ne-axe3"/>
+                    <image name="steelclad-ne-axe4"/>
+                    <image name="steelclad-ne-axe5"/>
+                    <image name="steelclad-ne-axe6"/>
+                    <image name="steelclad-ne-axe7"/>
+                    <image name="steelclad-ne-axe8"/>
+                    <image name="steelclad-ne-axe9"/>
+                </succ>
+            </ne>
+            <se>
+                <succ>
+                    <image name="steelclad-se-axe1"/>
+                    <image name="steelclad-se-axe2"/>
+                    <image name="steelclad-se-axe3"/>
+                    <image name="steelclad-se-axe4"/>
+                    <image name="steelclad-se-axe5"/>
+                    <image name="steelclad-se-axe6"/>
+                    <image name="steelclad-se-axe7"/>
+                    <image name="steelclad-se-axe8"/>
+                    <image name="steelclad-se-axe9"/>
+                </succ>
+            </se>
+            <s>
+                <succ>
+                    <image name="steelclad-se-axe1"/>
+                    <image name="steelclad-se-axe2"/>
+                    <image name="steelclad-se-axe3"/>
+                    <image name="steelclad-se-axe4"/>
+                    <image name="steelclad-se-axe5"/>
+                    <image name="steelclad-se-axe6"/>
+                    <image name="steelclad-se-axe7"/>
+                    <image name="steelclad-se-axe8"/>
+                    <image name="steelclad-se-axe9"/>
+                </succ>
+            </s>
+        </attack1>
+        <stand>
+            <image name="steelclad"/>
+        </stand>
+        <defence>
+            <image name="steelclad-se-defend2"/>
+        </defence>
+        <idle>
+            <image name="steelclad-idle-1"/>
+            <image name="steelclad-idle-2"/>
+            <image name="steelclad-idle-3"/>
+            <image name="steelclad-idle-4"/>
+            <image name="steelclad-idle-5"/>
+            <image name="steelclad-idle-6"/>
+            <image name="steelclad-idle-7"/>
+            <image name="steelclad-idle-8"/>
+            <image name="steelclad-idle-9"/>
+            <image name="steelclad-idle-10"/>
+            <image name="steelclad-idle-11"/>
+        </idle>
+        <move>
+            <image name="steelclad-se-run1"/>
+            <image name="steelclad-se-run2"/>
+            <image name="steelclad-se-run3"/>
+            <image name="steelclad-se-run4"/>
+            <image name="steelclad-se-run5"/>
+            <image name="steelclad-se-run6"/>
+            <image name="steelclad-se-run7"/>
+            <image name="steelclad-se-run8"/>
+            <image name="steelclad-se-run9"/>
+            <image name="steelclad-se-run10"/>
+        </move>
+        <sounds>
+            <attack1 succ="axe" fail="miss3"/>
+            <pain sound="dwarfPain1"/>
+        </sounds>
+    </view>
+    <view name="DwarfWesnoth-Ulfserker">
+        <attack1 imageName="axe">
+            <all>
+                <succ>
+                    <image name="ulfserker-attack-1"/>
+                    <image name="ulfserker-attack-2"/>
+                    <image name="ulfserker-attack-3"/>
+                    <image name="ulfserker-attack-4"/>
+                    <image name="ulfserker-attack-5"/>
+                    <image name="ulfserker-attack-6"/>
+                    <image name="ulfserker-attack-7"/>
+                    <image name="ulfserker-attack-8"/>
+                </succ>
+            </all>
+        </attack1>
+        <stand>
+            <image name="ulfserker"/>
+        </stand>
+        <idle>
+            <image name="ulfserker-idle-1"/>
+            <image name="ulfserker-idle-2"/>
+            <image name="ulfserker-idle-3"/>
+            <image name="ulfserker-idle-4"/>
+            <image name="ulfserker-idle-5"/>
+            <image name="ulfserker-idle-6"/>
+        </idle>
+        <sounds>
+            <attack1 succ="axe" fail="miss3"/>
+            <pain sound="dwarfPain1"/>
+        </sounds>
+    </view>
+    <view name="DwarfWesnoth-Berserker">
+        <attack1 imageName="axe">
+            <all>
+                <succ>
+                    <image name="berserker-attack-1"/>
+                    <image name="berserker-attack-2"/>
+                    <image name="berserker-attack-3"/>
+                    <image name="berserker-attack-4"/>
+                    <image name="berserker-attack-5"/>
+                    <image name="berserker-attack-6"/>
+                    <image name="berserker-attack-7"/>
+                    <image name="berserker-attack-8"/>
+                </succ>
+            </all>
+        </attack1>
+        <stand>
+            <image name="berserker"/>
+        </stand>
+        <idle>
+            <image name="berserker-idle-1"/>
+            <image name="berserker-idle-2"/>
+            <image name="berserker-idle-3"/>
+            <image name="berserker-idle-4"/>
+            <image name="berserker-idle-5"/>
+            <image name="berserker-idle-6"/>
+            <image name="berserker-idle-7"/>
+            <image name="berserker-idle-8"/>
+            <image name="berserker-idle-9"/>
+            <image name="berserker-idle-10"/>
+            <image name="berserker-idle-11"/>
+            <image name="berserker-idle-12"/>
+            <image name="berserker-idle-13"/>
+            <image name="berserker-idle-14"/>
+            <image name="berserker-idle-15"/>
+        </idle>
+        <sounds>
+            <attack1 succ="axe" fail="miss3"/>
+            <pain sound="dwarfPain1"/>
+        </sounds>
+    </view>
+    <view name="DwarfWesnoth-Runesmith">
+        <attack1 imageName="hammer-dwarven">
+            <all>
+                <succ>
+                    <image name="runesmith-attack-se-1"/>
+                    <image name="runesmith-attack-se-2"/>
+                    <image name="runesmith-attack-se-3"/>
+                    <image name="runesmith-attack-se-4"/>
+                    <image name="runesmith-attack-se-5"/>
+                    <image name="runesmith-attack-se-6"/>
+                    <image name="runesmith-attack-se-7"/>
+                    <image name="runesmith-attack-se-8"/>
+                    <image name="runesmith-attack-se-9"/>
+                    <image name="runesmith-attack-se-10"/>
+                </succ>
+            </all>
+        </attack1>
+        <attack2 imageName="fireball" projectile="Fireball">
+            <all>
+                <succ>
+                    <image name="runesmith"/>
+                </succ>
+            </all>
+        </attack2>
+        <stand>
+            <image name="runesmith"/>
+        </stand>
+        <defence>
+            <image name="runesmith-defend-2"/>
+        </defence>
+        <sounds>
+            <attack1 succ="mace" fail="miss1"/>
+            <attack2 succ="magicAttack1" fail="magicAttack1Fail"/>
+            <pain sound="dwarfPain1"/>
+        </sounds>
+    </view>
+    <view name="DwarfWesnoth-Arcanister">
+        <attack1 imageName="hammer-dwarven"/>
+        <attack2 imageName="fireball" projectile="Fireball"/>
+        <stand>
+            <image name="arcanister"/>
+        </stand>
+        <sounds>
+            <attack1 succ="staff" fail="miss1"/>
+            <attack2 succ="magicAttack1" fail="magicAttack1Fail"/>
+            <pain sound="dwarfPain1"/>
+        </sounds>
+    </view>
+    <view name="DwarfWesnoth-Rider">
+        <attack1 imageName="claws-animal"/>
+        <stand>
+            <image name="gryphon-rider"/>
+        </stand>
+        <move>
+            <image name="gryphon-rider-flying-1"/>
+            <image name="gryphon-rider-flying-2"/>
+            <image name="gryphon-rider-flying-3"/>
+            <image name="gryphon-rider-flying-4"/>
+            <image name="gryphon-rider-flying-5"/>
+            <image name="gryphon-rider-flying-6"/>
+            <image name="gryphon-rider-flying-7"/>
+            <image name="gryphon-rider-flying-8"/>
+        </move>
+        <sounds>
+            <attack1 succ="claws" fail="miss3"/>
+            <move sound="gryphonMovement"/>
+            <pain sound="gryphonPain1"/>
+        </sounds>
+    </view>
+    <view name="DwarfWesnoth-Master">
+        <attack1 imageName="claws-animal"/>
+        <stand>
+            <image name="gryphon-master"/>
+        </stand>
+        <move>
+            <image name="gryphon-master-flying-1"/>
+            <image name="gryphon-master-flying-2"/>
+            <image name="gryphon-master-flying-3"/>
+            <image name="gryphon-master-flying-4"/>
+            <image name="gryphon-master-flying-5"/>
+            <image name="gryphon-master-flying-6"/>
+            <image name="gryphon-master-flying-7"/>
+            <image name="gryphon-master-flying-8"/>
+        </move>
+        <sounds>
+            <attack1 succ="claws" fail="miss3"/>
+            <move sound="gryphonMovement"/>
+            <pain sound="gryphonPain1"/>
+        </sounds>
+    </view>
+    <view name="DwarfWesnoth-Sentinel">
+        <attack1 imageName="spear">
+            <all>
+                <succ>
+                    <image name="sentinel-attack"/>
+                </succ>
+            </all>
+        </attack1>
+        <stand>
+            <image name="sentinel"/>
+        </stand>
+        <defence>
+            <image name="sentinel-defend-2"/>
+        </defence>
+        <sounds>
+            <attack1 succ="spear" fail="spearFail"/>
+            <pain sound="dwarfPain1"/>
+        </sounds>
+    </view>
+    <view name="DwarfWesnoth-Guardsman">
+        <attack1 imageName="spear">
+            <n>
+                <succ>
+                    <image name="guard-ne"/>
+                    <image name="guard-ne-attack-1"/>
+                    <image name="guard-ne-attack-2"/>
+                    <image name="guard-ne-attack-3"/>
+                    <image name="guard-ne-attack-4"/>
+                    <image name="guard-ne-attack-5"/>
+                    <image name="guard-ne-attack-6"/>
+                    <image name="guard-ne-attack-7"/>
+                </succ>
+            </n>
+            <ne>
+                <succ>
+                    <image name="guard-ne"/>
+                    <image name="guard-ne-attack-1"/>
+                    <image name="guard-ne-attack-2"/>
+                    <image name="guard-ne-attack-3"/>
+                    <image name="guard-ne-attack-4"/>
+                    <image name="guard-ne-attack-5"/>
+                    <image name="guard-ne-attack-6"/>
+                    <image name="guard-ne-attack-7"/>
+                </succ>
+            </ne>
+            <se>
+                <succ>
+                    <image name="guard-attack-1"/>
+                    <image name="guard-attack-2"/>
+                    <image name="guard-attack-3"/>
+                    <image name="guard-attack-4"/>
+                    <image name="guard-attack-5"/>
+                    <image name="guard-attack-6"/>
+                    <image name="guard-attack-7"/>
+                </succ>
+            </se>
+            <s>
+                <succ>
+                    <image name="guard-attack-1"/>
+                    <image name="guard-attack-2"/>
+                    <image name="guard-attack-3"/>
+                    <image name="guard-attack-4"/>
+                    <image name="guard-attack-5"/>
+                    <image name="guard-attack-6"/>
+                    <image name="guard-attack-7"/>
+                </succ>
+            </s>
+        </attack1>
+        <stand>
+            <image name="guard"/>
+        </stand>
+        <defence>
+            <image name="guard-defend-2"/>
+        </defence>
+        <idle>
+            <image name="guard-idle-1"/>
+            <image name="guard-idle-2"/>
+            <image name="guard-idle-3"/>
+            <image name="guard-idle-4"/>
+            <image name="guard-idle-5"/>
+            <image name="guard-idle-6"/>
+        </idle>
+        <move>
+            <image name="guard-se-run1"/>
+            <image name="guard-se-run2"/>
+            <image name="guard-se-run3"/>
+            <image name="guard-se-run4"/>
+            <image name="guard-se-run5"/>
+            <image name="guard-se-run6"/>
+            <image name="guard-se-run7"/>
+            <image name="guard-se-run8"/>
+            <image name="guard-se-run9"/>
+            <image name="guard-se-run10"/>
+        </move>
+        <sounds>
+            <attack1 succ="spear" fail="spearFail"/>
+            <pain sound="dwarfPain1"/>
+        </sounds>
+    </view>
+
 </views>
