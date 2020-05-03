@@ -69,7 +69,7 @@ object WarriorType {
       MountainKind -> 3, SandKind -> 2, GrassKind -> 1, WallsKind -> 1,
       SnowKind -> 3, IceKind -> movement)
 
-    override def baseAttacks = List(Attack(0, 8, 4, Blade, ranged = false))
+    override def baseAttacks = List(Attack(0, 9, 4, Blade, ranged = false))
 
     override def baseHp: Int = 55
 
@@ -91,7 +91,7 @@ object WarriorType {
 
     override def movement: Int = 4
 
-    override def baseAttacks: List[Attack] =  List(Attack(0, 18, 2, Impact, ranged = false))
+    override def baseAttacks: List[Attack] =  List(Attack(0, 15, 2, Impact, ranged = false))
 
     override def moveCost: Map[TerrainKind, Int] = Map(
       WaterKind -> 4, ForestKind -> 2, SwampKind -> 4, HillKind -> 3,
@@ -109,7 +109,7 @@ object WarriorType {
   }
 
   case object HeavyPikeInfantry extends WarriorType("heavyPikeInfantry") {
-    override def baseHp: Int = 55
+    override def baseHp: Int = 57
 
     override def movement: Int = 5
 
@@ -132,11 +132,11 @@ object WarriorType {
   }
 
   case object LightBladeInfantry extends WarriorType("lightBladeInfantry") {
-    override def baseHp: Int = 44
+    override def baseHp: Int = 47
 
     override def movement: Int = 7
 
-    override def baseAttacks: List[Attack] = List(Attack(0, 5, 5, Blade, ranged = false))
+    override def baseAttacks: List[Attack] = List(Attack(0, 8, 5, Blade, ranged = false))
 
     override def moveCost: Map[TerrainKind, Int] = Map(
       WaterKind -> 2, ForestKind -> 2, SwampKind -> 2, HillKind -> 2,
@@ -161,7 +161,7 @@ object WarriorType {
 
     override def baseAttacks: List[Attack] = List(
       Attack(0, 8, 2, Blade, ranged = false),
-      Attack(1, 10, 3, Pierce, ranged = true))
+      Attack(1, 8, 3, Pierce, ranged = true))
 
     override def moveCost: Map[TerrainKind, Int] = Map(
       WaterKind -> 3, ForestKind -> 2, SwampKind -> 3, HillKind -> 2,
@@ -186,7 +186,7 @@ object WarriorType {
 
     override def baseAttacks: List[Attack] = List(
       Attack(0, 8, 2, Impact, ranged = false),
-      Attack(1, 10, 3, Impact, ranged = true))
+      Attack(1, 8, 3, Impact, ranged = true))
 
     override def moveCost: Map[TerrainKind, Int] = Map(
       WaterKind -> 3, ForestKind -> 2, SwampKind -> 3, HillKind -> 2,
@@ -205,11 +205,11 @@ object WarriorType {
   }
 
   case object BladeCavalry extends WarriorType("bladeCavalry") {
-    override def baseHp: Int = 49
+    override def baseHp: Int = 65
 
     override def movement: Int = 9
 
-    override def baseAttacks: List[Attack] = List(Attack(0, 6, 4, Blade, ranged = false))
+    override def baseAttacks: List[Attack] = List(Attack(0, 10, 4, Blade, ranged = false))
 
     override def moveCost: Map[TerrainKind, Int] = Map(
       WaterKind -> 4, ForestKind -> 3, SwampKind -> 4, HillKind -> 2,
@@ -251,13 +251,13 @@ object WarriorType {
   }
 
   case object FireWizard extends WarriorType("fireWizard") {
-    override def baseHp: Int = 42
+    override def baseHp: Int = 39
 
     override def movement: Int = 5
 
     override def baseAttacks: List[Attack] = List(
       Attack(0, 6, 2, Impact, ranged = false, Set()),
-      Attack(1, 8, 4, Fire, ranged = true, Set(Magical)))
+      Attack(1, 7, 4, Fire, ranged = true, Set(Magical)))
 
     override def moveCost: Map[TerrainKind, Int] = Map(
       WaterKind -> 3, ForestKind -> 2, SwampKind -> 3, HillKind -> 2,
@@ -276,13 +276,13 @@ object WarriorType {
   }
 
   case object ElvenFighter extends WarriorType("elvenFighter") {
-    override def baseHp: Int = 33
+    override def baseHp: Int = 53
 
     override def movement: Int = 5
 
     override def baseAttacks: List[Attack] = List(
-      Attack(0, 5, 4, Blade, ranged = false, Set()),
-      Attack(1, 3, 3, Pierce, ranged = true, Set()))
+      Attack(0, 7, 4, Blade, ranged = false, Set()),
+      Attack(1, 6, 3, Pierce, ranged = true, Set()))
 
     override def moveCost: Map[TerrainKind, Int] = Map(
       WaterKind -> 3, ForestKind -> 1, SwampKind -> 2, HillKind -> 2,
@@ -301,13 +301,13 @@ object WarriorType {
   }
 
   case object ElvenArcher extends WarriorType("elvenArcher") {
-    override def baseHp: Int = 29
+    override def baseHp: Int = 40
 
     override def movement: Int = 6
 
     override def baseAttacks: List[Attack] = List(
-      Attack(0, 5, 2, Blade, ranged = false, Set()),
-      Attack(1, 5, 4, Pierce, ranged = true, Set()))
+      Attack(0, 6, 2, Blade, ranged = false, Set()),
+      Attack(1, 9, 4, Pierce, ranged = true, Set()))
 
     override def moveCost: Map[TerrainKind, Int] = Map(
       WaterKind -> 3, ForestKind -> 1, SwampKind -> 2, HillKind -> 2,

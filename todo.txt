@@ -10,6 +10,8 @@ culture assimilation - ?
 
 
 bug: Battle between Set(Set(Player(Byzantine,[SFX]0xff00ffff)), Set())
+bug: AI battle sometimes hangs, add more logging?
+
 separate peace(+badboy)
 when 1 and 2 are in alliance and 2 and 3 too, and 1 declares war on 3
 add war targets to going war
@@ -63,7 +65,6 @@ Polishing:
 issues - balance production and needs multipliers
 localization - add parameters order, like %1, %2, %3
 soldiers and battles and wars
-tests for balancing warrior types
 when armies move they should try move near middle borders
 
 //"-Dglass.win.uiScale=100%"
