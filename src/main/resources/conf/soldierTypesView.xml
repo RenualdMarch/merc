@@ -2394,10 +2394,10 @@
             <all>
                 <succ>
                     <image name="xbowman-melee"/>
-                    <image name="xbowman-melee-1"/>
-                    <image name="xbowman-melee-2"/>
-                    <image name="xbowman-melee-3"/>
-                    <image name="xbowman-melee-4"/>
+                    <image name="xbowman-melee-attack-1"/>
+                    <image name="xbowman-melee-attack-2"/>
+                    <image name="xbowman-melee-attack-3"/>
+                    <image name="xbowman-melee-attack-4"/>
                 </succ>
             </all>
         </attack1>

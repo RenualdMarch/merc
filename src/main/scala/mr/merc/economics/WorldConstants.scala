@@ -306,5 +306,4 @@ object WorldGenerationConstants {
   val HexesPerProvince = 100
   val LandPercentage = 0.7
   val Provinces = (WorldMapHeight * WorldMapWidth * LandPercentage / HexesPerProvince).toInt
-
 }

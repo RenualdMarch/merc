@@ -137,10 +137,13 @@ class WorldGenerator(field:FourSeasonsTerrainHexField) {
 
   private def generateCultureStateDivisions(connectivityMap: Map[FourSeasonsTerrainHex, Set[FourSeasonsTerrainHex]]):List[(State, List[FourSeasonsTerrainHex])] = {
     import mr.merc.util.Divide.DivideIntegral
-    val provincesPerCulture = Culture.cultures zip (connectivityMap.size divList Culture.cultures.size)
+    /*val provincesPerCulture = Culture.cultures zip (connectivityMap.size divList Culture.cultures.size)
     val raceSizes = provincesPerCulture.groupBy(_._1.race).toList.map {case (race, list) =>
       race -> list.map(_._2).sum
-    }
+    }*/
+
+    val races = Culture.cultures.map(_.race).distinct
+    val raceSizes = races zip (connectivityMap.size divList races.size)
 
     val racesZipCM = raceSizes.map(_._1) zip divideIntoContinuousParts(connectivityMap, raceSizes.map(_._2))
     racesZipCM.flatMap {case (race, raceMap) =>
