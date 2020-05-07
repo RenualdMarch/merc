@@ -40,7 +40,6 @@ Elves
 - more dark elves \ Tharis ???
 
 Orcs
-- northern orcs \orcs
 - latin orcs \ _Orcei Gladiatores
 - more northern orcs \ _Northern Orcs
 

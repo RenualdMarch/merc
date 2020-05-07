@@ -9,7 +9,7 @@ import MapUtil.FloatOperations._
 
 object Culture {
 
-  private val humanCultures = List(LatinHuman, FrenchHuman/*, DarkHuman, GreekHuman, GermanHuman, ArabHuman, SlavicHuman, SpainHuman*/)
+  private val humanCultures = List(LatinHuman, FrenchHuman /*, DarkHuman, GreekHuman, GermanHuman, ArabHuman, SlavicHuman, SpainHuman*/)
 
   private val elvishCultures = List(WoodElves, DesertElves)
 
@@ -17,14 +17,14 @@ object Culture {
 
   private val dwarfishCultures = List(WesnothDwarfes)
 
+  private val undeadCultures = List(WesnothUndead)
+
   // + goblins
   // + trolls
-  // + drakes
   // + saurians
-  // + undead
 
 
-  val cultures: List[Culture] = humanCultures ++ elvishCultures ++ orcishCultures ++ dwarfishCultures
+  val cultures: List[Culture] = humanCultures ++ elvishCultures ++ orcishCultures ++ dwarfishCultures ++ undeadCultures
 
   //HighElf, DarkElf, BarbarianOrc, RockDwarf, GreenSaurian, OldDrakes, Forsaken, RedDemons)
 
@@ -33,8 +33,6 @@ object Culture {
   //
   /*case object HighElf extends Culture("state.federation", Elves)
   case object DarkElf extends Culture("state.confederation", Elves)
-  case object BarbarianOrc extends Culture("state.horde", Orcs)
-  case object RockDwarf extends Culture("state.clan", Dwarfs)
   case object GreenSaurian extends Culture("state.syndicate", Saurians)
   case object OldDrakes extends Culture("state.dominion", Drakes)
   case object Forsaken extends Culture("state.collective", Undead)
@@ -720,6 +718,55 @@ object Culture {
         "Khaz Modan",
         "Wildhammer",
         "Grim Batol"
+      ))
+  }
+
+  case object WesnothUndead extends Culture("undead", Undead, "caveCity", Color.Brown) {
+    override val warriorViewNames: WarriorViewNames = WarriorViewNames.WesnothUndeadCulture
+    override val cultureInfo: CultureInfo = CultureInfo(StateForm("hegemony", "union"),
+      List(
+        "Tugrad",
+        "Juchuth",
+        "Okrax",
+        "Taltozkos",
+        "Zanrormid",
+        "Nixruuzur",
+        "As Namkhok",
+        "Kur Ukkaar",
+        "Torquth Vass",
+        "Phudux Phir",
+        "Malrer",
+        "Naxxox",
+        "Zaurkhox",
+        "Orkherrax",
+        "Kaxnushix",
+        "Kunkhoshzis",
+        "Ux Ankar",
+        "Khas Vixxrud",
+        "Phoxxais Touss",
+        "Mumkuss Khos",
+        "Goshos",
+        "Zubrud",
+        "Zoxras",
+        "Phunkihress",
+        "Tulguggux",
+        "Agzikzaz",
+        "Chuus Olzik",
+        "Iz Zocred",
+        "Oggruss Khaiss",
+        "Nushrek Ax"
+      ),
+      List(
+        "Urkhissian",
+        "Chankhaidan",
+        "Nolturian",
+        "Cholrairhathan",
+        "Tecramossian",
+        "Kounkharozian",
+        "Ad Varqoxian",
+        "Zoud Jexrarian",
+        "Khiszis Kurian",
+        "Toxruss Gourian"
       ))
   }
 

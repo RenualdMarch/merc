@@ -162,7 +162,7 @@ object DiplomaticAgreement {
   }
 
   case class WarAgreement(var attackers: Set[State], var defenders: Set[State], warInitiator: State,
-                     warVictim: State, startingTurn: Int, var targets: Set[WarTarget])
+                     warVictim: State, startingTurn: Int, var targets: Set[WarTarget], fullWarName: String)
     extends DiplomaticAgreement(startingTurn, None) {
 
     override def sides: Set[State] = attackers ++ defenders

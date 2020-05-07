@@ -165,4 +165,17 @@ object WarriorViewNames {
     (HeavyPikeInfantry, Militia) -> "DwarfWesnoth-Guardsman",
     (HeavyPikeInfantry, Professional) -> "DwarfWesnoth-Sentinel",
   ))
+
+  val WesnothUndeadCulture = WarriorViewNames(Map(
+    (BladeCavalry, Militia) -> "UndeadWesnoth-Rider",
+    (BladeCavalry, Professional) -> "UndeadWesnoth-Deathrider",
+    (FireWizard, Militia) -> "UndeadWesnoth-Lich",
+    (FireWizard, Professional) -> "UndeadWesnoth-AncientLich",
+    (HeavyBladeInfantry, Militia) -> "UndeadWesnoth-Revenant",
+    (HeavyBladeInfantry, Professional) -> "UndeadWesnoth-Draug",
+    (LightBladeInfantry, Militia) -> "UndeadWesnoth-Skeleton",
+    (LightBladeInfantry, Professional) -> "UndeadWesnoth-Deathblade",
+    (BladeArcher, Militia) -> "UndeadWesnoth-Boneshooter",
+    (BladeArcher, Professional) -> "UndeadWesnoth-Banebow"
+  ))
 }

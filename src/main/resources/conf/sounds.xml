@@ -34,7 +34,7 @@
 	<sound name="orcPain2" path="orc-hit-2.ogg"/>
 	<sound name="dwarfPain1" path="dwarf-hit-1.ogg"/>
 	<sound name="gryphonPain1" path="gryphon-hit-3.ogg"/>
-
+	<sound name="skeletonPain3" path="skeleton-big-hit-3.ogg"/>
 
 
 </sounds>

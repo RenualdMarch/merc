@@ -203,7 +203,8 @@ object DiplomaticMessage {
 
     override def beforeSendAction(diplomacy: WorldDiplomacy, currentTurn: Int): Unit = {
       super.beforeSendAction(diplomacy, currentTurn)
-      val w = new WarAgreement(Set(from), Set(to), from, to, currentTurn, Set(target))
+      val name = diplomacy.generateNewWarName(from, to, target)
+      val w = new WarAgreement(Set(from), Set(to), from, to, currentTurn, Set(target), name)
       diplomacy.addAgreement(w)
       war = Some(w)
 

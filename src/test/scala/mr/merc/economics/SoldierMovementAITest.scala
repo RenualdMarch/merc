@@ -55,7 +55,7 @@ class SoldierMovementAITest extends FunSuite with Matchers with BeforeAndAfter {
       new FourSeasonsTerrainHexField(1, 1, (x,y) => new FourSeasonsTerrainHex(x, y, FourSeasonsGrass)), Map(), Stream())
 
     worldState.diplomacyEngine.addAgreement(new WarAgreement(Set(state1), Set(state2), state1, state2, 0,
-      Set(new TakeProvince(state1, state2, province3))))
+      Set(new TakeProvince(state1, state2, province3)), ""))
 
     val soldierMovementAI = new SoldierMovementAI(worldState, state1)
     soldierMovementAI.moveSoldiers()
@@ -86,7 +86,7 @@ class SoldierMovementAITest extends FunSuite with Matchers with BeforeAndAfter {
       new FourSeasonsTerrainHexField(1, 1, (x,y) => new FourSeasonsTerrainHex(x, y, FourSeasonsGrass)), Map(), Stream())
 
     worldState.diplomacyEngine.addAgreement(new WarAgreement(Set(state1), Set(state2), state1, state2, 0,
-      Set(new TakeProvince(state1, state2, province3))))
+      Set(new TakeProvince(state1, state2, province3)), ""))
 
     val soldierMovementAI = new SoldierMovementAI(worldState, state1)
     soldierMovementAI.moveSoldiers()
@@ -117,7 +117,7 @@ class SoldierMovementAITest extends FunSuite with Matchers with BeforeAndAfter {
       new FourSeasonsTerrainHexField(1, 1, (x,y) => new FourSeasonsTerrainHex(x, y, FourSeasonsGrass)), Map(), Stream())
 
     worldState.diplomacyEngine.addAgreement(new WarAgreement(Set(state1), Set(state2), state1, state2, 0,
-      Set(new TakeProvince(state1, state2, province3))))
+      Set(new TakeProvince(state1, state2, province3)), ""))
 
     val soldierMovementAI = new SoldierMovementAI(worldState, state1)
     soldierMovementAI.moveSoldiers()

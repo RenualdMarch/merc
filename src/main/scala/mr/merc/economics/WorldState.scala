@@ -369,6 +369,8 @@ trait WorldStateDiplomacyActions {
 
   def claims(state: State): List[Claim] = diplomacyEngine.claims(state)
 
+  def claimsAgainst(state: State): List[Claim] = diplomacyEngine.claimsAgainst(state)
+
   def notFulfilledClaims(state: State): List[Claim] = claims(state).filter {
     case s: StrongProvinceClaim => s.province.owner != state
     case w: WeakProvinceClaim => w.province.owner != state
@@ -541,13 +543,15 @@ trait WorldStateDiplomacyActions {
       val takeProvince = war.targets.find(isTakeThisProvince).get
 
       val newEnemies = war.oppositeSideByState(prevOwner)
+      val target = new TakeProvince(takeProvince.demander, state, province)
       val newWar = new WarAgreement(newEnemies, Set(state), takeProvince.demander, state, turn,
-        Set(new TakeProvince(takeProvince.demander, state, province)))
+        Set(target), diplomacyEngine.generateNewWarName(takeProvince.demander, state, target))
       diplomacyEngine.addAgreement(newWar)
     }
 
+    val target = new TakeProvince(prevOwner, state, province)
     val freedomWar = new WarAgreement(Set(prevOwner), Set(state), prevOwner, state, turn,
-      Set(new TakeProvince(prevOwner, state, province)))
+      Set(target), diplomacyEngine.generateNewWarName(prevOwner, state, target))
     diplomacyEngine.addAgreement(freedomWar)
 
     diplomacyEngine.removeDisappearedStates()

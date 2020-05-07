@@ -3047,4 +3047,386 @@
         </sounds>
     </view>
 
+    <view name="UndeadWesnoth-Skeleton">
+        <attack1 imageName="axe-undead">
+            <n>
+                <succ>
+                    <image name="skeleton-ne-melee1"/>
+                    <image name="skeleton-ne-melee2"/>
+                    <image name="skeleton-ne-melee3"/>
+                    <image name="skeleton-ne-melee4"/>
+                    <image name="skeleton-ne-melee5"/>
+                    <image name="skeleton-ne-melee6"/>
+                    <image name="skeleton-ne-melee7"/>
+                    <image name="skeleton-ne-melee8"/>
+                    <image name="skeleton-ne-melee9"/>
+                    <image name="skeleton-ne-melee10"/>
+                </succ>
+            </n>
+            <ne>
+                <succ>
+                    <image name="skeleton-ne-melee1"/>
+                    <image name="skeleton-ne-melee2"/>
+                    <image name="skeleton-ne-melee3"/>
+                    <image name="skeleton-ne-melee4"/>
+                    <image name="skeleton-ne-melee5"/>
+                    <image name="skeleton-ne-melee6"/>
+                    <image name="skeleton-ne-melee7"/>
+                    <image name="skeleton-ne-melee8"/>
+                    <image name="skeleton-ne-melee9"/>
+                    <image name="skeleton-ne-melee10"/>
+                </succ>
+            </ne>
+            <se>
+                <succ>
+                    <image name="skeleton-se-melee1"/>
+                    <image name="skeleton-se-melee2"/>
+                    <image name="skeleton-se-melee3"/>
+                    <image name="skeleton-se-melee4"/>
+                    <image name="skeleton-se-melee5"/>
+                    <image name="skeleton-se-melee6"/>
+                    <image name="skeleton-se-melee7"/>
+                    <image name="skeleton-se-melee8"/>
+                    <image name="skeleton-se-melee9"/>
+                    <image name="skeleton-se-melee10"/>
+                </succ>
+            </se>
+            <s>
+                <succ>
+                    <image name="skeleton-se-melee1"/>
+                    <image name="skeleton-se-melee2"/>
+                    <image name="skeleton-se-melee3"/>
+                    <image name="skeleton-se-melee4"/>
+                    <image name="skeleton-se-melee5"/>
+                    <image name="skeleton-se-melee6"/>
+                    <image name="skeleton-se-melee7"/>
+                    <image name="skeleton-se-melee8"/>
+                    <image name="skeleton-se-melee9"/>
+                    <image name="skeleton-se-melee10"/>
+                </succ>
+            </s>
+        </attack1>
+        <stand>
+            <image name="skeleton"/>
+        </stand>
+        <defence>
+            <image name="skeleton-se-defend2"/>
+        </defence>
+        <idle>
+            <image name="skeleton-se-bob1"/>
+            <image name="skeleton-se-bob2"/>
+            <image name="skeleton-se-bob3"/>
+            <image name="skeleton-se-bob4"/>
+            <image name="skeleton-se-bob5"/>
+            <image name="skeleton-se-bob6"/>
+            <image name="skeleton-se-bob7"/>
+            <image name="skeleton-se-bob8"/>
+        </idle>
+        <death>
+            <image name="skeleton-dying-1"/>
+            <image name="skeleton-dying-2"/>
+            <image name="skeleton-dying-3"/>
+            <image name="skeleton-dying-4"/>
+            <image name="skeleton-dying-5"/>
+            <image name="skeleton-dying-6"/>
+            <image name="skeleton-dying-7"/>
+        </death>
+        <move>
+            <image name="skeleton-se-run1"/>
+            <image name="skeleton-se-run2"/>
+            <image name="skeleton-se-run3"/>
+            <image name="skeleton-se-run4"/>
+            <image name="skeleton-se-run5"/>
+            <image name="skeleton-se-run6"/>
+            <image name="skeleton-se-run7"/>
+            <image name="skeleton-se-run8"/>
+            <image name="skeleton-se-run9"/>
+            <image name="skeleton-se-run10"/>
+            <image name="skeleton-se-run11"/>
+            <image name="skeleton-se-run12"/>
+        </move>
+        <sounds>
+            <attack1 succ="axe" fail="miss3"/>
+            <pain sound="skeletonPain3"/>
+        </sounds>
+    </view>
+    <view name="UndeadWesnoth-Deathblade">
+        <attack1 imageName="axe-deathblade">
+            <all>
+                <succ>
+                    <image name="deathblade-attack1"/>
+                    <image name="deathblade-attack2"/>
+                    <image name="deathblade-attack3"/>
+                </succ>
+            </all>
+        </attack1>
+        <defence>
+            <image name="deathblade-defend-1"/>
+        </defence>
+        <stand>
+            <image name="deathblade"/>
+        </stand>
+        <death>
+            <image name="deathblade-dying-1"/>
+            <image name="deathblade-dying-2"/>
+            <image name="deathblade-dying-3"/>
+            <image name="deathblade-dying-4"/>
+            <image name="deathblade-dying-5"/>
+            <image name="deathblade-dying-6"/>
+            <image name="deathblade-dying-7"/>
+        </death>
+        <sounds>
+            <attack1 succ="axe" fail="miss3"/>
+            <pain sound="skeletonPain3"/>
+        </sounds>
+    </view>
+    <view name="UndeadWesnoth-Revenant">
+        <attack1 imageName="axe-undead">
+            <all>
+                <succ>
+                    <image name="revenant-attack-1"/>
+                    <image name="revenant-attack-2"/>
+                    <image name="revenant-attack-3"/>
+                    <image name="revenant-attack-4"/>
+                    <image name="revenant-attack-5"/>
+                    <image name="revenant-attack-6"/>
+                    <image name="revenant-attack-7"/>
+                    <image name="revenant-attack-8"/>
+                    <image name="revenant-attack-9"/>
+                    <image name="revenant-attack-10"/>
+                </succ>
+            </all>
+        </attack1>
+        <stand>
+            <image name="revenant"/>
+        </stand>
+        <defence>
+            <image name="revenant-defend-2"/>
+        </defence>
+        <death>
+            <image name="revenant-dying-1"/>
+            <image name="revenant-dying-2"/>
+            <image name="revenant-dying-3"/>
+            <image name="revenant-dying-4"/>
+            <image name="revenant-dying-5"/>
+            <image name="revenant-dying-6"/>
+            <image name="revenant-dying-7"/>
+        </death>
+        <idle>
+            <image name="revenant-se-bob1"/>
+            <image name="revenant-se-bob2"/>
+            <image name="revenant-se-bob3"/>
+            <image name="revenant-se-bob4"/>
+            <image name="revenant-se-bob5"/>
+            <image name="revenant-se-bob6"/>
+            <image name="revenant-se-bob7"/>
+            <image name="revenant-se-bob8"/>
+        </idle>
+        <sounds>
+            <attack1 succ="axe" fail="miss3"/>
+            <pain sound="skeletonPain3"/>
+        </sounds>
+    </view>
+    <view name="UndeadWesnoth-Draug">
+        <attack1 imageName="axe-undead">
+            <all>
+                <succ>
+                    <image name="draug-attack1"/>
+                    <image name="draug-attack2"/>
+                </succ>
+            </all>
+        </attack1>
+        <stand>
+            <image name="draug"/>
+        </stand>
+        <defence>
+            <image name="draug-defend-2"/>
+        </defence>
+        <idle>
+            <image name="draug-bob1"/>
+            <image name="draug-bob2"/>
+            <image name="draug-bob3"/>
+            <image name="draug-bob4"/>
+            <image name="draug-bob5"/>
+            <image name="draug-bob6"/>
+            <image name="draug-bob7"/>
+            <image name="draug-bob8"/>
+        </idle>
+        <sounds>
+            <attack1 succ="axe" fail="miss3"/>
+            <pain sound="skeletonPain3"/>
+        </sounds>
+    </view>
+    <view name="UndeadWesnoth-Boneshooter">
+        <attack1 imageName="dagger-undead">
+            <all>
+                <succ>
+                    <image name="bone-shooter-melee-attack-1"/>
+                    <image name="bone-shooter-melee-attack-2"/>
+                    <image name="bone-shooter-melee-attack-3"/>
+                    <image name="bone-shooter-melee-attack-4"/>
+                </succ>
+            </all>
+        </attack1>
+        <attack2 imageName="bow-orcish" projectile="Arrow">
+            <all>
+                <succ>
+                    <image name="bone-shooter-bow"/>
+                    <image name="bone-shooter-bow-attack-1"/>
+                    <image name="bone-shooter-bow-attack-2"/>
+                    <image name="bone-shooter-bow-attack-3"/>
+                    <image name="bone-shooter-bow-attack-4"/>
+                </succ>
+            </all>
+        </attack2>
+        <defence>
+            <image name="bone-shooter-bow-defend"/>
+        </defence>
+        <stand>
+            <image name="bone-shooter"/>
+        </stand>
+        <idle>
+            <image name="bone-shooter-bob-1"/>
+            <image name="bone-shooter-bob-2"/>
+            <image name="bone-shooter-bob-3"/>
+            <image name="bone-shooter-bob-4"/>
+            <image name="bone-shooter-bob-5"/>
+            <image name="bone-shooter-bob-6"/>
+            <image name="bone-shooter-bob-7"/>
+            <image name="bone-shooter-bob-8"/>
+        </idle>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <attack2 succ="bow" fail="bowFail"/>
+            <pain sound="skeletonPain3"/>
+        </sounds>
+    </view>
+    <view name="UndeadWesnoth-Banebow">
+        <attack1 imageName="dagger-undead">
+            <all>
+                <succ>
+                    <image name="banebow-melee-attack-1"/>
+                    <image name="banebow-melee-attack-2"/>
+                    <image name="banebow-melee-attack-3"/>
+                    <image name="banebow-melee-attack-4"/>
+                </succ>
+            </all>
+        </attack1>
+        <attack2 imageName="bow-orcish" projectile="Arrow">
+            <all>
+                <succ>
+                    <image name="banebow-bow"/>
+                    <image name="banebow-bow-attack-1"/>
+                    <image name="banebow-bow-attack-2"/>
+                    <image name="banebow-bow-attack-3"/>
+                    <image name="banebow-bow-attack-4"/>
+                </succ>
+            </all>
+        </attack2>
+        <defence>
+            <image name="banebow-bow-defend"/>
+        </defence>
+        <stand>
+            <image name="banebow"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <attack2 succ="bow" fail="bowFail"/>
+            <pain sound="skeletonPain3"/>
+        </sounds>
+    </view>
+    <view name="UndeadWesnoth-Lich">
+        <attack1 imageName="fist-skeletal">
+            <all>
+                <succ>
+                    <image name="lich-melee-1"/>
+                    <image name="lich-melee-2"/>
+                </succ>
+            </all>
+        </attack1>
+        <attack2 imageName="fireball" projectile="Fireball">
+            <all>
+                <succ>
+                    <image name="lich-magic-1"/>
+                    <image name="lich-magic-2"/>
+                    <image name="lich-magic-3"/>
+                </succ>
+            </all>
+        </attack2>
+        <stand>
+            <image name="lich"/>
+        </stand>
+        <defence>
+            <image name="lich-defend"/>
+        </defence>
+        <sounds>
+            <attack1 succ="fist" fail="miss1"/>
+            <attack2 succ="magicAttack1" fail="magicAttack1Fail"/>
+            <pain sound="skeletonPain3"/>
+        </sounds>
+    </view>
+    <view name="UndeadWesnoth-AncientLich">
+        <attack1 imageName="fist-skeletal">
+            <all>
+                <succ>
+                    <image name="ancient-lich-melee-1"/>
+                    <image name="ancient-lich-melee-2"/>
+                </succ>
+            </all>
+        </attack1>
+        <attack2 imageName="fireball" projectile="Fireball">
+            <all>
+                <succ>
+                    <image name="ancient-lich-magic-1"/>
+                    <image name="ancient-lich-magic-2"/>
+                    <image name="ancient-lich-magic-3"/>
+                </succ>
+            </all>
+        </attack2>
+        <stand>
+            <image name="ancient-lich"/>
+        </stand>
+        <defence>
+            <image name="ancient-lich-defend"/>
+        </defence>
+        <sounds>
+            <attack1 succ="fist" fail="miss1"/>
+            <attack2 succ="magicAttack1" fail="magicAttack1Fail"/>
+            <pain sound="skeletonPain3"/>
+        </sounds>
+    </view>
+    <view name="UndeadWesnoth-Rider">
+        <attack1 imageName="axe-undead">
+            <all>
+                <succ>
+                    <image name="rider-attack"/>
+                </succ>
+            </all>
+        </attack1>
+        <defence>
+            <image name="rider-defend"/>
+        </defence>
+        <stand>
+            <image name="rider"/>
+        </stand>
+        <move>
+            <image name="rider-moving"/>
+        </move>
+        <sounds>
+            <attack1 succ="axe" fail="miss1"/>
+            <move sound="horseMovement"/>
+            <pain sound="skeletonPain3"/>
+        </sounds>
+    </view>
+    <view name="UndeadWesnoth-Deathrider">
+        <attack1 imageName="axe-undead"/>
+        <stand>
+            <image name="deathrider"/>
+        </stand>
+        <sounds>
+            <attack1 succ="axe" fail="miss1"/>
+            <move sound="horseMovement"/>
+            <pain sound="skeletonPain3"/>
+        </sounds>
+    </view>
 </views>

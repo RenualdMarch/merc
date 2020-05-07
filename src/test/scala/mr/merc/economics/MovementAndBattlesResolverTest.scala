@@ -46,7 +46,7 @@ class MovementAndBattlesResolverTest extends FunSuite with Matchers {
       WarriorCompetence.Professional, state1.primeCulture, state1)))
 
     ws.diplomacyEngine.addAgreement(new WarAgreement(Set(state1), Set(state2), state1, state2, 0,
-      Set(new TakeProvince(state1, state2, province2))))
+      Set(new TakeProvince(state1, state2, province2)), ""))
 
     val w = province1.regionWarriors.allWarriors
     province1.regionWarriors.planSendWarriors(w, Some(province2))
@@ -77,7 +77,7 @@ class MovementAndBattlesResolverTest extends FunSuite with Matchers {
       WarriorCompetence.Professional, state4.primeCulture, state4)))
 
     ws.diplomacyEngine.addAgreement(new WarAgreement(Set(state1, state2), Set(state3, state4), state1, state3, 0,
-      Set(new TakeProvince(state1, state3, province3))))
+      Set(new TakeProvince(state1, state3, province3)), ""))
 
     val w1 = province1.regionWarriors.allWarriors
     val w2 = province2.regionWarriors.allWarriors
@@ -115,9 +115,9 @@ class MovementAndBattlesResolverTest extends FunSuite with Matchers {
       WarriorCompetence.Professional, state4.primeCulture, state4)))
 
     ws.diplomacyEngine.addAgreement(new WarAgreement(Set(state1), Set(state3, state4), state1, state3, 0,
-      Set(new TakeProvince(state1, state3, province3))))
+      Set(new TakeProvince(state1, state3, province3)), ""))
     ws.diplomacyEngine.addAgreement(new WarAgreement(Set(state2), Set(state3, state4), state2, state3, 0,
-      Set(new TakeProvince(state2, state3, province3))))
+      Set(new TakeProvince(state2, state3, province3)), ""))
 
     val w1 = province1.regionWarriors.allWarriors
     val w2 = province2.regionWarriors.allWarriors
@@ -154,7 +154,7 @@ class MovementAndBattlesResolverTest extends FunSuite with Matchers {
       WarriorCompetence.Professional, state4.primeCulture, state4)))
 
     ws.diplomacyEngine.addAgreement(new WarAgreement(Set(state1, state2), Set(state3, state4), state1, state3, 0,
-      Set(new TakeProvince(state1, state3, province3))))
+      Set(new TakeProvince(state1, state3, province3)), ""))
 
     val w1 = province1.regionWarriors.allWarriors
     val w3 = province3.regionWarriors.allWarriors
@@ -189,9 +189,9 @@ class MovementAndBattlesResolverTest extends FunSuite with Matchers {
       WarriorCompetence.Professional, state4.primeCulture, state4)))
 
     ws.diplomacyEngine.addAgreement(new WarAgreement(Set(state1), Set(state3, state4), state1, state3, 0,
-      Set(new TakeProvince(state1, state3, province3))))
+      Set(new TakeProvince(state1, state3, province3)), ""))
     ws.diplomacyEngine.addAgreement(new WarAgreement(Set(state2), Set(state3, state4), state2, state3, 0,
-      Set(new TakeProvince(state2, state3, province3))))
+      Set(new TakeProvince(state2, state3, province3)), ""))
 
     val w1 = province1.regionWarriors.allWarriors
     val w11 = w1.filter(_.owner == state1)
@@ -235,7 +235,7 @@ class MovementAndBattlesResolverTest extends FunSuite with Matchers {
       WarriorCompetence.Professional, state3.primeCulture, state3)))
 
     ws.diplomacyEngine.addAgreement(new WarAgreement(Set(state1), Set(state3), state1, state3, 0,
-      Set(new TakeProvince(state1, state3, province3))))
+      Set(new TakeProvince(state1, state3, province3)), ""))
 
     val w1 = province1.regionWarriors.allWarriors
     val w2 = province2.regionWarriors.allWarriors
@@ -268,7 +268,7 @@ class MovementAndBattlesResolverTest extends FunSuite with Matchers {
       WarriorCompetence.Professional, state2.primeCulture, state2)))
 
     ws.diplomacyEngine.addAgreement(new WarAgreement(Set(state1), Set(state2), state1, state2, 0,
-      Set(new TakeProvince(state1, state2, province2))))
+      Set(new TakeProvince(state1, state2, province2)), ""))
 
     val w1 = province1.regionWarriors.allWarriors
     val w2 = province2.regionWarriors.allWarriors
@@ -315,7 +315,7 @@ class MovementAndBattlesResolverTest extends FunSuite with Matchers {
       WarriorCompetence.Professional, state4.primeCulture, state4)))
 
     ws.diplomacyEngine.addAgreement(new WarAgreement(Set(state1, state2), Set(state3, state4), state1, state3, 0,
-      Set(new TakeProvince(state1, state3, province3))))
+      Set(new TakeProvince(state1, state3, province3)), ""))
 
     val w1 = province1.regionWarriors.allWarriors
     val w2 = province2.regionWarriors.allWarriors
@@ -370,10 +370,10 @@ class MovementAndBattlesResolverTest extends FunSuite with Matchers {
       WarriorCompetence.Professional, state4.primeCulture, state4)))
 
     ws.diplomacyEngine.addAgreement(new WarAgreement(Set(state1), Set(state2), state1, state2, 0,
-      Set(new TakeProvince(state1, state2, province2))))
+      Set(new TakeProvince(state1, state2, province2)), ""))
 
     ws.diplomacyEngine.addAgreement(new WarAgreement(Set(state3), Set(state4), state3, state4, 0,
-      Set(new TakeProvince(state3, state4, province4))))
+      Set(new TakeProvince(state3, state4, province4)), ""))
 
     val w1 = province1.regionWarriors.allWarriors
     val w2 = province2.regionWarriors.allWarriors
@@ -414,10 +414,10 @@ class MovementAndBattlesResolverTest extends FunSuite with Matchers {
       WarriorCompetence.Professional, state4.primeCulture, state4)))
 
     ws.diplomacyEngine.addAgreement(new WarAgreement(Set(state1), Set(state2), state1, state2, 0,
-      Set(new TakeProvince(state1, state2, province2))))
+      Set(new TakeProvince(state1, state2, province2)), ""))
 
     ws.diplomacyEngine.addAgreement(new WarAgreement(Set(state3), Set(state4), state3, state4, 0,
-      Set(new TakeProvince(state3, state4, province4))))
+      Set(new TakeProvince(state3, state4, province4)), ""))
 
     val w1 = province1.regionWarriors.allWarriors
     val w2 = province2.regionWarriors.allWarriors

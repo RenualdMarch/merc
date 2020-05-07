@@ -45,6 +45,35 @@ class WorldDiplomacy(actions:WorldStateDiplomacyActions) {
     events ::= event
   }
 
+  private var prevWarNames:List[String] = Nil
+  def generateNewWarName(attacker:State, defender: State, target: WarTarget): String = {
+    val newWarName = target match {
+      case takeProvince: TakeProvince =>
+        if (allClaims.exists{
+          case StrongProvinceClaim(state, province) => state == attacker && province == takeProvince.province
+          case _ => false
+        }) {
+          Localization("diplomacy.warName.liberation", takeProvince.demander.initialName, takeProvince.giver.initialName, takeProvince.province.name)
+        } else {
+          Localization("diplomacy.warName.conquest", takeProvince.demander.initialName, takeProvince.giver.initialName, takeProvince.province.name)
+        }
+      case culture: LiberateCulture =>
+        Localization("diplomacy.warName.cultureLiberation", culture.demander.initialName,
+          Localization(culture.culture.cultureNameKey), culture.giver.initialName)
+      case state: CrackState =>
+        Localization("diplomacy.warName.crackState", state.demander.initialName, state.giver.initialName)
+      case money: TakeMoney =>
+        Localization("diplomacy.warName.demandMoney", money.demander.initialName, money.giver.initialName)
+      case vassalize: Vassalize =>
+        Localization("diplomacy.warName.vassalization", vassalize.demander.initialName, vassalize.giver.initialName)
+    }
+
+    val count = prevWarNames.count(_ == newWarName)
+    prevWarNames ::= newWarName
+    if (count == 0) newWarName
+    else s"${count + 1} $newWarName"
+  }
+
   def improveBadBoyOverTime(): Unit = {
     badBoy = badBoy.map { case (k, v) =>
       val newV = if (v > BadBoyTurnRecovery) v - BadBoyTurnRecovery else 0
@@ -253,6 +282,8 @@ class WorldDiplomacy(actions:WorldStateDiplomacyActions) {
 
   def claims(state:State): List[Claim] = this.claims.filter(_.state == state)
 
+  def claimsAgainst(state: State): List[Claim] = this.claims.filter(c => c.targetState == state && c.state != state)
+
   def joinWar(wa:WarAgreement, ally: State, newSide:State, currentTurn:Int): Unit = {
     if (wa.defenders.contains(ally)) {
       wa.defenders += newSide
@@ -389,7 +420,7 @@ sealed trait Claim {
 
 object Claim {
 
-  trait ProvinceClaim extends Claim {
+  sealed trait ProvinceClaim extends Claim {
     val state: State
     val province: Province
   }
