@@ -422,4 +422,85 @@ object DiplomaticMessage {
       WarAgreement.localizeTargetsList(acceptedTargets.toList))
   }
 
+  case class ProposeSeparatePeace(from: State, to: State, warAgreement: WarAgreement, acceptedTargets: Set[WarTarget],
+                             separateState:State) extends DiplomaticProposal {
+    require(from == separateState || to == separateState)
+
+    override def accept(diplomacy: WorldDiplomacy, currentTurn: Int): Unit = {
+      val sides = warAgreement.sideByState(separateState)
+      val otherSides = warAgreement.sides - from - to
+      diplomacy.acceptSeparatePeaceTreaty(warAgreement, separateState, acceptedTargets, currentTurn)
+      (sides - separateState).foreach { left =>
+        diplomacy.addEvent(new SeparatePeace(separateState, left, currentTurn))
+      }
+      diplomacy.sendMessage(AcceptedSeparatePeaceProposal(to, from, warAgreement, acceptedTargets, separateState), currentTurn)
+      otherSides.foreach { os =>
+        diplomacy.sendMessage(OtherAcceptedSeparatePeaceProposal(separateState, os, warAgreement, acceptedTargets), currentTurn)
+      }
+    }
+
+    override def decline(diplomacy: WorldDiplomacy, currentTurn: Int): Unit = {
+      diplomacy.sendMessage(new DeclinedSeparatePeaceProposal(to, from, warAgreement, acceptedTargets, separateState), currentTurn)
+    }
+
+    override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean = {
+      val leaders = Set(warAgreement.defendersLeader(diplomacy), warAgreement.attackersLeader(diplomacy))
+      val otherSides = warAgreement.sides -- leaders
+      val vassals = otherSides.filter(s => diplomacy.getOverlord(s).nonEmpty)
+      val possibleSeparateStates = otherSides -- vassals
+      possibleSeparateStates.contains(separateState)
+    }
+
+    override def sendTitle: Option[String] = Some(Localization("proposeSeparatePeace.button"))
+
+    override def messageTitle: String = Localization("proposeSeparatePeace.title", separateState.name)
+
+    override def body: String = if (from == separateState)
+      Localization("proposeSeparatePeace.toIsLeader.body", from.name)
+    else if (to == separateState)
+      Localization("proposeSeparatePeace.fromIsLeader.body", from.name,
+        WarAgreement.localizeTargetsList(acceptedTargets.toList))
+    else sys.error(s"$separateState is not to [$to] and is not from [$from]")
+  }
+
+  case class AcceptedSeparatePeaceProposal(from: State, to: State, warAgreement: WarAgreement, acceptedTargets: Set[WarTarget],
+                                      separateState:State) extends DiplomaticDeclaration {
+    override def ok(diplomacy: WorldDiplomacy, currentTurn: Int): Unit = {}
+
+    override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean = true
+
+    override def sendTitle: Option[String] = None
+
+    override def messageTitle: String = Localization("diplomacy.separatePeaceAccepted.title", from.name)
+
+    override def body: String = Localization("diplomacy.separatePeaceAccepted.body", from.name,
+      WarAgreement.localizeTargetsList(acceptedTargets.toList))
+  }
+
+  case class DeclinedSeparatePeaceProposal(from: State, to: State, warAgreement: WarAgreement, acceptedTargets: Set[WarTarget],
+                                      separateState:State) extends DiplomaticDeclaration {
+    override def ok(diplomacy: WorldDiplomacy, currentTurn: Int): Unit = {}
+
+    override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean = true
+
+    override def sendTitle: Option[String] = None
+
+    override def messageTitle: String = Localization("diplomacy.separatePeaceDeclined.title", from.name)
+
+    override def body: String = Localization("diplomacy.separatePeaceDeclined.body", from.name,
+      WarAgreement.localizeTargetsList(acceptedTargets.toList))
+  }
+
+  case class OtherAcceptedSeparatePeaceProposal(from: State, to: State, warAgreement: WarAgreement, acceptedTargets: Set[WarTarget]) extends DiplomaticDeclaration {
+    override def ok(diplomacy: WorldDiplomacy, currentTurn: Int): Unit = {}
+
+    override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean = true
+
+    override def sendTitle: Option[String] = None
+
+    override def messageTitle: String = Localization("diplomacy.otherSeparatePeaceAccepted.title", from.name)
+
+    override def body: String = Localization("diplomacy.otherSeparatePeaceAccepted.body", from.name,
+      WarAgreement.localizeTargetsList(acceptedTargets.toList))
+  }
 }

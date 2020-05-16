@@ -1,15 +1,16 @@
 package mr.merc.diplomacy
 
-import mr.merc.diplomacy.DiplomaticAgreement.{VassalAgreement, WarAgreement}
+import mr.merc.diplomacy.DiplomaticAgreement.{AllianceAgreement, VassalAgreement, WarAgreement}
 import mr.merc.diplomacy.DiplomaticAgreement.WarAgreement.{CrackState, TakeProvince, Vassalize}
-import mr.merc.diplomacy.DiplomaticMessage.{AcceptedPeaceProposal, DeclareWar, ProposePeace}
+import mr.merc.diplomacy.DiplomaticMessage.{AcceptedPeaceProposal, AskJoinWar, DeclareWar, ProposePeace, ProposeSeparatePeace}
+import mr.merc.diplomacy.RelationshipEvent.SeparatePeace
 
 class WarTargetsTest extends AbstractDiplomacyTest {
 
-  override def statesCount = 2
+  override def statesCount = 3
 
   test("war with white peace") {
-    val List(first, second) = states
+    val List(first, second, _) = states
 
     val List(firstProvince1, firstProvince2) = actions.regions.filter(_.owner == first)
     val List(secondProvince1, secondProvince2) = actions.regions.filter(_.owner == second)
@@ -39,7 +40,7 @@ class WarTargetsTest extends AbstractDiplomacyTest {
   }
 
   test("war with province taking") {
-    val List(first, second) = states
+    val List(first, second, _) = states
 
     val List(firstProvince1, firstProvince2) = actions.regions.filter(_.owner == first)
     val List(secondProvince1, secondProvince2) = actions.regions.filter(_.owner == second)
@@ -69,7 +70,7 @@ class WarTargetsTest extends AbstractDiplomacyTest {
   }
 
   test("war with cracking state") {
-    val List(first, second) = states
+    val List(first, second, _) = states
 
     val List(firstProvince1, firstProvince2) = actions.regions.filter(_.owner == first)
     val List(secondProvince1, secondProvince2) = actions.regions.filter(_.owner == second)
@@ -107,7 +108,7 @@ class WarTargetsTest extends AbstractDiplomacyTest {
   }
 
   test("war with vassalization") {
-    val List(first, second) = states
+    val List(first, second, _) = states
 
     val List(firstProvince1, firstProvince2) = actions.regions.filter(_.owner == first)
     val List(secondProvince1, secondProvince2) = actions.regions.filter(_.owner == second)
@@ -130,7 +131,7 @@ class WarTargetsTest extends AbstractDiplomacyTest {
   }
 
   test("war when war target becomes not possible") {
-    val List(first, second) = states
+    val List(first, second, _) = states
 
     val List(firstProvince1, firstProvince2) = actions.regions.filter(_.owner == first)
     val List(secondProvince1, secondProvince2) = actions.regions.filter(_.owner == second)
@@ -153,7 +154,7 @@ class WarTargetsTest extends AbstractDiplomacyTest {
   }
 
   test("when peace proposal declined, nothing happens") {
-    val List(first, second) = states
+    val List(first, second, _) = states
 
     val List(firstProvince1, firstProvince2) = actions.regions.filter(_.owner == first)
     val List(secondProvince1, secondProvince2) = actions.regions.filter(_.owner == second)
@@ -167,4 +168,57 @@ class WarTargetsTest extends AbstractDiplomacyTest {
     List(agreement) shouldBe actions.agreements(first)
   }
 
+  test("separate peace test - separatist asks") {
+    val List(first, second, third) = states
+
+    val List(firstProvince1, firstProvince2) = actions.regions.filter(_.owner == first)
+    val List(secondProvince1, secondProvince2) = actions.regions.filter(_.owner == second)
+    val List(thirdProvince1, thirdProvince2) = actions.regions.filter(_.owner == third)
+
+    actions.diplomacyEngine.addAgreement(new AllianceAgreement(first, third, 0))
+
+    val dw = new DeclareWar(first, second, new TakeProvince(first, second, secondProvince1), Set(third))
+    actions.sendMessage(dw)
+    actions.answerDeclareWar(dw, Set())
+    val messages = actions.diplomacyEngine.messages(third, 0)
+    messages.size shouldBe 1
+    val askJoinWar = messages.head.asInstanceOf[AskJoinWar]
+    actions.answerMessage(askJoinWar, true)
+
+    val List(war) = actions.diplomacyEngine.wars
+
+    val sp = ProposeSeparatePeace(third, second, war, Set(), third)
+    actions.sendMessage(sp)
+
+    actions.mailbox(second).find(_ == sp).get
+    actions.answerMessage(sp, true)
+    war.sides shouldBe Set(first, second)
+  }
+
+  test("separate peace test - leader asks") {
+    val List(first, second, third) = states
+
+    val List(firstProvince1, firstProvince2) = actions.regions.filter(_.owner == first)
+    val List(secondProvince1, secondProvince2) = actions.regions.filter(_.owner == second)
+    val List(thirdProvince1, thirdProvince2) = actions.regions.filter(_.owner == third)
+
+    actions.diplomacyEngine.addAgreement(new AllianceAgreement(first, third, 0))
+
+    val dw = new DeclareWar(first, second, new TakeProvince(first, second, secondProvince1), Set(third))
+    actions.sendMessage(dw)
+    actions.answerDeclareWar(dw, Set())
+    val messages = actions.diplomacyEngine.messages(third, 0)
+    messages.size shouldBe 1
+    val askJoinWar = messages.head.asInstanceOf[AskJoinWar]
+    actions.answerMessage(askJoinWar, true)
+
+    val List(war) = actions.diplomacyEngine.wars
+
+    val sp = ProposeSeparatePeace(second, third, war, Set(), third)
+    actions.sendMessage(sp)
+
+    actions.mailbox(third).find(_ == sp).get
+    actions.answerMessage(sp, true)
+    war.sides shouldBe Set(first, second)
+  }
 }

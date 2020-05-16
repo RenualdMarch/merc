@@ -233,6 +233,8 @@ class RegionPopulation(initialPops: List[Population]) {
 
   def pops:List[Population] = currentPops
 
+  def nonEmptyPops:List[Population] = currentPops.filter(_.populationCount > 0)
+
   def cultureMembers:Map[Culture, Int] = pops.groupBy(_.culture).mapValues(_.map(_.populationCount).sum)
 
   def learnLiteracy(): Unit = {

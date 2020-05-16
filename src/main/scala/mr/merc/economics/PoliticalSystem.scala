@@ -8,6 +8,14 @@ import WorldConstants.Population._
 class PoliticalSystem(startingRulingParty: Party) {
   private var lastElectionTurn = -1
 
+  def rulingParty_=(newRulingParty: Party): Unit = {
+    _rulingParty = newRulingParty
+    _parliament = if (_rulingParty.regime == Regime.Absolute) None
+    else Some(ParliamentParties(Map(_rulingParty -> 1.0d), Set(_rulingParty)))
+  }
+
+  def rulingParty: Party = _rulingParty
+
   def nextElectionTurn:Option[Int] =
     if(rulingParty.votersPolicy == NoVoting) None
     else Some(lastElectionTurn + 5 * 4)
@@ -32,8 +40,6 @@ class PoliticalSystem(startingRulingParty: Party) {
   }
 
   def parliament:Option[ParliamentParties] = _parliament
-
-  def rulingParty: Party = _rulingParty
 
   def applyElectionResults(election: StateElectionReport): Unit = {
     val resultsAfterThreshold = election.votes.scaleToSum(1d).filter(_._2 >= ElectionThreshold).scaleToSum(1d)

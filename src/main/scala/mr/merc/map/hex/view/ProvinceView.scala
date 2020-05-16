@@ -1,6 +1,6 @@
 package mr.merc.map.hex.view
 
-import mr.merc.economics.{EconomicRegion, FourSeasonsTerrainHex, FourSeasonsTerrainHexField}
+import mr.merc.economics.{Culture, EconomicRegion, FourSeasonsTerrainHex, FourSeasonsTerrainHexField}
 import mr.merc.politics.Province
 import mr.merc.economics.MapUtil.NumericOperations._
 import mr.merc.economics.Seasons.Season
@@ -13,14 +13,27 @@ import mr.merc.map.terrain.FourSeasonsTerrainTypes._
 
 class ProvinceView(season: Season, val province: Province, field: FourSeasonsTerrainHexField, currentField:TerrainHexField, view: TerrainHexFieldView) {
 
+  private def housesPerCulture(map:Map[Culture, Int]):Map[FourSeasonsHouse, Int] = {
+    val (minorityWithoutHouses, majorityWithHouses) = map.partition(_._2 < HousePerPopulation)
+
+    val majMap = majorityWithHouses.map { case (cul, count) =>
+      FourSeasonsHouse(cul) -> count / HousePerPopulation
+    }
+
+    val minMap:Map[FourSeasonsHouse, Int] = if (minorityWithoutHouses.isEmpty) Map()
+    else {
+      Map(FourSeasonsHouse(minorityWithoutHouses.maxBy(_._2)._1) -> 1)
+    }
+
+    majMap |+| minMap
+  }
+
   def refreshCity(): Unit = {
     val alreadyHouses = province.hexes.filter(_.mapObj.exists(_.isInstanceOf[FourSeasonsHouse]))
 
     val alreadyHousesGroups = alreadyHouses.groupBy(_.mapObj.get).mapValues(_.size).asInstanceOf[Map[FourSeasonsHouse, Int]]
 
-    val newHousesCount = province.regionPopulation.cultureMembers.map { case (cul, count) =>
-      FourSeasonsHouse(cul) -> (count / HousePerPopulation + 1)
-    }
+    val newHousesCount = housesPerCulture(province.regionPopulation.cultureMembers)
 
     val changes = newHousesCount |-| alreadyHousesGroups
 

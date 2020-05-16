@@ -87,7 +87,7 @@ object WorldConstants {
 
     val RebellionPopulationPart = 0.3
 
-    val HousePerPopulation = 20000
+    val HousePerPopulation = 10000
 
     def isPopRebelling(consumptionHappiness: Double, politicalHappiness: Double): Boolean = {
       if (politicalHappiness > 0.5) false
@@ -217,10 +217,18 @@ object WorldConstants {
     val NoCasusBelliWarBadBoy = 3
     val RefuseAllyCallBadBoy = 5
     val AnnexedProvinceWithoutClaimBadBoy = 5
-    val AnnexedState = 10
-    val CrackedState = 5
-    val VassalizedState = 3
-    val LiberateCulture = 2
+    val AnnexedStateBadBoy = 10
+    val CrackedStateBadBoy = 5
+    val VassalizedStateBadBoy = 3
+    val LiberateCultureBadBoy = 2
+
+    def reputationDescriptionTextKey(badBoy: Double):String = {
+      if (badBoy == 0) "diplomacy.reputation.honorable"
+      else if (badBoy <= 5) "diplomacy.reputation.respectable"
+      else if (badBoy <= 10) "diplomacy.reputation.tarnished"
+      else if (badBoy <= 15) "diplomacy.reputation.bad"
+      else "diplomacy.reputation.hated"
+    }
   }
 
   object AI {
@@ -301,8 +309,8 @@ object WorldGenerationConstants {
   val PopMigrationToNeighbourPercentage = 0.2
   val PopMigrationsToNeighbours = 1
 
-  val WorldMapWidth = 50
-  val WorldMapHeight = 50
+  val WorldMapWidth = 30
+  val WorldMapHeight = 30
   val HexesPerProvince = 100
   val LandPercentage = 0.7
   val Provinces = (WorldMapHeight * WorldMapWidth * LandPercentage / HexesPerProvince).toInt

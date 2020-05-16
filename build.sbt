@@ -22,8 +22,6 @@ libraryDependencies ++= javaFXModules.map( m =>
 
 libraryDependencies += "org.scala-lang" % "scala-reflect" % "2.12.8"
 
-libraryDependencies += "org.scalactic" %% "scalactic" % "3.0.4"
-
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.1" % "test"
 
 libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.3"

@@ -162,7 +162,7 @@ object DiplomaticAgreement {
   }
 
   case class WarAgreement(var attackers: Set[State], var defenders: Set[State], warInitiator: State,
-                     warVictim: State, startingTurn: Int, var targets: Set[WarTarget], fullWarName: String)
+                          warVictim: State, startingTurn: Int, var targets: Set[WarTarget], fullWarName: String)
     extends DiplomaticAgreement(startingTurn, None) {
 
     override def sides: Set[State] = attackers ++ defenders
@@ -179,6 +179,9 @@ object DiplomaticAgreement {
     def attackersLeader(diplomacy: WorldDiplomacy): State = diplomacy.getOverlord(warInitiator).getOrElse(warInitiator)
 
     def defendersLeader(diplomacy: WorldDiplomacy): State = diplomacy.getOverlord(warVictim).getOrElse(warVictim)
+
+    def isLeader(state: State, diplomacy: WorldDiplomacy): Boolean =
+      Set(attackersLeader(diplomacy), defendersLeader(diplomacy)).contains(state)
 
     override def voluntaryBreakingAgreementEvent(breaker: State, currentTurn: Int): Set[RelationshipEvent] = {
       if (attackers.contains(breaker)) {
@@ -215,7 +218,7 @@ object DiplomaticAgreement {
       (attackers & states).nonEmpty && (defenders & states).nonEmpty
     }
 
-    def containsSides(side1:Set[State], side2:Set[State]):Boolean = {
+    def containsSides(side1: Set[State], side2: Set[State]): Boolean = {
       (side1.subsetOf(attackers) && side2.subsetOf(defenders)) || (side2.subsetOf(attackers) && side1.subsetOf(defenders))
     }
 
@@ -240,24 +243,90 @@ object DiplomaticAgreement {
       Localization("diplomacy.warname", warInitiator.name, warVictim.name)
     }
 
-    def sideByState(state:State):Set[State] =
+    def sideByState(state: State): Set[State] =
       if (defenders.contains(state)) defenders
       else if (attackers.contains(state)) attackers
       else sys.error(s"Invalid side by state for state $state for war $this")
 
-    def oppositeSideByState(state:State):Set[State] =
+    def oppositeSideByState(state: State): Set[State] =
       if (attackers.contains(state)) defenders
       else if (defenders.contains(state)) attackers
       else sys.error(s"Invalid opposite side by state for state $state for war $this")
+
+    def leaderByState(state: State, diplomacy: WorldDiplomacy): State = {
+      if (defenders.contains(state))
+        defendersLeader(diplomacy)
+      else if (attackers.contains(state))
+        attackersLeader(diplomacy)
+      else sys.error(s"state $state doesn't belong to war $this")
+    }
   }
 
   object WarAgreement {
 
-    def localizeTargetsList(targets:List[WarTarget]):String = targets.map(t =>
+    def localizeTargetsList(targets: List[WarTarget]): String = targets.map(t =>
       Localization("diplomacy.demands", t.demander.name) + " " + t.localizeTarget).mkString("\n")
 
+    object WarTarget {
 
-    sealed abstract class WarTarget(val demander: State, val giver: State) {
+      def areWarTargetsConsistent(targets: Set[WarTarget]): Boolean = {
+        !sameCultureLiberated(targets) &&
+          !sameProvinceDemanded(targets) &&
+          !sameMoneyDemanded(targets) &&
+          !sameStateCracked(targets) &&
+          !sameStateVassalized(targets)
+      }
+
+      private def sameCultureLiberated(targets: Set[WarTarget]): Boolean = {
+        val lcSet = targets.collect {
+          case lc: LiberateCulture => lc
+        }
+
+        val pairs = lcSet.map(lc => (lc.giver, lc.culture))
+
+        lcSet.size != pairs.size
+      }
+
+      private def sameProvinceDemanded(targets: Set[WarTarget]): Boolean = {
+        targets.collect {
+          case t: TakeProvince => t
+        }.groupBy(_.province).exists(_._2.size > 1)
+      }
+
+      private def sameMoneyDemanded(targets: Set[WarTarget]): Boolean = {
+        sameGiverMoreThanOnce(
+          targets.collect {
+            case m: TakeMoney => m
+          }
+        )
+      }
+
+      private def sameStateCracked(targets: Set[WarTarget]): Boolean = {
+        sameGiverMoreThanOnce(
+          targets.collect {
+            case c: CrackState => c
+          }
+        )
+      }
+
+      private def sameStateVassalized(targets: Set[WarTarget]): Boolean = {
+        sameGiverMoreThanOnce(
+          targets.collect {
+            case v: Vassalize => v
+          }
+        )
+      }
+
+      private def sameGiverMoreThanOnce(targets: Set[WarTarget]): Boolean = {
+        targets.groupBy(_.giver).exists(_._2.size > 1)
+      }
+    }
+
+    sealed trait WarTarget {
+      def demander: State
+
+      def giver: State
+
       def validTarget(wa: WarAgreement, diplomacy: WorldDiplomacy): Option[WarTarget]
 
       def giverCanGiveInThisWar(wa: WarAgreement, diplomacy: WorldDiplomacy): Boolean = {
@@ -270,7 +339,7 @@ object DiplomaticAgreement {
       def localizeTarget: String
     }
 
-    class TakeProvince(demander: State, giver: State, val province: Province) extends WarTarget(demander, giver) {
+    case class TakeProvince(demander: State, giver: State, val province: Province) extends WarTarget {
       override def validTarget(wa: WarAgreement, diplomacy: WorldDiplomacy): Option[WarTarget] = {
         if (giverCanGiveInThisWar(wa, diplomacy) && wa.onDifferentSides(Set(giver, demander)) &&
           giver == province.owner && wa.sides.contains(province.controller)) {
@@ -278,10 +347,10 @@ object DiplomaticAgreement {
         } else None
       }
 
-      override def localizeTarget: String = Localization("diplomacy.warTarget.takeProvince", province.name, giver.name)
+      override def localizeTarget: String = Localization("diplomacy.warTarget.takeProvince", demander.initialName, province.name, giver.initialName)
     }
 
-    class LiberateCulture(demander: State, giver: State, val culture: Culture, val provinces: Set[Province]) extends WarTarget(demander, giver) {
+    case class LiberateCulture(demander: State, giver: State, val culture: Culture, val provinces: Set[Province]) extends WarTarget {
       override def validTarget(wa: WarAgreement, diplomacy: WorldDiplomacy): Option[WarTarget] = {
         if (giverCanGiveInThisWar(wa, diplomacy) && giver.primeCulture != culture) {
           val validProvinces = provinces.filter(_.owner == giver)
@@ -291,36 +360,36 @@ object DiplomaticAgreement {
         } else None
       }
 
-      override def localizeTarget: String = Localization("diplomacy.warTarget.liberateCulture", culture.name, giver.name)
+      override def localizeTarget: String = Localization("diplomacy.warTarget.liberateCulture", demander.initialName, culture.name, giver.initialName)
 
     }
 
     // every province became separate state
-    class CrackState(demander: State, giver: State) extends WarTarget(demander, giver) {
+    case class CrackState(demander: State, giver: State) extends WarTarget {
       override def validTarget(wa: WarAgreement, diplomacy: WorldDiplomacy): Option[WarTarget] = {
         if (giverCanGiveInThisWar(wa, diplomacy) && diplomacy.regions.count(_.owner == giver) > 1) {
           Some(this)
         } else None
       }
 
-      override def localizeTarget: String = Localization("diplomacy.warTarget.crackState", giver.name)
+      override def localizeTarget: String = Localization("diplomacy.warTarget.crackState", demander.initialName, giver.initialName)
     }
 
-    class TakeMoney(demander: State, giver: State, val amount: Double) extends WarTarget(demander, giver) {
+    case class TakeMoney(demander: State, giver: State) extends WarTarget {
       override def validTarget(wa: WarAgreement, diplomacy: WorldDiplomacy): Option[WarTarget] = {
-        if (giverCanGiveInThisWar(wa, diplomacy) && giver.budget.moneyReserve > 0) Some(new TakeMoney(demander, giver, giver.budget.moneyReserve))
+        if (giverCanGiveInThisWar(wa, diplomacy) && giver.budget.moneyReserve > 0) Some(TakeMoney(demander, giver))
         else None
       }
 
-      override def localizeTarget: String = Localization("diplomacy.warTarget.takeMoney", IntFormatter().format(amount), giver.name)
+      override def localizeTarget: String = Localization("diplomacy.warTarget.takeMoney", demander.initialName, giver.initialName)
     }
 
-    class Vassalize(demander: State, giver: State) extends WarTarget(demander, giver) {
+    case class Vassalize(demander: State, giver: State) extends WarTarget {
       override def validTarget(wa: WarAgreement, diplomacy: WorldDiplomacy): Option[WarTarget] = {
         if (giverCanGiveInThisWar(wa, diplomacy)) Some(this) else None
       }
 
-      override def localizeTarget: String = Localization("diplomacy.warTarget.vassalize", giver.name)
+      override def localizeTarget: String = Localization("diplomacy.warTarget.vassalize", demander.initialName, giver.initialName)
     }
 
   }

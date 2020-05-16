@@ -3,15 +3,17 @@ package mr.merc.ui.world
 import java.text.DecimalFormat
 
 import mr.merc.local.Localization
+import mr.merc.log.Logging
 import org.tbee.javafx.scene.layout.MigPane
 import scalafx.beans.binding.{ObjectBinding, StringBinding}
 import scalafx.beans.property.{ObjectProperty, ReadOnlyObjectProperty, ReadOnlyStringProperty}
 import scalafx.scene.{Node, Scene}
+import scalafx.scene.layout.{Region}
 import scalafx.scene.control.Button
 import scalafx.scene.text.{Font, Text}
 import scalafx.stage.Stage
-
 import scalafx.Includes._
+import mr.merc.util.FxPropertyUtils._
 
 object Components {
   val largeFontSize = 24
@@ -101,15 +103,15 @@ object DoubleFormatter {
   }
 }
 
-abstract class DialogStage[T] extends Stage {
+abstract class DialogStage[T] extends Stage with Logging {
   var dialogResult: Option[T] = None
 
-  private val okButton = BigButton(Localization("ok"))
+  private val okButton = BigButton(Localization("common.ok"))
   okButton.onAction = { _ =>
     close()
   }
 
-  private val cancelButton = BigButton(Localization("cancel"))
+  private val cancelButton = BigButton(Localization("common.cancel"))
   cancelButton.onAction = { _ =>
     dialogResult = None
     close()
@@ -123,18 +125,28 @@ abstract class DialogStage[T] extends Stage {
   buttonsPane.add(okButton)
   buttonsPane.add(cancelButton)
 
-  protected def dialogContent:Node
+  protected def dialogContent:Region
 
   protected def css:Option[String]
 
+  private val actualDialogContent = dialogContent
+
   val contentPane = new MigPane("")
-  contentPane.add(dialogContent, "grow, push, wrap")
+  contentPane.add(actualDialogContent, "grow, push, wrap")
   contentPane.add(buttonsPane, "center")
 
-  scene = new Scene {
+  val pane = new PaneForTooltip(contentPane)
+  val currentScene = new Scene {
     css.foreach {c =>
       stylesheets.add(c)
     }
-    content = new PaneForTooltip(contentPane)
+    content = pane
+  }
+  scene = currentScene
+  actualDialogContent.width.onChange {
+    Option(currentScene.window.value).foreach(_.sizeToScene())
+  }
+  actualDialogContent.height.onChange {
+    Option(currentScene.window.value).foreach(_.sizeToScene())
   }
 }

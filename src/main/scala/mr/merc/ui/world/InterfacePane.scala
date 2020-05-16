@@ -138,8 +138,8 @@ class TopTitledBorderPane extends BorderPane {
 
 class PaneForTooltip(content:Region) extends Pane {
 
-  content.prefWidth <== this.width
-  content.prefHeight <== this.height
+  this.prefWidth <== content.prefWidth
+  this.prefHeight <== content.prefHeight
 
   children.add(content)
 }

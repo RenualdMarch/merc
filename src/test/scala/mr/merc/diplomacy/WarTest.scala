@@ -238,4 +238,76 @@ class WarTest extends AbstractDiplomacyTest {
     actions.mailbox(second) shouldBe Nil
     actions.mailbox(third) shouldBe Nil
   }
+
+  test("complicated alliance situation 1") {
+    val List(first, second, third) = states
+
+    sendAndAccept(new AllianceProposal(first, third))
+    sendAndAccept(new AllianceProposal(second, third))
+
+    actions.processUnansweredMessages()
+    val declareWar = new DeclareWar(first, second, new CrackState(first, second), Set(third))
+    actions.sendMessage(declareWar)
+
+    actions.diplomacyEngine.areAllies(first, third) shouldBe true
+    actions.diplomacyEngine.areAllies(second, third) shouldBe true
+
+    actions.answerDeclareWar(declareWar, Set(third))
+
+    actions.diplomacyEngine.areAllies(first, third) shouldBe true
+    actions.diplomacyEngine.areAllies(second, third) shouldBe true
+
+    val List(war) = actions.diplomacyEngine.wars
+    war.sides shouldBe Set(first, second)
+
+    val messages = actions.mailbox(third)
+    messages.size shouldBe 2
+    val askJoinWar1 = messages.find(_.from == first).get.asInstanceOf[AskJoinWar]
+    val askJoinWar2 = messages.find(_.from == second).get.asInstanceOf[AskJoinWar]
+
+    actions.answerMessage(askJoinWar1, true)
+
+    war.sides shouldBe Set(first, second, third)
+    war.attackers shouldBe Set(first, third)
+    war.attackersLeader(actions.diplomacyEngine) shouldBe first
+    war.defenders shouldBe Set(second)
+
+    actions.mailbox(third).size shouldBe 0
+  }
+
+  test("complicated alliance situation 2") {
+    val List(first, second, third) = states
+
+    sendAndAccept(new AllianceProposal(first, third))
+    sendAndAccept(new AllianceProposal(second, third))
+
+    actions.processUnansweredMessages()
+    val declareWar = new DeclareWar(first, second, new CrackState(first, second), Set(third))
+    actions.sendMessage(declareWar)
+
+    actions.diplomacyEngine.areAllies(first, third) shouldBe true
+    actions.diplomacyEngine.areAllies(second, third) shouldBe true
+
+    actions.answerDeclareWar(declareWar, Set(third))
+
+    actions.diplomacyEngine.areAllies(first, third) shouldBe true
+    actions.diplomacyEngine.areAllies(second, third) shouldBe true
+
+    val List(war) = actions.diplomacyEngine.wars
+    war.sides shouldBe Set(first, second)
+
+    val messages = actions.mailbox(third)
+    messages.size shouldBe 2
+    val askJoinWar1 = messages.find(_.from == first).get.asInstanceOf[AskJoinWar]
+    val askJoinWar2 = messages.find(_.from == second).get.asInstanceOf[AskJoinWar]
+
+    actions.answerMessage(askJoinWar2, true)
+
+    war.sides shouldBe Set(first, second, third)
+    war.attackers shouldBe Set(first)
+    war.defendersLeader(actions.diplomacyEngine) shouldBe second
+    war.defenders shouldBe Set(second, third)
+
+    actions.mailbox(third).size shouldBe 0
+  }
 }

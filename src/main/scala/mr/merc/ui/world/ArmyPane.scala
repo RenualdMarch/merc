@@ -7,7 +7,7 @@ import mr.merc.politics.{Province, State}
 import scalafx.collections.ObservableBuffer
 import scalafx.scene.control._
 import scalafx.scene.image.{Image, ImageView}
-import scalafx.scene.layout.{BorderPane, Pane}
+import scalafx.scene.layout.{BorderPane, Pane, Region}
 import mr.merc.util.FxPropertyUtils._
 import scalafx.beans.property.{ObjectProperty, ReadOnlyObjectProperty}
 import EconomicLocalization._
@@ -343,7 +343,7 @@ class SelectRecruitWarriorDialog(possibleChoices: List[RecruitWarriorOrder]) ext
     MercTooltip.applyTooltip(this, new WarriorTypeInfoPane(child.warrior))
   }
 
-  override protected def dialogContent: Node = {
+  override protected def dialogContent: Region = {
     val gridPane = new MigPane("wrap 4", "")
     possibleChoices.foreach { c =>
       gridPane.add(new ParentWarriorPane(c), "grow")

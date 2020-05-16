@@ -1,6 +1,6 @@
 package mr.merc.ui.world
 
-import mr.merc.economics.{Culture, Seasons, WorldStateDiplomacyActions}
+import mr.merc.economics.{Culture, Seasons, WorldConstants, WorldStateDiplomacyActions}
 import mr.merc.politics.{Province, State}
 import mr.merc.util.MercTooltip
 import org.tbee.javafx.scene.layout.MigPane
@@ -9,25 +9,22 @@ import mr.merc.diplomacy.Claim
 import mr.merc.diplomacy.DiplomaticAgreement.WarAgreement._
 import mr.merc.diplomacy.DiplomaticAgreement.{AllianceAgreement, TruceAgreement, VassalAgreement, WarAgreement}
 import mr.merc.diplomacy.DiplomaticMessage._
+import mr.merc.economics.WorldStateDiplomacyActions.StateInfo
 import mr.merc.local.Localization
 import mr.merc.ui.dialog.ModalDialog
 import scalafx.scene.control._
-import scalafx.scene.layout.{BorderPane, Pane}
+import scalafx.scene.layout.{BorderPane, Pane, Region}
 import scalafx.Includes._
 import scalafx.beans.property.{ObjectProperty, ReadOnlyObjectProperty, StringProperty}
 import scalafx.collections.ObservableBuffer
 import scalafx.scene.paint.Color
 import scalafx.scene.shape.Rectangle
 import scalafx.stage.Stage
-
-import scala.collection.JavaConverters._
 import mr.merc.util.FxPropertyUtils.PropertyBindingMap
 import scalafx.scene.Node
 import scalafx.scene.control.TabPane.TabClosingPolicy
 
-import scala.util.Try
-
-class DiplomacyPane(actions: WorldStateDiplomacyActions, currentState: State, stage: Stage) extends PaneWithTwoHorizontalChildren(0.2) {
+class DiplomacyPane(actions: WorldStateDiplomacyActions, currentState: State, stage: Stage) extends PaneWithTwoHorizontalChildren(0.45) {
 
   private val tablePane = new StatesTablePane(actions, currentState)
   private val property = tablePane.selectedItem
@@ -42,9 +39,9 @@ class DiplomacyPane(actions: WorldStateDiplomacyActions, currentState: State, st
 }
 
 class StatesTablePane(actions: WorldStateDiplomacyActions, currentState: State) extends MigPane with WorldInterfaceJavaNode {
-  private val statesTable = new TableView[State]()
+  private val statesTable = new TableView[StateInfo]()
 
-  statesTable.width.onChange { (_, _, _) =>
+  /*statesTable.width.onChange { (_, _, _) =>
     val header = lookup("TableHeaderRow").asInstanceOf[javafx.scene.layout.Pane]
     header.setMinHeight(0)
     header.setPrefHeight(0)
@@ -52,7 +49,6 @@ class StatesTablePane(actions: WorldStateDiplomacyActions, currentState: State) 
     header.setVisible(false)
   }
 
-  /*
   width.onChange { (_, _, _) =>
     val header = lookup("TableHeaderRow").delegate.asInstanceOf[javafx.scene.layout.Pane]
     header.setMinHeight(0)
@@ -62,47 +58,84 @@ class StatesTablePane(actions: WorldStateDiplomacyActions, currentState: State) 
   }
    */
 
-  statesTable.style = Components.largeFontStyle
+  statesTable.style = Components.mediumFontStyle
 
-  private val stateRectColumn = new TableColumn[State, Rectangle] {
-    cellFactory = p => new TableCell[State, Rectangle] {
-      override def updateItem(t: Rectangle, b: Boolean): Unit = {
+  val stateColumn = new TableColumn[StateInfo, StateComponentColorName] {
+
+    text = Localization("diplomacy.state")
+
+    cellFactory = p => new TableCell[StateInfo, StateComponentColorName] {
+      override def updateItem(t: StateComponentColorName, b: Boolean): Unit = {
         super.updateItem(t, b)
         setGraphic(t)
       }
     }
     cellValueFactory = p => {
-      val rect = Rectangle(Components.largeFontSize, Components.largeFontSize)
-      rect.fill = p.value.color
-      rect.stroke = Color.Black
-      ObjectProperty(rect)
+      ObjectProperty(new StateComponentColorName(p.value.state))
     }
     editable = false
   }
 
-  private val stateNameColumn = new TableColumn[State, String] {
-    cellValueFactory = p => StringProperty(p.value.name)
+  private val relationsColumn = new TableColumn[StateInfo, String] {
+    text = Localization("diplomacy.relationsToUs")
+    cellValueFactory = p => StringProperty(actions.relationships(p.value.state)(currentState).toString)
     editable = false
   }
 
-  private val relationsColumn = new TableColumn[State, String] {
-    cellValueFactory = p => StringProperty(actions.relationships(currentState)(p.value).toString)
+  private class StringColumn(title: String, f: StateInfo => String) extends TableColumn[StateInfo, String] {
+    text = title
+    cellValueFactory = p => StringProperty(f(p.value))
     editable = false
   }
 
-  statesTable.columns ++= List(stateRectColumn, stateNameColumn, relationsColumn)
+  private val armyColumn = new StringColumn(Localization("army"), _.army.toString)
 
-  private val buffer = new ObservableBuffer[State]()
-  buffer.addAll((currentState :: actions.relationships(currentState).toList.sortBy(a => -Math.abs(a._2)).map(_._1)).asJava)
-  statesTable.items = buffer
+  private val incomeColumn = new StringColumn(Localization("budget.income"),
+    x => DoubleFormatter().format(x.income))
+
+  private val spendingColumn = new StringColumn(Localization("budget.spending"),
+    x => DoubleFormatter().format(x.spending))
+
+  private val moneyReservesColumn = new StringColumn(Localization("budget.reserve"),
+    x => DoubleFormatter().format(x.moneyReserve))
+
+  private val literacyColumn = new StringColumn(Localization("population.literacy"),
+    x => DoubleFormatter().format(x.literacy * 100) + "%")
+
+  private val partyColumn = new TableColumn[StateInfo, PartyComponentColorName] {
+    text = Localization("parliament.rulingParty")
+    cellFactory = p => new TableCell[StateInfo, PartyComponentColorName] {
+      override def updateItem(t: PartyComponentColorName, b: Boolean): Unit = {
+        super.updateItem(t, b)
+        setGraphic(t)
+      }
+    }
+    cellValueFactory = p => {
+      ObjectProperty {
+        new PartyComponentColorName(p.value.rulingParty)
+      }
+    }
+    editable = false
+  }
+
+  statesTable.columns ++= List(stateColumn, relationsColumn, armyColumn, literacyColumn,
+    partyColumn, moneyReservesColumn, incomeColumn, spendingColumn)
+
+  private val buffer = new ObservableBuffer[StateInfo]()
+  val relationships = actions.relationships(currentState)
+  val stateInfos = actions.stateInfo.filter(_.state == currentState) :::
+    actions.stateInfo.filterNot(_.state == currentState).sortBy(a => -actions.relationships(a.state)(currentState))
+  statesTable.items = buffer ++ stateInfos
 
   statesTable.delegate.getSelectionModel.setSelectionMode(SelectionMode.SINGLE)
   statesTable.delegate.getSelectionModel.clearAndSelect(0)
-  val selectedItem: ReadOnlyObjectProperty[State] = statesTable.delegate.getSelectionModel.selectedItemProperty
+  val selectedItem: ReadOnlyObjectProperty[StateInfo] = statesTable.delegate.getSelectionModel.selectedItemProperty
   add(statesTable, "grow,push")
 }
 
-class StateDiplomacyPane(currentState: State, selectedState: State, actions: WorldStateDiplomacyActions, stage: Stage) extends MigPane {
+class StateDiplomacyPane(currentState: State, selectedStateInfo: StateInfo, actions: WorldStateDiplomacyActions, stage: Stage) extends MigPane {
+  private val selectedState = selectedStateInfo.state
+
   private val tabPane = new TabPane {
     style = Components.mediumFontStyle
     tabClosingPolicy = TabClosingPolicy.Unavailable
@@ -111,13 +144,10 @@ class StateDiplomacyPane(currentState: State, selectedState: State, actions: Wor
   val relationsTab = new Tab {
     text = Localization("diplomacy.relations")
     style = Components.largeFontStyle
-    content = new StateRelationsPane(currentState, selectedState, actions)
-  }
-
-  val agreementsPane = new Tab {
-    text = Localization("diplomacy.agreements")
-    style = Components.largeFontStyle
-    content = new StateAgreementsPane(selectedState, actions)
+    content = new MigPane {
+      add(new StateRelationsPane(currentState, selectedState, actions), "wrap")
+      add(new StateAgreementsPane(selectedState, actions), "grow, push")
+    }
   }
 
   val actionsPane = new Tab {
@@ -138,19 +168,31 @@ class StateDiplomacyPane(currentState: State, selectedState: State, actions: Wor
     }
   }
 
-  tabPane.tabs.addAll(relationsTab, agreementsPane, actionsPane, claimsPane)
+  tabPane.tabs.addAll(relationsTab, actionsPane, claimsPane)
   add(BigText(selectedState.name), "wrap")
   add(tabPane, "grow, push")
 }
 
 class StateRelationsPane(currentState: State, selectedState: State, actions: WorldStateDiplomacyActions) extends MigPane() {
+  add(new MigPane {
+    add(MediumText(Localization("diplomacy.reputation") + ":"))
+    add(BigText(reputationText))
+  }, "wrap")
+
   if (selectedState != currentState) {
-    add(BigText(Localization("diplomacy.relationsToUs")))
-    add(BigText(actions.relationships(selectedState)(currentState).toString), "wrap")
-    actions.relationshipsDescribed(selectedState).getOrElse(currentState, Nil).foreach { b =>
-      add(MediumText(b.title))
-      add(MediumText(b.bonus.toString), "wrap")
-    }
+    add(new MigPane {
+      add(BigText(Localization("diplomacy.relationsToUs")))
+      add(BigText(actions.relationships(selectedState)(currentState).toString), "wrap")
+      actions.relationshipsDescribed(selectedState).getOrElse(currentState, Nil).foreach { b =>
+        add(MediumText(b.title))
+        add(MediumText(b.bonus.toString), "wrap")
+      }
+    })
+  }
+
+  def reputationText: String = {
+    val badBoy = actions.diplomacyEngine.badBoy.getOrElse(currentState, 0d)
+    Localization(WorldConstants.Diplomacy.reputationDescriptionTextKey(badBoy)) + s" ($badBoy)"
   }
 }
 
@@ -164,33 +206,33 @@ class StateAgreementsPane(selectedState: State, actions: WorldStateDiplomacyActi
   private val truces = agreements.collect { case t: TruceAgreement => t }
 
   private def addWar(war: WarAgreement): Unit = {
-    add(new WarPane(war, actions), "grow, push, span 2, wrap")
+    add(new WarPane(war, actions), "grow, push, wrap")
   }
 
   if (vassalAgreements.nonEmpty) {
-    add(MediumText(Localization("diplomacy.vassalOf")))
+    add(MediumText(Localization("diplomacy.vassalOf")), "wrap")
     add(new StateComponentList(vassalAgreements.map(_.overlord)), "wrap")
   }
 
   if (overlordAgreements.nonEmpty) {
-    add(MediumText(Localization("diplomacy.overlordFor")))
+    add(MediumText(Localization("diplomacy.overlordFor")), "wrap")
     add(new StateComponentList(overlordAgreements.map(_.vassal)), "wrap")
   }
 
   if (allianceAgreements.nonEmpty) {
-    add(MediumText(Localization("diplomacy.alliances")))
+    add(MediumText(Localization("diplomacy.alliances")), "wrap")
     val alliances = allianceAgreements.flatMap(_.sides - selectedState)
     add(new StateComponentList(alliances), "wrap")
   }
 
   if (truces.nonEmpty) {
-    add(MediumText(Localization("diplomacy.truces")))
+    add(MediumText(Localization("diplomacy.truces")), "wrap")
     val currentTruces = truces.flatMap(_.sides - selectedState)
     add(new StateComponentList(currentTruces), "wrap")
   }
 
   if (wars.nonEmpty) {
-    add(MediumText(Localization("diplomacy.wars")), "span 2, wrap")
+    add(MediumText(Localization("diplomacy.wars")), "wrap")
     wars.foreach(addWar)
   }
 }
@@ -200,7 +242,7 @@ class StateActionsPane(currentState: State, selectedState: State, actions: World
   import ModalDialog._
 
   private val declareWar = new MediumButton() {
-    text = Localization("diplomacy.declareWar")
+    text = Localization("diplomacy.declareWar.button")
     onAction = { _ =>
       val dialog = new DeclareWarPane(currentState, selectedState, actions).showDialog(stage)
       dialog.dialogResult.foreach { message =>
@@ -209,32 +251,54 @@ class StateActionsPane(currentState: State, selectedState: State, actions: World
     }
   }
 
-  private val proposePeace = new MediumButton() {
-    text = Localization("diplomacy.proposePeace")
+  private val addWarTarget = new MediumButton {
+    text = Localization("diplomacy.addWarTarget")
     onAction = { _ =>
-      val dialog = new ProposePeacePane(currentState, selectedState, actions).showDialog(stage)
+      actions.warsForWhichCanAddTarget(currentState, selectedState).headOption.foreach { wa =>
+        val dialog = new AddWarTargetPane(currentState, selectedState, wa, actions).showDialog(stage)
+        dialog.dialogResult.foreach { wt =>
+          actions.diplomacyEngine.addWarTarget(wa, wt)
+        }
+      }
+    }
+  }
+
+  private val proposePeace = new MediumButton() {
+    text = Localization("diplomacy.proposePeace.button")
+    onAction = { _ =>
+      val dialog = new ProposePeacePane(currentState, selectedState, actions, false).showDialog(stage)
       dialog.dialogResult.foreach { message =>
-        actions.sendMessage(message)
+        actions.sendMessage(message.right.get)
+      }
+    }
+  }
+
+  private val proposeSeparatePeace = new MediumButton {
+    text = Localization("diplomacy.proposeSeparatePeace.button")
+    onAction = { _ =>
+      val dialog = new ProposePeacePane(currentState, selectedState, actions, true).showDialog(stage)
+      dialog.dialogResult.foreach { message =>
+        actions.sendMessage(message.left.get)
       }
     }
   }
 
   private val proposeVassalization = new MediumButton() {
-    text = Localization("diplomacy.proposeVassalization")
+    text = Localization("diplomacy.proposeVassalization.button")
     onAction = { _ =>
       actions.sendMessage(new VassalizationProposal(currentState, selectedState))
     }
   }
 
   private val proposeOverlordship = new MediumButton() {
-    text = Localization("diplomacy.proposeOverlordship")
+    text = Localization("diplomacy.proposeOverlordship.button")
     onAction = { _ =>
       actions.sendMessage(new OverlordshipProposal(currentState, selectedState))
     }
   }
 
   private val proposeAlliance = new MediumButton() {
-    text = Localization("diplomacy.proposeAlliance")
+    text = Localization("diplomacy.proposeAlliance.button")
     onAction = { _ =>
       actions.sendMessage(new AllianceProposal(currentState, selectedState))
     }
@@ -244,8 +308,16 @@ class StateActionsPane(currentState: State, selectedState: State, actions: World
     add(proposePeace, "wrap")
   }
 
+  if (actions.canProposeSeparatePeace(currentState, selectedState)) {
+    add(proposeSeparatePeace, "wrap")
+  }
+
   if (actions.canDeclareWar(currentState, selectedState)) {
     add(declareWar, "wrap")
+  }
+
+  if (actions.inWarAgainst(currentState, selectedState)) {
+    add(addWarTarget, "wrap")
   }
 
   if (actions.canProposeAlliance(currentState, selectedState)) {
@@ -262,23 +334,40 @@ class StateActionsPane(currentState: State, selectedState: State, actions: World
 }
 
 class DeclareWarPane(currentState: State, selectedState: State, actions: WorldStateDiplomacyActions) extends DialogStage[DeclareWar] {
-  private val selectWarTarget = new SelectWarTarget(currentState, selectedState, Set(), actions)
 
-  selectWarTarget.selectedWarTarget.onChange {
-    dialogResult = selectWarTarget.selectedWarTarget.value.map { wt =>
-      new DeclareWar(currentState, selectedState, wt, Set())
+  override protected def dialogContent: Region = new MigPane("") {
+    val selectWarTarget = new SelectWarTarget(actions.diplomacyEngine.possibleTargetsForStartingWar(currentState, selectedState))
+
+    selectWarTarget.selectedWarTarget.onChange {
+      dialogResult = selectWarTarget.selectedWarTarget.value.map { wt =>
+        new DeclareWar(currentState, selectedState, wt, Set())
+      }
     }
-  }
 
-  override protected def dialogContent: Node = new MigPane {
     add(BigText(Localization("diplomacy.declareWarOn", selectedState.name)), "wrap")
-    add(selectWarTarget)
+    add(selectWarTarget, "grow, push")
   }
 
   override protected def css: Option[String] = None
 }
 
-class SelectWarTarget(currentState: State, selectedState: State, alreadyExistedTargets: Set[WarTarget], actions: WorldStateDiplomacyActions) extends PaneWithTwoHorizontalChildren {
+class AddWarTargetPane(currentState: State, selectedState: State, warAgreement: WarAgreement, actions:WorldStateDiplomacyActions) extends DialogStage[WarTarget] {
+
+  override protected def dialogContent: Region = new MigPane {
+    val selectWarTarget = new SelectWarTarget(actions.diplomacyEngine.possibleWarTargets(warAgreement, currentState))
+
+    selectWarTarget.selectedWarTarget.onChange {
+      dialogResult = selectWarTarget.selectedWarTarget.value
+    }
+
+    add(BigText(Localization("diplomacy.addWarTargetTo", selectedState.name)), "wrap")
+    add(selectWarTarget, "grow, push")
+  }
+
+  override protected def css: Option[String] = None
+}
+
+class SelectWarTarget(possibleWarTargets:Set[WarTarget]) extends MigPane {
 
   private abstract class WarTargetSelection extends BorderPane {
     def selectedWarTarget: Option[WarTarget]
@@ -291,8 +380,9 @@ class SelectWarTarget(currentState: State, selectedState: State, alreadyExistedT
   }
 
   private class VassalizeTargetKind extends WarTargetKind {
-    private val possibleVassalizationTargets = actions.possibleVassalizationWarTargets(selectedState).toSet --
-      alreadyExistedTargets.collect { case v: Vassalize => v.giver }
+    private val possibleVassalizationTargets = possibleWarTargets.collect {
+      case v:Vassalize => v
+    }
 
     override def component: Option[WarTargetSelection] = {
       val child = new WarTargetSelection {
@@ -300,19 +390,20 @@ class SelectWarTarget(currentState: State, selectedState: State, alreadyExistedT
         center = new MigPane {
           possibleVassalizationTargets.foreach { pt =>
             val rb = new RadioButton {
-              text = pt.name
+              text = pt.giver.name
               toggleGroup = tg
               userData = pt
+              style = Components.largeFontStyle
             }
             add(rb, "wrap")
           }
         }
 
-        override def selectedWarTarget: Option[WarTarget] = tg.selectedToggle.map { state =>
-          Option(state).map { st =>
-            new Vassalize(currentState, st.userData.asInstanceOf[State])
+        override def selectedWarTarget: Option[WarTarget] = Option(tg.selectedToggle).flatMap { st =>
+          Option(st.value).map { st =>
+            st.userData.asInstanceOf[Vassalize]
           }
-        }.value
+        }
       }
 
       if (possibleVassalizationTargets.isEmpty) None else Some(child)
@@ -322,44 +413,58 @@ class SelectWarTarget(currentState: State, selectedState: State, alreadyExistedT
   }
 
   private class DemandMoneyTargetKind extends WarTargetKind {
-    override def component: Option[WarTargetSelection] = Some(new WarTargetSelection {
-      override def selectedWarTarget: Option[WarTarget] = Try(textField.text.value.toDouble).map { d =>
-        new TakeMoney(currentState, selectedState, d)
-      }.toOption
+    private val possibleDemandMoneyTargets = possibleWarTargets.collect {
+      case t:TakeMoney => t
+    }
 
-      private val textField = new TextField {
-        text = "0"
+    override def component: Option[WarTargetSelection] = {
+      val child = new WarTargetSelection {
+        val tg = new ToggleGroup()
+        center = new MigPane {
+          possibleDemandMoneyTargets.foreach { pt =>
+            val rb = new RadioButton {
+              text = pt.giver.name
+              toggleGroup = tg
+              userData = pt
+              style = Components.largeFontStyle
+            }
+            add(rb, "wrap")
+          }
+        }
+
+        override def selectedWarTarget: Option[WarTarget] = Option(tg.selectedToggle).flatMap { st =>
+          Option(st.value).map { st =>
+            st.userData.asInstanceOf[TakeMoney]
+          }
+        }
       }
-      center = new MigPane {
-        add(MediumText(Localization("diplomacy.demand.money.from", selectedState)), "wrap")
-        add(textField)
-      }
-    })
+
+      if (possibleDemandMoneyTargets.isEmpty) None else Some(child)
+    }
 
     override def label: String = Localization("diplomacy.demand.money")
   }
 
   private class TakeProvinceTargetKind extends WarTargetKind {
-    private val possibleProvinces = actions.possibleProvincesToTake(selectedState).toSet --
-      alreadyExistedTargets.collect { case t: TakeProvince => t.province }
+    private val possibleProvinces = possibleWarTargets.collect { case t: TakeProvince => t }
 
     override def component: Option[WarTargetSelection] = if (possibleProvinces.nonEmpty) {
       Some(new WarTargetSelection {
         private val group = new ToggleGroup()
 
-        override def selectedWarTarget: Option[WarTarget] = group.selectedToggle.map(Option.apply).map {
-          case Some(toggle) =>
-            val province = toggle.getUserData.asInstanceOf[Province]
-            Some(new TakeProvince(currentState, selectedState, province))
-          case None => None
-        }.value
+        override def selectedWarTarget: Option[WarTarget] = Option(group.selectedToggle).flatMap { st =>
+          Option(st.value).map { toggle =>
+            toggle.getUserData.asInstanceOf[TakeProvince]
+          }
+        }
 
         center = new MigPane {
           possibleProvinces.foreach { p =>
             val radio = new RadioButton {
-              text = p.name
+              text = p.province.name
               toggleGroup = group
               userData = p
+              style = Components.largeFontStyle
             }
             add(radio, "wrap")
           }
@@ -371,28 +476,28 @@ class SelectWarTarget(currentState: State, selectedState: State, alreadyExistedT
   }
 
   private class CollapseTargetKind extends WarTargetKind {
-    private val possibleStates = Set(selectedState) -- alreadyExistedTargets.collect {
-      case c: CrackState => c.giver
+    private val possibleTargets = possibleWarTargets.collect {
+      case c: CrackState => c
     }
 
-    override def component: Option[WarTargetSelection] = if (possibleStates.nonEmpty) {
+    override def component: Option[WarTargetSelection] = if (possibleTargets.nonEmpty) {
       Some(
         new WarTargetSelection {
           private val group = new ToggleGroup()
 
-          override def selectedWarTarget: Option[WarTarget] = group.selectedToggle.map(Option.apply).map {
-            case Some(toggle) =>
-              val state = toggle.getUserData.asInstanceOf[State]
-              Some(new CrackState(currentState, state))
-            case None => None
-          }.value
+          override def selectedWarTarget: Option[WarTarget] = Option(group.selectedToggle).flatMap { st =>
+            Option(st.value).map { toggle =>
+              toggle.getUserData.asInstanceOf[CrackState]
+            }
+          }
 
           center = new MigPane {
-            possibleStates.foreach { s =>
+            possibleTargets.foreach { s =>
               val radio = new RadioButton {
-                text = s.name
+                text = s.giver.name
                 toggleGroup = group
                 userData = s
+                style = Components.largeFontStyle
               }
               add(radio, "wrap")
             }
@@ -405,7 +510,7 @@ class SelectWarTarget(currentState: State, selectedState: State, alreadyExistedT
   }
 
   private class LiberateCultureTargetKind extends WarTargetKind {
-    private val possibleCultures = actions.possibleCulturesToLiberate(selectedState) -- alreadyExistedTargets.collect {
+    private val possibleCultures = possibleWarTargets.collect {
       case lc: LiberateCulture => lc.culture
     }
 
@@ -414,13 +519,11 @@ class SelectWarTarget(currentState: State, selectedState: State, alreadyExistedT
         new WarTargetSelection {
           private val group = new ToggleGroup()
 
-          override def selectedWarTarget: Option[WarTarget] = group.selectedToggle.map(Option.apply).map {
-            case Some(toggle) =>
-              val culture = toggle.getUserData.asInstanceOf[Culture]
-              Some(new LiberateCulture(currentState, selectedState, culture,
-                actions.provincesByCulture(selectedState, culture).toSet))
-            case None => None
-          }.value
+          override def selectedWarTarget: Option[WarTarget] = Option(group.selectedToggle).flatMap { st =>
+            Option(st.value).map { toggle =>
+              toggle.getUserData.asInstanceOf[LiberateCulture]
+            }
+          }
 
           center = new MigPane {
             possibleCultures.foreach { s =>
@@ -428,6 +531,7 @@ class SelectWarTarget(currentState: State, selectedState: State, alreadyExistedT
                 text = s.name
                 toggleGroup = group
                 userData = s
+                style = Components.largeFontStyle
               }
               add(radio, "wrap")
             }
@@ -447,15 +551,14 @@ class SelectWarTarget(currentState: State, selectedState: State, alreadyExistedT
       new LiberateCultureTargetKind).filter(_.component.nonEmpty)
   }
 
-  private class RadioTargetKindsPane(kinds: List[WarTargetKind]) extends MigPane {
+  private class RadioTargetKindsPane(kinds: List[WarTargetKind]) extends MigPane("") {
     private val group = new ToggleGroup()
 
     kinds.foreach { k =>
-      val btn = new RadioButton {
-        text = k.label
+      val btn = new RadioButton(k.label) {
         toggleGroup = group
         userData = k
-
+        style = Components.largeFontStyle
       }
       add(btn, "wrap")
     }
@@ -475,25 +578,32 @@ class SelectWarTarget(currentState: State, selectedState: State, alreadyExistedT
     }
   }
 
-  setTwoChildren(left, right)
+  add(left)
+  add(right)
 
   val selectedWarTarget: ObjectProperty[Option[WarTarget]] = right.centerComponent.map(_.flatMap(_.selectedWarTarget))
 }
 
-class ProposePeacePane(currentState: State, selectedState: State, actions: WorldStateDiplomacyActions) extends DialogStage[ProposePeace] {
+class ProposePeacePane(currentState: State, selectedState: State, actions: WorldStateDiplomacyActions, separatePeace: Boolean) extends DialogStage[Either[ProposePeace, ProposeSeparatePeace]] {
 
   // TODO case when two simultaneous wars, however it is very unlikely
-  private val warOpt = actions.warsForWhichCanProposePeace(currentState, selectedState).headOption
+  private val warOpt = actions.warsForWhichCanProposePeace(currentState, selectedState, separatePeace).headOption
 
   def targets: List[WarTarget] = {
     warOpt.map { war =>
-      val currentSide = if (war.attackers.contains(currentState)) war.attackers
-      else if (war.defenders.contains(currentState)) war.defenders
-      else sys.error(s"Impossible propose peace for $currentState in war $war")
-
-      war.targets.filter { target =>
-        currentSide.contains(target.demander)
-      }.toList
+      if (separatePeace) {
+        if (war.isLeader(currentState, actions.diplomacyEngine) && !war.isLeader(selectedState, actions.diplomacyEngine)) {
+          val affected = war.sideByState(currentState) + selectedState ++ actions.diplomacyEngine.getVassals(selectedState)
+          war.targets.filter(t => affected.contains(t.giver) && affected.contains(t.demander)).toList
+        } else if (!war.isLeader(currentState, actions.diplomacyEngine) && war.isLeader(selectedState, actions.diplomacyEngine)) {
+          val affected = war.sideByState(selectedState) + currentState ++ actions.diplomacyEngine.getVassals(currentState)
+          war.targets.filter(t => affected.contains(t.giver) && affected.contains(t.demander)).toList
+        } else {
+          sys.error(s"Invalid separate peace for war $war and currentState $currentState and selectedState $selectedState")
+        }
+      } else {
+        war.targets.toList
+      }
     }.getOrElse(Nil)
   }
 
@@ -505,13 +615,26 @@ class ProposePeacePane(currentState: State, selectedState: State, actions: World
         if (this.selected.value) selectedTargets += t
         else selectedTargets -= t
         warOpt.foreach { war =>
-          dialogResult = Some(new ProposePeace(currentState, selectedState, war, selectedTargets))
+          dialogResult = Some(
+            if (separatePeace) {
+              val separateState = if (war.isLeader(currentState, actions.diplomacyEngine) && !war.isLeader(selectedState, actions.diplomacyEngine)) {
+                selectedState
+              } else if (!war.isLeader(currentState, actions.diplomacyEngine) && war.isLeader(selectedState, actions.diplomacyEngine)) {
+                currentState
+              } else {
+                sys.error(s"Invalid separate peace for war $war and currentState $currentState and selectedState $selectedState")
+              }
+              Right(ProposeSeparatePeace(currentState, selectedState, war, selectedTargets, separateState))
+            }
+            else
+              Left(ProposePeace(currentState, selectedState, war, selectedTargets))
+          )
         }
       }
     }
   }
 
-  override val dialogContent: Node = new MigPane {
+  override def dialogContent: Region = new MigPane {
     checkButtons.foreach { cb =>
       add(cb, "wrap")
     }
@@ -521,11 +644,11 @@ class ProposePeacePane(currentState: State, selectedState: State, actions: World
 
 }
 
-class StateComponentColorName(state: State) extends MigPane("center") with WorldInterfaceJavaNode {
-  val rect = Rectangle(Components.mediumFontSize, Components.mediumFontSize)
+class StateComponentColorName(state: State, align: String = "left") extends MigPane(align) with WorldInterfaceJavaNode {
+  val rect = Rectangle(Components.largeFontSize, Components.largeFontSize)
   rect.fill = state.color
   rect.stroke = Color.Black
-  val text = MediumText(state.name)
+  val text = BigText(state.name)
   add(rect)
   add(text)
 }
@@ -625,13 +748,13 @@ class ClaimsTable(claims: List[Claim]) extends TableView[Claim] {
   items = new ObservableBuffer[Claim]() ++ claims
 }
 
-class WarPane(war:WarAgreement, diplomacyActions: WorldStateDiplomacyActions) extends MigPane {
+class WarPane(war: WarAgreement, diplomacyActions: WorldStateDiplomacyActions) extends MigPane {
   add(BigText(war.fullWarName), "center, wrap")
   add(buildTable, "grow, push")
 
-  private case class WarTableRow(attacker:Option[State], warTarget:Option[WarTarget], defender: Option[State])
+  private case class WarTableRow(attacker: Option[State], warTarget: Option[WarTarget], defender: Option[State])
 
-  private def tableRows:List[WarTableRow] = {
+  private def tableRows: List[WarTableRow] = {
     val mainAttacker = war.attackersLeader(diplomacyActions.diplomacyEngine)
     val mainDefender = war.defendersLeader(diplomacyActions.diplomacyEngine)
 
@@ -655,7 +778,7 @@ class WarPane(war:WarAgreement, diplomacyActions: WorldStateDiplomacyActions) ex
     }.toList
   }
 
-  private def buildTable:TableView[WarTableRow] = {
+  private def buildTable: TableView[WarTableRow] = {
 
     class WarColumn(f: WarTableRow => Option[State]) extends TableColumn[WarTableRow, MigPane] {
 
@@ -707,7 +830,7 @@ class WarPane(war:WarAgreement, diplomacyActions: WorldStateDiplomacyActions) ex
       style = Components.mediumFontStyle
     }
 
-    tableView.columns ++= List(attacker, demander, target, giver, defender)
+    tableView.columns ++= List(attacker, target, defender)
     tableView.items = ObservableBuffer() ++ tableRows
     tableView
 

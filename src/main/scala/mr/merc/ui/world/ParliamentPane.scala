@@ -4,7 +4,7 @@ import mr.merc.economics.WorldStateParliamentActions
 import mr.merc.local.Localization._
 import mr.merc.local.Localization
 import mr.merc.politics._
-import mr.merc.ui.common.SceneManager
+import mr.merc.ui.common.{LazyPane, SceneManager}
 import mr.merc.ui.dialog.ModalDialog
 import mr.merc.ui.world.PieChartBuilder.PiePart
 import org.tbee.javafx.scene.layout.MigPane
@@ -153,14 +153,14 @@ class ParliamentPie(worldState: WorldStateParliamentActions) extends TabPane {
   private val votersPopularityTab = new Tab() {
     text = Localization("parliament.votersPopularity")
     content <== worldState.playerPoliticalSystemProperty.map { _ =>
-      pieByVotes(worldState.partyPopularityAmongVoters(worldState.playerState)).delegate
+      new LazyPane(pieByVotes(worldState.partyPopularityAmongVoters(worldState.playerState))).delegate
     }
   }
 
   private val popularityTab = new Tab() {
     text = Localization("parliament.popularity")
     content <== worldState.playerPoliticalSystemProperty.map { _ =>
-      pieByVotes(worldState.partyPopularity(worldState.playerState)).delegate
+      new LazyPane(pieByVotes(worldState.partyPopularity(worldState.playerState))).delegate
     }
   }
 

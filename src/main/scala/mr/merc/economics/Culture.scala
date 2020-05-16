@@ -24,7 +24,7 @@ object Culture {
   // + saurians
 
 
-  val cultures: List[Culture] = humanCultures ++ elvishCultures ++ orcishCultures ++ dwarfishCultures ++ undeadCultures
+  val cultures: List[Culture] = humanCultures ++ elvishCultures //++ orcishCultures ++ dwarfishCultures ++ undeadCultures
 
   //HighElf, DarkElf, BarbarianOrc, RockDwarf, GreenSaurian, OldDrakes, Forsaken, RedDemons)
 

@@ -5,7 +5,7 @@ import mr.merc.economics.Products._
 import mr.merc.log.Logging
 import mr.merc.map.generator.WorldMapGenerator
 import mr.merc.players.{ColorGenerator, NamesGenerator}
-import mr.merc.politics.{Party, PoliticalViews, Province, State}
+import mr.merc.politics.{Election, Party, PoliticalViews, Province, State}
 import mr.merc.util.WeightedRandom
 import WorldConstants.Enterprises._
 import WorldGenerationConstants._
@@ -187,6 +187,11 @@ class WorldGenerator(field:FourSeasonsTerrainHexField) {
     }
     (0 until PopMigrationsToNeighbours).foreach {_ =>
       mixPopulations(provinces)
+    }
+
+    result.foreach { case (state, provinces) =>
+      val party = Election.mostPopularParty(provinces.flatMap(_.regionPopulation.pops), Party.allParties)
+      state.politicalSystem.rulingParty = party
     }
 
     result

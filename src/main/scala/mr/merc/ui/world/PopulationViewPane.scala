@@ -80,12 +80,12 @@ class PopsTablePane(regionPopulation: RegionPopulation, province: Province) exte
 
   private val buffer = new ObservableBuffer[PopulationInfo]()
 
-  private val info = regionPopulation.pops.sortBy(p => (p.populationType, p.populationCount)).map(p => new PopulationInfo(List(p), province))
+  private val info = regionPopulation.nonEmptyPops.sortBy(p => (p.populationType, p.populationCount)).map(p => new PopulationInfo(List(p), province))
 
-  buffer.add(new PopulationInfo(regionPopulation.pops, province))
-  buffer.add(new PopulationInfo(regionPopulation.pops.filter(_.populationType.populationClass == Upper), province))
-  buffer.add(new PopulationInfo(regionPopulation.pops.filter(_.populationType.populationClass == Middle), province))
-  buffer.add(new PopulationInfo(regionPopulation.pops.filter(_.populationType.populationClass == Lower), province))
+  buffer.add(new PopulationInfo(regionPopulation.nonEmptyPops, province))
+  buffer.add(new PopulationInfo(regionPopulation.nonEmptyPops.filter(_.populationType.populationClass == Upper), province))
+  buffer.add(new PopulationInfo(regionPopulation.nonEmptyPops.filter(_.populationType.populationClass == Middle), province))
+  buffer.add(new PopulationInfo(regionPopulation.nonEmptyPops.filter(_.populationType.populationClass == Lower), province))
   buffer.addAll(info.reverse.asJava)
   populationTable.items = buffer
 
