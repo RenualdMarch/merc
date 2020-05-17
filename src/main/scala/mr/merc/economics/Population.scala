@@ -23,7 +23,7 @@ class Population(val culture: Culture, val populationType: PopulationType, priva
 
   private var tax: Double = 0d
   private var currentPopulationDayRecord: PopulationDayRecord = PopulationDayRecord(populationCount, 0, 0, 0, 0,
-    new ProductFulfillmentRecord(Map(), needs, Map()), Nil, Nil)
+    new ProductFulfillmentRecord(Map(), needs, Map()), 0, Nil, Nil)
 
   def currentDayRecord: PopulationDayRecord = currentPopulationDayRecord
 
@@ -77,6 +77,15 @@ class Population(val culture: Culture, val populationType: PopulationType, priva
 
   def grow(): Unit = {
     count *= (1 + growthRate)
+  }
+
+  def kill(part: Double): Unit = {
+    require(part >= 0 && part <= 1, s"part is $part")
+
+    val killingPart = 1 - part
+
+    count *= killingPart
+    literatePeople *= killingPart
   }
 
   def extractLiterateMovers(count: Int): PopulationMovers = {
@@ -189,7 +198,7 @@ class Population(val culture: Culture, val populationType: PopulationType, priva
   def newDay(stateTaxPolicy: TaxPolicy, bureaucratsPercentage: Double): Unit = {
     this.tax = stateTaxPolicy.tax(taxPolicy, bureaucratsPercentage)
     this.currentPopulationDayRecord = PopulationDayRecord(populationCount, 0, 0, 0, 0,
-      new ProductFulfillmentRecord(Map(), needs, Map()), this.movements, this.movementsBetweenProvinces)
+      new ProductFulfillmentRecord(Map(), needs, Map()), 0, this.movements, this.movementsBetweenProvinces)
     this.movements = Nil
     this.movementsBetweenProvinces = Nil
     this.currentPrices = Map()
@@ -224,6 +233,7 @@ class Population(val culture: Culture, val populationType: PopulationType, priva
     } else {
       literatePeople = count
     }
+    currentPopulationDayRecord = currentPopulationDayRecord.copy(mayBeAssimilated = (students * WorldConstants.Population.LiteracyToAssimilationQ).toInt)
   }
 
   private case class DemandInfo(product: Product, count: Double, price: Double)
@@ -459,7 +469,8 @@ object Population {
   // TODO add money source
   case class PopulationDayRecord(populationCount: Int, receivedMoney: Double, totalMoney: Double, taxes: Double,
                                  investments: Double, productFulfillment: ProductFulfillmentRecord,
-                                 provinceMovements: List[PopulationProvinceMovement], movementsBetweenProvinces: List[PopulationMovementBetweenProvinces])
+                                 mayBeAssimilated: Int, provinceMovements: List[PopulationProvinceMovement],
+                                 movementsBetweenProvinces: List[PopulationMovementBetweenProvinces])
 
 }
 
@@ -487,7 +498,7 @@ abstract class AbstractPopulationMigration(maxMigrationConstant: Double) {
   }
 }
 
-class PopulationMigrationInsideProvince(regionPopulation: RegionPopulation) extends AbstractPopulationMigration(MaxProvinceMigrationPart) {
+class PopulationMigrationInsideProvince(regionPopulation: RegionPopulation, state: State) extends AbstractPopulationMigration(MaxProvinceMigrationPart) {
 
   import PopulationMigrationInsideProvince._
 
@@ -502,9 +513,16 @@ class PopulationMigrationInsideProvince(regionPopulation: RegionPopulation) exte
     } else None
   }
 
+  private def assimilationMigration(population: Population): Option[PopulationProvinceMovement] = {
+    if (population.culture.race == state.primeCulture.race && population.culture != state.primeCulture) {
+      Some(PopulationProvinceMovement(population, regionPopulation.pop(population.populationType, state.primeCulture),
+        population.currentDayRecord.mayBeAssimilated))
+    } else None
+  }
+
   def migrateInsideProvince(): Unit = {
     val movements = regionPopulation.pops.flatMap { p =>
-      whereToMigrateInsideProvince(p)
+      whereToMigrateInsideProvince(p) ++ assimilationMigration(p)
     }
 
     movements.foreach { movement =>

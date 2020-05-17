@@ -1,6 +1,9 @@
 package mr.merc.economics
 
+import cats.kernel.Semigroup
 import mr.merc.economics.MapUtil.NumericOperations.{InnerMapWithOperations, MapWithOperations}
+
+import scala.collection.mutable
 
 object MapUtil {
 
@@ -8,13 +11,15 @@ object MapUtil {
     implicit class MapWithOperations[K, V](map: Map[K, V])(implicit  num: Numeric[V]) {
 
       def |+| (other: Map[K, V]):Map[K, V] = {
-        val keysInMapOnly = map.keySet -- other.keySet
-        val keysInOtherOnly = other.keySet -- map.keySet
-        val intersectingKeys = map.keySet ++ other.keySet -- keysInMapOnly -- keysInOtherOnly
-        val sumMap = intersectingKeys.map { k =>
-          k -> num.plus(map(k), other(k))
-        }.toMap
-        map.filterKeys(keysInMapOnly.contains) ++ other.filterKeys(keysInOtherOnly.contains) ++ sumMap
+        val hashMap = mutable.Map[K, V]()
+        map.foreach { case (k, v) =>
+          hashMap.put(k, v)
+        }
+        other.foreach { case (k, v) =>
+          val prev = hashMap.getOrElse(k, num.zero)
+          hashMap.put(k, num.plus(prev, v))
+        }
+        hashMap.toMap
       }
 
       def |+| (other: (K, V)):Map[K, V] = {
@@ -46,6 +51,22 @@ object MapUtil {
       }
 
       def sumValues:V = map.values.sum
+    }
+
+    implicit class CollectionMapWithOperations[K, V](iterable: Iterable[Map[K, V]])(implicit  num: Numeric[V]) {
+
+      def sumAll:Map[K, V] = {
+        val hashMap = mutable.Map[K, V]()
+        for {
+          map <- iterable
+          (k, v) <- map
+        } {
+          val prev = hashMap.getOrElse(k, num.zero)
+          hashMap.put(k, num.plus(v, prev))
+        }
+        hashMap.toMap
+      }
+
     }
 
     implicit class InnerMapWithOperations[K1, K2, V](map: Map[K1, Map[K2, V]])(implicit  num: Numeric[V]) {

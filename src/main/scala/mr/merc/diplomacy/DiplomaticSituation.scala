@@ -10,7 +10,7 @@ class DiplomaticSituation(diplomacy:WorldDiplomacy) {
     val provinceClaims:List[ProvinceClaim] = diplomacy.allClaims.collect {
       case c:StrongProvinceClaim if c.province.owner != c.state => c
       case c:WeakProvinceClaim if c.province.owner != c.state => c
-    }
+    }.toList
 
     provinceClaims.flatMap { pc =>
       val first = pc.province.owner

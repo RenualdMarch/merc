@@ -2,9 +2,8 @@ package mr.merc.politics
 
 import mr.merc.economics.{EconomicRegion, Population}
 import mr.merc.economics.MapUtil.FloatOperations._
+import mr.merc.economics.MapUtil.NumericOperations.CollectionMapWithOperations
 import mr.merc.economics.Culture
-
-import scala.collection.immutable
 
 class Election(currentParty: Party, primaryCulture: Culture, possibleParties: List[Party]) {
 
@@ -32,7 +31,7 @@ class Election(currentParty: Party, primaryCulture: Culture, possibleParties: Li
 object Election {
 
   def mostPopularParty(pops: List[Population], allowedParties: List[Party]): Party = {
-    pops.map(_.choose(allowedParties)).map(_.votes).fold(Map(allowedParties.head -> 0d))(_ ++ _)
+    pops.par.map(_.choose(allowedParties)).map(_.votes).reduce(_ |+| _)
     }.maxBy(_._2)._1
 
   implicit class PopulationElection(population: Population) {
@@ -45,7 +44,7 @@ object Election {
         val mostPopularParties = diff(minKey)
         val countPerParty = count / mostPopularParties.size
         mostPopularParties.map(_ -> countPerParty).toMap
-      }.reduce(_ |+| _)
+      }.sumAll
       val votes = votesByGroups.groupBy(_._1).map { case (p, list) =>
         p -> list.values.sum
       }

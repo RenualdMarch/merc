@@ -118,6 +118,10 @@ trait EconomicRegion {
   def gdp:Double = {
     goodsProducedLastTurn dot regionMarket.currentPrices
   }
+
+  def civilianVictimsOfBattleDied(): Unit = {
+    regionPopulation.nonEmptyPops.foreach(_.kill(WorldConstants.Population.BattleVictimsPercentage))
+  }
 }
 
 class EconomicGrid(region:EconomicRegion) extends PossibleGrid[EconomicRegion] {

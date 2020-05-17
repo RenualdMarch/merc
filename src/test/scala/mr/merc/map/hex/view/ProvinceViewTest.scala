@@ -57,42 +57,42 @@ class ProvinceViewTest extends FunSuite with MockitoSugar with BeforeAndAfter wi
 
     provinceView.refreshCity()
     val houses1 = field.hexes.filter(_.mapObj.exists(_.isInstanceOf[FourSeasonsHouse]))
-    assert(houses1.size === 4)
+    assert(houses1.size === 3)
     assert(houses1.forall(_.mapObj.contains(FourSeasonsHouse(LatinHuman))))
     assert(field.hex(3, 1).mapObj.isEmpty)
     assert(field.hex(3, 2).mapObj.isEmpty)
     provinceView.refreshCity()
 
     val houses2 = field.hexes.filter(_.mapObj.exists(_.isInstanceOf[FourSeasonsHouse]))
-    assert(houses2.size === 5)
+    assert(houses2.size === 4)
     val latinHouses2 = houses2.filter(_.mapObj.contains(FourSeasonsHouse(LatinHuman)))
     val westHouses2 = houses2.filter(_.mapObj.contains(FourSeasonsHouse(FrenchHuman)))
-    assert(latinHouses2.size === 4)
+    assert(latinHouses2.size === 3)
     assert(westHouses2.size === 1)
 
     assert(latinHouses2 === houses1)
 
     provinceView.refreshCity()
     val houses3 = field.hexes.filter(_.mapObj.exists(_.isInstanceOf[FourSeasonsHouse]))
-    assert(houses3.size === 5)
+    assert(houses3.size === 3)
 
     val latinHouses3 = houses3.filter(_.mapObj.contains(FourSeasonsHouse(LatinHuman)))
     val westHouses3 = houses3.filter(_.mapObj.contains(FourSeasonsHouse(FrenchHuman)))
 
-    assert(latinHouses3.size === 3)
-    assert(westHouses3.size === 2)
+    assert(latinHouses3.size === 2)
+    assert(westHouses3.size === 1)
 
     assert(latinHouses3.toSet.subsetOf(latinHouses2.toSet))
     assert(westHouses2.toSet.subsetOf(westHouses3.toSet))
 
     provinceView.refreshCity()
     val houses4 = field.hexes.filter(_.mapObj.exists(_.isInstanceOf[FourSeasonsHouse]))
-    assert(houses4.size === 6)
+    assert(houses4.size === 4)
     val latinHouses4 = houses4.filter(_.mapObj.contains(FourSeasonsHouse(LatinHuman)))
     val westHouses4 = houses4.filter(_.mapObj.contains(FourSeasonsHouse(FrenchHuman)))
 
-    assert(latinHouses4.size === 4)
-    assert(westHouses4.size === 2)
+    assert(latinHouses4.size === 3)
+    assert(westHouses4.size === 1)
 
     assert(latinHouses3.toSet.subsetOf(latinHouses4.toSet))
     assert(westHouses3.toSet.subsetOf(westHouses4.toSet))

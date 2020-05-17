@@ -12,6 +12,7 @@ import scala.util.Random
 import mr.merc.economics.WorldGenerationConstants._
 import FourSeasonsTerrainTypes._
 import FourSeasonsMapObjects._
+import mr.merc.util.MercUtils
 
 object WorldMapGenerator {
 
@@ -167,8 +168,8 @@ case class WorldMap(terrain: FourSeasonsTerrainHexField, provinces: Map[FourSeas
 case class MapDivision[T <: Hex](capitals: Set[T], allHexes: Set[T]) {
 
   def voronoiDivision: Map[T, Set[T]] = {
-    val map = capitals.map(c => c -> mutable.Set[T]()).toMap
-    allHexes.foreach { h =>
+    val map = capitals.map(c => c -> MercUtils.concurrentMutableSet[T]()).toMap
+    allHexes.par.foreach { h =>
       val closestCapital = capitals.toSeq.minBy(_.distance(h))
       map(closestCapital) += h
     }
@@ -176,11 +177,11 @@ case class MapDivision[T <: Hex](capitals: Set[T], allHexes: Set[T]) {
   }
 
   def lloydRelaxationCapitals: Set[T] = {
-    voronoiDivision.map { case (_, hexes) =>
+    voronoiDivision.par.map { case (_, hexes) =>
       val x = math.round(hexes.toList.map(_.x).sum.toDouble / hexes.size).toInt
       val y = math.round(hexes.toList.map(_.y).sum.toDouble / hexes.size).toInt
       val newCapitalCandidate = new Hex(x, y)
       hexes.minBy(_.distance(newCapitalCandidate))
-    } toSet
+    }.toSet.seq
   }
 }

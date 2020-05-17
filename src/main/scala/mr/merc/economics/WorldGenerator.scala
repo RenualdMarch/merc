@@ -308,21 +308,10 @@ object WorldGenerator extends Logging {
     // TODO battles are not played!!! possible source of errors
     0 until TradeDaysBeforeStart foreach(_ => ws.nextTurn())
     info(s"World generation took ${(System.currentTimeMillis() - timeBefore) / 1000d} seconds")
-    addClaims(ws)
+    ws.diplomacyEngine.generateInitialStrongClaimsForOwnedTerritories()
+    ws.diplomacyEngine.generateInitialClaimsForNeighbours()
     ws.initialAiDiplomacy()
     ws
-  }
-
-  def addClaims(state:WorldState): Unit ={
-    Random.shuffle(state.regions).take(state.regions.size / 2).foreach { r =>
-      (r.neighbours.map(_.owner).toSet - r.owner).headOption.foreach { s =>
-        if (s.primeCulture == r.culture) {
-          state.addClaim(StrongProvinceClaim(s, r))
-        } else {
-          state.addClaim(WeakProvinceClaim(s, r, 100))
-        }
-      }
-    }
   }
 
   def buildConnectivityMap(field:FourSeasonsTerrainHexField, map:Map[FourSeasonsTerrainHex, Set[FourSeasonsTerrainHex]]):Map[FourSeasonsTerrainHex, Set[FourSeasonsTerrainHex]] = {

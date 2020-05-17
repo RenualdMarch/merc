@@ -189,7 +189,7 @@ class PopulationTest extends FunSuite with Matchers {
     regionPopulation.pops.foreach(_.endOfDay())
     assert(pop.currentDayRecord.productFulfillment.needsFulfillment === Map(LifeNeeds -> 1, RegularNeeds -> 1, LuxuryNeeds -> 1))
 
-    val ppd = new PopulationMigrationInsideProvince(regionPopulation)
+    val ppd = new PopulationMigrationInsideProvince(regionPopulation, new State("1", TestCulture, 0, new PoliticalSystem(Party.aristocratic)))
     ppd.migrateInsideProvince()
     val traders = regionPopulation.pop(Traders, TestCulture)
     assert(traders.populationCount === 1000)

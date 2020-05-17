@@ -7,6 +7,7 @@ import mr.merc.economics.TaxPolicy._
 import mr.merc.politics.IssuePosition._
 import mr.merc.economics.WorldConstants.Enterprises._
 
+import scala.collection.mutable
 import scala.util.Random
 
 trait IssuePosition extends Product {
@@ -439,13 +440,25 @@ case class PoliticalPosition(migration: MigrationPosition,
                              socialPolicy: SocialPolicyPosition,
                              votersPolicy: VotersPolictyPosition) {
 
-  def diffWithPosition(other: PoliticalPosition): Int = {
-    Migration.distanceBetweenPositions(other.migration, migration) +
-      Regime.distanceBetweenPositions(other.regime, regime) +
-      ForeignPolicy.distanceBetweenPositions(other.foreignPolicy, foreignPolicy) +
-      Economy.distanceBetweenPositions(other.economy, economy) +
-      SocialPolicy.distanceBetweenPositions(other.socialPolicy, socialPolicy) +
-      VotersPolicy.distanceBetweenPositions(other.votersPolicy, votersPolicy)
+  private val memo = mutable.Map[PoliticalPosition, Int]()
+
+  def diffWithPosition(o: PoliticalPosition): Int = {
+    def f(other: PoliticalPosition): Int = {
+      Migration.distanceBetweenPositions(other.migration, migration) +
+        Regime.distanceBetweenPositions(other.regime, regime) +
+        ForeignPolicy.distanceBetweenPositions(other.foreignPolicy, foreignPolicy) +
+        Economy.distanceBetweenPositions(other.economy, economy) +
+        SocialPolicy.distanceBetweenPositions(other.socialPolicy, socialPolicy) +
+        VotersPolicy.distanceBetweenPositions(other.votersPolicy, votersPolicy)
+    }
+
+    memo.get(o) match {
+      case Some(r) => r
+      case None =>
+        val v = f(o)
+        memo.put(o, v)
+        v
+    }
   }
 
 }

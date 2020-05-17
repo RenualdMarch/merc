@@ -60,7 +60,7 @@ class WorldState(val regions: List[Province], val playerState: State, val worldH
     val day = new WorldMarketDay(this, turn)
     day.trade()
     regions.foreach { r =>
-      val ppd = new PopulationMigrationInsideProvince(r.regionPopulation)
+      val ppd = new PopulationMigrationInsideProvince(r.regionPopulation, r.owner)
       ppd.migrateInsideProvince()
     }
 
@@ -74,6 +74,8 @@ class WorldState(val regions: List[Province], val playerState: State, val worldH
     this.processUnansweredMessages()
     this.aiTurn(onlyAnswer = false)
     this.diplomacyEngine.improveBadBoyOverTime()
+    this.diplomacyEngine.generateEndTurnClaimsForNeighbours(turn)
+    this.diplomacyEngine.replaceWeakClaimsWithStrongClaimsForOwnedTerritories(turn)
 
     info(s"Total money is $totalMoney")
     info(s"Budgets are: ${states.keySet.map(s => s.name -> s.budget.moneyReserve).toMap}")
@@ -86,6 +88,9 @@ class WorldState(val regions: List[Province], val playerState: State, val worldH
 
     val battlesResolver = new MovementAndBattlesResolver(this)
     val battles = battlesResolver.moveAndPrepareBattles()
+    for (b <- battles;p <- b.provinces) {
+      p.civilianVictimsOfBattleDied()
+    }
     processAiBattles(battles)
     battles
   }
@@ -115,6 +120,9 @@ class WorldState(val regions: List[Province], val playerState: State, val worldH
     val rebellions = regions.flatMap(r => r.regionPopulation.rebellion(r))
     val resolver = new RebellionBattlesResolver(this)
     val battles = resolver.rebellions(rebellions).values.toList
+    for (b <- battles;p <- b.provinces) {
+      p.civilianVictimsOfBattleDied()
+    }
     processAiBattles(battles)
     battles
   }

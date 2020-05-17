@@ -42,6 +42,12 @@ object MercUtils {
     s"rgb(${(color.red * 255).toInt},${(color.green * 255).toInt},${(color.blue * 255).toInt})"
   }
 
+  def concurrentMutableSet[T]() = {
+    import scala.collection.JavaConverters._
+    java.util.Collections.newSetFromMap(
+      new java.util.concurrent.ConcurrentHashMap[T, java.lang.Boolean]).asScala
+  }
+
   implicit class MedianFinder[T](points:Traversable[(T, T)])(implicit numeric: Numeric[T], ordering: Ordering[T]) {
     def medianBySquares:(T, T) = {
       import numeric._

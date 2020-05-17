@@ -50,6 +50,9 @@ object WorldConstants {
     val EmptyPopConsumptionHappiness = 0.6
     val BureaucratsPercentageForMaxEff = 0.02
 
+    val LiteracyToAssimilationQ = 0.5
+    val BattleVictimsPercentage = 0.1
+
     val RiggedElectionsQ:Map[RegimePosition, Double] = Map(Constitutional -> 0.3, Democracy -> 0.15)
     val ElectionThreshold = 0.03
 
@@ -222,6 +225,10 @@ object WorldConstants {
     val VassalizedStateBadBoy = 3
     val LiberateCultureBadBoy = 2
 
+    val ChanceForInitialWeakClaim = 0.2
+    val ChanceForWeakClaim = 0.05
+    val WeakClaimTime = 100
+
     def reputationDescriptionTextKey(badBoy: Double):String = {
       if (badBoy == 0) "diplomacy.reputation.honorable"
       else if (badBoy <= 5) "diplomacy.reputation.respectable"
@@ -309,8 +316,8 @@ object WorldGenerationConstants {
   val PopMigrationToNeighbourPercentage = 0.2
   val PopMigrationsToNeighbours = 1
 
-  val WorldMapWidth = 30
-  val WorldMapHeight = 30
+  val WorldMapWidth = 50
+  val WorldMapHeight = 50
   val HexesPerProvince = 100
   val LandPercentage = 0.7
   val Provinces = (WorldMapHeight * WorldMapWidth * LandPercentage / HexesPerProvince).toInt

@@ -5,7 +5,7 @@ version := "0.2"
 scalaVersion := "2.12.8"
 
 // Add dependency on ScalaFX library
-libraryDependencies += "org.scalafx" %% "scalafx" % "12.0.1-R17"
+libraryDependencies += "org.scalafx" %% "scalafx" % "14-R19"
 
 // Determine OS version of JavaFX binaries
 lazy val osName = System.getProperty("os.name") match {
@@ -17,7 +17,7 @@ lazy val osName = System.getProperty("os.name") match {
 
 lazy val javaFXModules = Seq("base", "controls", "fxml", "graphics", "media", "swing", "web")
 libraryDependencies ++= javaFXModules.map( m =>
-  "org.openjfx" % s"javafx-$m" % "12.0.1" classifier osName
+  "org.openjfx" % s"javafx-$m" % "14.0.1" classifier osName
 )
 
 libraryDependencies += "org.scala-lang" % "scala-reflect" % "2.12.8"
