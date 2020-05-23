@@ -82,24 +82,18 @@ class StatesTablePane(actions: WorldStateDiplomacyActions, currentState: State) 
     editable = false
   }
 
-  private class StringColumn(title: String, f: StateInfo => String) extends TableColumn[StateInfo, String] {
-    text = title
-    cellValueFactory = p => StringProperty(f(p.value))
-    editable = false
-  }
+  private val armyColumn = new StringColumn[StateInfo](Localization("army"), _.army.toString)
 
-  private val armyColumn = new StringColumn(Localization("army"), _.army.toString)
-
-  private val incomeColumn = new StringColumn(Localization("budget.income"),
+  private val incomeColumn = new StringColumn[StateInfo](Localization("budget.income"),
     x => DoubleFormatter().format(x.income))
 
-  private val spendingColumn = new StringColumn(Localization("budget.spending"),
+  private val spendingColumn = new StringColumn[StateInfo](Localization("budget.spending"),
     x => DoubleFormatter().format(x.spending))
 
-  private val moneyReservesColumn = new StringColumn(Localization("budget.reserve"),
+  private val moneyReservesColumn = new StringColumn[StateInfo](Localization("budget.reserve"),
     x => DoubleFormatter().format(x.moneyReserve))
 
-  private val literacyColumn = new StringColumn(Localization("population.literacy"),
+  private val literacyColumn = new StringColumn[StateInfo](Localization("population.literacy"),
     x => DoubleFormatter().format(x.literacy * 100) + "%")
 
   private val partyColumn = new TableColumn[StateInfo, PartyComponentColorName] {

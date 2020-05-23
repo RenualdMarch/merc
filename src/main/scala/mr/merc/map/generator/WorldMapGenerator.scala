@@ -6,7 +6,6 @@ import mr.merc.map.hex._
 import mr.merc.map.pathfind.PathFinder
 import mr.merc.map.terrain._
 
-import scala.collection.mutable
 import scala.math.{abs, max, pow}
 import scala.util.Random
 import mr.merc.economics.WorldGenerationConstants._

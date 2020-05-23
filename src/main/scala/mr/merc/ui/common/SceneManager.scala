@@ -1,7 +1,8 @@
 package mr.merc.ui.common
 
 import mr.merc.ai.BattleAI
-import mr.merc.economics.WorldGenerator
+import mr.merc.economics.WorldGenerationConstants.WorldMapCreationConf
+import mr.merc.economics.{WorldGenerator, WorldState}
 import mr.merc.game.QuickGameGenerator
 import scalafx.Includes._
 import scalafx.stage.Stage
@@ -10,7 +11,7 @@ import mr.merc.ui.battle.BattleFrame
 import mr.merc.ui.menu.MainMenu
 import mr.merc.log.Logging
 import mr.merc.ui.menu.OptionsMenu
-import mr.merc.ui.world.WorldFrame
+import mr.merc.ui.world.{CustomNewGameFrame, WorldFrame}
 import scalafx.scene.layout.Pane
 
 class SceneManager(val stage: Stage) extends Logging {
@@ -23,7 +24,18 @@ class SceneManager(val stage: Stage) extends Logging {
   }
 
   def startNewWorld(): Unit = {
-    val worldState = WorldGenerator.generateWorld()
+    info("starting quick game")
+    val worldState = WorldGenerator.generateWorld(WorldMapCreationConf(50, 50, 100))
+    sceneRoot = new WorldFrame(this, worldState)
+  }
+
+  def startCustomNewWorldDialog(): Unit = {
+    info("Custom new world dialog")
+    sceneRoot = new CustomNewGameFrame(this)
+  }
+
+  def startCustomNewWorld(worldState: WorldState): Unit = {
+    info("starting new world")
     sceneRoot = new WorldFrame(this, worldState)
   }
 

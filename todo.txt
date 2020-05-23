@@ -11,7 +11,6 @@ bug: Battle between Set(Set(Player(Byzantine,[SFX]0xff00ffff)), Set())
 bug: AI battle sometimes hangs, add more logging?
 
 conquered province economic freeze
-add state selection screen with offlane world generation
 add battles with results to UI - end turn newspaper with events of previous turn
 
 Not high priority:

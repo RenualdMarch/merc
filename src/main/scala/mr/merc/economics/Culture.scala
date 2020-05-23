@@ -9,7 +9,7 @@ import MapUtil.FloatOperations._
 
 object Culture {
 
-  private val humanCultures = List(LatinHuman, FrenchHuman/*, DarkHuman, GreekHuman, GermanHuman, ArabHuman, SlavicHuman, SpainHuman*/)
+  private val humanCultures = List(LatinHuman, FrenchHuman, DarkHuman, GreekHuman, GermanHuman, ArabHuman, SlavicHuman, SpainHuman)
 
   private val elvishCultures = List(WoodElves, DesertElves)
 
@@ -24,7 +24,7 @@ object Culture {
   // + saurians
 
 
-  val cultures: List[Culture] = humanCultures ++ elvishCultures// ++ orcishCultures ++ dwarfishCultures ++ undeadCultures
+  val cultures: List[Culture] = humanCultures ++ elvishCultures ++ orcishCultures ++ dwarfishCultures ++ undeadCultures
 
   //HighElf, DarkElf, BarbarianOrc, RockDwarf, GreenSaurian, OldDrakes, Forsaken, RedDemons)
 

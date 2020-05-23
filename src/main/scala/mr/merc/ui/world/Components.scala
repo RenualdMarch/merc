@@ -6,10 +6,10 @@ import mr.merc.local.Localization
 import mr.merc.log.Logging
 import org.tbee.javafx.scene.layout.MigPane
 import scalafx.beans.binding.{ObjectBinding, StringBinding}
-import scalafx.beans.property.{ObjectProperty, ReadOnlyObjectProperty, ReadOnlyStringProperty}
+import scalafx.beans.property.{ObjectProperty, ReadOnlyObjectProperty, ReadOnlyStringProperty, StringProperty}
 import scalafx.scene.{Node, Scene}
-import scalafx.scene.layout.{Region}
-import scalafx.scene.control.Button
+import scalafx.scene.layout.Region
+import scalafx.scene.control.{Button, TableColumn}
 import scalafx.scene.text.{Font, Text}
 import scalafx.stage.Stage
 import scalafx.Includes._
@@ -149,4 +149,10 @@ abstract class DialogStage[T] extends Stage with Logging {
   actualDialogContent.height.onChange {
     Option(currentScene.window.value).foreach(_.sizeToScene())
   }
+}
+
+class StringColumn[T](title: String, f: T => String) extends TableColumn[T, String] {
+  text = title
+  cellValueFactory = p => StringProperty(f(p.value))
+  editable = false
 }

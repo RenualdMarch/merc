@@ -316,9 +316,16 @@ object WorldGenerationConstants {
   val PopMigrationToNeighbourPercentage = 0.2
   val PopMigrationsToNeighbours = 1
 
+  val LandPercentage = 0.7
+
+/*
   val WorldMapWidth = 50
   val WorldMapHeight = 50
   val HexesPerProvince = 100
-  val LandPercentage = 0.7
+
   val Provinces = (WorldMapHeight * WorldMapWidth * LandPercentage / HexesPerProvince).toInt
+  */
+  case class WorldMapCreationConf(width: Int, height: Int, hexesPerProvince: Int) {
+    val provinces: Int = (width * height * LandPercentage / hexesPerProvince).toInt
+  }
 }

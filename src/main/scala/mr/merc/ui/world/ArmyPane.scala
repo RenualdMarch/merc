@@ -29,6 +29,7 @@ import scalafx.scene.{Node, Scene}
 import Localization._
 import mr.merc.image.MImage
 import mr.merc.unit.view.AttackView
+import mr.merc.util.MercTooltip.TooltipRecalculateWithCoords
 import scalafx.scene.chart.{AreaChart, LineChart, NumberAxis, XYChart}
 
 
@@ -340,7 +341,7 @@ class SelectRecruitWarriorDialog(possibleChoices: List[RecruitWarriorOrder]) ext
       dialogResult = Some(child)
     }
 
-    MercTooltip.applyTooltip(this, new WarriorTypeInfoPane(child.warrior))
+    MercTooltip.applyCenterTooltip(this, new WarriorTypeInfoPane(child.warrior))
   }
 
   override protected def dialogContent: Region = {

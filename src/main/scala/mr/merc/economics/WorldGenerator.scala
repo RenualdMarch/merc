@@ -11,7 +11,6 @@ import WorldConstants.Enterprises._
 import WorldGenerationConstants._
 import mr.merc.army.WarriorCompetence.Professional
 import mr.merc.army.{Warrior, WarriorType}
-import mr.merc.diplomacy.Claim.{StrongProvinceClaim, WeakProvinceClaim}
 import mr.merc.economics.PopulationMigrationOutsideProvince.PopulationMovementBetweenProvinces
 import mr.merc.map.terrain.FourSeasonsTerrainTypes._
 
@@ -137,17 +136,15 @@ class WorldGenerator(field:FourSeasonsTerrainHexField) {
 
   private def generateCultureStateDivisions(connectivityMap: Map[FourSeasonsTerrainHex, Set[FourSeasonsTerrainHex]]):List[(State, List[FourSeasonsTerrainHex])] = {
     import mr.merc.util.Divide.DivideIntegral
-    /*val provincesPerCulture = Culture.cultures zip (connectivityMap.size divList Culture.cultures.size)
-    val raceSizes = provincesPerCulture.groupBy(_._1.race).toList.map {case (race, list) =>
-      race -> list.map(_._2).sum
-    }*/
 
-    val races = Culture.cultures.map(_.race).distinct
+    val currentCultures = Random.shuffle(Culture.cultures).take(connectivityMap.size / WorldGenerationConstants.StateAvgProvinces / 2)
+
+    val races = currentCultures.map(_.race).distinct
     val raceSizes = races zip (connectivityMap.size divList races.size)
 
     val racesZipCM = raceSizes.map(_._1) zip divideIntoContinuousParts(connectivityMap, raceSizes.map(_._2))
     racesZipCM.flatMap {case (race, raceMap) =>
-      val cultures = Random.shuffle(Culture.cultures.filter(_.race == race))
+      val cultures = Random.shuffle(currentCultures.filter(_.race == race))
       val cultureSizes = raceMap.size divList cultures.size
       val cultureZipMaps = cultures zip divideIntoContinuousParts(raceMap, cultureSizes)
       cultureZipMaps.flatMap { case (culture, cultureMap) =>
@@ -298,18 +295,18 @@ class WorldGenerator(field:FourSeasonsTerrainHexField) {
 
 object WorldGenerator extends Logging {
 
-  def generateWorld(): WorldState = {
+  def generateWorld(conf:WorldMapCreationConf): WorldState = {
     val timeBefore = System.currentTimeMillis()
-    val world = WorldMapGenerator.generateWorldMap(WorldMapWidth, WorldMapHeight, Provinces)
+    val world = WorldMapGenerator.generateWorldMap(conf.width, conf.height, conf.provinces)
     val generator = new WorldGenerator(world.terrain)
     val r = (generator.generateStateAndProvinces(world.provinces), world.terrain)
     val playerState = r._1.keys.head
     val ws = new WorldState(r._1.values.flatten.toList, playerState, world.terrain, generator.namesGenerators, generator.colorStream)
     // TODO battles are not played!!! possible source of errors
-    0 until TradeDaysBeforeStart foreach(_ => ws.nextTurn())
-    info(s"World generation took ${(System.currentTimeMillis() - timeBefore) / 1000d} seconds")
     ws.diplomacyEngine.generateInitialStrongClaimsForOwnedTerritories()
     ws.diplomacyEngine.generateInitialClaimsForNeighbours()
+    0 until TradeDaysBeforeStart foreach(_ => ws.nextTurn(false))
+    info(s"World generation took ${(System.currentTimeMillis() - timeBefore) / 1000d} seconds")
     ws.initialAiDiplomacy()
     ws
   }

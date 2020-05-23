@@ -1,6 +1,7 @@
 package mr.merc.players
 
 import mr.merc.log.Logging
+import mr.merc.util.MercUtils
 import scalafx.scene.paint.Color
 
 import scala.collection.mutable
@@ -9,7 +10,7 @@ object ColorGenerator {
 
   def colorStream:Stream[Color] = {
     val generator = new ColorGenerator()
-    Stream.continually (generator.nextColor())
+    Stream.continually(generator.nextColor())
   }
 }
 
@@ -43,7 +44,6 @@ class ColorGenerator extends Logging {
       nextColor()
     } else {
       val max = mostDistantFromNotSelected
-      info(s"generated new color $max")
       notSelectedColors -= max
       selectedColors += max
       max

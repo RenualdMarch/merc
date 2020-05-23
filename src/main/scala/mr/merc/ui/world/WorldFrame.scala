@@ -170,27 +170,32 @@ class WorldFrame(sceneManager: SceneManager, worldState: WorldState) extends Pan
   }
 
   def nextTurn(): Unit = {
-
     val waitDialog = new WaitDialog
 
-    Future {
-      worldState.nextTurn()
-    }.onComplete {
-      case Success(battles) =>
-        Platform.runLater(waitDialog.close())
-        Platform.runLater(playBattles(battles))
-      case Failure(ex) =>
-        error(ex.getMessage, ex)
-        Platform.runLater(waitDialog.close())
+    def playRebelBattles(): Unit = {
+      val waitDialog2 = new WaitDialog
+      Future {
+        worldState.processRebels()
+      }.onComplete {
+        case Success(battles) =>
+          Platform.runLater(waitDialog2.close())
+          Platform.runLater(playBattles(battles))
+        case Failure(ex) =>
+          error(ex.getMessage, ex)
+          Platform.runLater(waitDialog2.close())
+      }
+      waitDialog2.showDialog(sceneManager.stage)
     }
 
-    // TODO think how to do it in one method
     Future {
-      worldState.processRebels()
+      worldState.nextTurn(true)
     }.onComplete {
       case Success(battles) =>
         Platform.runLater(waitDialog.close())
-        Platform.runLater(playBattles(battles))
+        Platform.runLater {
+          playBattles(battles)
+          playRebelBattles()
+        }
       case Failure(ex) =>
         error(ex.getMessage, ex)
         Platform.runLater(waitDialog.close())

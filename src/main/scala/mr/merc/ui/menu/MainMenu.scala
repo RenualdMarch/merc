@@ -27,6 +27,13 @@ class MainMenu(sceneManager: SceneManager) extends BorderPane {
     }
   }
 
+  val customNewWorldButton = new BigButton {
+    text = Localization("menu.customGame")
+    onAction = { _ =>
+      sceneManager.startCustomNewWorldDialog()
+    }
+  }
+
   val optionsButton = new BigButton() {
     text = Localization("menu.options")
     onAction = { e: ActionEvent =>
@@ -42,7 +49,7 @@ class MainMenu(sceneManager: SceneManager) extends BorderPane {
   }
 
   val menuPane = new VBox {
-    children = List(newBattleButton, newWorldButton, optionsButton, exitButton)
+    children = List(newBattleButton, newWorldButton, customNewWorldButton, optionsButton, exitButton)
   }
 
   menuPane.styleClass.add("menuPane")

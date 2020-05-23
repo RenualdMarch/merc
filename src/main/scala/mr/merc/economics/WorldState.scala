@@ -29,7 +29,7 @@ import scalafx.scene.paint.Color
 
 import scala.collection.mutable.ArrayBuffer
 
-class WorldState(val regions: List[Province], val playerState: State, val worldHexField: FourSeasonsTerrainHexField,
+class WorldState(val regions: List[Province], var playerState: State, val worldHexField: FourSeasonsTerrainHexField,
                  val namesGenerators: Map[Culture, NamesGenerator], var colorStream: Stream[Color], var turn: Int = 1)
   extends WorldStateParliamentActions
     with WorldStateBudgetActions
@@ -52,7 +52,7 @@ class WorldState(val regions: List[Province], val playerState: State, val worldH
 
   def seasonOfYear: SeasonOfYear = Seasons.date(turn)
 
-  def nextTurn(): List[Battle] = {
+  def nextTurn(aiBattles:Boolean): List[Battle] = {
     thisTurnBattles.clear()
     this.states.keysIterator.foreach(_.mailBox.clearMessages())
 
@@ -72,18 +72,23 @@ class WorldState(val regions: List[Province], val playerState: State, val worldH
     this.handlePossibleElections()
 
     this.processUnansweredMessages()
-    this.aiTurn(onlyAnswer = false)
     this.diplomacyEngine.improveBadBoyOverTime()
     this.diplomacyEngine.generateEndTurnClaimsForNeighbours(turn)
     this.diplomacyEngine.replaceWeakClaimsWithStrongClaimsForOwnedTerritories(turn)
 
+    if (aiBattles) {
+      this.aiTurn(onlyAnswer = false)
+    }
+
     info(s"Total money is $totalMoney")
     info(s"Budgets are: ${states.keySet.map(s => s.name -> s.budget.moneyReserve).toMap}")
 
-    states.keysIterator.filterNot(_ == playerState).foreach { state =>
-      val soldierMovementAI = new SoldierMovementAI(this, state)
-      soldierMovementAI.orderSoldiers()
-      soldierMovementAI.moveSoldiers()
+    if (aiBattles) {
+      states.keysIterator.filterNot(_ == playerState).foreach { state =>
+        val soldierMovementAI = new SoldierMovementAI(this, state)
+        soldierMovementAI.orderSoldiers()
+        soldierMovementAI.moveSoldiers()
+      }
     }
 
     val battlesResolver = new MovementAndBattlesResolver(this)
@@ -378,10 +383,6 @@ trait WorldStateDiplomacyActions {
   var colorStream: Stream[Color]
 
   val diplomacyEngine = new WorldDiplomacy(this)
-
-  def addClaim(claim: Claim): Unit = {
-    diplomacyEngine.addClaim(claim)
-  }
 
   def stateInfo: List[StateInfo] = states.toList.map { case (state, provinces) =>
     StateInfo(
