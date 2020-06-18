@@ -322,20 +322,17 @@ class PopulationMigrationsPane(val population:List[Population]) extends ScrollPa
       left = MediumText(label)
       style = "-fx-border-color: black;-fx-border-width: 1 1 1 1; -fx-padding: 10 10 10 10;"
     }
-
+    fitToWidth = true
     val colFrom = new ColumnConstraints {
       percentWidth = 40
-      fitToWidth = true
     }
 
     val colTo = new ColumnConstraints {
       percentWidth = 40
-      fitToWidth = true
     }
 
     val colCount  = new ColumnConstraints {
       percentWidth = 20
-      fitToWidth = true
     }
 
     new GridPane {
@@ -361,20 +358,17 @@ class PopulationMigrationsPane(val population:List[Population]) extends ScrollPa
       left = MediumText(label)
       style = "-fx-border-color: black;-fx-border-width: 1 1 1 1; -fx-padding: 10 10 10 10;"
     }
-
+    fitToWidth = true
     val colFrom = new ColumnConstraints {
       percentWidth = 40
-      fitToWidth = true
     }
 
     val colTo = new ColumnConstraints {
       percentWidth = 40
-      fitToWidth = true
     }
 
     val colCount  = new ColumnConstraints {
       percentWidth = 20
-      fitToWidth = true
     }
 
     new GridPane {

@@ -8,20 +8,21 @@ Important core stuff
 requirement failed: Buying and selling differ
 
 bug: Battle between Set(Set(Player(Byzantine,[SFX]0xff00ffff)), Set())
-bug: AI battle sometimes hangs, add more logging?
 
-conquered province economic freeze
-add battles with results to UI - end turn newspaper with events of previous turn
+open mail at start of the turn
+battle fixes and polishing
+declare war,propose and accept peace diplomacy
+save/load
 
 Not high priority:
-idle animation for soldiers on world map
 allow army movement through territory diplomacy
 allow hire people from other cultures with some political configurations, now it is possible to hire primary culture warrior anywhere
 when hiring soldiers, use actual population
+idle animation for soldiers on world map
 make cultures for castles/walls
 check conditional AI logic - unused expression
 
-add more cultures:
+add more cultures, at least two cultures per race:
 Marashy culture as indian?
 Vikings culture as scandinavian?
 chinese?
@@ -66,19 +67,14 @@ Consider following:
 
 less or more products - refactor needs
 technologies
-migration(with churches and mage guilds creation and destruction)
 smarter capitalists when creating and expanding factories
 terrain additives specifically for given terrain types
-add winter weather on maps
 corruption and tax evasion
 world state unit testing
 ability to retreat from battle
-army supply
 change cursor while drag&drop
-Technologies?
 
 Dreams:
-terrain season changes
 strange wooden bridges placement during map creation(MapObject placement)
 water animation
 windmill animation

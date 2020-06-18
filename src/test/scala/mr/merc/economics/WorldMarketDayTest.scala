@@ -14,6 +14,8 @@ class WorldMarketDayTest extends FunSuite with Matchers {
   var worldStateEnterpriseActions = new WorldStateEnterpriseActions {
     override def playerState: State = ???
 
+    override def controlledRegions: List[EconomicRegion] = regions
+
     override def regions: List[EconomicRegion] = List(region1, region2, region3)
   }
 

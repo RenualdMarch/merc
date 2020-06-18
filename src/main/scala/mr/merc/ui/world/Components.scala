@@ -8,7 +8,7 @@ import org.tbee.javafx.scene.layout.MigPane
 import scalafx.beans.binding.{ObjectBinding, StringBinding}
 import scalafx.beans.property.{ObjectProperty, ReadOnlyObjectProperty, ReadOnlyStringProperty, StringProperty}
 import scalafx.scene.{Node, Scene}
-import scalafx.scene.layout.Region
+import scalafx.scene.layout.{BorderPane, ColumnConstraints, GridPane, Region}
 import scalafx.scene.control.{Button, TableColumn}
 import scalafx.scene.text.{Font, Text}
 import scalafx.stage.Stage
@@ -155,4 +155,36 @@ class StringColumn[T](title: String, f: T => String) extends TableColumn[T, Stri
   text = title
   cellValueFactory = p => StringProperty(f(p.value))
   editable = false
+}
+
+object GridPaneBuilder {
+
+  def buildWithoutCaption(constraints:List[Double], nodes:List[Node]): GridPane = {
+    val cc = constraints.map { c =>
+      new ColumnConstraints {
+        percentWidth = c
+      }
+    }
+
+    new GridPane {
+      columnConstraints = cc
+      nodes.grouped(constraints.size).zipWithIndex.foreach { case (row, r) =>
+        row.zipWithIndex.foreach { case (el, col) =>
+          add(el, col, r)
+        }
+      }
+    }
+  }
+
+  def buildWithCaption(constraints: List[Double], nodes: List[Node], captions:List[Node]): GridPane = {
+    buildWithoutCaption(constraints, captions ++ nodes)
+  }
+
+  def buildWithCaptionString(constraints:List[Double], nodes:List[String], captions:List[String]): GridPane = {
+    def mediumText(label:String): Node = new BorderPane {
+      left = MediumText(label)
+      style = "-fx-border-color: black;-fx-border-width: 1 1 1 1; -fx-padding: 10 10 10 10;"
+    }
+    buildWithCaption(constraints, nodes.map(mediumText), captions.map(mediumText))
+  }
 }

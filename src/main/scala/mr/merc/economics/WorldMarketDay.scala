@@ -3,14 +3,19 @@ package mr.merc.economics
 import mr.merc.economics.Population.{Clergy, Traders}
 import mr.merc.economics.TaxPolicy._
 import mr.merc.economics.ai.FactoryBuildingAI
+import mr.merc.economics.message.InformationDomesticMessage
+import mr.merc.local.Localization
 import mr.merc.log.Logging
 import mr.merc.map.pathfind.PathFinder
 import mr.merc.politics.{Province, State}
+import mr.merc.ui.world.BusinessProjectsReportPane
+
+import scalafx.Includes._
 
 class WorldMarketDay(worldState: WorldStateEnterpriseActions, turn:Int) extends Logging {
   type PathCache = Map[EconomicRegion, Map[EconomicRegion, List[EconomicRegion]]]
 
-  private val regions:List[EconomicRegion] = worldState.regions
+  private val regions:List[EconomicRegion] = worldState.controlledRegions
 
   private var currentPathCache: PathCache = _
 
@@ -138,6 +143,7 @@ class WorldMarketDay(worldState: WorldStateEnterpriseActions, turn:Int) extends 
     }
 
     // let all pop receive salaries + taxes to budget and do end of day tasks
+    var projectsMap = Map[EconomicRegion, List[BusinessProject]]()
     regions.foreach { r =>
       val factoryCommands = FactoryBuildingAI().factoryCommands(r, worldState)
 
@@ -153,15 +159,21 @@ class WorldMarketDay(worldState: WorldStateEnterpriseActions, turn:Int) extends 
       }
 
       r.regionMarket.endOfMarketDay(turn)
-      r.removeCompletedProjectsAndAddInvestments()
+      val projects = r.removeCompletedProjectsAndAddInvestments()
+      projectsMap += (r -> projects)
       factoryCommands.foreach {c => worldState.applyCommand(c)}
       r.removeBankruptFactories()
       r.regionPopulation.learnLiteracy()
       r.regionPopulation.pops.foreach(_.grow())
     }
+    val stateProjects = projectsMap.groupBy(_._1.owner)
     states.foreach {s =>
       s.budget.spendBudgetMoney(regions.filter(_.owner == s), s.primeCulture)
       s.budget.endDay()
+
+      val map = stateProjects.getOrElse(s, Map()).asInstanceOf[Map[Province, List[BusinessProject]]]
+      s.mailBox.addMessage(new InformationDomesticMessage(Localization("projectsReport.reporter"),
+        Localization("projectsReport.title"), new BusinessProjectsReportPane(map)))
     }
   }
 

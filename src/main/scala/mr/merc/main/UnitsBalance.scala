@@ -64,18 +64,26 @@ object UnitsBalance {
     val aiMap = Map(player1 -> BattleAI(), player2 -> BattleAI())
     val model = new BattleModel(gameField)
 
-    while (!model.isOver) {
+    val maxCount = 10000
+    var count = 0
+
+    while (!model.isOver && count < maxCount) {
       val player = model.currentPlayer
       val event = aiMap(player).nextTurn(model)
+      count += 1
       model.handleEvent(event)
     }
 
-    val winner = model.soldiersByAlliance.keys.head.head
-    if (winner == player1)
-      BattleResult(wt1, wt2, wc)
-    else if (winner == player2)
-      BattleResult(wt2, wt1, wc)
-    else sys.error(s"Expected player1 or player2 but got $winner")
+    if (count == maxCount) {
+      tournamentBattle(wt1, wt2, wc)
+    } else {
+      val winner = model.soldiersByAlliance.keys.head.head
+      if (winner == player1)
+        BattleResult(wt1, wt2, wc)
+      else if (winner == player2)
+        BattleResult(wt2, wt1, wc)
+      else sys.error(s"Expected player1 or player2 but got $winner")
+    }
   }
 
   private def cultureByWarriorType(wt: WarriorType, wc: WarriorCompetence): Culture = {

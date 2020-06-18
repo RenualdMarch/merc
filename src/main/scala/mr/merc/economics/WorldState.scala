@@ -22,7 +22,7 @@ import mr.merc.players.NamesGenerator
 import mr.merc.politics.IssuePosition.{EconomyPosition, RegimePosition}
 import mr.merc.politics.Regime.{Absolute, Constitutional, Democracy}
 import mr.merc.politics.{Election, Party, Province, State}
-import mr.merc.ui.world.ElectionResultsPane
+import mr.merc.ui.world.{BattleReportPane, ElectionResultsPane}
 import scalafx.beans.property.ObjectProperty
 import mr.merc.util.FxPropertyUtils.PropertyBindingMap
 import scalafx.scene.paint.Color
@@ -46,25 +46,27 @@ class WorldState(val regions: List[Province], var playerState: State, val worldH
 
   def states: Map[State, List[Province]] = regions.groupBy(_.owner)
 
+  def controlledRegions:List[Province] = regions.filter(p => p.controller == p.owner)
+
   def initialAiDiplomacy(): Unit = {
     this.aiTurn(onlyAnswer = false)
   }
 
   def seasonOfYear: SeasonOfYear = Seasons.date(turn)
 
-  def nextTurn(aiBattles:Boolean): List[Battle] = {
+  def nextTurn(aiBattlesEnabled:Boolean): List[Battle] = {
     thisTurnBattles.clear()
     this.states.keysIterator.foreach(_.mailBox.clearMessages())
 
     turn = turn + 1
     val day = new WorldMarketDay(this, turn)
     day.trade()
-    regions.foreach { r =>
+    controlledRegions.foreach { r =>
       val ppd = new PopulationMigrationInsideProvince(r.regionPopulation, r.owner)
       ppd.migrateInsideProvince()
     }
 
-    regions.flatMap { r =>
+    controlledRegions.flatMap { r =>
       val m = new PopulationMigrationOutsideProvince(r)
       m.migrateToNeighbours()
     }.foreach(_.applyMovement())
@@ -76,14 +78,14 @@ class WorldState(val regions: List[Province], var playerState: State, val worldH
     this.diplomacyEngine.generateEndTurnClaimsForNeighbours(turn)
     this.diplomacyEngine.replaceWeakClaimsWithStrongClaimsForOwnedTerritories(turn)
 
-    if (aiBattles) {
+    if (aiBattlesEnabled) {
       this.aiTurn(onlyAnswer = false)
     }
 
     info(s"Total money is $totalMoney")
     info(s"Budgets are: ${states.keySet.map(s => s.name -> s.budget.moneyReserve).toMap}")
 
-    if (aiBattles) {
+    if (aiBattlesEnabled) {
       states.keysIterator.filterNot(_ == playerState).foreach { state =>
         val soldierMovementAI = new SoldierMovementAI(this, state)
         soldierMovementAI.orderSoldiers()
@@ -96,8 +98,12 @@ class WorldState(val regions: List[Province], var playerState: State, val worldH
     for (b <- battles;p <- b.provinces) {
       p.civilianVictimsOfBattleDied()
     }
-    processAiBattles(battles)
-    battles
+
+    val rebelBattles = processRebels(battles.flatMap(_.provinces).toSet)
+
+    val (playerBattles, aiBattles) = (battles ++ rebelBattles).partition(_.participants.contains(playerState))
+    processAiBattles(aiBattles)
+    playerBattles
   }
 
   def processAiBattles(battles: List[Battle]): Unit = {
@@ -121,17 +127,22 @@ class WorldState(val regions: List[Province], var playerState: State, val worldH
     result
   }
 
-  def processRebels(): List[Battle] = {
-    val rebellions = regions.flatMap(r => r.regionPopulation.rebellion(r))
+  def processRebels(excludedProvinces:Set[Province]): List[Battle] = {
+    val rebellions = controlledRegions.filterNot(excludedProvinces.contains).flatMap(r => r.regionPopulation.rebellion(r))
     val resolver = new RebellionBattlesResolver(this)
     val battles = resolver.rebellions(rebellions).values.toList
     for (b <- battles;p <- b.provinces) {
       p.civilianVictimsOfBattleDied()
     }
-    processAiBattles(battles)
     battles
   }
 
+  def sendBattleReports(): Unit = {
+    states.keysIterator.foreach { state =>
+      state.mailBox.addMessage(new InformationDomesticMessage(Localization("battleReport.sender"),
+        Localization("battleReport.title"), new BattleReportPane(thisTurnBattles.toList)))
+    }
+  }
 }
 
 trait WorldStateBudgetActions {
@@ -299,6 +310,8 @@ trait WorldStateEnterpriseActions {
   def playerState: State
 
   def regions: List[EconomicRegion]
+
+  def controlledRegions:List[EconomicRegion]
 
   import WorldConstants.Enterprises._
   import MapUtil.FloatOperations._

@@ -69,7 +69,8 @@ trait EconomicRegion {
 
   var projects:List[BusinessProject] = Nil
 
-  def removeCompletedProjectsAndAddInvestments(): Unit = {
+  def removeCompletedProjectsAndAddInvestments(): List[BusinessProject] = {
+    val allProjects = projects
     val (finished, notFinished) = projects.partition(_.isComplete)
     this.projects = notFinished
     finished.foreach { p =>
@@ -79,6 +80,7 @@ trait EconomicRegion {
     notFinished.foreach { p =>
       p.takeMoreMoneyFromInvestorIfNeeded(regionMarket.currentPrices)
     }
+    allProjects
   }
 
   def removeBankruptFactories(): Unit = {

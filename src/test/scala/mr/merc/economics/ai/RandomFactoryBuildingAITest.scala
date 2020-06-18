@@ -37,6 +37,8 @@ class RandomFactoryBuildingAITest extends FunSuite {
 
       override def regions: List[EconomicRegion] = List(region)
 
+      override def controlledRegions: List[EconomicRegion] = regions
+
       override def factoryBuildCost(state: State): Map[Products.Product, Double] = Map(Coal -> 1000)
 
       override def factoryExpandCost(state: State): Map[Products.Product, Double] = Map(Coal -> 500)
