@@ -20,9 +20,9 @@ object Components {
   val mediumFontSize = 20
   val smallFontSize = 16
 
-  val smallFontStyle = s"-fx-font-size: ${Components.smallFontSize}"
-  val mediumFontStyle = s"-fx-font-size: ${Components.mediumFontSize}"
-  val largeFontStyle = s"-fx-font-size: ${Components.largeFontSize}"
+  val smallFontStyle = s"-fx-font-size: ${Components.smallFontSize};"
+  val mediumFontStyle = s"-fx-font-size: ${Components.mediumFontSize};"
+  val largeFontStyle = s"-fx-font-size: ${Components.largeFontSize};"
 }
 
 object BigText {

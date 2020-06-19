@@ -12,8 +12,6 @@ class BusinessProjectsReportPane(map:Map[Province, List[BusinessProject]]) exten
 
   fitToWidth = true
 
-  style = Components.largeFontStyle
-
   content = new MigPane {
 
     style = "-fx-background-color: white;"

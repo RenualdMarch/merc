@@ -31,7 +31,6 @@ object MailPane {
 
 class MailTitles(playerState:State, actions: WorldStateDiplomacyActions) extends BorderPane {
 
-
   private val tableView = new TableView[RowType]()
   tableView.style = Components.largeFontStyle
 
@@ -79,6 +78,8 @@ class MailTitles(playerState:State, actions: WorldStateDiplomacyActions) extends
 }
 
 class MailView(actions: WorldStateDiplomacyActions, playerState:State, selectedMessage: ReadOnlyObjectProperty[RowType], refreshTable: () => Unit) extends BorderPane {
+
+  style = Components.largeFontStyle
 
    val prop = selectedMessage.map(Option.apply).map {
     case None => new Pane()

@@ -15,29 +15,18 @@ class WorldMenu(parent: WorldFrame) extends MenuBar {
   val gameMenu = new Menu(Localization("menu.game"))
   val viewMenu = new Menu(Localization("menu.view"))
 
-  val email = new Menu(Localization("menu.mail")) {
-    val menuItem = new MenuItem()
-    this.items.add(menuItem)
-    val self = this
-    this.delegate.addEventHandler(javafx.scene.control.Menu.ON_SHOWN, new EventHandler[Event] {
-      override def handle(t: Event): Unit = self.hide()
-    })
-    this.delegate.addEventHandler(javafx.scene.control.Menu.ON_SHOWING, new EventHandler[Event] {
-      override def handle(t: Event): Unit = self.fire()
-    })
-    this.onAction = {_ =>
-      parent.showMailPane()
-    }
-  }
-
-  this.menus.addAll(politicsMenu, diplomacyMenu, email, viewMenu, gameMenu)
+  this.menus.addAll(politicsMenu, diplomacyMenu, viewMenu, gameMenu)
 
   val army = new MenuItem(Localization("menu.defence"))
   val relations = new MenuItem(Localization("menu.relations"))
   relations.onAction = {_ =>
     parent.showDiplomacyPane()
   }
-  diplomacyMenu.items.addAll(relations, army)
+  val emailMenu = new MenuItem(Localization("menu.mail"))
+  emailMenu.onAction = { _ =>
+    parent.showMailPane()
+  }
+  diplomacyMenu.items.addAll(emailMenu, relations, army)
 
   val budgetMenu = new MenuItem(Localization("menu.budget"))
   budgetMenu.onAction = { _ =>
@@ -49,7 +38,6 @@ class WorldMenu(parent: WorldFrame) extends MenuBar {
   }
 
   politicsMenu.items.addAll(budgetMenu, parliamentMenu)
-
 
   val saveMenu = new MenuItem(Localization("menu.save"))
   val loadMenu = new MenuItem(Localization("menu.load"))

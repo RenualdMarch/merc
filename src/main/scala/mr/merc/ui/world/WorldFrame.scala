@@ -180,11 +180,13 @@ class WorldFrame(sceneManager: SceneManager, worldState: WorldState) extends Pan
             worldState.sendBattleReports()
             totalRefresh()
             sceneManager.showFrame(this)
+            showMailPane()
           })
         } else {
           worldState.sendBattleReports()
           totalRefresh()
           sceneManager.showFrame(this)
+          showMailPane()
         }
       }
     } onComplete {

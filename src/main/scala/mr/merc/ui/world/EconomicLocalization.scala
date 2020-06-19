@@ -37,6 +37,7 @@ object EconomicLocalization {
       case p:StateExpandFactory => Localization("project.state.expandFactory", Localization(p.factory.product.name))
       case p:PopulationBuildFactory => Localization("project.private.buildFactory", Localization(p.product.name))
       case p:StateBuildFactory => Localization("project.state.buildFactory", Localization(p.product.name))
+      case p:StateRecruitWarrior => Localization("project.recruitWarrior", localizeWarriorTypeInOneLine(p.competence, p.warriorType))
     }
   }
 
