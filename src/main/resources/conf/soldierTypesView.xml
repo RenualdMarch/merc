@@ -1774,7 +1774,7 @@
             <image name="archer-bow-defend"/>
         </defence>
         <stand>
-            <image name="archer"/>
+            <image name="archer-bow"/>
         </stand>
         <idle>
             <image name="archer-idle-1"/>
@@ -2232,7 +2232,7 @@
     <view name="ElvesDesert-Scout">
         <attack1 imageName="sword-elven"/>
         <defence>
-            <image name="scout-defend2"/>
+            <image name="scout-defend"/>
         </defence>
         <stand>
             <image name="scout"/>

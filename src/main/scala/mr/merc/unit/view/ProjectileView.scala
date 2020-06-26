@@ -10,7 +10,7 @@ import mr.merc.sound.Sound
 import mr.merc.map.hex.view.TerrainHexView
 
 class ProjectileView(start: Option[List[MImage]], move: Option[List[MImage]], end: Option[List[MImage]],
-  from: (Int, Int), to: (Int, Int), speed: Int, factor: Double, sounds: Map[ProjectileSoundState, Sound]) extends Sprite[ProjectileState](
+                     from: (Int, Int), to: (Int, Int), speed: Int, factor: Double, sounds: Map[ProjectileSoundState, Sound]) extends Sprite[ProjectileState](
   Map(ProjectileStart -> start.getOrElse(List(MImage.emptyImage)),
     ProjectileMovement -> move.getOrElse(List(MImage.emptyImage)),
     ProjectileEnd -> end.getOrElse(List(MImage.emptyImage)),
@@ -44,7 +44,7 @@ class ProjectileView(start: Option[List[MImage]], move: Option[List[MImage]], en
 
     if (result != 0 && index == 0 || movement.isOver && this.state == ProjectileMovement) {
       state match {
-        case ProjectileStart => {
+        case ProjectileStart =>
           if (move.isDefined) {
             this.state = ProjectileMovement
           } else if (end.isDefined) {
@@ -53,9 +53,8 @@ class ProjectileView(start: Option[List[MImage]], move: Option[List[MImage]], en
           } else {
             this.state = ProjectileNotRender
           }
-        }
 
-        case ProjectileMovement => {
+        case ProjectileMovement =>
           if (movement.isOver) {
             if (end.isDefined) {
               this.state = ProjectileEnd
@@ -63,7 +62,6 @@ class ProjectileView(start: Option[List[MImage]], move: Option[List[MImage]], en
               this.state = ProjectileNotRender
             }
           }
-        }
         case ProjectileEnd => this.state = ProjectileNotRender
         case _ => // do nothing in this case
       }
@@ -74,7 +72,11 @@ class ProjectileView(start: Option[List[MImage]], move: Option[List[MImage]], en
 }
 
 sealed trait ProjectileState extends SpriteState
+
 object ProjectileStart extends ProjectileState
+
 object ProjectileMovement extends ProjectileState
+
 object ProjectileEnd extends ProjectileState
+
 object ProjectileNotRender extends ProjectileState

@@ -54,25 +54,19 @@ class BattleView(model: BattleModel, scalingFactor: Double, soldierDrawer: Soldi
         handleAttackEvent(wrap(attackerTerrainHex), wrap(defenderTerrainHex), attacker, defender, result)
       case MoveBattleViewEvent(soldier, path) => handleMovementEvent(wrap(soldier), path map wrap)
       case EndMoveViewEvent(nextPlayer) => handleEndMoveEvent(nextPlayer)
-      case ShowMovementOptions(hexes) => {
+      case ShowMovementOptions(hexes) =>
         val options = hexes map wrap
         mapView.terrainView.movementOptions = Some(options)
-      }
-      case HideMovementOptions => {
+      case HideMovementOptions =>
         mapView.terrainView.movementOptions = None
-      }
-      case ShowArrow(src, dest) => {
+      case ShowArrow(src, dest) =>
         mapView.terrainView.arrow = Some(wrap(src), wrap(dest))
-      }
-      case HideArrow => {
+      case HideArrow =>
         mapView.terrainView.arrow = None
-      }
-      case ShowDefence(view, defence, drawPolygon) => {
+      case ShowDefence(view, defence, drawPolygon) =>
         mapView.terrainView.defence = Some(wrap(view), defence, drawPolygon)
-      }
-      case HideDefence => {
+      case HideDefence =>
         mapView.terrainView.defence = None
-      }
     }
   }
 
@@ -109,9 +103,10 @@ class BattleView(model: BattleModel, scalingFactor: Double, soldierDrawer: Soldi
 
   private def battleOverActions(soldier: Soldier) {
     val view = wrap(soldier)
-    view.refreshBars()
     if (soldier.hp == 0) {
       view.state = DeathState
+    } else {
+      view.state = StandState
     }
   }
 

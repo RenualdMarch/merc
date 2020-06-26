@@ -45,7 +45,7 @@ class BattleFrame(sceneManager: SceneManager, gameField:GameField, ai:Map[Player
 
   val mapView = controller.battleView.mapView
   private val battleCanvas = new CanvasLayers(mapView.canvasBattleLayers, new Rectangle2D(0, 0, mapView.pixelWidth, mapView.pixelHeight))
-  private val minimap = new Minimap(gameField.hexField, battleCanvas, scaling, mapView.pixelWidth, mapView.pixelHeight, false
+  private val minimap = new Minimap(gameField.hexField, battleCanvas, scaling, mapView.pixelWidth, mapView.pixelHeight, true
   )
   private val soldierName = new BigText()
   private val soldierLevel = new BigText()
@@ -143,7 +143,7 @@ class BattleFrame(sceneManager: SceneManager, gameField:GameField, ai:Map[Player
     val currentTime = System.currentTimeMillis
     val timePassed = currentTime - lastUpdateTime
     lastUpdateTime = currentTime
-    debug(s"in game loop $timePassed ms passed since previous call")
+    //debug(s"in game loop $timePassed ms passed since previous call")
     if (!battleIsOverDialogShown) {
       controller.update(timePassed.toInt)
       battleCanvas.updateCanvas()
@@ -151,7 +151,8 @@ class BattleFrame(sceneManager: SceneManager, gameField:GameField, ai:Map[Player
   }
 
   def onMinimapChange() {
-    minimap.redraw()
+    minimap.redrawScrollCanvas()
+    minimap.refreshMapCanvas()
   }
 
   def showBattleOverDialog(result: BattleResult) {

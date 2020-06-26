@@ -140,7 +140,7 @@ class WorldState(val regions: List[Province], var playerState: State, val worldH
   def sendBattleReports(): Unit = {
     states.keysIterator.foreach { state =>
       state.mailBox.addMessage(new InformationDomesticMessage(Localization("battleReport.sender"),
-        Localization("battleReport.title"), new BattleReportPane(thisTurnBattles.toList)))
+        Localization("battleReport.title"), () => new BattleReportPane(thisTurnBattles.toList)))
     }
   }
 }
@@ -254,7 +254,7 @@ trait WorldStateParliamentActions {
         val electionResults = state.politicalSystem.doElectionsNow(turn,
           state.primeCulture, possibleParties(state.politicalSystem), states(state))
         state.mailBox.addMessage(new InformationDomesticMessage(Localization("election.commission"),
-          Localization("election.results"), new ElectionResultsPane(electionResults, state)))
+          Localization("election.results"), () => new ElectionResultsPane(electionResults, state)))
       }
     }
   }

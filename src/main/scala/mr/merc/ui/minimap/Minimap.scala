@@ -69,9 +69,10 @@ class Minimap(private var field: TerrainHexField, pane: ScrollPaneLike, factor: 
       val x = hex.x * side + xOffset
       val offset = if (hex.x % 2 == 0) 0 else side / 2
       val y = hex.y * side + offset.ceil + yOffset
-      gc.fill = color(hex)
-      gc.fillRect(x, y, side, side)
-      if (!battleMode) {
+      if (battleMode) {
+        gc.fill = color(hex)
+        gc.fillRect(x, y, side, side)
+      } else {
         hex.province.foreach { p =>
           if (hex.terrain.isNot(WaterKind)) {
             gc.fill = p.owner.color.opacity(0.7f)
@@ -81,10 +82,10 @@ class Minimap(private var field: TerrainHexField, pane: ScrollPaneLike, factor: 
       }
     }
     gc.restore()
-    redraw()
+    redrawScrollCanvas()
   }
 
-  def redraw() {
+  def redrawScrollCanvas() {
     val w = width.value
     val h = height.value
     if (w == 0 || h == 0) {
@@ -105,12 +106,11 @@ class Minimap(private var field: TerrainHexField, pane: ScrollPaneLike, factor: 
     gc.restore()
   }
 
-
   private def canvasMouseClicked(event: MouseEvent) {
     val x = event.x.toInt
     val y = event.y.toInt
     clickOnMinimap(x, y)
-    redraw()
+    redrawScrollCanvas()
     event.consume()
   }
 
@@ -147,7 +147,7 @@ class Minimap(private var field: TerrainHexField, pane: ScrollPaneLike, factor: 
     val coords = positionOnMapToMinimap(x, y)
     rectPosX = coords._1
     rectPosY = coords._2
-    redraw()
+    redrawScrollCanvas()
   }
 
   def updatePositionOnMap() {
@@ -197,7 +197,7 @@ class Minimap(private var field: TerrainHexField, pane: ScrollPaneLike, factor: 
     if (hex.soldier.nonEmpty && battleMode) {
       hex.soldier.get.owner.color
     } else {
-      hex.terrain.kind match {
+      (hex.terrain.kind match {
         case GrassKind => Color.Green
         case WaterKind | IceKind => Color.Blue
         case HillKind => Color.Gray
@@ -208,7 +208,7 @@ class Minimap(private var field: TerrainHexField, pane: ScrollPaneLike, factor: 
         case RoadKind => Color.LightGray
         case SnowKind => Color.White
         case _ => Color.Black
-      }
+      }).desaturate.desaturate.desaturate.desaturate
     }
   }
 }

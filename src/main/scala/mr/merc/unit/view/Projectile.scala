@@ -95,7 +95,7 @@ object Projectile {
 class Projectile(val name: String, val start: Option[Map[Direction, List[MImage]]],
   val move: Option[Map[Direction, List[MImage]]], val end: Option[Map[Direction, List[MImage]]],
                  val sounds: Map[ProjectileSoundState, Sound]) {
-  private val speed = 200
+  private val speed = 300
 
   def buildView(dir: Direction, from: (Int, Int), to: (Int, Int), factor: Double) =
     new ProjectileView(start.map(_(dir)), move.map(_(dir)), end.map(_(dir)),

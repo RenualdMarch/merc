@@ -1,11 +1,9 @@
 package mr.merc.view.move
 
 import mr.merc.map.hex.view.TerrainHexView
-import mr.merc.unit.view.SoldierView
+import mr.merc.unit.view.{DefenceState, SoldierView, SoldierViewAttackState, StandState}
 import mr.merc.map.hex.Direction
 import mr.merc.map.hex._
-import mr.merc.unit.view.SoldierViewAttackState
-import mr.merc.unit.view.StandState
 import mr.merc.unit.AttackResult
 import mr.merc.unit.sound.AttackSound
 import mr.merc.unit.sound.PainSound
@@ -51,6 +49,15 @@ class SoldierAttackMovement(val fromHex: TerrainHexView, val toHex: TerrainHexVi
     None
   }
 
+  private def changeHp(): Unit = {
+    if (result.success) {
+      attacker.viewHp += result.drained
+      defender.viewHp -= result.damage
+    }
+  }
+
+  private val hpChangeMovement = new MomentaryMovement (changeHp())
+
   // attack sequence is played
   private val linearMovementToEnemy = new LinearMovement(fromX, fromY, toX, toY, attackSpeed, attackMovementPercentage)
   linearMovementToEnemy.start()
@@ -91,6 +98,11 @@ class SoldierAttackMovement(val fromHex: TerrainHexView, val toHex: TerrainHexVi
   override def update(time: Int) {
     super.update(time)
     if (linearMovementToEnemy.isOver) {
+
+      if (!hpChangeMovement.isOver) {
+        hpChangeMovement.start()
+      }
+
       handleMoveFromEnemy(time)
     } else {
       handleMoveToEnemy(time)
@@ -102,14 +114,14 @@ class SoldierAttackMovement(val fromHex: TerrainHexView, val toHex: TerrainHexVi
 
     if (result.success && !defenderPainSoundPlayed && linearMovementToEnemy.isOver) {
       defenderPainSoundPlayed = true
-      defender.sounds.get(PainSound).foreach(_.play)
+      defender.sounds.get(PainSound).foreach(_.play())
     }
   }
 
   private def changeSoldierConfigurationBack() {
     attacker.animationEnabled = true
     attacker.mirroringEnabled = true
-    attacker.state = StandState
+    attacker.state = DefenceState
   }
 
   private def handleMoveToEnemy(time: Int) {
@@ -136,8 +148,8 @@ class SoldierAttackMovement(val fromHex: TerrainHexView, val toHex: TerrainHexVi
     Nil
   }
 
-  private def numbersAreOver = damageNumberMovement.map(_.isOver).getOrElse(true) &&
-    drainNumberMovement.map(_.isOver).getOrElse(true)
+  private def numbersAreOver = damageNumberMovement.forall(_.isOver) &&
+    drainNumberMovement.forall(_.isOver)
 
   override def drawables = List(defender, attacker) ++ numberMovements
 

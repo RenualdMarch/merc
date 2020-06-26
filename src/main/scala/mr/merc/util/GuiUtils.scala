@@ -8,13 +8,13 @@ import scalafx.scene.control.TableView
 
 object GuiUtils {
   private val columnToFitMethod = {
-    val cls = Class.forName("javafx.scene.control.skin.TableSkinUtils")
+    val cls = Class.forName("javafx.scene.control.skin.TableColumnHeader")
     val m = cls.getDeclaredMethod("resizeColumnToFitContent", classOf[TableViewSkinBase[_, _, _, _, _]], classOf[TableColumnBase[_, _]], Integer.TYPE)
     m.setAccessible(true)
     m
   }
 
-  def autoFitTable[T](table:TableView[T]): Unit = {
+  private def autoFitTable[T](table:TableView[T]): Unit = {
     table.items.addListener(new ChangeListener[ObservableList[T]] {
       override def changed(observableValue: ObservableValue[_ <: ObservableList[T]],
                            t: ObservableList[T], t1: ObservableList[T]): Unit = {

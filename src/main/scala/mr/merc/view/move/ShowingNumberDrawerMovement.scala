@@ -8,7 +8,9 @@ import scalafx.scene.text.FontWeight
 import scalafx.geometry.Rectangle2D
 
 object ShowingNumberDrawerMovement {
-  private val speed = 125
+  val TextSize = 40
+
+  private val speed = 120
   private val height = 60
   private val fadingStart = 0.7
 
@@ -30,14 +32,16 @@ class ShowingNumberDrawerMovement(target: (Int, Int), speed: Int, height: Int, f
 
   var dirtyRect: Option[Rectangle2D] = None
 
+  override def viewRect: Rectangle2D = new Rectangle2D(movement.x + textLength / 2, movement.y - ShowingNumberDrawerMovement.TextSize * 1.5, textLength, ShowingNumberDrawerMovement.TextSize * 3)
+
   override def start() {
     super.start()
     movement.start()
   }
 
   override def update(time: Int) {
+    dirtyRect = Some(viewRect)
     super.update(time)
-    dirtyRect = Some(new Rectangle2D(movement.x + textLength / 2, movement.y, textLength, 30))
     movement.update(time)
   }
 
@@ -59,7 +63,7 @@ class ShowingNumberDrawerMovement(target: (Int, Int), speed: Int, height: Int, f
 
   def drawText(gc: GraphicsContext, xOffset: Int, yOffset: Int) {
     gc.save()
-    gc.font = Font.font(Font.default.getFamily, FontWeight.Bold, 20)
+    gc.font = Font.font(Font.default.getFamily, FontWeight.Bold, ShowingNumberDrawerMovement.TextSize)
     gc.fill = color
     gc.fillText(text, movement.x + textLength / 2 + xOffset, movement.y + yOffset, textLength)
     gc.restore()

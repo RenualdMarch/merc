@@ -248,7 +248,7 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
     events.filter(e => e.fromState == from && e.toState == to)
 
   def claimsBonuses(from: State): List[RelationshipBonus] = {
-    claims.filter(_.state == from).map {
+    claims.filter(s => s.state == from && s.targetState != from).map {
       case str: StrongProvinceClaim => RelationshipBonus(from, str.province.owner, StrongClaimRelationshipBonus,
         Localization("diplomacy.strongClaim", from.name, str.province.name))
       case wk: WeakProvinceClaim => RelationshipBonus(from, wk.province.owner, WeakClaimRelationshipBonus,

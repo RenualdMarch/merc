@@ -26,6 +26,7 @@ import scalafx.scene.control.ContentDisplay
 import mr.merc.image.MImage
 import mr.merc.unit.AttackAttribute
 import mr.merc.ai.AttackSelectionHelper
+import mr.merc.ui.world.{BigButton, Components}
 import mr.merc.unit.view.SoldierTypeViewInfo
 
 class AttackSelectionDialog(attacker: Soldier, defender: Soldier, attackerHex: TerrainHex,
@@ -50,7 +51,7 @@ class AttackSelectionDialog(attacker: Soldier, defender: Soldier, attackerHex: T
 
   tableWidth <== table.width
 
-  val okButton = new Button {
+  val okButton = new BigButton {
     text = Localization("common.ok")
     onAction = { e: ActionEvent =>
       val index = table.delegate.getSelectionModel().getSelectedIndex()
@@ -58,7 +59,7 @@ class AttackSelectionDialog(attacker: Soldier, defender: Soldier, attackerHex: T
       AttackSelectionDialog.this.close()
     }
   }
-  val cancelButton = new Button {
+  val cancelButton = new BigButton {
     text = Localization("common.cancel")
     onAction = { e: ActionEvent =>
       AttackSelectionDialog.this.close()
@@ -68,10 +69,10 @@ class AttackSelectionDialog(attacker: Soldier, defender: Soldier, attackerHex: T
   this.scene = new Scene {
     stylesheets.add("/css/attackSelectionDialog.css")
     content = new VBox {
+      style = Components.largeFontStyle
       children = List(table, new HBox() {
         children = List(okButton, cancelButton)
-        alignment = Pos.CenterRight
-
+        alignment = Pos.BottomCenter
       })
     }
   }
@@ -168,8 +169,8 @@ class AttackSelectionDialog(attacker: Soldier, defender: Soldier, attackerHex: T
 
   private def attacks(attacker: Soldier, defender: Soldier, attackerHex: TerrainHex,
     defenderHex: TerrainHex): List[AttackPair] = {
-    val attackersAttackViews = SoldierTypeViewInfo(attacker.soldierType.name).attacks
-    val defendersAttackViews = SoldierTypeViewInfo(defender.soldierType.name).attacks
+    val attackersAttackViews = SoldierTypeViewInfo(attacker.soldierType.viewName).attacks
+    val defendersAttackViews = SoldierTypeViewInfo(defender.soldierType.viewName).attacks
 
     val attacks = attacker.soldierType.attacks
     attacks map (a => {
@@ -180,17 +181,14 @@ class AttackSelectionDialog(attacker: Soldier, defender: Soldier, attackerHex: T
       val imageName = attackersAttackViews.find(a.index == _.index).get.imageName
       val attackerChoice = AttackChoice(imageName, attackDamage, a.count, attackesChance, a.attributes)
       defendersAttackOpt match {
-        case Some(defendersAttack) => {
+        case Some(defendersAttack) =>
           val defenderDamage = Attack.possibleAttackersDamage(false, defender, attacker, defendersAttack, Some(a))
           val defenderChance = defendersAttack.chanceOfSuccess(Attack.calculateSoldierDefence(attacker, attackerHex))
           val defenderImageName = defendersAttackViews.find(defendersAttack.index == _.index).get.imageName
           val defenderChoice = AttackChoice(defenderImageName, defenderDamage, defendersAttack.count,
             defenderChance, defendersAttack.attributes)
           (attackerChoice, Some(defenderChoice))
-        }
-        case None => {
-          (attackerChoice, None)
-        }
+        case None => (attackerChoice, None)
       }
     })
   }
@@ -217,4 +215,11 @@ class AttackSelectionDialog(attacker: Soldier, defender: Soldier, attackerHex: T
   }
 
   private def attackImagePath(name: String) = "/images/attacks/" + name + ".png"
+
+  table.width.onChange {
+    Option(scene.value.window.value).foreach(_.sizeToScene())
+  }
+  table.height.onChange {
+    Option(scene.value.window.value).foreach(_.sizeToScene())
+  }
 }

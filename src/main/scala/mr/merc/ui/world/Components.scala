@@ -106,8 +106,13 @@ object DoubleFormatter {
 abstract class DialogStage[T] extends Stage with Logging {
   var dialogResult: Option[T] = None
 
+  protected def onOkButtonPressed(): Unit = {
+
+  }
+
   private val okButton = BigButton(Localization("common.ok"))
   okButton.onAction = { _ =>
+    onOkButtonPressed()
     close()
   }
 

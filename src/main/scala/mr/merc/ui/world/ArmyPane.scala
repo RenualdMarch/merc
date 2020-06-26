@@ -506,7 +506,7 @@ class WarriorsListTable(province: Province, controller: ArmyPaneController) exte
   table.columns ++= List(soldierImageColumn, soldierHP)
   table.items = controller.soldiers(province)
   table.getSelectionModel.setSelectionMode(SelectionMode.Multiple)
-  GuiUtils.autoFitTable(table)
+  //GuiUtils.autoFitTable(table)
   add(BigText(province.name).delegate, "center, wrap")
   add(table, "grow, push")
 }

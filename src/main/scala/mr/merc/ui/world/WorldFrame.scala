@@ -144,7 +144,7 @@ class WorldFrame(sceneManager: SceneManager, worldState: WorldState) extends Pan
   }
 
   def showDiplomacyPane(): Unit = {
-    val pane = new DiplomacyPane(worldState, worldState.playerState, sceneManager.stage)
+    val pane = new DiplomacyPane(worldState, worldState.playerState, sceneManager.stage, this)
     interfacePane.setFullPanel(new InterfacePane(pane, () => hideFullPane()))
   }
 

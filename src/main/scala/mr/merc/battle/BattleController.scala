@@ -19,7 +19,7 @@ import mr.merc.battle.event.ShowDefence
 import mr.merc.log.Logging
 import scalafx.geometry.Rectangle2D
 
-class BattleController(gameField: GameField, parent: BattleControllerParent, factor: Double, aiMap:Map[Player, BattleAI]) extends Logging {
+class BattleController(gameField: GameField, parent: BattleControllerParent, factor: Double, aiMap: Map[Player, BattleAI]) extends Logging {
   val battleModel = new BattleModel(gameField)
   val battleView = new BattleView(battleModel, factor)
 
@@ -32,7 +32,7 @@ class BattleController(gameField: GameField, parent: BattleControllerParent, fac
   private[battle] val visitedHexesList = new VisitedHexesList()
 
   def moveMouse(x: Int, y: Int, viewRect: Rectangle2D) {
-    debug(s"Mouse moved to ($x, $y)")
+    //debug(s"Mouse moved to ($x, $y)")
     val hexOpt = battleView.hexByPixel(x, y, viewRect)
     hexOpt match {
       case Some(hexView) =>
@@ -49,18 +49,14 @@ class BattleController(gameField: GameField, parent: BattleControllerParent, fac
             } else {
               removeArrow()
             }
-
           case None =>
             removeArrow()
             drawDefenceForSelectedTerrainHex()
             soldierToShow.soldier = selectedSoldier
-
         }
-
       case None =>
         removeArrow()
         removeDefence()
-
     }
   }
 
@@ -98,7 +94,6 @@ class BattleController(gameField: GameField, parent: BattleControllerParent, fac
         val possible = battleModel.possibleMoves(selectedSoldier.get, hex) ++ Set(hex) ++
           battleModel.possibleAttacksWhenThereAreNoMoves(selectedSoldier.get, hex)
         battleView.handleEvent(ShowMovementOptions(possible))
-
       case None => // do nothing
     }
   }
@@ -106,9 +101,9 @@ class BattleController(gameField: GameField, parent: BattleControllerParent, fac
   def rightClickMouse() = withCurrent(currentHex => {
     debug(s"Mouse right clicked in hex (${currentHex.x}, ${currentHex.y})")
     currentHex.soldier match {
-      case Some(soldier) => {
+      case Some(soldier) =>
         selectedSoldier match {
-          case Some(attacker) => {
+          case Some(attacker) =>
             val attackerHex = battleModel.hexBySoldier(attacker)
 
             val hexFromWhichAttack = if (onlyChoiceForSelectedSoldierIsAttack) {
@@ -128,7 +123,7 @@ class BattleController(gameField: GameField, parent: BattleControllerParent, fac
 
               val attackOpt = selectAttack(attacker, currentHex.soldier.get, hexFromWhichAttack, currentHex)
               attackOpt match {
-                case Some(attack) => {
+                case Some(attack) =>
                   if (attackerHex != hexFromWhichAttack) {
                     val moveResult = battleModel.handleMovementEvent(attacker, attackerHex, hexFromWhichAttack)
                     battleView.handleEvent(moveResult.buildBattleViewEvent)
@@ -138,18 +133,15 @@ class BattleController(gameField: GameField, parent: BattleControllerParent, fac
                   val attackResult = battleModel.handleEvent(AttackModelEvent(attacker,
                     hexFromWhichAttack, currentHex, attackIndex))
                   battleView.handleEvent(attackResult.buildBattleViewEvent)
-                }
                 case None => // do nothing
               }
             }
             parent.onMinimapChange()
-          }
           case None => // TODO do something, do nothing by now
         }
-      }
-      case None => {
+      case None =>
         selectedSoldier match {
-          case Some(soldier) => {
+          case Some(soldier) =>
             val from = battleModel.hexBySoldier(soldier)
             if (battleModel.validateMovementEvent(soldier, from, currentHex)) {
               val result = battleModel.handleEvent(MovementModelEvent(soldier, from, currentHex))
@@ -161,15 +153,13 @@ class BattleController(gameField: GameField, parent: BattleControllerParent, fac
             removeMovementOptions()
             removeDefence()
             parent.onMinimapChange()
-          }
           case None => // do nothing
         }
-      }
     }
   })
 
   def selectAttack(attacker: Soldier, defender: Soldier, attackerHex: TerrainHex,
-    defenderHex: TerrainHex): Option[Attack] = parent.showAttackSelectionDialog(attacker, defender, attackerHex, defenderHex)
+                   defenderHex: TerrainHex): Option[Attack] = parent.showAttackSelectionDialog(attacker, defender, attackerHex, defenderHex)
 
   def endTurnButton() {
     debug(s"End turn button clicked")
@@ -187,19 +177,17 @@ class BattleController(gameField: GameField, parent: BattleControllerParent, fac
   def leftClickMouse() = withCurrent(hex => {
     debug(s"Mouse left clicked in hex (${hex.x}, ${hex.y})")
     hex.soldier match {
-      case Some(soldier) => {
+      case Some(soldier) =>
         selectedSoldier = Some(soldier)
         // TODO add if soldier player is human player
         addMovementOptionsForSelectedSoldier()
         removeArrow()
         removeDefence()
-      }
-      case None => {
+      case None =>
         selectedSoldier = None
         removeArrow()
         removeDefence()
         removeMovementOptions()
-      }
     }
     soldierToShow.soldier = selectedSoldier
 
@@ -208,9 +196,7 @@ class BattleController(gameField: GameField, parent: BattleControllerParent, fac
   private def withCurrent[T](f: TerrainHex => T, default: T = Unit): T = {
     val hexOpt = visitedHexesList.current
     hexOpt match {
-      case Some(hex) => {
-        f(hex)
-      }
+      case Some(hex) => f(hex)
       case None => default // do nothing
     }
   }
@@ -254,8 +240,8 @@ class BattleController(gameField: GameField, parent: BattleControllerParent, fac
   }
 
   private def drawDefenceForHexFromWhichAttack() {
-    if (!selectedSoldier.isDefined ||
-      visitedHexesList.prev.map(_.soldier.isDefined).getOrElse(true)) {
+    if (selectedSoldier.isEmpty ||
+      visitedHexesList.prev.forall(_.soldier.isDefined)) {
       return
     }
 
@@ -270,7 +256,7 @@ class BattleController(gameField: GameField, parent: BattleControllerParent, fac
 
   private def drawDefenceForSelectedTerrainHex() {
     withCurrent { hex =>
-      if (!selectedSoldier.isDefined || hex.soldier.isDefined) {
+      if (selectedSoldier.isEmpty || hex.soldier.isDefined) {
         return
       }
 
@@ -281,6 +267,7 @@ class BattleController(gameField: GameField, parent: BattleControllerParent, fac
   }
 
   private var battleIsOverDialogShown = false
+
   def update(time: Int) {
     battleView.update(time)
     if (!battleModel.isOver) {
@@ -289,6 +276,7 @@ class BattleController(gameField: GameField, parent: BattleControllerParent, fac
           val event = ai.nextTurn(battleModel)
           val result = battleModel.handleEvent(event)
           battleView.handleEvent(result.buildBattleViewEvent)
+          parent.onMinimapChange()
         }
       }
     } else if (!battleIsOverDialogShown && !battleView.areMovementsGoing
@@ -309,17 +297,22 @@ class BattleController(gameField: GameField, parent: BattleControllerParent, fac
 private[battle] class VisitedHexesList {
   private var _prev: Option[TerrainHex] = None
   private var _current: Option[TerrainHex] = None
+
   def prev = _prev
+
   def current = _current
+
   def clean() {
     _prev = None
     _current = None
   }
+
   def visitHex(hex: TerrainHex) {
     if (_current != Some(hex)) {
       _prev = _current
       _current = Some(hex)
     }
   }
+
   def isDefined = prev.isDefined && current.isDefined
 }

@@ -11,7 +11,7 @@ import scala.util.Random
 class RandomTerrainGenerator(houseChance: Double = 0.1, bridgeChance: Double = 0.1) extends MapGenerator {
 
   val terrainTypesMap = Map[TerrainType, Int](ShallowWater -> 1, DecForest -> 1, GreenGrass -> 3, CleanRoad -> 1,
-    DesertSand -> 1, Mud -> 1, BasicHill -> 1, BasicMountain -> 1, DirtRoad -> 1, Castle -> 2)
+    DesertSand -> 1, Mud -> 1, BasicHill -> 1, BasicMountain -> 1, DirtRoad -> 1, Castle -> 1)
   val terrainTypes: List[TerrainType] = terrainTypesMap.flatMap { case (t, i) => List.fill(i)(t) } toList
 
   def generateMap(width: Int, height: Int, seed: Int): TerrainHexField = {

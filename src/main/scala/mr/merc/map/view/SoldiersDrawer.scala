@@ -7,7 +7,7 @@ import scala.collection.mutable.{ArrayBuffer, Queue}
 import mr.merc.map.hex.view.TerrainHexView
 import mr.merc.log.Logging
 import scalafx.geometry.Rectangle2D
-import mr.merc.view.Drawable
+import mr.merc.view.{Drawable, Sprite}
 import mr.merc.unit.view.AbstractSoldierView
 
 import scala.reflect.ClassTag
@@ -16,7 +16,9 @@ class SoldiersDrawer[T <: AbstractSoldierView: ClassTag] extends Logging {
   private var _soldiers = Set[T]()
   private val _movements = Queue[Movement]()
   private def currentMovement = _movements.headOption
-  private val rectIntersectionHelper = new RectIntersectionHelper[T]
+  private val rectIntersectionHelper = new RectIntersectionHelper[Drawable]
+
+  private var dirtyDrawablesFromPrevMovement:Set[Drawable] = Set()
 
   def addSoldier(s: T) {
     _soldiers += s
@@ -38,10 +40,10 @@ class SoldiersDrawer[T <: AbstractSoldierView: ClassTag] extends Logging {
 
   private def drawablesInMovements = currentMovement.map(_.drawables).getOrElse(Nil)
 
-  private def soldiersInMovements = drawablesInMovements flatMap (d => d match {
+  private def soldiersInMovements = drawablesInMovements flatMap {
     case soldier: T => Some(soldier)
     case _ => None
-  })
+  }
 
   def update(time: Int) {
     updateAllSoldiersExceptForInMovement(time)
@@ -49,6 +51,7 @@ class SoldiersDrawer[T <: AbstractSoldierView: ClassTag] extends Logging {
     currentMovement match {
       case Some(move) => if (move.isOver) {
         info(s"Movement $move is over")
+        dirtyDrawablesFromPrevMovement = move.drawables.filter(_.dirtyRect.nonEmpty).toSet
         executeAllMomentaryMovesAndStartFirstNonMomentary()
       } else {
         executeAllMomentaryMovesAndStartFirstNonMomentary()
@@ -75,17 +78,17 @@ class SoldiersDrawer[T <: AbstractSoldierView: ClassTag] extends Logging {
       case None => // do nothing
     }
 
-    while (currentMovement.map(_.isOver).getOrElse(false)) {
+    while (currentMovement.exists(_.isOver)) {
       _movements.dequeue()
       currentMovement.map(_.start())
     }
   }
 
-  private def calculateTouchedSoldiers(dirtySoldiers: Set[T]): Set[T] = {
-    var alreadyTouched = Set[T]()
-    var touchedLastTime = Set[T]()
+  private def calculateTouchedSprites(dirtySprites: Set[Drawable]): Set[Drawable] = {
+    var alreadyTouched = Set[Drawable]()
+    var touchedLastTime = Set[Drawable]()
 
-    touchedLastTime ++= dirtySoldiers
+    touchedLastTime ++= dirtySprites
 
     do {
       val touchedThisIteration = touchedLastTime.flatMap(rectIntersectionHelper.intersections)
@@ -93,7 +96,7 @@ class SoldiersDrawer[T <: AbstractSoldierView: ClassTag] extends Logging {
       touchedLastTime = touchedThisIteration -- alreadyTouched
     } while (touchedLastTime.nonEmpty)
 
-    alreadyTouched -- dirtySoldiers
+    alreadyTouched -- dirtySprites
   }
 
   def drawSoldiersFromScratch(gc: GraphicsContext, viewRect: Rectangle2D) {
@@ -105,18 +108,22 @@ class SoldiersDrawer[T <: AbstractSoldierView: ClassTag] extends Logging {
   def drawSoldiers(gc: GraphicsContext, viewRect: Rectangle2D) {
     val visibleSoldiers = soldiers.filter(_.viewRect.intersects(viewRect))
     val dirtySoldiers = visibleSoldiers.filter(_.dirtyRect.isDefined)
-    val dirtyDrawables = drawablesInMovements.filter(_.dirtyRect.isDefined)
-    val soldiersDrawables = dirtyDrawables.collect { case x: T => x }
-    val allDirtySoldiers = dirtySoldiers ++ soldiersDrawables
+    val dirtyDrawables = dirtySoldiers ++ drawablesInMovements.filter(_.dirtyRect.isDefined) ++ dirtyDrawablesFromPrevMovement
 
-    allDirtySoldiers foreach { ds =>
+    (dirtyDrawables ++ visibleSoldiers) foreach { ds =>
       rectIntersectionHelper.addRect(ds, ds.viewRect)
     }
-    val touchedSoldiers = calculateTouchedSoldiers(allDirtySoldiers)
-    touchedSoldiers foreach (t => t.dirtyRect = Some(t.viewRect))
-    val dirtySoldiersNotTakingPartInMovements = dirtySoldiers -- soldiersDrawables
-    val dirtyAndTouched = (dirtySoldiersNotTakingPartInMovements ++ touchedSoldiers).toList.sortBy(_.y)
-    val drawablesToRedraw: List[Drawable] = dirtyAndTouched ::: dirtyDrawables
+    val touchedDrawables = calculateTouchedSprites(dirtyDrawables)
+    touchedDrawables foreach  { t =>
+      if (t.dirtyRect.isEmpty) {
+        t.dirtyRect = Some(t.viewRect)
+      }
+    }
+    val dirtySoldiersNotTakingPartInMovements = dirtySoldiers.filter(ds => !touchedDrawables.contains(ds))
+    val (touchedDirtySoldiers, touchedNotSoldiers) = (dirtyDrawables ++ touchedDrawables).partition(_.isInstanceOf[T])
+    val dirtyAndTouched = (dirtySoldiersNotTakingPartInMovements ++
+      touchedDirtySoldiers.map(_.asInstanceOf[T])).toList.sortBy(_.y)
+    val drawablesToRedraw: List[Drawable] = dirtyAndTouched.map(_.asInstanceOf[Drawable]) ++ touchedNotSoldiers
 
     drawablesToRedraw.foreach { d =>
       val rect = d.dirtyRect.get
@@ -124,8 +131,9 @@ class SoldiersDrawer[T <: AbstractSoldierView: ClassTag] extends Logging {
       d.dirtyRect = None
     }
 
-    drawablesToRedraw.foreach { d =>
+    drawablesToRedraw.filterNot(dirtyDrawablesFromPrevMovement.contains).foreach { d =>
       d.drawItself(gc, -viewRect.minX.toInt, -viewRect.minY.toInt)
     }
+    dirtyDrawablesFromPrevMovement = Set()
   }
 }

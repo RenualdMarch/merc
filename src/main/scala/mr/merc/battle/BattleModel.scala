@@ -183,6 +183,10 @@ class BattleModel(val map: GameField) extends BattleModelEventHandler with Loggi
 
   // TODO allies test
   def validateAttackEvent(soldier: Soldier, from: TerrainHex, target: TerrainHex, attackNumber: Int): Boolean = {
+    if (soldier.attackedThisTurn) {
+      return false
+    }
+
     if (soldier.owner != currentPlayer) {
       return false
     }

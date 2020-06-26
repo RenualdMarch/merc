@@ -42,16 +42,31 @@ class SoldierView(val soldier: Soldier, factor: Double, drawOval: Boolean = true
   private val xpBarHeight = Math.min(soldier.soldierType.exp, maxXp) * TerrainHexView.side(factor) / maxXp
   private val xpBarWidth = 4
 
-  lazy val sounds = SoldierTypeViewInfo(soldier.soldierType.name).sounds
+  private val ovalSize = 12
+
+  private var _viewHp: Double = soldier.hp
+  def viewHp: Double = _viewHp
+  def viewHp_=(v:Double): Unit = {
+    _viewHp = v
+    if (_viewHp < 0)
+      _viewHp = 0
+    else if (_viewHp > soldier.soldierType.hp)
+      _viewHp = soldier.soldierType.hp
+
+    refreshBars()
+  }
+
+
+  lazy val sounds = SoldierTypeViewInfo(soldier.soldierType.viewName).sounds
 
   val healthBar = new VerticalBarView(healthBarWidth, healthBarHeight, Color.White, Color.Red, hpPercent)
   val xpBar = new VerticalBarView(xpBarWidth, xpBarHeight, Color.White, Color.White, xpPercent)
 
-  def hpPercent = soldier.hp.toDouble / soldier.soldierType.hp
+  def hpPercent = viewHp / soldier.soldierType.hp
   def xpPercent = soldier.exp.toDouble / soldier.soldierType.exp
 
   override def drawItself(gc: GraphicsContext, xOffset: Int, yOffset: Int) {
-    if (state != DeathState && state != NoState && !state.isInstanceOf[SoldierViewAttackState] && drawOval) {
+    if ((state == StandState || state == IdleState) && drawOval) {
       drawOvalUnderSoldier(gc, xOffset: Int, yOffset: Int, soldier.owner.color)
     }
 
@@ -77,7 +92,7 @@ class SoldierView(val soldier: Soldier, factor: Double, drawOval: Boolean = true
     }
 
     gc.fill = color
-    gc.fillOval(x + xOffset + 18, y + yOffset, 8, 8)
+    gc.fillOval(x + xOffset + centered.get / 2 - ovalSize / 2, y + yOffset, ovalSize, ovalSize)
     gc.restore()
   }
 
@@ -92,6 +107,10 @@ class SoldierView(val soldier: Soldier, factor: Double, drawOval: Boolean = true
       //xpBar.fillPercentage = xpPercent
       markAsDirty()
     }
+  }
+
+  def reloadHp(): Unit = {
+    _viewHp = soldier.hp
   }
 }
 

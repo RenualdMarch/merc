@@ -89,7 +89,7 @@ class MailView(actions: WorldStateDiplomacyActions, playerState:State, selectedM
       case dw: DeclareWar => new DeclareWarMessageView(actions, dw, refreshTable)
     }
     case Some(Right(x)) => x match {
-      case dm:InformationDomesticMessage => dm.body
+      case dm:InformationDomesticMessage => dm.body()
     }
   }
 

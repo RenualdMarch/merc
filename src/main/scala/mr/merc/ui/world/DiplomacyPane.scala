@@ -21,16 +21,15 @@ import scalafx.scene.paint.Color
 import scalafx.scene.shape.Rectangle
 import scalafx.stage.Stage
 import mr.merc.util.FxPropertyUtils.PropertyBindingMap
-import scalafx.scene.Node
 import scalafx.scene.control.TabPane.TabClosingPolicy
 
-class DiplomacyPane(actions: WorldStateDiplomacyActions, currentState: State, stage: Stage) extends PaneWithTwoHorizontalChildren(0.45) {
+class DiplomacyPane(actions: WorldStateDiplomacyActions, currentState: State, stage: Stage, parentFrame:WorldFrame) extends PaneWithTwoHorizontalChildren(0.45) {
 
   private val tablePane = new StatesTablePane(actions, currentState)
   private val property = tablePane.selectedItem
   private val selectedPane = new BorderPane {
     center <== property.map(Option.apply).map {
-      case Some(p) => new StateDiplomacyPane(currentState, p, actions, stage)
+      case Some(p) => new StateDiplomacyPane(currentState, p, actions, stage, parentFrame)
       case None => new javafx.scene.layout.Pane()
     }
   }
@@ -127,7 +126,7 @@ class StatesTablePane(actions: WorldStateDiplomacyActions, currentState: State) 
   add(statesTable, "grow,push")
 }
 
-class StateDiplomacyPane(currentState: State, selectedStateInfo: StateInfo, actions: WorldStateDiplomacyActions, stage: Stage) extends MigPane {
+class StateDiplomacyPane(currentState: State, selectedStateInfo: StateInfo, actions: WorldStateDiplomacyActions, stage: Stage, parentFrame:WorldFrame) extends MigPane {
   private val selectedState = selectedStateInfo.state
 
   private val tabPane = new TabPane {
@@ -148,7 +147,7 @@ class StateDiplomacyPane(currentState: State, selectedStateInfo: StateInfo, acti
     text = Localization("diplomacy.actions")
     style = Components.largeFontStyle
     content = if (currentState == selectedState) new Pane().delegate
-    else new StateActionsPane(currentState, selectedState, actions, stage)
+    else new StateActionsPane(currentState, selectedState, actions, stage, parentFrame)
   }
 
   val claimsPane = new Tab {
@@ -231,7 +230,7 @@ class StateAgreementsPane(selectedState: State, actions: WorldStateDiplomacyActi
   }
 }
 
-class StateActionsPane(currentState: State, selectedState: State, actions: WorldStateDiplomacyActions, stage: Stage) extends MigPane {
+class StateActionsPane(currentState: State, selectedState: State, actions: WorldStateDiplomacyActions, stage: Stage, parentFrame:WorldFrame) extends MigPane {
 
   import ModalDialog._
 
@@ -241,6 +240,7 @@ class StateActionsPane(currentState: State, selectedState: State, actions: World
       val dialog = new DeclareWarPane(currentState, selectedState, actions).showDialog(stage)
       dialog.dialogResult.foreach { message =>
         actions.sendMessage(message)
+        parentFrame.showDiplomacyPane()
       }
     }
   }
@@ -252,6 +252,7 @@ class StateActionsPane(currentState: State, selectedState: State, actions: World
         val dialog = new AddWarTargetPane(currentState, selectedState, wa, actions).showDialog(stage)
         dialog.dialogResult.foreach { wt =>
           actions.diplomacyEngine.addWarTarget(wa, wt)
+          parentFrame.showDiplomacyPane()
         }
       }
     }
@@ -263,6 +264,7 @@ class StateActionsPane(currentState: State, selectedState: State, actions: World
       val dialog = new ProposePeacePane(currentState, selectedState, actions, false).showDialog(stage)
       dialog.dialogResult.foreach { message =>
         actions.sendMessage(message.right.get)
+        parentFrame.showDiplomacyPane()
       }
     }
   }
@@ -273,6 +275,7 @@ class StateActionsPane(currentState: State, selectedState: State, actions: World
       val dialog = new ProposePeacePane(currentState, selectedState, actions, true).showDialog(stage)
       dialog.dialogResult.foreach { message =>
         actions.sendMessage(message.left.get)
+        parentFrame.showDiplomacyPane()
       }
     }
   }
@@ -281,6 +284,7 @@ class StateActionsPane(currentState: State, selectedState: State, actions: World
     text = Localization("diplomacy.proposeVassalization.button")
     onAction = { _ =>
       actions.sendMessage(new VassalizationProposal(currentState, selectedState))
+      parentFrame.showDiplomacyPane()
     }
   }
 
@@ -288,6 +292,7 @@ class StateActionsPane(currentState: State, selectedState: State, actions: World
     text = Localization("diplomacy.proposeOverlordship.button")
     onAction = { _ =>
       actions.sendMessage(new OverlordshipProposal(currentState, selectedState))
+      parentFrame.showDiplomacyPane()
     }
   }
 
@@ -295,6 +300,7 @@ class StateActionsPane(currentState: State, selectedState: State, actions: World
     text = Localization("diplomacy.proposeAlliance.button")
     onAction = { _ =>
       actions.sendMessage(new AllianceProposal(currentState, selectedState))
+      parentFrame.showDiplomacyPane()
     }
   }
 
@@ -329,15 +335,16 @@ class StateActionsPane(currentState: State, selectedState: State, actions: World
 
 class DeclareWarPane(currentState: State, selectedState: State, actions: WorldStateDiplomacyActions) extends DialogStage[DeclareWar] {
 
-  override protected def dialogContent: Region = new MigPane("") {
-    val selectWarTarget = new SelectWarTarget(actions.diplomacyEngine.possibleTargetsForStartingWar(currentState, selectedState))
+  private lazy val selectWarTarget = new SelectWarTarget(actions.diplomacyEngine.possibleTargetsForStartingWar(currentState, selectedState))
 
-    selectWarTarget.selectedWarTarget.onChange {
-      dialogResult = selectWarTarget.selectedWarTarget.value.map { wt =>
-        new DeclareWar(currentState, selectedState, wt, Set())
-      }
+  override def onOkButtonPressed(): Unit = {
+    super.onOkButtonPressed()
+    dialogResult = selectWarTarget.selectedWarTarget.map { wt =>
+      new DeclareWar(currentState, selectedState, wt, Set())
     }
+  }
 
+  override protected def dialogContent: Region = new MigPane("") {
     add(BigText(Localization("diplomacy.declareWarOn", selectedState.name)), "wrap")
     add(selectWarTarget, "grow, push")
   }
@@ -347,13 +354,14 @@ class DeclareWarPane(currentState: State, selectedState: State, actions: WorldSt
 
 class AddWarTargetPane(currentState: State, selectedState: State, warAgreement: WarAgreement, actions:WorldStateDiplomacyActions) extends DialogStage[WarTarget] {
 
+  private lazy val selectWarTarget = new SelectWarTarget(actions.diplomacyEngine.possibleWarTargets(warAgreement, currentState))
+
+  override def onOkButtonPressed(): Unit = {
+    super.onOkButtonPressed()
+    dialogResult = selectWarTarget.selectedWarTarget
+  }
+
   override protected def dialogContent: Region = new MigPane {
-    val selectWarTarget = new SelectWarTarget(actions.diplomacyEngine.possibleWarTargets(warAgreement, currentState))
-
-    selectWarTarget.selectedWarTarget.onChange {
-      dialogResult = selectWarTarget.selectedWarTarget.value
-    }
-
     add(BigText(Localization("diplomacy.addWarTargetTo", selectedState.name)), "wrap")
     add(selectWarTarget, "grow, push")
   }
@@ -575,7 +583,7 @@ class SelectWarTarget(possibleWarTargets:Set[WarTarget]) extends MigPane {
   add(left)
   add(right)
 
-  val selectedWarTarget: ObjectProperty[Option[WarTarget]] = right.centerComponent.map(_.flatMap(_.selectedWarTarget))
+  def selectedWarTarget: Option[WarTarget] = right.centerComponent.value.flatMap(_.selectedWarTarget)
 }
 
 class ProposePeacePane(currentState: State, selectedState: State, actions: WorldStateDiplomacyActions, separatePeace: Boolean) extends DialogStage[Either[ProposePeace, ProposeSeparatePeace]] {

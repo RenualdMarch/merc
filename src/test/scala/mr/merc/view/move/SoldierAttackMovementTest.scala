@@ -3,11 +3,9 @@ package mr.merc.view.move
 import org.scalatest.FunSuite
 import mr.merc.unit.Soldier
 import mr.merc.unit.SoldierType
-import mr.merc.unit.view.SoldierView
+import mr.merc.unit.view.{DefenceState, SoldierView, SoldierViewAttackState, StandState}
 import mr.merc.map.hex.NE
 import mr.merc.players.Player
-import mr.merc.unit.view.StandState
-import mr.merc.unit.view.SoldierViewAttackState
 import mr.merc.unit.AttackResult
 import mr.merc.map.hex.view.TerrainHexView
 import mr.merc.map.hex.TerrainHexField
@@ -98,7 +96,7 @@ class SoldierAttackMovementTest extends FunSuite with BeforeAndAfter {
     movement.update(5000 / 4)
     assert(soldierView.x === 0)
     assert(soldierView.y === 10)
-    assert(soldierView.state === StandState)
+    assert(soldierView.state === DefenceState)
     assert(soldierView.index === 0)
 
     assert(movement.isOver)

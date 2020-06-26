@@ -173,7 +173,7 @@ class WorldMarketDay(worldState: WorldStateEnterpriseActions, turn:Int) extends 
 
       val map = stateProjects.getOrElse(s, Map()).asInstanceOf[Map[Province, List[BusinessProject]]]
       s.mailBox.addMessage(new InformationDomesticMessage(Localization("projectsReport.reporter"),
-        Localization("projectsReport.title"), new BusinessProjectsReportPane(map)))
+        Localization("projectsReport.title"), () => new BusinessProjectsReportPane(map)))
     }
   }
 
