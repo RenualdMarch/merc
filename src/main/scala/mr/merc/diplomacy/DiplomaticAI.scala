@@ -1,6 +1,7 @@
 package mr.merc.diplomacy
 
 import mr.merc.diplomacy.Claim.{ProvinceClaim, VassalizationClaim}
+import mr.merc.diplomacy.DiplomaticAgreement.WarAgreement
 import mr.merc.diplomacy.DiplomaticAgreement.WarAgreement._
 import mr.merc.diplomacy.DiplomaticMessage._
 import mr.merc.economics.{WorldConstants, WorldStateDiplomacyActions}
@@ -28,6 +29,7 @@ class DiplomaticAI(state: State, actions: WorldStateDiplomacyActions) extends Lo
       case v: VassalizationProposal => actions.answerMessage(v, answerVassalizationProposal(v))
       case ajw: AskJoinWar => actions.answerMessage(ajw, answerAskJoinWar(ajw))
       case pp: ProposePeace => actions.answerMessage(pp, answerProposePeace(pp))
+      case sp: ProposeSeparatePeace => actions.answerMessage(sp, answerProposeSeparatePeace(sp))
       case ap: AllianceProposal => actions.answerMessage(ap, answerAllianceProposal(ap))
       case op: OverlordshipProposal => actions.answerMessage(op, answerOverlordshipProposal(op))
       case dw: DeclareWar => actions.answerDeclareWar(dw, answerDeclareWar(dw))
@@ -67,6 +69,38 @@ class DiplomaticAI(state: State, actions: WorldStateDiplomacyActions) extends Lo
     }
   }
 
+  def answerProposeSeparatePeace(message: ProposeSeparatePeace): Boolean = {
+    val war = message.warAgreement
+    val (stateSide, enemySide) = if (war.attackers.contains(state)) (war.attackers, war.defenders)
+    else if (war.defenders.contains(state)) (war.defenders, war.attackers)
+    else {
+      error(s"state $state is not in war $war")
+      return false
+    }
+
+    if (message.acceptedTargets.isEmpty) answerSeparateWhitePeace(message, stateSide, enemySide)
+    else if (message.acceptedTargets.exists(at => stateSide.contains(at.giver))) answerSeparatePeaceDemand(message, stateSide, enemySide)
+    else if (message.acceptedTargets.exists(at => enemySide.contains(at.giver))) answerSeparatePeaceBegging(message, stateSide, enemySide)
+    else {
+      error(s"Can't decide what to do with peace proposal $message in war $war")
+      false
+    }
+  }
+
+  def answerSeparateWhitePeace(message: ProposeSeparatePeace, stateSide: Set[State], enemySide: Set[State]): Boolean = {
+    // accept only if enemy controls smth and has bigger army
+    val stateSideTotalArmy = stateSide.map(s => situation.stateArmyTotalLevel(s)).sum
+    val enemySideTotalArmy = enemySide.map(s => situation.stateArmyTotalLevel(s)).sum
+
+    val enemyArmyDomination = stateSideTotalArmy == 0 || enemySideTotalArmy / stateSideTotalArmy > PowerDifferenceForWhitePeace
+
+    val enemyHasControl = actions.regions.exists { p =>
+      p.owner == state && enemySide.contains(p.controller)
+    }
+
+    enemyArmyDomination && enemyHasControl
+  }
+
   def answerWhitePeace(message: ProposePeace, stateSide: Set[State], enemySide: Set[State]): Boolean = {
     val stateSideTotalArmy = stateSide.map(s => situation.stateArmyTotalLevel(s)).sum
     val enemySideTotalArmy = enemySide.map(s => situation.stateArmyTotalLevel(s)).sum
@@ -83,13 +117,39 @@ class DiplomaticAI(state: State, actions: WorldStateDiplomacyActions) extends Lo
     enemyArmyDomination && noEnemyControl && noStateControl
   }
 
+  def answerSeparatePeaceBegging(message: ProposeSeparatePeace, stateSide: Set[State], enemySide: Set[State]): Boolean = {
+    false
+  }
+
   def answerPeaceBegging(message: ProposePeace, stateSide: Set[State], enemySide: Set[State]): Boolean = {
     val stateTargets = message.warAgreement.targets.filter(t => stateSide.contains(t.demander))
     message.acceptedTargets == stateTargets
   }
 
-  def answerPeaceDemand(message: ProposePeace, stateSide: Set[State], enemySide: Set[State]): Boolean = {
+  def answerSeparatePeaceDemand(message: ProposeSeparatePeace, stateSide: Set[State], enemySide: Set[State]): Boolean = {
+    val stateSideTotalArmy = stateSide.map(s => situation.stateArmyTotalLevel(s)).sum
+    val enemySideTotalArmy = enemySide.map(s => situation.stateArmyTotalLevel(s)).sum
 
+    val enemyArmyDomination = stateSideTotalArmy == 0 || enemySideTotalArmy / stateSideTotalArmy > PowerDifferenceForWhitePeace
+
+    val stateAndVassals = state :: actions.diplomacyEngine.getVassals(state)
+
+    message.acceptedTargets.forall {
+      case tp: TakeProvince => enemySide.contains(tp.province.controller) && stateAndVassals.contains(tp.province.owner)
+      case lc: LiberateCulture => actions.provincesByCulture(lc.giver, lc.culture).forall { p =>
+        enemySide.contains(p.controller) && stateAndVassals.contains(p.owner)
+      }
+      case tm: TakeMoney => enemyArmyDomination
+      case v: Vassalize => enemyArmyDomination && actions.regions.filter(_.owner == v.giver).forall { p =>
+        enemySide.contains(p.controller) && stateAndVassals.contains(p.owner)
+      }
+      case cs: CrackState => enemyArmyDomination && actions.regions.filter(_.owner == cs.giver).forall { p =>
+        enemySide.contains(p.controller) && stateAndVassals.contains(p.owner)
+      }
+    }
+  }
+
+  def answerPeaceDemand(message: ProposePeace, stateSide: Set[State], enemySide: Set[State]): Boolean = {
     val stateSideTotalArmy = stateSide.map(s => situation.stateArmyTotalLevel(s)).sum
     val enemySideTotalArmy = enemySide.map(s => situation.stateArmyTotalLevel(s)).sum
 
@@ -132,8 +192,70 @@ class DiplomaticAI(state: State, actions: WorldStateDiplomacyActions) extends Lo
   }
 
   def possibleMessages(): List[DiplomaticMessage] = {
-    declareWar() ::: proposeAlliance() ::: proposeVassalization() ::: proposeOverlordship() filter(
-      _.isPossible(actions.diplomacyEngine, actions.turn))
+    declareWar() ::: proposeAlliance() ::: proposeVassalization() ::: proposeOverlordship() :::
+      proposePeace() filter(_.isPossible(actions.diplomacyEngine, actions.turn))
+  }
+
+  private def proposePeace():List[DiplomaticProposal] = {
+    actions.diplomacyEngine.wars(state).flatMap { war =>
+      val stateSide = war.sideByState(state)
+      val enemySide = war.oppositeSideByState(state)
+      val stateSideTotalArmy = stateSide.map(s => situation.stateArmyTotalLevel(s)).sum
+      val enemySideTotalArmy = enemySide.map(s => situation.stateArmyTotalLevel(s)).sum
+
+
+      if (stateSideTotalArmy <= TotalArmySumToBeTiredOfWar && enemySideTotalArmy <= TotalArmySumToBeTiredOfWar) {
+        // both sides are tired
+        if (war.isLeader(state, actions.diplomacyEngine)) List(proposePeaceOfCurrentAchieved(war))
+        else Nil
+      } else if (stateSideTotalArmy <= TotalArmySumToBeTiredOfWar && enemySideTotalArmy >= TotalArmySumToBeTiredOfWar) {
+        // we cant attack any more, enemy can
+        if (war.isLeader(state, actions.diplomacyEngine)) List(proposePeaceOfCurrentAchieved(war))
+        else List(proposeSeparatePeaceOfCurrentAchieved(war))
+      } else if (stateSideTotalArmy >= TotalArmySumToBeTiredOfWar && enemySideTotalArmy <= TotalArmySumToBeTiredOfWar) {
+        // we are winning
+        if (war.isLeader(state, actions.diplomacyEngine)) List(proposePeaceWithMaxDemands(war))
+        else Nil
+      } else if (allTargetsReached(war)) {
+        List(proposePeaceWithMaxDemands(war))
+      } else Nil
+    }
+  }
+
+  private def proposePeaceOfCurrentAchieved(war:WarAgreement):ProposePeace = {
+    val targets = war.targets.filter(t => isAchieved(war, t))
+    ProposePeace(state, war.oppositeLeader(state, actions.diplomacyEngine), war, targets)
+  }
+
+  private def isAchieved(war:WarAgreement, target:WarTarget):Boolean = {
+    val demanderSide = war.sideByState(target.demander)
+    target match {
+      case TakeProvince(_, _, province) =>
+        demanderSide.contains(province.controller)
+      case LiberateCulture(_, _, _, provinces) =>
+        provinces.forall (p => demanderSide.contains(p.controller))
+      case CrackState(_, giver) =>
+        actions.regions.filter(_.owner == giver).forall(p => demanderSide.contains(p.controller))
+      case TakeMoney(_, _) => true
+      case Vassalize(_, giver) =>
+        actions.regions.filter(_.owner == giver).forall(p => demanderSide.contains(p.controller))
+    }
+  }
+
+  private def proposeSeparatePeaceOfCurrentAchieved(war:WarAgreement): ProposeSeparatePeace = {
+    val targets = war.targets.filter(t => t.demander == state || t.giver == state)
+    ProposeSeparatePeace(state, war.oppositeLeader(state, actions.diplomacyEngine), war, targets, state)
+  }
+
+  private def proposePeaceWithMaxDemands(war:WarAgreement):ProposePeace = {
+    val side = war.sideByState(state)
+    val targets = war.targets.filter(t => side.contains(t.demander))
+    ProposePeace(state, war.oppositeLeader(state, actions.diplomacyEngine), war, targets)
+  }
+
+  private def allTargetsReached(war:WarAgreement):Boolean = {
+    val demanderSide = war.sideByState(state)
+    war.targets.filter(wt => demanderSide.contains(wt.demander)).forall(wt => isAchieved(war, wt))
   }
 
   private def declareWar():List[DeclareWar] = {

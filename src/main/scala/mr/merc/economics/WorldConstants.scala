@@ -250,6 +250,7 @@ object WorldConstants {
     val PowerDifferenceForWhitePeace = 2
     val PowerDifferenceToStartWar = 3
     val MaxBudgetSpendingOnWarriors = 0.3
+    val TotalArmySumToBeTiredOfWar = 5
   }
 }
 

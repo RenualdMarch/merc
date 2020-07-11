@@ -183,6 +183,12 @@ object DiplomaticAgreement {
     def isLeader(state: State, diplomacy: WorldDiplomacy): Boolean =
       Set(attackersLeader(diplomacy), defendersLeader(diplomacy)).contains(state)
 
+    def oppositeLeader(state: State, diplomacy: WorldDiplomacy): State = {
+      if (attackers.contains(state)) defendersLeader(diplomacy)
+      else if (defenders.contains(state)) attackersLeader(diplomacy)
+      else sys.error(s"state $state doesn't belong to war $this")
+    }
+
     override def voluntaryBreakingAgreementEvent(breaker: State, currentTurn: Int): Set[RelationshipEvent] = {
       if (attackers.contains(breaker)) {
         attackers -= breaker
