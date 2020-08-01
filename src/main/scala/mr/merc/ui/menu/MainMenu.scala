@@ -5,10 +5,11 @@ import scalafx.scene.layout.VBox
 import mr.merc.local.Localization
 import scalafx.geometry.Pos
 import javafx.event.ActionEvent
+import mr.merc.log.Logging
 import mr.merc.ui.common.SceneManager
 import mr.merc.ui.world.BigButton
 
-class MainMenu(sceneManager: SceneManager) extends BorderPane {
+class MainMenu(sceneManager: SceneManager) extends BorderPane with Logging {
 
   styleClass.add("mainMenuContainer")
   stylesheets.add("/css/mainMenu.css")
@@ -48,8 +49,15 @@ class MainMenu(sceneManager: SceneManager) extends BorderPane {
     }
   }
 
+  val loadButton = new BigButton() {
+    text = Localization("menu.load")
+    onAction = { _ =>
+      sceneManager.loadGame()
+    }
+  }
+
   val menuPane = new VBox {
-    children = List(newBattleButton, newWorldButton, customNewWorldButton, optionsButton, exitButton)
+    children = List(newBattleButton, newWorldButton, customNewWorldButton, loadButton, optionsButton, exitButton)
   }
 
   menuPane.styleClass.add("menuPane")

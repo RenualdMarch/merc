@@ -9,17 +9,17 @@ import mr.merc.log.Logging
 import mr.merc.map.pathfind.PathFinder
 import mr.merc.politics.{Province, State}
 import mr.merc.ui.world.BusinessProjectsReportPane
-
 import scalafx.Includes._
+import scalafx.scene.layout.Region
 
-class WorldMarketDay(worldState: WorldStateEnterpriseActions, turn:Int) extends Logging {
+class WorldMarketDay(worldState: WorldStateEnterpriseActions, turn: Int) extends Logging {
   type PathCache = Map[EconomicRegion, Map[EconomicRegion, List[EconomicRegion]]]
 
-  private val regions:List[EconomicRegion] = worldState.controlledRegions
+  private val regions: List[EconomicRegion] = worldState.controlledRegions
 
   private var currentPathCache: PathCache = _
 
-  private def newPathCache():PathCache = {
+  private def newPathCache(): PathCache = {
     regions.par.map { from =>
       from -> {
         val grid = new EconomicGrid(from)
@@ -82,12 +82,13 @@ class WorldMarketDay(worldState: WorldStateEnterpriseActions, turn:Int) extends 
     regions.foreach { r =>
       r.regionMarket.doTrade(Products.AllProducts)
       r.regionMarket.fulfilledDemands.values.foreach { demands =>
-        demands.foreach { demand => demand.request match {
-            case p:PopulationDemandRequest =>
+        demands.foreach { demand =>
+          demand.request match {
+            case p: PopulationDemandRequest =>
               p.pop.buyDemandedProducts(List(demand))
-            case e:EnterpriseDemandRequest =>
+            case e: EnterpriseDemandRequest =>
               e.enterprise.buyDemandedProducts(List(demand))
-            case p:BusinessDemandRequest =>
+            case p: BusinessDemandRequest =>
               p.project.buyDemandedProducts(List(demand))
             case w: WarriorDemandRequest =>
               w.warrior.buyDemand(demand)
@@ -147,7 +148,7 @@ class WorldMarketDay(worldState: WorldStateEnterpriseActions, turn:Int) extends 
     regions.foreach { r =>
       val factoryCommands = FactoryBuildingAI().factoryCommands(r, worldState)
 
-      r.enterprises.foreach{ e =>
+      r.enterprises.foreach { e =>
         e.payMoneyToPops()
         e.payTaxes()
         e.endOfDay()
@@ -161,23 +162,25 @@ class WorldMarketDay(worldState: WorldStateEnterpriseActions, turn:Int) extends 
       r.regionMarket.endOfMarketDay(turn)
       val projects = r.removeCompletedProjectsAndAddInvestments()
       projectsMap += (r -> projects)
-      factoryCommands.foreach {c => worldState.applyCommand(c)}
+      factoryCommands.foreach { c => worldState.applyCommand(c) }
       r.removeBankruptFactories()
       r.regionPopulation.learnLiteracy()
       r.regionPopulation.pops.foreach(_.grow())
     }
     val stateProjects = projectsMap.groupBy(_._1.owner)
-    states.foreach {s =>
+    states.foreach { s =>
       s.budget.spendBudgetMoney(regions.filter(_.owner == s), s.primeCulture)
       s.budget.endDay()
 
       val map = stateProjects.getOrElse(s, Map()).asInstanceOf[Map[Province, List[BusinessProject]]]
       s.mailBox.addMessage(new InformationDomesticMessage(Localization("projectsReport.reporter"),
-        Localization("projectsReport.title"), () => new BusinessProjectsReportPane(map)))
+        Localization("projectsReport.title")) {
+        override def body: Region = new BusinessProjectsReportPane(map)
+      })
     }
   }
 
-  private def buildSupplyInfoForProductAndRegion(product: Products.Product, from: EconomicRegion, to: EconomicRegion) : Option[SupplyInfo] = {
+  private def buildSupplyInfoForProductAndRegion(product: Products.Product, from: EconomicRegion, to: EconomicRegion): Option[SupplyInfo] = {
 
     currentPathCache(from).get(to).flatMap { path =>
       val toOwner = to.owner
@@ -212,13 +215,14 @@ class WorldMarketDay(worldState: WorldStateEnterpriseActions, turn:Int) extends 
     }.toMap
   }
 
-  private case class SupplyInfo(price: Price, path:List[EconomicRegion]) {
+  private case class SupplyInfo(price: Price, path: List[EconomicRegion]) {
     def tradeProfit: Double = price.afterTaxesProfit
   }
+
 }
 
 
-case class Price(finalPrice: Double, extractions:List[Extraction]) {
+case class Price(finalPrice: Double, extractions: List[Extraction]) {
   val afterTaxesProfit: Double = {
     val taxes = extractions.map(_.extractionPart).sum
     val profit = finalPrice / (1 + taxes)
@@ -231,6 +235,7 @@ case class Price(finalPrice: Double, extractions:List[Extraction]) {
 
 sealed abstract class Extraction(val extractionPart: Double) {
   var extractionMoney: Double = 0
+
   def payMoney(count: Double, fulfilledSupplyRequest: FulfilledSupplyRequest): Unit
 }
 
@@ -247,7 +252,7 @@ class TradersSalesPart(tradersRegion: EconomicRegion) extends TradersExtraction(
 class TradersTransitPart(tradersRegion: EconomicRegion) extends TradersExtraction(tradersRegion, 0.05)
 
 
-class StateTransitPart(val owner: State, region: EconomicRegion) extends Extraction (
+class StateTransitPart(val owner: State, region: EconomicRegion) extends Extraction(
   owner.taxPolicy.tax(TransitTax, region.bureaucratsPercentageFromMax)) {
   override def payMoney(count: Double, fulfilledSupplyRequest: FulfilledSupplyRequest): Unit = {
     val money = count * extractionMoney

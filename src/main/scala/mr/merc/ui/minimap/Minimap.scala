@@ -75,7 +75,10 @@ class Minimap(private var field: TerrainHexField, pane: ScrollPaneLike, factor: 
       } else {
         hex.province.foreach { p =>
           if (hex.terrain.isNot(WaterKind)) {
-            gc.fill = p.owner.color.opacity(0.7f)
+            gc.fill = p.owner.color//.opacity(0.7f)
+            gc.fillRect(x, y, side, side)
+          } else {
+            gc.fill = Color.LightBlue.opacity(0.7f)
             gc.fillRect(x, y, side, side)
           }
         }

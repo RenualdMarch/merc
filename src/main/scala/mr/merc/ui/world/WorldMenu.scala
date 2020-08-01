@@ -32,6 +32,7 @@ class WorldMenu(parent: WorldFrame) extends MenuBar {
   budgetMenu.onAction = { _ =>
     parent.showBudgetPane()
   }
+
   val parliamentMenu = new MenuItem(Localization("menu.parliament"))
   parliamentMenu.onAction = {_ =>
     parent.showParliamentPane()
@@ -39,8 +40,16 @@ class WorldMenu(parent: WorldFrame) extends MenuBar {
 
   politicsMenu.items.addAll(budgetMenu, parliamentMenu)
 
-  val saveMenu = new MenuItem(Localization("menu.save"))
-  val loadMenu = new MenuItem(Localization("menu.load"))
+  val saveMenu = new MenuItem(Localization("menu.save")) {
+    onAction = {_ =>
+      parent.saveGame()
+    }
+  }
+  val loadMenu = new MenuItem(Localization("menu.load")) {
+    onAction = {_ =>
+      parent.sceneManager.loadGame()
+    }
+  }
   val options = new MenuItem(Localization("menu.options"))
   val exit = new MenuItem(Localization("menu.exit"))
   gameMenu.items.addAll(saveMenu, loadMenu, options, exit)

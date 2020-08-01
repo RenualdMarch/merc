@@ -48,7 +48,7 @@ class Warrior(val warriorType: WarriorType, val competence: WarriorCompetence, v
 
   val soldier:Soldier = new Soldier(warriorType.name, soldierType, player)
 
-  private val cache = CacheFactoryMap.memo[(Double, Boolean), SoldierView] {
+  @transient private lazy val cache = CacheFactoryMap.memo[(Double, Boolean), SoldierView] {
     case (factor, circles) => new SoldierView(soldier, factor, circles, circles)
   }
 

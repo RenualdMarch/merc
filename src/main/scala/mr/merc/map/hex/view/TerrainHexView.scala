@@ -148,7 +148,7 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
   }
 
   private def thisHexViewIsHuge(): Boolean = {
-    this.hex.terrain.isOneOf(MountainKind, ForestKind, WallsKind) || this.mapObject.nonEmpty
+    this.hex.terrain.isOneOf(MountainKind, ForestKind, WallsKind) || this.mapObjectView.nonEmpty
   }
 
   var interfaceDirty = true
@@ -209,27 +209,27 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
     rule.transform(additives)
   }
 
-  def image: MImage = {
+  lazy val image: MImage = {
     hex.terrain.belowTerrainType match {
       case Some(b) => b.image(hex.x, hex.y)
       case None => hex.terrain.image(hex.x, hex.y)
     }
   }
 
-  def secondaryImage: Option[MImage] = {
+  lazy val secondaryImage: Option[MImage] = {
     hex.terrain.belowTerrainType.map { _ =>
       hex.terrain.image(hex.x, hex.y)
     }
   }
 
-  def mapObject: List[MImage] = hex.mapObj match {
-    case Some(mapObj) => mapObj.images(hex, field)
+  lazy val mapObjectView: List[MImage] = hex.mapObj match {
+    case Some(mapObj) => mapObj.view.images(hex, field)
     case None => Nil
   }
 
-  def neighbourMapObjects: List[MImage] = {
+  lazy val neighbourMapObjects: List[MImage] = {
     val neigMapObj = field.neighbours(hex).filter(p => p.mapObj.isDefined && p.mapObj != hex.mapObj)
-    neigMapObj.flatMap(p => p.mapObj.get.images(hex, field))
+    neigMapObj.flatMap(p => p.mapObj.get.view.images(hex, field))
   }
 
   def drawCastleAndWalls(gc: GraphicsContext, xOffset: Int, yOffset: Int): Unit = {
@@ -252,7 +252,7 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
   def drawMapObjectIfNeeded(gc: GraphicsContext, xOffset: Int, yOffset: Int): Unit = {
     val x = this.x + xOffset
     val y = this.y + yOffset
-    mapObject foreach (_.scaledImage(factor).drawCenteredImage(gc, x, y, side, side))
+    mapObjectView foreach (_.scaledImage(factor).drawCenteredImage(gc, x, y, side, side))
   }
 
   def drawSecondaryImageIfNeeded(gc: GraphicsContext, xOffset: Int, yOffset: Int): Unit = {

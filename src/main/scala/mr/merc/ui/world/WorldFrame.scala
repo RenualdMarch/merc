@@ -1,5 +1,7 @@
 package mr.merc.ui.world
 
+import java.io.File
+
 import javafx.event.EventHandler
 import mr.merc.economics.{Battle, SeasonOfYear, WorldGenerator, WorldState}
 import mr.merc.log.Logging
@@ -16,6 +18,8 @@ import javafx.scene.input.{KeyEvent => JKeyEvent}
 import javafx.scene.input.{KeyCode => JKeyCode}
 import mr.merc.ai.BattleAI
 import mr.merc.economics.Seasons.Season
+import mr.merc.game.{GameContainer, SaveLoad}
+import mr.merc.local.Localization
 import mr.merc.map.hex.TerrainHexField
 import mr.merc.ui.battle.BattleFrame
 import mr.merc.ui.dialog.WaitDialog
@@ -25,6 +29,9 @@ import scalafx.scene.shape.Rectangle
 import mr.merc.ui.dialog.ModalDialog._
 import scalafx.application.Platform
 import scalafx.beans.property.ObjectProperty
+import scalafx.scene.control.Alert
+import scalafx.scene.control.Alert.AlertType
+import scalafx.stage.FileChooser
 
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.Future
@@ -34,7 +41,7 @@ object WorldFrame {
   val PixelsPerScroll = 200
 }
 
-class WorldFrame(sceneManager: SceneManager, worldState: WorldState) extends Pane with Logging {
+class WorldFrame(val sceneManager: SceneManager, worldState: WorldState) extends Pane with Logging {
   val factor = 1d
 
   private val dateProperty = ObjectProperty(worldState.seasonOfYear)
@@ -260,6 +267,31 @@ class WorldFrame(sceneManager: SceneManager, worldState: WorldState) extends Pan
 
     callbackFunction(battles)()
   }
+
+  def saveGame(): Unit = {
+    val chooser = new FileChooser()
+    chooser.setInitialDirectory(SaveLoad.saveDirectory())
+    Option(chooser.showSaveDialog(sceneManager.stage)).foreach { f =>
+      SaveLoad.save(GameContainer(worldState), f) match {
+        case Success(_) =>
+          val alert = new Alert(AlertType.Information)
+          alert.setTitle(Localization("saveDialog.title"))
+          alert.setHeaderText(null)
+          alert.setContentText(Localization("saveDialog.content"))
+          info(s"Game saved to ${f.getAbsolutePath}")
+          alert.showAndWait()
+        case Failure(exception) =>
+          val alert = new Alert(AlertType.Error)
+          alert.setTitle(Localization("saveDialogFailed.title"))
+          alert.setHeaderText(Localization("saveDialogFailed.content"))
+          alert.setContentText(exception.getMessage)
+          error(s"Failed to save game to ${f.getAbsolutePath}")
+          error(exception.getMessage, exception)
+          alert.showAndWait()
+      }
+    }
+  }
+
 
   class PlayerStateData(state: State) extends MigPane("center") with WorldInterfaceJavaNode {
     val rect = Rectangle(Components.largeFontSize, Components.largeFontSize)

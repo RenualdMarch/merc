@@ -44,6 +44,6 @@ class WoodenBridgeTest extends FunSuite {
   }
 
   private def image(x: Int, y: Int)(implicit field: TerrainHexField): List[MImage] = {
-    WoodenBridge.images(field.hex(x, y), field)
+    WoodenBridge.view.images(field.hex(x, y), field)
   }
 }

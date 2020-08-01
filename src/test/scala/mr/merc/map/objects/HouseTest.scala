@@ -16,13 +16,13 @@ class HouseTest extends FunSuite {
   })
   
   test("positive case"){
-     val images = SummerHouse(LatinHuman).images(field.hex(1, 1), field)
+     val images = SummerHouse(LatinHuman).view.images(field.hex(1, 1), field)
      assert(images.size === 1)
      assert(images.head.imagePath.get.contains(".png"))
   }
 
   test("negative case") {
-     val images = SummerHouse(LatinHuman).images(field.hex(1, 2), field)
+     val images = SummerHouse(LatinHuman).view.images(field.hex(1, 2), field)
      assert(images.size === 0)
   }
 }

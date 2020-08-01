@@ -50,6 +50,10 @@ libraryDependencies += "org.kordamp.ikonli" % "ikonli-entypo-pack" % "11.3.4"
 
 libraryDependencies += "com.object-refinery" % "orsoncharts" % "1.7"
 
+libraryDependencies += "com.esotericsoftware" % "kryo" % "4.0.2"
+
+libraryDependencies += "com.twitter" %% "chill" % "0.9.1"
+
 scalacOptions ++= Seq("-feature", "-deprecation", "-language:postfixOps",
   "-language:implicitConversions", "-language:reflectiveCalls", "-Ypartial-unification")
 

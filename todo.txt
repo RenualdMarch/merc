@@ -9,9 +9,6 @@ requirement failed: Buying and selling differ
 
 bug: Battle between Set(Set(Player(Byzantine,[SFX]0xff00ffff)), Set())
 
-declare war,propose and accept peace diplomacy
-save/load
-
 Not high priority:
 allow army movement through territory diplomacy
 allow hire people from other cultures with some political configurations, now it is possible to hire primary culture warrior anywhere

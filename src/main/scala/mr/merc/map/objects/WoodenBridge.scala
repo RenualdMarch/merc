@@ -3,8 +3,8 @@ package mr.merc.map.objects
 import mr.merc.map.hex.Direction
 import mr.merc.map.hex.TerrainHex
 import mr.merc.image.MImage
-
 import mr.merc.map.hex.TerrainHexField
+import mr.merc.map.objects.view.MapObjectView
 import mr.merc.map.terrain.{MountainKind, RoadKind, WaterKind}
 
 object WoodenBridge extends MapObject("woodenBridge") {
@@ -25,11 +25,13 @@ object WoodenBridge extends MapObject("woodenBridge") {
 
   private val possibleCenters = possibleTwoSides ++ possibleThreeSides
 
-  override def images(hex: TerrainHex, field: TerrainHexField): List[MImage] = {
-    val neighbours = field.neighboursWithDirections(hex.x, hex.y)
-    hex.mapObj match {
-      case Some(WoodenBridge) => List(imagesForWoodenBridge(neighbours))
-      case _ => imagesForWoodenBridgeNeighbour(hex, field)
+  override def view: MapObjectView = new MapObjectView {
+    override def images(hex: TerrainHex, field: TerrainHexField): List[MImage] = {
+      val neighbours = field.neighboursWithDirections(hex.x, hex.y)
+      hex.mapObj match {
+        case Some(WoodenBridge) => List(imagesForWoodenBridge(neighbours))
+        case _ => imagesForWoodenBridgeNeighbour(hex, field)
+      }
     }
   }
 
