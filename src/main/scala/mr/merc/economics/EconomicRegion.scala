@@ -8,6 +8,7 @@ import mr.merc.politics.{PoliticalViews, Province, State}
 import mr.merc.economics.MapUtil.FloatOperations.MapWithFloatOperations
 import WorldConstants.Population._
 import mr.merc.army.Warrior
+import mr.merc.economics.EconomicRegion.ProductionTradingInfo
 import mr.merc.economics.RegionPopulation.Rebellion
 import mr.merc.log.Logging
 
@@ -119,6 +120,23 @@ trait EconomicRegion {
 
   def gdp:Double = {
     goodsProducedLastTurn dot regionMarket.currentPrices
+  }
+
+  def soldToMarket:Map[State, List[ProductionTradingInfo]] = {
+    enterprises.flatMap { e =>
+      e.dayRecords.lastOption.map { day =>
+        day.sold.map { case (region, profit) =>
+          region -> ProductionTradingInfo(e.product, profit.request.sold, profit.request.receivedMoney)
+        }
+      }.getOrElse(Map()).toList
+    }.groupBy(_._1.owner).map { case (owner, list) =>
+      owner -> list.groupBy(_._2.product).map { case (product, infos) =>
+        infos.map(_._2).fold(ProductionTradingInfo(product, 0, 0)) { case (a, b) =>
+          require(a.product == b.product, s"Products $a and $b are for different products")
+          ProductionTradingInfo(a.product, a.count + b.count, a.totalPrice + b.totalPrice)
+        }
+      }.toList
+    }
   }
 
   def civilianVictimsOfBattleDied(): Unit = {
@@ -418,4 +436,8 @@ class RegionWarriors(initial: List[Warrior], neighbours: => Set[EconomicRegion])
       } else Nil
     }
   }
+}
+
+object EconomicRegion {
+  case class ProductionTradingInfo(product: Product, count: Double, totalPrice: Double)
 }

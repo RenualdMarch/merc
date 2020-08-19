@@ -209,25 +209,25 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
     rule.transform(additives)
   }
 
-  lazy val image: MImage = {
+  def image: MImage = {
     hex.terrain.belowTerrainType match {
       case Some(b) => b.image(hex.x, hex.y)
       case None => hex.terrain.image(hex.x, hex.y)
     }
   }
 
-  lazy val secondaryImage: Option[MImage] = {
+  def secondaryImage: Option[MImage] = {
     hex.terrain.belowTerrainType.map { _ =>
       hex.terrain.image(hex.x, hex.y)
     }
   }
 
-  lazy val mapObjectView: List[MImage] = hex.mapObj match {
+  def mapObjectView: List[MImage] = hex.mapObj match {
     case Some(mapObj) => mapObj.view.images(hex, field)
     case None => Nil
   }
 
-  lazy val neighbourMapObjects: List[MImage] = {
+  def neighbourMapObjects: List[MImage] = {
     val neigMapObj = field.neighbours(hex).filter(p => p.mapObj.isDefined && p.mapObj != hex.mapObj)
     neigMapObj.flatMap(p => p.mapObj.get.view.images(hex, field))
   }

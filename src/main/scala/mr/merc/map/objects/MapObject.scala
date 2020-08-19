@@ -7,6 +7,6 @@ abstract class MapObject(val name:String) {
 }
 
 abstract class OneImageMapObject(name: String) extends MapObject(name) {
-  override def view: MapObjectView = new OneImageObjectView(name, this)
+  @transient override lazy val view: MapObjectView = new OneImageObjectView(name, this)
 }
 

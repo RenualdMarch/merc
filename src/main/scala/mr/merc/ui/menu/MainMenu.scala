@@ -56,13 +56,19 @@ class MainMenu(sceneManager: SceneManager) extends BorderPane with Logging {
     }
   }
 
+  val buttons = List(newBattleButton, newWorldButton, customNewWorldButton, loadButton, optionsButton, exitButton)
+
   val menuPane = new VBox {
-    children = List(newBattleButton, newWorldButton, customNewWorldButton, loadButton, optionsButton, exitButton)
+    children = buttons
+  }
+
+  buttons.foreach { b =>
+    b.prefWidth <== menuPane.width / 2
   }
 
   menuPane.styleClass.add("menuPane")
 
-  menuPane.spacing <== height / (5 * menuPane.children.size())
+  menuPane.spacing <== height / 60
 
   menuPane.maxWidth <== width / 5
   menuPane.maxHeight <== height / 2
