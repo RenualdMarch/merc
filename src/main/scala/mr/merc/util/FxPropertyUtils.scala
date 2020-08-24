@@ -112,4 +112,25 @@ object FxPropertyUtils {
     objectProperty
   }
 
+  def mergeTwoProperties[T, K](p1:ReadOnlyObjectProperty[T], p2:ReadOnlyObjectProperty[K]):ObjectProperty[(T, K)] = {
+    val objectProperty = new ObjectProperty[(T, K)]()
+
+    def setValue(): Unit = {
+      if (p1.value != null && p2.value != null) {
+        objectProperty.value = (p1.value, p2.value)
+      }
+    }
+
+    p1.onChange {
+      setValue()
+    }
+
+    p2.onChange {
+      setValue()
+    }
+
+    setValue()
+    objectProperty
+  }
+
 }

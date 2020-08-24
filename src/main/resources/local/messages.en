@@ -419,3 +419,7 @@ saveDialogFailed.title=Failed to save game
 saveDialogFailed.content=Failed to save game
 loadDialogFailed.title=Failed to load game
 loadDialogFailed.content=Failed to load game
+menu.foreignTrade=Foreign trade
+trade.import=Import
+trade.export=Export
+trade.balance=Balance

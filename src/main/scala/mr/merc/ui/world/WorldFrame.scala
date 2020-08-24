@@ -145,6 +145,11 @@ class WorldFrame(val sceneManager: SceneManager, worldState: WorldState) extends
     interfacePane.setFullPanel(new InterfacePane(pane, () => hideFullPane()))
   }
 
+  def showForeignTradePane(): Unit = {
+    val pane = new StateTradePane(worldState.stateProduction, worldState.playerState)
+    interfacePane.setFullPanel(new InterfacePane(pane, () => hideFullPane()))
+  }
+
   def showParliamentPane(): Unit = {
     val pane = new ParliamentPane(sceneManager, worldState)
     interfacePane.setFullPanel(new InterfacePane(pane, () => hideFullPane()))

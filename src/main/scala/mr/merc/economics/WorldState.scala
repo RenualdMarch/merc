@@ -1,5 +1,7 @@
 package mr.merc.economics
 
+import cats.Eval
+import cats.kernel.Monoid
 import mr.merc.ai.BattleAI
 import mr.merc.army.{Warrior, WarriorCompetence, WarriorType}
 import mr.merc.battle.BattleModel
@@ -9,6 +11,7 @@ import mr.merc.diplomacy.DiplomaticAgreement.WarAgreement.{TakeMoney, TakeProvin
 import mr.merc.diplomacy.DiplomaticMessage._
 import mr.merc.diplomacy.WorldDiplomacy.RelationshipBonus
 import mr.merc.diplomacy._
+import mr.merc.economics.EconomicRegion.ProductionTradingInfo
 import mr.merc.economics.Products.IndustryProduct
 import mr.merc.economics.TaxPolicy.Income
 import mr.merc.economics.WorldConstants.Army.SoldierRecruitmentCost
@@ -144,6 +147,14 @@ class WorldState(val regions: List[Province], var playerState: State, val worldH
         Localization("battleReport.title")) {
         override def body: Region = new BattleReportPane(thisTurnBattles.toList)
       })
+    }
+  }
+
+  def stateProduction:Map[State, Map[State, ProductionTradingInfo]] = {
+    states.map { case (st, provinces) =>
+      import EconomicRegion._
+      import cats.implicits._
+      st -> Monoid.combineAll(provinces.map(_.soldToMarket))
     }
   }
 }

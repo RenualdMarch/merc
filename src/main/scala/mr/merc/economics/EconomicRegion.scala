@@ -7,10 +7,12 @@ import mr.merc.economics.util.DistributionCalculator
 import mr.merc.politics.{PoliticalViews, Province, State}
 import mr.merc.economics.MapUtil.FloatOperations.MapWithFloatOperations
 import WorldConstants.Population._
+import cats.Monoid
 import mr.merc.army.Warrior
-import mr.merc.economics.EconomicRegion.ProductionTradingInfo
+import mr.merc.economics.EconomicRegion.{ProductTradingInfo, ProductionTradingInfo}
 import mr.merc.economics.RegionPopulation.Rebellion
 import mr.merc.log.Logging
+import EconomicRegion._
 
 import scala.util.Random
 
@@ -122,20 +124,17 @@ trait EconomicRegion {
     goodsProducedLastTurn dot regionMarket.currentPrices
   }
 
-  def soldToMarket:Map[State, List[ProductionTradingInfo]] = {
+  def soldToMarket:Map[State, ProductionTradingInfo] = {
     enterprises.flatMap { e =>
       e.dayRecords.lastOption.map { day =>
         day.sold.map { case (region, profit) =>
-          region -> ProductionTradingInfo(e.product, profit.request.sold, profit.request.receivedMoney)
+          region -> ProductTradingInfo(e.product, profit.request.sold, profit.request.receivedMoney)
         }
       }.getOrElse(Map()).toList
     }.groupBy(_._1.owner).map { case (owner, list) =>
-      owner -> list.groupBy(_._2.product).map { case (product, infos) =>
-        infos.map(_._2).fold(ProductionTradingInfo(product, 0, 0)) { case (a, b) =>
-          require(a.product == b.product, s"Products $a and $b are for different products")
-          ProductionTradingInfo(a.product, a.count + b.count, a.totalPrice + b.totalPrice)
-        }
-      }.toList
+      owner -> Monoid.combineAll(list.map { case (_, pti) =>
+        ProductionTradingInfo(Map(pti.product -> pti))
+      })
     }
   }
 
@@ -439,5 +438,27 @@ class RegionWarriors(initial: List[Warrior], neighbours: => Set[EconomicRegion])
 }
 
 object EconomicRegion {
-  case class ProductionTradingInfo(product: Product, count: Double, totalPrice: Double)
+  implicit val ProductionTradingInfoMonoid:Monoid[ProductionTradingInfo] = new Monoid[ProductionTradingInfo] {
+    override def empty: ProductionTradingInfo = ProductionTradingInfo(Map())
+
+    override def combine(x: ProductionTradingInfo, y: ProductionTradingInfo): ProductionTradingInfo = {
+      val intersection = x.perProduct.keySet & y.perProduct.keySet
+      val xOnly = x.perProduct.keySet -- intersection
+      val xOnlyMap = x.perProduct.filterKeys(xOnly.contains)
+      val yOnly = y.perProduct.keySet -- intersection
+      val yOnlyMap = y.perProduct.filterKeys(yOnly.contains)
+      val intersectionMap = intersection.map { k =>
+        val xp = x.perProduct(k)
+        val yp = y.perProduct(k)
+        k -> ProductTradingInfo(k, xp.count + yp.count, xp.totalPrice + yp.totalPrice)
+      }.toMap
+
+      ProductionTradingInfo(xOnlyMap ++ yOnlyMap ++ intersectionMap)
+    }
+  }
+
+  case class ProductionTradingInfo(perProduct:Map[Product, ProductTradingInfo]) {
+    lazy val totalSum: Double = perProduct.values.map(_.totalPrice).sum
+  }
+  case class ProductTradingInfo(product: Product, count: Double, totalPrice: Double)
 }

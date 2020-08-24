@@ -26,7 +26,13 @@ class WorldMenu(parent: WorldFrame) extends MenuBar {
   emailMenu.onAction = { _ =>
     parent.showMailPane()
   }
-  diplomacyMenu.items.addAll(emailMenu, relations, army)
+
+  val foreignTradeMenu = new MenuItem(Localization("menu.foreignTrade"))
+  foreignTradeMenu.onAction = { _ =>
+    parent.showForeignTradePane()
+  }
+
+  diplomacyMenu.items.addAll(emailMenu, relations, foreignTradeMenu, army)
 
   val budgetMenu = new MenuItem(Localization("menu.budget"))
   budgetMenu.onAction = { _ =>

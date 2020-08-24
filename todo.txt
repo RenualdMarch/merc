@@ -5,6 +5,9 @@ Current battle issues:
 
 Important core stuff
 
+state trade pane
+state rating pane
+
 requirement failed: Buying and selling differ
 
 bug: Battle between Set(Set(Player(Byzantine,[SFX]0xff00ffff)), Set())
