@@ -29,7 +29,7 @@ object EconomicLocalization {
     p.culture.race.name, p.culture.name, p.populationType.name, province.name)
 
   def localizePopulation(p: Population): String = Localization("population.titleSmall",
-    p.culture.race.name, p.culture.name, p.populationType.name)
+    Localization(p.culture.race.name), Localization(p.culture.cultureNameKey), p.populationType.name)
 
   def localizeProject(project:BusinessProject):String = {
     project match {
@@ -56,7 +56,7 @@ object EconomicLocalization {
     case _ => Localization("product." + p.name.toLowerCase)
   }
 
-  def localizeCulture(c:Culture): String = Localization(c.cultureNameKey)
+  def localizeCulture(c:Culture): String = Localization(c.cultureNameKey) + " " + Localization(c.race.name)
 
   def localizeProductsBucket(products:Map[Products.Product, Double]): String = {
     products.map{ case (p, amount) =>

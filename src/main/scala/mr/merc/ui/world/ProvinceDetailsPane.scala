@@ -47,7 +47,8 @@ class ProvinceDetailsPane(province: Province, parent: WorldFrame) extends MigPan
 
   private def culturesDiagram: Node = {
     val pies = province.regionPopulation.cultureMembers.map { case (culture, count) =>
-      PieChartBuilder.PiePart(culture.color, Localization(culture.cultureNameKey), count, Some(Localization(culture.cultureNameKey)))
+      PieChartBuilder.PiePart(culture.color, EconomicLocalization.localizeCulture(culture), count,
+        Some(EconomicLocalization.localizeCulture(culture)))
     }.toList
 
     PieChartBuilder.build(pies)

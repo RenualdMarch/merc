@@ -297,7 +297,7 @@ class PopulationInfo(val population:List[Population], province: Province) {
 
 class PopulationMigrationsPane(val population:List[Population]) extends ScrollPane {
   fitToWidth = true
-  content = new MigPane() {
+  content = new MigPane with WorldInterfaceWhiteJavaNode {
     add(BigText(Localization("migrations.province")), "wrap, center")
     population.groupBy(_.populationType).foreach { case (pt, popList) =>
       val provinceMovements = popList.flatMap(_.currentDayRecord.provinceMovements)

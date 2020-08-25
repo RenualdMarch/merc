@@ -1,24 +1,14 @@
-Current battle issues:
-* Flickering in projectiles
-* Damage numbers not cleared in highest points
-* Redraw bugs during fast movement
-
-Important core stuff
-
-state trade pane
-state rating pane
-
 requirement failed: Buying and selling differ
 
 bug: Battle between Set(Set(Player(Byzantine,[SFX]0xff00ffff)), Set())
 
 Not high priority:
-allow army movement through territory diplomacy
 allow hire people from other cultures with some political configurations, now it is possible to hire primary culture warrior anywhere
-when hiring soldiers, use actual population
+when hiring soldiers, use actual population(manpower pools?)
 idle animation for soldiers on world map
 make cultures for castles/walls
 check conditional AI logic - unused expression
+state rating pane
 
 add more cultures, at least two cultures per race:
 Marashy culture as indian?

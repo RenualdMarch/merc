@@ -143,7 +143,7 @@ class StatesTradeBalance(stateProduction:Map[State, Map[State, ProductionTrading
   fitToWidth = true
   style = Components.largeFontStyle
 
-  content = new MigPane {
+  content = new MigPane with WorldInterfaceWhiteJavaNode {
     val export = stateProduction(currentState).getOrElse(selectedState, ProductionTradingInfo(Map()))
     val imp = stateProduction(selectedState).getOrElse(currentState, ProductionTradingInfo(Map()))
 
