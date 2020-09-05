@@ -18,7 +18,7 @@ class WorldInterfacePane(frame: WorldFrame, val worldCanvas: CanvasLayers, terra
 
   children = List(worldCanvas, minimap, endTurnButton)
 
-  worldCanvas.prefWidth <== this.width
+  worldCanvas.prefWidth <== this.width - minimap.width
   worldCanvas.prefHeight <== this.height
 
   layoutX = 0

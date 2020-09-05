@@ -75,11 +75,10 @@ class StatesTablePane(actions: WorldStateDiplomacyActions, currentState: State) 
     editable = false
   }
 
-  private val relationsColumn = new TableColumn[StateInfo, String] {
-    text = Localization("diplomacy.relationsToUs")
-    cellValueFactory = p => StringProperty(actions.relationships(p.value.state)(currentState).toString)
-    editable = false
-  }
+  private val relationsColumn = new StringColumn[StateInfo](
+    Localization("diplomacy.relationsToUs"),
+    p => actions.relationships(p.state)(currentState).toString
+  )
 
   private val armyColumn = new StringColumn[StateInfo](Localization("army"), _.army.toString)
 
@@ -111,7 +110,23 @@ class StatesTablePane(actions: WorldStateDiplomacyActions, currentState: State) 
     editable = false
   }
 
-  statesTable.columns ++= List(stateColumn, relationsColumn, armyColumn, literacyColumn,
+  private val cultureColumn = new TableColumn[StateInfo, CultureComponentColorName] {
+    text = Localization("culture")
+    cellFactory = p => new TableCell[StateInfo, CultureComponentColorName] {
+      override def updateItem(t: CultureComponentColorName, b: Boolean): Unit = {
+        super.updateItem(t, b)
+        setGraphic(t)
+      }
+    }
+    cellValueFactory = p => {
+      ObjectProperty {
+        new CultureComponentColorName(p.value.state.primeCulture)
+      }
+    }
+    editable = false
+  }
+
+  statesTable.columns ++= List(stateColumn, cultureColumn, relationsColumn, armyColumn, literacyColumn,
     partyColumn, moneyReservesColumn, incomeColumn, spendingColumn)
 
   private val buffer = new ObservableBuffer[StateInfo]()
@@ -647,7 +662,7 @@ class ProposePeacePane(currentState: State, selectedState: State, actions: World
 }
 
 class StateComponentColorName(state: State, align: String = "left") extends MigPane(align) with WorldInterfaceJavaNode {
-  val rect = Rectangle(Components.largeFontSize, Components.largeFontSize)
+  val rect = Rectangle(Components.mediumFontSize * 2, Components.mediumFontSize * 2)
   rect.fill = state.color
   rect.stroke = Color.Black
   val text = BigText(state.name)

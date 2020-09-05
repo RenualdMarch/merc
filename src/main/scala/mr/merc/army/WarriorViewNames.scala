@@ -178,4 +178,17 @@ object WarriorViewNames {
     (BladeArcher, Militia) -> "UndeadWesnoth-Boneshooter",
     (BladeArcher, Professional) -> "UndeadWesnoth-Banebow"
   ))
+
+  val DarkElvesCulture = WarriorViewNames(Map(
+    (BladeCavalry, Militia) -> "DarkElvesEE-LizardRider",
+    (BladeCavalry, Professional) -> "DarkElvesEE-LizardMaster",
+    (FireWizard, Militia) -> "DarkElvesEE-Enchantress",
+    (FireWizard, Professional) -> "DarkElvesEE-Cleric",
+    (HeavyBladeInfantry, Militia) -> "DarkElvesEE-Lord",
+    (HeavyBladeInfantry, Professional) -> "DarkElvesEE-HighLord",
+    (LightBladeInfantry, Militia) -> "DarkElvesEE-Fighter",
+    (LightBladeInfantry, Professional) -> "DarkElvesEE-Corsair",
+    (BladeArcher, Militia) -> "DarkElvesEE-Hunter",
+    (BladeArcher, Professional) -> "DarkElvesEE-Shadow"
+  ))
 }

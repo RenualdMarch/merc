@@ -1,5 +1,6 @@
 package mr.merc.ui.world
 
+import mr.merc.economics.Culture
 import mr.merc.local.Localization
 import mr.merc.politics.{Party, State, StateElectionReport}
 import org.tbee.javafx.scene.layout.MigPane
@@ -74,6 +75,15 @@ class PartyComponentColorName(party: Party) extends MigPane("") with WorldInterf
   rect.fill = party.color
   rect.stroke = Color.Black
   val text = BigText(Localization(party.name))
+  add(rect)
+  add(text)
+}
+
+class CultureComponentColorName(culture: Culture) extends MigPane("") with WorldInterfaceJavaNode {
+  val rect = Circle(Components.mediumFontSize)
+  rect.fill = culture.color
+  rect.stroke = Color.Black
+  val text = BigText(EconomicLocalization.localizeCulture(culture))
   add(rect)
   add(text)
 }

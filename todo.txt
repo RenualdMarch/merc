@@ -17,7 +17,6 @@ chinese?
 +_Forestfolk
 
 Elves
-- dark elves \  Darkelves
 - deep elves \ Deep Elves ???
 - more dark elves \ Tharis ???
 

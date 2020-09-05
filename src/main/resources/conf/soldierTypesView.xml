@@ -2342,6 +2342,170 @@
             <pain sound="elfPain1"/>
         </sounds>
     </view>
+    <view name="DarkElvesEE-Enchantress">
+        <attack1 imageName="staff-elven"/>
+        <attack2 imageName="fireball" projectile="Fireball"/>
+        <stand>
+            <image name="enchantress"/>
+        </stand>
+        <sounds>
+            <attack1 succ="staff" fail="miss1"/>
+            <attack2 succ="magicAttack1" fail="magicAttack1Fail"/>
+            <pain sound="elfPain1"/>
+        </sounds>
+    </view>
+    <view name="DarkElvesEE-Cleric">
+        <attack1 imageName="staff-elven"/>
+        <attack2 imageName="fireball" projectile="Fireball"/>
+        <stand>
+            <image name="cleric"/>
+        </stand>
+        <sounds>
+            <attack1 succ="staff" fail="miss1"/>
+            <attack2 succ="magicAttack1" fail="magicAttack1Fail"/>
+            <pain sound="elfPain1"/>
+        </sounds>
+    </view>
+    <view name="DarkElvesEE-Fighter">
+        <attack1 imageName="sword-elven">
+            <all>
+                <succ>
+                    <image name="fighter-attack1"/>
+                    <image name="fighter-attack2"/>
+                </succ>
+            </all>
+        </attack1>
+        <stand>
+            <image name="fighter"/>
+        </stand>
+        <defence>
+            <image name="fighter-defend"/>
+        </defence>
+        <death>
+            <image name="fighter-die1"/>
+            <image name="fighter-die2"/>
+            <image name="fighter-die3"/>
+            <image name="fighter-die4"/>
+        </death>
+        <attack1 succ="sword" fail="miss1"/>
+        <pain sound="elfPain2"/>
+    </view>
+    <view name="DarkElvesEE-Corsair">
+        <attack1 imageName="sword-elven"/>
+        <stand>
+            <image name="corsair"/>
+        </stand>
+        <attack1 succ="sword" fail="miss1"/>
+        <pain sound="elfPain2"/>
+    </view>
+    <view name="DarkElvesEE-Hunter">
+        <attack1 imageName="sword-elven">
+            <all>
+                <succ>
+                    <image name="hunter"/>
+                    <image name="hunter-attack1"/>
+                    <image name="hunter-attack2"/>
+                </succ>
+            </all>
+        </attack1>
+        <attack2 imageName="bow-elven" projectile="Arrow">
+            <all>
+                <succ>
+                    <image name="hunter"/>
+                    <image name="hunter-ranged1"/>
+                    <image name="hunter-ranged2"/>
+                </succ>
+            </all>
+        </attack2>
+        <defence>
+            <image name="hunter-defend"/>
+        </defence>
+        <stand>
+            <image name="hunter"/>
+        </stand>
+        <death>
+            <image name="hunter-die1"/>
+            <image name="hunter-die2"/>
+            <image name="hunter-die3"/>
+            <image name="hunter-die4"/>
+        </death>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <attack2 succ="bow" fail="bowFail"/>
+            <pain sound="elfPain2"/>
+        </sounds>
+    </view>
+    <view name="DarkElvesEE-Shadow">
+        <attack1 imageName="sword-elven"/>
+        <attack2 imageName="bow-elven" projectile="Arrow"/>
+        <stand>
+            <image name="shadow"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <attack2 succ="bow" fail="bowFail"/>
+            <pain sound="elfPain2"/>
+        </sounds>
+    </view>
+    <view name="DarkElvesEE-LizardRider">
+        <attack1 imageName="glaive">
+            <all>
+                <succ>
+                    <image name="lizard-rider-attack-claws1"/>
+                    <image name="lizard-rider-attack-spear"/>
+                </succ>
+            </all>
+        </attack1>
+        <stand>
+            <image name="lizard-rider"/>
+        </stand>
+        <defence>
+            <image name="lizard-rider-defend"/>
+        </defence>
+        <death>
+            <image name="lizard-rider-die1"/>
+            <image name="lizard-rider-die2"/>
+            <image name="lizard-rider-die3"/>
+        </death>
+        <move>
+            <image name="lizard-rider-move"/>
+        </move>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <pain sound="elfPain2"/>
+        </sounds>
+    </view>
+    <view name="DarkElvesEE-LizardMaster">
+        <attack1 imageName="glaive"/>
+        <stand>
+            <image name="lizard-master"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <pain sound="elfPain2"/>
+        </sounds>
+    </view>
+    <view name="DarkElvesEE-Lord">
+        <attack1 imageName="sword-elven"/>
+        <stand>
+            <image name="lord"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <pain sound="elfPain2"/>
+        </sounds>
+    </view>
+    <view name="DarkElvesEE-HighLord">
+        <attack1 imageName="sword-elven"/>
+        <stand>
+            <image name="high-lord"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <pain sound="elfPain2"/>
+        </sounds>
+    </view>
+
 
     <!-- orcs -->
     <view name="OrcsWesnoth-Archer">
@@ -3046,6 +3210,8 @@
             <pain sound="dwarfPain1"/>
         </sounds>
     </view>
+
+    <!-- Undead -->
 
     <view name="UndeadWesnoth-Skeleton">
         <attack1 imageName="axe-undead">

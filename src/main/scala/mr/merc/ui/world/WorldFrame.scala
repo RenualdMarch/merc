@@ -222,6 +222,14 @@ class WorldFrame(val sceneManager: SceneManager, worldState: WorldState) extends
     }
   })
 
+  this.onScroll = { event =>
+    val delta = event.getDeltaY
+    val diff = delta * 1.75
+    val d = diff / mapView.pixelHeight
+    val v = keepHValueInBounds(worldCanvas.vvalue.value - d)
+    worldCanvas.vvalue.value = v
+  }
+
   private def keepHValueInBounds(hv: Double): Double = {
     if (hv < 0) 0
     else if (hv > 1) 1

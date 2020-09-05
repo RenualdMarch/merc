@@ -52,7 +52,7 @@ object EconomicLocalization {
   }
 
   def localizeProduct(p: Products.Product): String = p match {
-    case r:Ritual => Localization(s"product.ritual", Localization(r.culture.name))
+    case r:Ritual => Localization(s"product.ritual", localizeCulture(r.culture))
     case _ => Localization("product." + p.name.toLowerCase)
   }
 

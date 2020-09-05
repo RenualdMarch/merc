@@ -11,7 +11,7 @@ object Culture {
 
   private val humanCultures = List(LatinHuman, FrenchHuman, DarkHuman, GreekHuman, GermanHuman, ArabHuman, SlavicHuman, SpainHuman)
 
-  private val elvishCultures = List(WoodElves, DesertElves)
+  private val elvishCultures = List(WoodElves, DesertElves, DarkElves)
 
   private val orcishCultures = List(WesnothOrcs)
 
@@ -768,6 +768,53 @@ object Culture {
         "Khiszis Kurian",
         "Toxruss Gourian"
       ))
+  }
+
+  case object DarkElves extends Culture("darkElves", Elves, "elvenHouse", Color.DarkGray) {
+    override val warriorViewNames: WarriorViewNames = WarriorViewNames.DarkElvesCulture
+    override val cultureInfo: CultureInfo = CultureInfo(StateForm("dynasty", "confederation"),
+      List(
+        "Omyne Elunore",
+        "Irha Shaeras",
+        "Osyfe Serine",
+        "Merannoris",
+        "Lelfserin",
+        "Amyve Nalore",
+        "Enan Esari",
+        "Asntalos",
+        "Iysa Anore",
+        "Amyo Serin",
+        "Mythnqua",
+        "Oshan Nalore",
+        "Waholume",
+        "Ylaenasari",
+        "Cal Anore",
+        "Asethbelle",
+        "Jaathlean",
+        "Amyfa Unarith",
+        "Sylho Esari",
+        "Shehomelle",
+        "Thavalenor",
+        "Alrannore",
+        "Myfelune",
+        "Sylorius",
+        "Neeth Elunore",
+        "Iyhe Dorei",
+        "Emrenrion",
+        "Selirion",
+        "Syhlenora",
+        "Milvaserine"
+      ),
+      List(
+        "Teir'Dal",
+        "Midkemia",
+        "Krondor",
+        "Kryn",
+        "Xhorhas",
+        "Urzin",
+        "Dranas"
+      )
+    )
   }
 
   private def scaleNeeds(needsToScale: CornerPopulationNeeds): CornerPopulationNeeds = {

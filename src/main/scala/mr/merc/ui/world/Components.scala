@@ -160,6 +160,7 @@ class StringColumn[T](title: String, f: T => String) extends TableColumn[T, Stri
   text = title
   cellValueFactory = p => StringProperty(f(p.value))
   editable = false
+  style = Components.largeFontStyle + "-fx-alignment: CENTER-RIGHT;"
 }
 
 object GridPaneBuilder {
