@@ -183,15 +183,15 @@ class WarriorInfoPane(warrior: Warrior) extends BorderPane {
 }
 
 class WarriorSupplyPane(warrior: Warrior) extends MigPane {
-  def buildSupplyChart():Option[AreaChart[Number, Number]] = {
+  def buildSupplyChart():Option[LineChart[Number, Number]] = {
     val size = warrior.historicalNeeds.size
     warrior.historicalNeeds.headOption.map { first =>
-      val xAxis = new NumberAxis(first.turn, first.turn + size, 1)
+      val xAxis = new NumberAxis(first.turn, first.turn + size - 1, 1)
       val yAxis = new NumberAxis()
       xAxis.label = Localization("weeks")
       yAxis.label = Localization("units")
 
-      val chart = new AreaChart[Number, Number](xAxis, yAxis)
+      val chart = new LineChart[Number, Number](xAxis, yAxis)
       chart.title = Localization("production")
       chart.style = Components.mediumFontStyle
 

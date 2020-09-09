@@ -369,11 +369,19 @@ class RegionMarket(initialPrices:Map[Product, Double]) extends Logging {
     marketDaysForProduct = marketDaysForProduct.map { case (p, m) =>
       p -> new MarketDay(p, m.tomorrowPrice.getOrElse(sys.error(s"Market for $p was not closed!")), turn + 1)
     }
+
+    recalculateCurrentPrices()
   }
 
-  def currentPrices: Map[Product, Double] = marketDaysForProduct.map { case (product, market) =>
-    product -> market.price
+  private var _currentPricesCached: Map[Product, Double] = initialPrices
+
+  private def recalculateCurrentPrices(): Unit = {
+    _currentPricesCached = marketDaysForProduct.map { case (product, market) =>
+      product -> market.price
+    }
   }
+
+  def currentPrices: Map[Product, Double] = _currentPricesCached
 }
 
 class RegionWarriors(initial: List[Warrior], neighbours: => Set[EconomicRegion]) {

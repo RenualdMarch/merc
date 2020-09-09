@@ -36,7 +36,10 @@ class EnterprisesViewPane(province: Province, stage: Stage, enterpriseActions: W
     Option(either) match {
       case Some(Left(e)) =>
         projectsPane.projectsTable.delegate.getSelectionModel.clearSelection()
-        new EnterpriseDetailsPane(e, province, e.dayRecords.last.turn, stage)
+        e.dayRecords.lastOption match {
+          case Some(v) => new EnterpriseDetailsPane(e, province, v.turn, stage)
+          case None => new MigPane() with WorldInterfaceJavaNode
+        }
       case Some(Right(p)) =>
         enterpriseTablePane.enterprisesTable.delegate.getSelectionModel.clearSelection()
         new ProjectPane(p)

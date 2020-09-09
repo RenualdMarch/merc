@@ -184,7 +184,7 @@ class WorldFrame(val sceneManager: SceneManager, worldState: WorldState) extends
   def nextTurn(): Unit = {
     val waitDialog = new WaitDialog
 
-    Future(worldState.nextTurn(true)).map { battles =>
+    Future(worldState.nextTurn(false)).map { battles =>
       Platform.runLater {
         waitDialog.close()
         if (battles.nonEmpty) {

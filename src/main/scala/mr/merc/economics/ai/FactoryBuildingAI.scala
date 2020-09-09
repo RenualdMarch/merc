@@ -48,8 +48,10 @@ class RandomFactoryBuildingAI extends FactoryBuildingAI {
     absentProducts.toList.map { p =>
       PopBuildFactoryCommand(currentRegion.owner, investors, p, currentRegion)
     } ::: productsToExpand.flatMap { case (p, count) =>
-      (0 until count).map {_ =>
-        PopExpandFactoryCommand(currentRegion.owner, investors, currentRegion.factories(p))
+      (0 until count).flatMap {_ =>
+        currentRegion.factories.get(p).map { f =>
+          PopExpandFactoryCommand(currentRegion.owner, investors, f)
+        }
       }
     }.toList
   }

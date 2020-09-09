@@ -27,10 +27,7 @@ object MapUtil {
       }
 
       def |-| (other: Map[K, V]): Map[K, V] = {
-        // intersecting keys
-        val first = map.map{case (p, c) => p -> num.minus(c, other.getOrElse(p, num.zero))}
-        val absentKeys = other.keySet -- first.keySet
-        first ++ absentKeys.map(k => k -> num.negate(other(k))).toMap
+        map |+| other.mapValues(num.negate)
       }
 
       def |*| (q: V): Map[K, V] = {
@@ -40,14 +37,21 @@ object MapUtil {
       }
 
       def dot (other: Map[K, V]): V = {
-        (this |*| other).values.sum
+        map.foldLeft(num.zero) { case (acc, (key, value)) =>
+          num.plus(acc, num.times(value, other.getOrElse(key, num.zero)))
+        }
       }
 
       def |*|(other: Map[K, V]): Map[K, V] = {
-        val intersectingKeys = this.map.keySet & other.keySet
-        intersectingKeys.map { k =>
-          k -> num.times(map(k), other(k))
-        }.toMap
+        val hashMap = mutable.Map[K, V]()
+
+        map.foreach { case (k, v) =>
+          other.get(k).foreach { v2 =>
+              val newValue = num.times(v, v2)
+              hashMap.put(k, newValue)
+          }
+        }
+        hashMap.toMap
       }
 
       def sumValues:V = map.values.sum

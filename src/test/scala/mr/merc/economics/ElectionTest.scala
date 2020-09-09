@@ -27,7 +27,7 @@ class ElectionTest extends FunSuite {
       Migration.popularity(1, 0, 1, 0),
       Regime.popularity(1, 0, 0, 1, 0, 0),
       ForeignPolicy.popularity(1, 0, 1, 0),
-      Economy.popularity(1, 0, 0, 1, 0, 0),
+      Economy.popularity(1, 0, 1, 0),
       SocialPolicy.popularity(0, 1, 0, 0, 1, 0),
       VotersPolicy.popularity(0, 1, 0, 0, 0, 0,
         0, 1, 0, 0, 0, 0))
@@ -53,7 +53,7 @@ class ElectionTest extends FunSuite {
       Migration.popularity(1, 0, 1, 0),
       Regime.popularity(1, 0, 0, 1, 0, 0),
       ForeignPolicy.popularity(1, 0, 1, 0),
-      Economy.popularity(1, 0, 0, 1, 0, 0),
+      Economy.popularity(1, 0, 1, 0),
       SocialPolicy.popularity(0, 1, 0, 0, 1, 0),
       VotersPolicy.popularity(0, 1, 0, 0, 0, 0,
         0, 1, 0, 0, 0, 0))
@@ -81,7 +81,7 @@ class ElectionTest extends FunSuite {
       Migration.popularity(1, 0, 0, 1),
       Regime.popularity(1, 0, 0, 1, 0, 0),
       ForeignPolicy.popularity(1, 0, 0, 1),
-      Economy.popularity(1, 0, 0, 0, 0, 1),
+      Economy.popularity(1, 0, 0, 1),
       SocialPolicy.popularity(1, 0, 0, 0, 1, 0),
       VotersPolicy.popularity(0, 1, 0, 0, 0, 0,
         0, 0, 0, 1, 0, 0))

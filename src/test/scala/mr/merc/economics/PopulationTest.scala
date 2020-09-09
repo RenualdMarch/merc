@@ -215,7 +215,7 @@ class PopulationTest extends FunSuite with Matchers {
     val absoluteRadical = PoliticalViews(Migration.popularity(0, 1, 1, 1),
       Regime.popularity(1, 0, 0, 1, 1, 1),
       ForeignPolicy.popularity(1, 0, 1, 1),
-      Economy.popularity(1, 0, 0, 1, 1, 1),
+      Economy.popularity(1, 0, 1, 1),
       SocialPolicy.popularity(1, 0, 0, 1, 1, 1),
       VotersPolicy.popularity(1, 0, 0, 0, 0, 0,1,1,1,1,1,1))
 

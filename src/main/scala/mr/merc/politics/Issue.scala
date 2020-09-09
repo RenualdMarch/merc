@@ -67,7 +67,7 @@ object IssuePosition {
 
   trait ForeignPolicyPosition extends IssuePosition
 
-  trait VotersPolictyPosition extends IssuePosition {
+  trait VotersPolicyPosition extends IssuePosition {
     def canVote(populationType: PopulationType, primaryCulture: Boolean): Boolean
   }
 
@@ -190,26 +190,6 @@ object Economy extends Issue[EconomyPosition] {
     val investmentCostMultiplier:Double = StateEconomicsInvestmentMultiplier
   }
 
-  case object Interventionism extends EconomyPosition {
-    override def color: Color = Color.Blue
-
-    override def positionNumber: Int = 1
-
-    val tariff = MinMax(0.1, 0.4)
-    val corporateTax = MinMax(0.1, 0.4)
-    val salaryTax = MinMax(0.1, 0.4)
-    val salesTax = MinMax(0.1, 0.4)
-    val transit = MinMax(0.05, 0.2)
-
-    val stateCanBuildFactory: Boolean = true
-    val stateCanExpandFactory: Boolean = false
-    val capitalistsCanBuildFactory: Boolean = true
-    val capitalistsCanExpandFactory: Boolean = true
-    val stateCanDestroyFactory: Boolean = true
-
-    val investmentCostMultiplier:Double = InterventionismInvestmentMultiplier
-  }
-
   case object FreeMarket extends EconomyPosition {
     override def color: Color = Color.Yellow
 
@@ -221,7 +201,7 @@ object Economy extends Issue[EconomyPosition] {
     val salesTax = MinMax(0, 0.2)
     val transit = MinMax(0, 0.1)
 
-    val stateCanBuildFactory: Boolean = false
+    val stateCanBuildFactory: Boolean = true
     val stateCanExpandFactory: Boolean = false
     val capitalistsCanBuildFactory: Boolean = true
     val capitalistsCanExpandFactory: Boolean = true
@@ -230,16 +210,16 @@ object Economy extends Issue[EconomyPosition] {
     val investmentCostMultiplier:Double = FreeMarketInvestmentMultiplier
   }
 
-  def popularity(stateStart: Double, interventionismStart: Double, freeMarketStart: Double,
-                 stateEnd: Double, interventionismEnd: Double, freeMarketEnd: Double): Popularity = {
+  def popularity(stateStart: Double, freeMarketStart: Double,
+                 stateEnd: Double, freeMarketEnd: Double): Popularity = {
     new IssuePositionPopularity(
-      Map(StateEconomy -> stateStart, Interventionism -> interventionismStart, FreeMarket -> freeMarketStart),
-      Map(StateEconomy -> stateEnd, Interventionism -> interventionismEnd, FreeMarket -> freeMarketEnd))
+      Map(StateEconomy -> stateStart, FreeMarket -> freeMarketStart),
+      Map(StateEconomy -> stateEnd, FreeMarket -> freeMarketEnd))
   }
 
   override def name: String = "economy"
 
-  override val possiblePositions: Vector[EconomyPosition] = Vector(StateEconomy, Interventionism, FreeMarket)
+  override val possiblePositions: Vector[EconomyPosition] = Vector(StateEconomy, FreeMarket)
 }
 
 object ForeignPolicy extends Issue[ForeignPolicyPosition] {
@@ -302,9 +282,9 @@ object SocialPolicy extends Issue[SocialPolicyPosition] {
   override val possiblePositions: Vector[SocialPolicyPosition] = Vector(NoSocialSecurity, LifeNeedsSocialSecurity, RegularNeedsSocialSecurity)
 }
 
-object VotersPolicy extends Issue[VotersPolictyPosition] {
+object VotersPolicy extends Issue[VotersPolicyPosition] {
 
-  case object NoVoting extends VotersPolictyPosition {
+  case object NoVoting extends VotersPolicyPosition {
     override def color: Color = Color.Gray
 
     override def positionNumber: Int = 0
@@ -313,7 +293,7 @@ object VotersPolicy extends Issue[VotersPolictyPosition] {
 
   }
 
-  case object PrimaryUpperClass extends VotersPolictyPosition {
+  case object PrimaryUpperClass extends VotersPolicyPosition {
     override def color: Color = Color.Purple
 
     override def positionNumber: Int = 1
@@ -321,7 +301,7 @@ object VotersPolicy extends Issue[VotersPolictyPosition] {
     override def canVote(populationType: PopulationType, primaryCulture: Boolean): Boolean = primaryCulture && populationType.populationClass == Upper
   }
 
-  case object PrimaryUpperAndMiddleClass extends VotersPolictyPosition {
+  case object PrimaryUpperAndMiddleClass extends VotersPolicyPosition {
     override def color: Color = Color.Blue
 
     override def positionNumber: Int = 2
@@ -329,7 +309,7 @@ object VotersPolicy extends Issue[VotersPolictyPosition] {
     override def canVote(populationType: PopulationType, primaryCulture: Boolean): Boolean = primaryCulture && Set(Upper, Middle).contains(populationType.populationClass)
   }
 
-  case object Everyone extends VotersPolictyPosition {
+  case object Everyone extends VotersPolicyPosition {
     override def color: Color = Color.Yellow
 
     override def positionNumber: Int = 3
@@ -338,7 +318,7 @@ object VotersPolicy extends Issue[VotersPolictyPosition] {
 
   }
 
-  case object MagesOnly extends VotersPolictyPosition {
+  case object MagesOnly extends VotersPolicyPosition {
     override def color: Color = Color.Orange
 
     override def positionNumber: Int = 1
@@ -346,7 +326,7 @@ object VotersPolicy extends Issue[VotersPolictyPosition] {
     override def canVote(populationType: PopulationType, primaryCulture: Boolean): Boolean = Mages == populationType
   }
 
-  case object ClericsOnly extends VotersPolictyPosition {
+  case object ClericsOnly extends VotersPolicyPosition {
     override def color: Color = Color.Green
 
     override def positionNumber: Int = 1
@@ -377,7 +357,7 @@ object VotersPolicy extends Issue[VotersPolictyPosition] {
     )
   }
 
-  override def distanceBetweenPositions(first: VotersPolictyPosition, second: VotersPolictyPosition): Int = {
+  override def distanceBetweenPositions(first: VotersPolicyPosition, second: VotersPolicyPosition): Int = {
     if (first.positionNumber == second.positionNumber && first != second) {
       1
     } else {
@@ -387,7 +367,7 @@ object VotersPolicy extends Issue[VotersPolictyPosition] {
 
   override def name: String = "votersPolicy"
 
-  override val possiblePositions: Vector[VotersPolictyPosition] = Vector(NoVoting, PrimaryUpperClass,
+  override val possiblePositions: Vector[VotersPolicyPosition] = Vector(NoVoting, PrimaryUpperClass,
     PrimaryUpperAndMiddleClass, Everyone, MagesOnly, ClericsOnly)
 }
 
@@ -415,7 +395,7 @@ case class CurrentPoliticalViews(migration: Map[MigrationPosition, Double],
                                  foreignPolicy: Map[ForeignPolicyPosition, Double],
                                  economy: Map[EconomyPosition, Double],
                                  socialPolicy: Map[SocialPolicyPosition, Double],
-                                 votersPolicy: Map[VotersPolictyPosition, Double]) {
+                                 votersPolicy: Map[VotersPolicyPosition, Double]) {
   def pointsOfView:Map[PoliticalPosition, Double] = {
     val positions = for {
       m <- Migration.possiblePositions
@@ -438,7 +418,7 @@ case class PoliticalPosition(migration: MigrationPosition,
                              foreignPolicy: ForeignPolicyPosition,
                              economy: EconomyPosition,
                              socialPolicy: SocialPolicyPosition,
-                             votersPolicy: VotersPolictyPosition) {
+                             votersPolicy: VotersPolicyPosition) {
 
   private val memo = mutable.Map[PoliticalPosition, Int]()
 
@@ -473,10 +453,10 @@ object PoliticalViews {
     def regime = Regime.popularity(1.r, 0.5.r, 0.r, 0.r, 0.5.r, 1.r)
     def foreignPolicy = ForeignPolicy.popularity(0.7.r, 0.3.r, 0.3.r, 0.7.r)
     def aristocraticPolicy = ForeignPolicy.popularity(1.r, 0.r, 0.8.r, 0.2.r)
-    def poorEconomy = Economy.popularity(1.r, 0.5.r, 0.5.r, 0.5.r, 0.5.r, 0.5.r)
-    def middleEconomy = Economy.popularity(0.5.r, 1.r, 0.5.r, 0.5.r, 0.5.r, 0.5.r)
-    def aristorcraticEconomy = Economy.popularity(1.r, 0.5.r, 0.r, 0.r, 0.5.r, 1.r)
-    def capitalistEconomy = Economy.popularity(0.r, 0.5.r, 0.5.r, 0.r, 0.r, 1.r)
+    def poorEconomy = Economy.popularity(1.r, 0.5.r, 0.5.r, 0.5.r)
+    def middleEconomy = Economy.popularity(0.5.r, 1.r, 0.5.r, 0.5.r)
+    def aristorcraticEconomy = Economy.popularity(1.r, 0.r, 1.r, 0.r)
+    def capitalistEconomy = Economy.popularity(0.r, 1.r, 0.r, 1.r)
     def poorSocial = SocialPolicy.popularity(0.2.r, 0.3.r, 0.4.r, 0.2.r, 0.5.r, 0.8.r)
     def mediumSocial = SocialPolicy.popularity(0.5.r, 0.3.r, 0.2.r, 1.r, 0.5.r, 0.r)
     def upperSocial = SocialPolicy.popularity(1.r, 0.r, 0.r, 1.r, 0.2.r, 0.r)
@@ -496,7 +476,7 @@ object PoliticalViews {
         PoliticalViews(migration, regime, foreignPolicy, poorEconomy, poorSocial, poorVoters)
       case Bureaucrats =>
         PoliticalViews(migration, regime, foreignPolicy,
-          Economy.popularity(1.r, 0.5.r, 0.r, 0.5.r, 0.5.r, 0.r),
+          Economy.popularity(1.r, 0.r, 0.5.r, 0.5.r),
           mediumSocial, middleVoters)
       case Scholars =>
         PoliticalViews(migration, regime, foreignPolicy, middleEconomy, mediumSocial, middleVoters)
@@ -510,7 +490,7 @@ object PoliticalViews {
             1.r, 0.5.r, 0.3.r, 0.r, 1.r, 0.r))
       case Traders =>
         PoliticalViews(migration, regime, foreignPolicy,
-          Economy.popularity(0.r, 1.r, 0.5.r, 0.r, 0.5.r, 1.r),
+          Economy.popularity(0.r, 1.r, 0.r, 1.r),
           mediumSocial, middleVoters)
       case Capitalists =>
         PoliticalViews(migration, regime, aristocraticPolicy, capitalistEconomy, upperSocial, upperVoters)
@@ -523,7 +503,7 @@ object PoliticalViews {
     PoliticalViews(Migration.popularity(1, 1, 1, 1),
       Regime.popularity(1, 1, 1, 1, 1, 1),
       ForeignPolicy.popularity(1, 1, 1, 1),
-      Economy.popularity(1, 1, 1, 1, 1, 1),
+      Economy.popularity(1, 1, 1, 1),
       SocialPolicy.popularity(1, 1, 1, 1, 1, 1),
       VotersPolicy.popularity(1, 1, 1, 1, 1, 1,1,1,1,1,1,1))
   }

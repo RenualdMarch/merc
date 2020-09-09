@@ -11,6 +11,8 @@ import MapUtil.FloatOperations._
 import mr.merc.util.MercUtils._
 
 class SoldierMovementAI(worldState: WorldState, state: State) extends Logging{
+  private val MaxRecruitingSoldiers = 20
+
   private val advantageToAttack = 2d
 
   private val stateRegions = worldState.regions.filter(_.owner == state)
@@ -42,7 +44,9 @@ class SoldierMovementAI(worldState: WorldState, state: State) extends Logging{
           if (diff > minPriceForMilitia && diff < minPriceForPro) {
             worldState.recruitSoldier(militiaProvince, WarriorCompetence.Militia, randomWarriorType, state.primeCulture)
           } else if (diff > minPriceForPro) {
-            val count = (diff / minPriceForPro).toInt
+            val alreadyRecruiting = proProvince.projects.count(_.isInstanceOf[StateRecruitWarrior])
+            val count = Math.min(MaxRecruitingSoldiers, (diff / minPriceForPro).toInt) - alreadyRecruiting
+
             (0 until count).foreach { _ =>
               worldState.recruitSoldier(proProvince, WarriorCompetence.Professional, randomWarriorType, state.primeCulture)
             }

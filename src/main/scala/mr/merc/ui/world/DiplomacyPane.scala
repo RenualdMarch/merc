@@ -604,9 +604,9 @@ class SelectWarTarget(possibleWarTargets:Set[WarTarget]) extends MigPane {
 class ProposePeacePane(currentState: State, selectedState: State, actions: WorldStateDiplomacyActions, separatePeace: Boolean) extends DialogStage[Either[ProposePeace, ProposeSeparatePeace]] {
 
   // TODO case when two simultaneous wars, however it is very unlikely
-  private val warOpt = actions.warsForWhichCanProposePeace(currentState, selectedState, separatePeace).headOption
+  private lazy val warOpt = actions.warsForWhichCanProposePeace(currentState, selectedState, separatePeace).headOption
 
-  def targets: List[WarTarget] = {
+  lazy val targets: List[WarTarget] = {
     warOpt.map { war =>
       if (separatePeace) {
         if (war.isLeader(currentState, actions.diplomacyEngine) && !war.isLeader(selectedState, actions.diplomacyEngine)) {
@@ -626,7 +626,7 @@ class ProposePeacePane(currentState: State, selectedState: State, actions: World
 
   private var selectedTargets: Set[WarTarget] = Set()
 
-  private val checkButtons = targets.map { t =>
+  private def checkButtons = targets.map { t =>
     new CheckBox(t.localizeTarget) {
       onAction = { _ =>
         if (this.selected.value) selectedTargets += t

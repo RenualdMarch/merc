@@ -11,29 +11,29 @@ import mr.merc.politics.Regime.{Constitutional, Democracy}
 object WorldConstants {
 
   object Enterprises {
+    val EfficiencyPerOneFactoryLevel = 1000
+
     val FactoryInputMultiplier = 1
-    val FactoryOutputMultiplier = 2
-    val FactoryStartingResources = 1000
+    val FactoryOutputMultiplier = 4
+    val FactoryStartingResources = EfficiencyPerOneFactoryLevel * FactoryOutputMultiplier
 
-    val ResourceExtractionEfficiency = 1
-    val ChurchRitualEfficiency = 1
-    val MagicGuildEfficiency = 1
+    val ResourceExtractionEfficiency = 3
+    val ChurchRitualEfficiency = 3
+    val MagicGuildEfficiency = 3
 
-    val FarmStartingResources = 1000
-    val MineStartingResources = 1000
-    val ChurchStartingResources = 1000
-    val MagicGuildStartingResources = 1000
+    val FarmStartingResources = EfficiencyPerOneFactoryLevel * ResourceExtractionEfficiency
+    val MineStartingResources = EfficiencyPerOneFactoryLevel * ResourceExtractionEfficiency
+    val ChurchStartingResources = EfficiencyPerOneFactoryLevel * ChurchRitualEfficiency
+    val MagicGuildStartingResources = EfficiencyPerOneFactoryLevel * MagicGuildEfficiency
 
     val FactoryBuildCost:Map[Products.Product, Double] = Map(Wood -> 100, Iron -> 100, Coal -> 100)
     val FactoryExpandCost:Map[Products.Product, Double] = Map(Wood -> 50, Iron -> 50, Coal -> 50)
 
-    val StateEconomicsInvestmentMultiplier:Double = 4
-    val InterventionismInvestmentMultiplier:Double = 2
+    val StateEconomicsInvestmentMultiplier:Double = 3
     val FreeMarketInvestmentMultiplier:Double = 1
 
     val ProfitPartToWorkers = 0.5
     val ProfitPartToOwners = 0.5
-    val EfficiencyPerOneFactoryLevel = 1000
 
     val BankruptStorage = 0.1
     val BankruptMoney = 0.1
@@ -161,7 +161,7 @@ object WorldConstants {
     )
 
     def NeedsToHP(d:Double):Double = {
-      val result = d + 0.33
+      val result = d + 0.5
       if (result > 1) 1 else result
     }
 
@@ -176,7 +176,6 @@ object WorldConstants {
     val WarRelationshipChange:Int = -50
     val SeparatePeaceRelationshipChange = -100
     val SeparatePeaceDuration = 40
-
 
     val TruceDuration = 20
     val TruceRelationshipChange = -100

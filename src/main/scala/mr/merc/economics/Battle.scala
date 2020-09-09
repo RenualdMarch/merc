@@ -242,7 +242,11 @@ class OneProvinceBattle(worldHexField: TerrainHexField, val province: Province, 
 
   val defendersSet: Set[State] = defenders.map(_.owner).toSet ++ additionalDefenders.values.flatten.map(_.owner)
 
-  override def sides: (Set[State], Set[State]) = (attackersSet, defendersSet)
+  override def sides: (Set[State], Set[State]) = {
+    require(defendersSet.nonEmpty, "defenders set must be non-empty")
+    require(attackersSet.nonEmpty, "Attackers set must be non-empty")
+    (attackersSet, defendersSet)
+  }
 }
 
 class TwoProvinceBattle(worldHexField: TerrainHexField, val province1: Province, val province2: Province, val province1Attackers: Map[Province, List[Warrior]],
@@ -275,7 +279,11 @@ class TwoProvinceBattle(worldHexField: TerrainHexField, val province1: Province,
   val attackers2Set: Set[State] = province1Defenders.map(_.owner).toSet ++
     province2Attackers.values.flatten.map(_.owner) ++ province1AdditionalDefenders.values.flatten.map(_.owner)
 
-  val sides: (Set[State], Set[State]) = (attackers1Set, attackers2Set)
+  val sides: (Set[State], Set[State]) = {
+    require(attackers1Set.nonEmpty, "Attackers 1 set must be non-empty")
+    require(attackers2Set.nonEmpty, "Attackers 2 set must be non-empty")
+    (attackers1Set, attackers2Set)
+  }
 
   val allAttackers1: List[Warrior] = province2Defenders ++ province1Attackers.values.flatten ++ province2AdditionalDefenders.values.flatten
 
@@ -315,5 +323,12 @@ class RebellionOneProvinceBattle(worldHexField: TerrainHexField, val province: P
     }
   }
 
-  override def sides: (Set[State], Set[State]) = (rebels.map(_.owner).toSet, loyalists.map(_.owner).toSet)
+  override def sides: (Set[State], Set[State]) = {
+    val r = rebels.map(_.owner).toSet
+    val l = loyalists.map(_.owner).toSet
+    require(r.nonEmpty, "Rebels must be non-empty")
+    require(l.nonEmpty, "Loyalists must be non-empty")
+    (r, l)
+  }
+
 }
