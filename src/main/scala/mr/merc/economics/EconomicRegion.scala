@@ -92,6 +92,8 @@ trait EconomicRegion {
     }.foreach { f =>
       if (f.level > 1) {
         f.decreaseLevel()
+      } else {
+        f.giveBudgetToOwners()
       }
     }
 

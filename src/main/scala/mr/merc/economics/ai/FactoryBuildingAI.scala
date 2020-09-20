@@ -30,8 +30,8 @@ class RandomFactoryBuildingAI extends FactoryBuildingAI {
     val capMoneyForNeeds = currentRegion.moneyToFulfillNeeds(Capitalists).values.sum
     val capTotalMoney = Math.max(0, capInvestors.map(_.moneyReserves).sum - capMoneyForNeeds)
     val (investors, totalMoney) = if (capTotalMoney / maxTask.toInt == 0) {
-      val investors = capInvestors ++ currentRegion.regionPopulation.popsByType(Aristocrats)
-      val moneyForNeeds = capMoneyForNeeds + currentRegion.moneyToFulfillNeeds(Aristocrats).values.sum
+      val investors = capInvestors //++ currentRegion.regionPopulation.popsByType(Aristocrats)
+      val moneyForNeeds = capMoneyForNeeds //+ currentRegion.moneyToFulfillNeeds(Aristocrats).values.sum
       val totalMoney = Math.max(0, investors.map(_.moneyReserves).sum - moneyForNeeds)
       (investors, totalMoney)
     } else (capInvestors, capTotalMoney)

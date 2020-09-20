@@ -16,6 +16,7 @@ object Factory {
                            peopleResources: Map[Population, Double], bought: List[FulfilledDemandRequest],
                            sold: Map[EconomicRegion, FulfilledSupplyRequestProfit], turn: Int) extends DayRecord {
     def factoryBuySellProfit: Double = earnings - moneySpentOnResources
+    lazy val totalSold: Double = sold.values.map(_.request.sold).sum
   }
 
 }
@@ -46,7 +47,10 @@ abstract class Factory[Producible <: IndustryProduct](val region: EconomicRegion
   def factoryStorage: FactoryStorage = storage
 
   def isBankrupt:Boolean = {
-    storage.unsoldProducts <= BankruptStorage && storage.money <= BankruptMoney
+    if (dayRecords.size > NoBankruptDays) {
+      val last = dayRecords.last
+      last.produced < BankruptProduced && last.totalSold < BankruptSold
+    } else false
   }
 
   override def reduceStorage(): Unit = {
@@ -259,6 +263,10 @@ class IndustrialFactory(region: EconomicRegion, product: IndustryProduct, var le
     storage = storage.copy(unsoldProducts = factoryStorage.unsoldProducts + maxPossibleInputToUse * outputMultiplier)
   }
 
+  def giveBudgetToOwners(): Unit = {
+    owners.head.receiveSalary(storage.money, false)
+    storage = storage.copy(money = 0)
+  }
 
   override def owners: List[Population] = region.regionPopulation.pops.filter(_.populationType == Capitalists)
 }

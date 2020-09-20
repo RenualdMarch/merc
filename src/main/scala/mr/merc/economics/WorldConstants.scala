@@ -35,16 +35,17 @@ object WorldConstants {
     val ProfitPartToWorkers = 0.5
     val ProfitPartToOwners = 0.5
 
-    val BankruptStorage = 0.1
-    val BankruptMoney = 0.1
+    val NoBankruptDays = 3
+    val BankruptSold = 0.1
+    val BankruptProduced = 0.1
 
     val ResourceGatheringStorageReduction = 0d//0.5
     val FactoriesStorageReduction = 0d//0.5
   }
 
   object Population {
-    val MaxProvinceMigrationPart = 0.3
-    val MaxOutsideProvinceMigrationPart = 0.1
+    val MaxProvinceMigrationPart = 0.1
+    val MaxOutsideProvinceMigrationPart = 0.05
     val ConsumptionHappinessToMigrateInsideProvince = 0.3
     val ConsumptionHappinessToMigrateOutsideProvince = 0.2
     val EmptyPopConsumptionHappiness = 0.6

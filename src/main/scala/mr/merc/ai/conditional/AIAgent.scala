@@ -19,32 +19,29 @@ case class AIAgent(soldier: Soldier, hex: TerrainHex, conf: AIConfiguration) {
     val targetOpt = bestTarget(model)
 
     // if can kill someone or attack makes sense, should do it
-    if (targetOpt.map(_.prediction.defenderDies >= conf.highEnoughPercentOfEnemyDeath).getOrElse(false)
-      || targetOpt.map(t => conf.attackIsPerfect(t.prediction)).getOrElse(false)) {
+    if (targetOpt.exists(_.prediction.defenderDies >= conf.highEnoughPercentOfEnemyDeath)
+      || targetOpt.exists(t => conf.attackIsPerfect(t.prediction))) {
       return Some(targetToEvent(targetOpt.get))
     }
 
     // TODO add healing
     command match {
-      case RushCommand(targets) => {
+      case RushCommand(targets) =>
         // if it is possible to attack, should attack
         if (targetOpt.isDefined) {
           Some(targetToEvent(targetOpt.get))
         } else {
-          Some(List(moveToClosestEnemy(model, targets)))
+          moveToClosestEnemy(model, targets).map(List(_))
         }
-      }
-      case AttackCommand(targets) => {
-        if (targetOpt.map(t => conf.attackIsGood(t.prediction)).getOrElse(false)) {
+      case AttackCommand(targets) =>
+        if (targetOpt.exists(t => conf.attackIsGood(t.prediction))) {
           Some(targetToEvent(targetOpt.get))
         } else {
-          Some(List(moveToClosestEnemy(model, targets)))
+          moveToClosestEnemy(model, targets).map(List(_))
         }
-      }
-      case DefendCommand => {
+      case DefendCommand =>
         // TODO think what should be done when there are only few soldiers left?
         None
-      }
     }
   }
 
@@ -57,31 +54,36 @@ case class AIAgent(soldier: Soldier, hex: TerrainHex, conf: AIConfiguration) {
     }
   }
 
-  private def moveToClosestEnemy(model: BattleModel, enemies: List[TerrainHex]): MovementModelEvent = {
+  private def moveToClosestEnemy(model: BattleModel, enemies: List[TerrainHex]): Option[MovementModelEvent] = {
     moveCloserToEnemy(selectClosestEnemy(enemies), model)
   }
 
   // TODO
   // By now it uses simple distance, in case of lakes it will move through them
   private[conditional] def selectClosestEnemy(enemies: List[TerrainHex]): TerrainHex = {
-    enemies.sortBy(hex.distance).head
+    enemies.minBy(hex.distance)
   }
 
-  private[conditional] def moveCloserToEnemy(enemy: TerrainHex, model: BattleModel): MovementModelEvent = {
+  private[conditional] def moveCloserToEnemy(enemy: TerrainHex, model: BattleModel): Option[MovementModelEvent] = {
     val possibleMoves = model.possibleMoves(soldier, hex).toList
-    val minDistance = enemy.distance(possibleMoves.minBy(enemy.distance))
-    val acceptableDistance = minDistance + conf.maxDistanceForBestDefence
-    val hexesOnAcceptableDistance = possibleMoves.filter(h => enemy.distance(h) <= acceptableDistance)
-    val hexWithMaxDefence = hexesOnAcceptableDistance.maxBy(h => Attack.calculateSoldierDefence(soldier, h).defence)
-    val maxDefence = Attack.calculateSoldierDefence(soldier, hexWithMaxDefence)
-    val targetHex = hexesOnAcceptableDistance.sortBy(enemy.distance).dropWhile(h => Attack.calculateSoldierDefence(soldier, h) != maxDefence).head
+    if (possibleMoves.isEmpty) {
+      None
+    } else {
+      val minDistance = enemy.distance(possibleMoves.minBy(enemy.distance))
+      val acceptableDistance = minDistance + conf.maxDistanceForBestDefence
+      val hexesOnAcceptableDistance = possibleMoves.filter(h => enemy.distance(h) <= acceptableDistance)
+      val hexWithMaxDefence = hexesOnAcceptableDistance.maxBy(h => Attack.calculateSoldierDefence(soldier, h).defence)
+      val maxDefence = Attack.calculateSoldierDefence(soldier, hexWithMaxDefence)
+      val targetHex = hexesOnAcceptableDistance.sortBy(enemy.distance).dropWhile(h => Attack.calculateSoldierDefence(soldier, h) != maxDefence).head
 
-    MovementModelEvent(soldier, hex, targetHex)
+      Some(MovementModelEvent(soldier, hex, targetHex))
+    }
+
   }
 
   private[conditional] def bestTarget(model: BattleModel): Option[TargetInfo] = {
     val reachableHexes = model.possibleMoves(soldier, hex) ++ Set(hex)
-    val reachableHexesAndNeigs = reachableHexes.flatMap(model.map.hexField.neighbours(_))
+    val reachableHexesAndNeigs = reachableHexes.flatMap(model.map.hexField.neighbours)
     val reachableEnemies = reachableHexesAndNeigs.filter(_.soldier.isDefined).filter(s => model.areEnemies(s.soldier.get.owner, soldier.owner))
     val enemyAndAttackPossitions = reachableEnemies.map(h => (h, model.map.hexField.neighboursSet(h) & reachableHexes))
     val targets = enemyAndAttackPossitions map {
@@ -97,7 +99,7 @@ case class AIAgent(soldier: Soldier, hex: TerrainHex, conf: AIConfiguration) {
     }
 
     if (targets.nonEmpty) {
-      Some(targets.toList.sorted.last)
+      Some(targets.toList.max)
     } else {
       None
     }

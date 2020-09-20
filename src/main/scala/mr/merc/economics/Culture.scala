@@ -828,17 +828,17 @@ object Culture {
 
   private def defaultIlliterateHumanNeeds(culture: Culture): CornerPopulationNeeds = Map(
     Lower -> Map(
-      LifeNeeds -> Map(Grain -> 2, Fruit -> 1, Cattle -> 1, Coal -> 1),
+      LifeNeeds -> Map(Grain -> 2, Fruit -> 1, Cattle -> 1, Coal -> 1, Liquor -> 1),
       RegularNeeds -> Map(Coal -> 1, Herbs -> 1, Tea -> 1, Magic -> 1, Cotton -> 1, Ritual(culture) -> 1),
       LuxuryNeeds -> Map(Iron -> 1, Wood -> 1, Magic -> 1, Ritual(culture) -> 1, Coal -> 1)
     ),
     Middle -> Map(
-      LifeNeeds -> Map(Grain -> 2, Fruit -> 1, Cattle -> 1, Coal -> 1),
+      LifeNeeds -> Map(Grain -> 2, Fruit -> 1, Cattle -> 1, Coal -> 1, Liquor -> 1),
       RegularNeeds -> Map(Coal -> 1, Herbs -> 1, Coffee -> 1, Magic -> 1, Cotton -> 1, Ritual(culture) -> 1),
       LuxuryNeeds -> Map(PreciousMetal -> 1, Iron -> 1, Wood -> 1, Magic -> 1, Ritual(culture) -> 1, Coal -> 1)
     ),
     Upper -> Map(
-      LifeNeeds -> Map(Grain -> 2, Fruit -> 1, Cattle -> 1, Coal -> 1),
+      LifeNeeds -> Map(Grain -> 2, Fruit -> 1, Cattle -> 1, Coal -> 1, Liquor -> 1),
       RegularNeeds -> Map(Coal -> 1, Herbs -> 1, Coffee -> 1, Magic -> 1, Cotton -> 1, Ritual(culture) -> 1),
       LuxuryNeeds -> Map(PreciousMetal -> 1, Iron -> 1, Wood -> 1, Magic -> 1, Ritual(culture) -> 1, Coal -> 1)
     )

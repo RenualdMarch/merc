@@ -70,13 +70,13 @@ class AIAgentTest extends FunSuite with BeforeAndAfter {
     val soldier = new Soldier("1", soldierType, Player("1"))
     field.hex(0, 0).soldier = Some(soldier)
     val agent1 = new AIAgent(soldier, field.hex(0, 0), conf1)
-    val move1 = agent1.moveCloserToEnemy(field.hex(0, 9), model)
+    val move1 = agent1.moveCloserToEnemy(field.hex(0, 9), model).get
     assert(move1.from === field.hex(0, 0))
     assert(move1.to === field.hex(0, 4))
     assert(move1.soldier === soldier)
     val conf0 = AIConfiguration(0.4, 0, 0, 0, 10, 1)
     val agent0 = new AIAgent(soldier, field.hex(0, 0), conf0)
-    val move0 = agent0.moveCloserToEnemy(field.hex(0, 9), model)
+    val move0 = agent0.moveCloserToEnemy(field.hex(0, 9), model).get
     assert(move0.from === field.hex(0, 0))
     assert(move0.to === field.hex(0, 5))
     assert(move0.soldier === soldier)

@@ -57,7 +57,7 @@ object SupplyDemandTables {
         case EnterpriseSupplyRequest(enterprise, _, _) => localizeEnterprise(enterprise,
           enterprise.region.asInstanceOf[Province])
       }
-      Supply(name, r.sold, r.request.count, r.price)
+      Supply(name, r.request.count, r.sold, r.price)
     }
 
     val buffer = new ObservableBuffer[Supply]()

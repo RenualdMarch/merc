@@ -240,11 +240,13 @@ class OneProvinceBattle(worldHexField: TerrainHexField, val province: Province, 
 
   val attackersSet: Set[State] = attackers.values.flatten.map(_.owner).toSet
 
-  val defendersSet: Set[State] = defenders.map(_.owner).toSet ++ additionalDefenders.values.flatten.map(_.owner)
+  val defendersSet: Set[State] = {
+    val set = defenders.map(_.owner).toSet ++ additionalDefenders.values.flatten.map(_.owner)
+    if (set.isEmpty) Set(province.controller)
+    else set
+  }
 
   override def sides: (Set[State], Set[State]) = {
-    require(defendersSet.nonEmpty, "defenders set must be non-empty")
-    require(attackersSet.nonEmpty, "Attackers set must be non-empty")
     (attackersSet, defendersSet)
   }
 }
@@ -325,9 +327,11 @@ class RebellionOneProvinceBattle(worldHexField: TerrainHexField, val province: P
 
   override def sides: (Set[State], Set[State]) = {
     val r = rebels.map(_.owner).toSet
-    val l = loyalists.map(_.owner).toSet
-    require(r.nonEmpty, "Rebels must be non-empty")
-    require(l.nonEmpty, "Loyalists must be non-empty")
+    val l = {
+      val loyal = loyalists.map(_.owner).toSet
+      if (loyal.isEmpty) Set(province.owner)
+      else loyal
+    }
     (r, l)
   }
 

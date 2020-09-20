@@ -527,13 +527,15 @@ class PopulationMigrationInsideProvince(regionPopulation: RegionPopulation, stat
 
     movements.foreach { movement =>
       if (movement.from.populationCount != 0 && movement.count != 0) {
-        val move = if (movement.from.populationType > movement.to.populationType) {
+        val move = /*if (movement.from.populationType > movement.to.populationType) {
           movement.from.extractIlliterateThenLiterate(movement.count)
         } else if (movement.from.populationType < movement.to.populationType) {
           movement.from.extractLiterateThenIlliterate(movement.count)
         } else {
           movement.from.extractRandomMovers(movement.count)
-        }
+        }*/
+          movement.from.extractRandomMovers(movement.count)
+
         movement.to.applyMovers(move)
         movement.from.addProvinceMovement(movement)
         movement.to.addProvinceMovement(movement)
