@@ -117,6 +117,8 @@ abstract sealed class Battle(worldHexField: TerrainHexField) {
 
   def sides: (Set[State], Set[State])
 
+  def isOver: Boolean = new BattleModel(gameField).isOver
+
   def concludeBattle(actions: WorldStateDiplomacyActions): BattleReport = {
     provinces.foreach { p =>
       val alreadyInProvince = p.regionWarriors.allWarriors.toSet
@@ -334,5 +336,4 @@ class RebellionOneProvinceBattle(worldHexField: TerrainHexField, val province: P
     }
     (r, l)
   }
-
 }

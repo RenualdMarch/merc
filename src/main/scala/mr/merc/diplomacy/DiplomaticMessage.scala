@@ -56,6 +56,7 @@ object DiplomaticMessage {
       !agreements.exists {
         case v: VassalAgreement if Set(v.overlord, v.vassal) == Set(from, to) => true
         case v: VassalAgreement if Set(from, to).contains(v.vassal) => true
+        case aa: AllianceAgreement if aa.sides == Set(from, to) => true
         case wa: WarAgreement => wa.onDifferentSides(Set(from, to))
         case _ => false
       }
@@ -106,7 +107,6 @@ object DiplomaticMessage {
     override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean = {
       val agreements = diplomacy.agreements(from) ::: diplomacy.agreements(to)
       !agreements.exists {
-        case aa:AllianceAgreement => aa.sides == Set(from, to)
         case v: VassalAgreement if Set(v.overlord, v.vassal) == Set(from, to) => true
         case v: VassalAgreement if Set(from, to).contains(v.vassal) => true
         case wa: WarAgreement => wa.onDifferentSides(Set(from, to))
@@ -284,7 +284,7 @@ object DiplomaticMessage {
       }.foreach { a =>
         diplomacy.cancelAgreement(to, a, currentTurn)
       }
-      diplomacy.increaseBadBoy(to, RefuseAllyCallBadBoy)
+      diplomacy.increaseBadBoy(from, RefuseAllyCallBadBoy)
     }
 
     override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean = {

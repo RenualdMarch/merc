@@ -1,10 +1,9 @@
 requirement failed: Buying and selling differ
 
+add call to arms action
+declined to join war - reputation change?
+
 polish battle reports
-
-bug: Battle between Set(Set(Player(Byzantine,[SFX]0xff00ffff)), Set())
-if defenders is empty, battle should be automatically won
-
 
 Not high priority:
 allow hire people from other cultures with some political configurations, now it is possible to hire primary culture warrior anywhere

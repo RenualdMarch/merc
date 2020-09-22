@@ -26,8 +26,8 @@ object WorldConstants {
     val ChurchStartingResources = EfficiencyPerOneFactoryLevel * ChurchRitualEfficiency
     val MagicGuildStartingResources = EfficiencyPerOneFactoryLevel * MagicGuildEfficiency
 
-    val FactoryBuildCost:Map[Products.Product, Double] = Map(Wood -> 100, Iron -> 100, Coal -> 100)
-    val FactoryExpandCost:Map[Products.Product, Double] = Map(Wood -> 50, Iron -> 50, Coal -> 50)
+    val FactoryBuildCost:Map[Products.Product, Double] = Map(Wood -> 1000, Iron -> 1000, Coal -> 1000)
+    val FactoryExpandCost:Map[Products.Product, Double] = Map(Wood -> 1000, Iron -> 1000, Coal -> 1000)
 
     val StateEconomicsInvestmentMultiplier:Double = 3
     val FreeMarketInvestmentMultiplier:Double = 1

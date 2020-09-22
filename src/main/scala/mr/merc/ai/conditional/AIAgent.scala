@@ -76,7 +76,9 @@ case class AIAgent(soldier: Soldier, hex: TerrainHex, conf: AIConfiguration) {
       val maxDefence = Attack.calculateSoldierDefence(soldier, hexWithMaxDefence)
       val targetHex = hexesOnAcceptableDistance.sortBy(enemy.distance).dropWhile(h => Attack.calculateSoldierDefence(soldier, h) != maxDefence).head
 
-      Some(MovementModelEvent(soldier, hex, targetHex))
+      Some(MovementModelEvent(soldier, hex, targetHex)).flatMap { me =>
+        if(model.validateMovementEvent(soldier, hex, targetHex)) Some(me) else None
+      }
     }
 
   }

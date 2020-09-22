@@ -272,9 +272,13 @@ class WorldFrame(val sceneManager: SceneManager, worldState: WorldState) extends
           battles.foreach(worldState.concludePlayerBattle)
           callback()
         case some :: rem =>
-          val ai = some.gameField.players.map(_ -> BattleAI()).toMap - worldState.playerState.toPlayer
-          val battleFrame = new BattleFrame(sceneManager, some.gameField, ai, callbackFunction(rem))
-          sceneManager.showFrame(battleFrame)
+          if (some.isOver) {
+            callbackFunction(rem)
+          } else {
+            val ai = some.gameField.players.map(_ -> BattleAI()).toMap - worldState.playerState.toPlayer
+            val battleFrame = new BattleFrame(sceneManager, some.gameField, ai, callbackFunction(rem))
+            sceneManager.showFrame(battleFrame)
+          }
       }
     }
 
