@@ -13,7 +13,7 @@ import mr.merc.util.MercUtils._
 class SoldierMovementAI(worldState: WorldState, state: State) extends Logging{
   private val MaxRecruitingSoldiers = 20
 
-  private val advantageToAttack = 2d
+  private val advantageToAttack = 1.5d
 
   private val stateRegions = worldState.regions.filter(_.owner == state)
   private val allSoldiers = worldState.regions.flatMap(_.regionWarriors.allWarriors.filter(_.owner == state))

@@ -59,6 +59,10 @@ class DiplomaticSituation(diplomacy:WorldDiplomacy) {
     rivalsOfRivals(state1).contains(state2)
   }
 
+  def isInWar(state: State): Boolean = {
+    this.inWar(state).nonEmpty
+  }
+
   def powerDifference(from: State, to:State):Double = {
     val toPower = statePower(to)
     val fromPower = statePower(from)

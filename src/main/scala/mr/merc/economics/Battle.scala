@@ -14,7 +14,7 @@ import mr.merc.politics.{Province, State}
 import mr.merc.unit.Soldier
 import mr.merc.util.MercUtils._
 
-abstract sealed class Battle(worldHexField: TerrainHexField) {
+abstract sealed class Battle(worldHexField: TerrainHexField, turn: Int) {
 
   val allWarriors: List[Warrior]
 
@@ -130,7 +130,7 @@ abstract sealed class Battle(worldHexField: TerrainHexField) {
     val model = new BattleModel(gameField)
     require(model.isOver, "battle must be over")
 
-    this match {
+    val report = this match {
       case one: OneProvinceBattle =>
         val result: ReportBattleResult = if (one.allAttackers.exists(_.isAlive)) {
           val newController = whoToTakeProvince(actions, one.province, one.attackersSet)
@@ -147,7 +147,7 @@ abstract sealed class Battle(worldHexField: TerrainHexField) {
         one.province.regionWarriors.receiveWarriors(warriors)
 
         BattleReport(List(one.province), one.attackersSet.toList, one.defendersSet.toList, result,
-          side1Survived, side2Survived, side1Lost, side2Lost)
+          side1Survived, side2Survived, side1Lost, side2Lost, turn)
 
       case two: TwoProvinceBattle =>
         val result: ReportBattleResult = if (two.allAttackers1.exists(_.isAlive)) {
@@ -166,7 +166,7 @@ abstract sealed class Battle(worldHexField: TerrainHexField) {
         val (side2Survived, side2Lost) = two.allAttackers2.partition(_.isAlive)
 
         BattleReport(two.provinces, two.attackers1Set.toList, two.attackers2Set.toList, result,
-          side1Survived, side2Survived, side1Lost, side2Lost)
+          side1Survived, side2Survived, side1Lost, side2Lost, turn)
 
       case rebellion: RebellionOneProvinceBattle =>
         val currentController = rebellion.province.owner
@@ -184,8 +184,12 @@ abstract sealed class Battle(worldHexField: TerrainHexField) {
         actions.newRebelStateArised(currentController, rebellion.rebelState, rebellion.province)
 
         BattleReport(List(rebellion.province), List(currentController), List(rebellion.rebelState), result,
-          side1Survived, side2Survived, side1Lost, side2Lost)
+          side1Survived, side2Survived, side1Lost, side2Lost, turn)
     }
+
+    actions.recordBattle(report)
+
+    report
   }
 
   private def whoToTakeProvince(actions: WorldStateDiplomacyActions, province: Province, winners: Set[State]): State = {
@@ -208,7 +212,7 @@ abstract sealed class Battle(worldHexField: TerrainHexField) {
 }
 
 case class BattleReport(provincesInBattle: List[Province], side1: List[State], side2: List[State], result: ReportBattleResult, side1Survived: List[Warrior],
-                        side2Survived: List[Warrior], side1Lost: List[Warrior], side2Lost: List[Warrior])
+                        side2Survived: List[Warrior], side1Lost: List[Warrior], side2Lost: List[Warrior], turn: Int)
 
 object BattleReport {
 
@@ -223,7 +227,7 @@ object BattleReport {
 }
 
 class OneProvinceBattle(worldHexField: TerrainHexField, val province: Province, val attackers: Map[Province, List[Warrior]], val defenders: List[Warrior],
-                        val additionalDefenders: Map[Province, List[Warrior]]) extends Battle(worldHexField) {
+                        val additionalDefenders: Map[Province, List[Warrior]], turn: Int) extends Battle(worldHexField, turn) {
 
   override val allWarriors: List[Warrior] = defenders ++ attackers.values.flatten ++ additionalDefenders.values.flatten
 
@@ -256,7 +260,7 @@ class OneProvinceBattle(worldHexField: TerrainHexField, val province: Province, 
 class TwoProvinceBattle(worldHexField: TerrainHexField, val province1: Province, val province2: Province, val province1Attackers: Map[Province, List[Warrior]],
                         val province1Defenders: List[Warrior], val province1AdditionalDefenders: Map[Province, List[Warrior]],
                         val province2Attackers: Map[Province, List[Warrior]], val province2Defenders: List[Warrior],
-                        val province2AdditionalDefenders: Map[Province, List[Warrior]]) extends Battle(worldHexField) {
+                        val province2AdditionalDefenders: Map[Province, List[Warrior]], turn: Int) extends Battle(worldHexField, turn) {
 
   override val allWarriors: List[Warrior] = province1Defenders ++ province1Attackers.values.flatten ++
     province1AdditionalDefenders.values.flatten ++ province2Attackers.values.flatten ++ province2Defenders ++
@@ -296,7 +300,7 @@ class TwoProvinceBattle(worldHexField: TerrainHexField, val province1: Province,
 }
 
 class RebellionOneProvinceBattle(worldHexField: TerrainHexField, val province: Province, val rebelState: State,
-                                 val loyalists: List[Warrior]) extends Battle(worldHexField) {
+                                 val loyalists: List[Warrior], turn: Int) extends Battle(worldHexField, turn) {
   private val houses = province.hexes.filter(_.mapObj.exists(_.isInstanceOf[FourSeasonsHouse]))
 
   private def generateRebel: Warrior = {

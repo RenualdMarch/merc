@@ -21,6 +21,7 @@ import scalafx.scene.paint.Color
 import scalafx.scene.shape.Rectangle
 import scalafx.stage.Stage
 import mr.merc.util.FxPropertyUtils.PropertyBindingMap
+import scalafx.scene.{Node, Scene}
 import scalafx.scene.control.TabPane.TabClosingPolicy
 
 class DiplomacyPane(actions: WorldStateDiplomacyActions, currentState: State, stage: Stage, parentFrame:WorldFrame) extends PaneWithTwoHorizontalChildren(0.45) {
@@ -154,7 +155,7 @@ class StateDiplomacyPane(currentState: State, selectedStateInfo: StateInfo, acti
     style = Components.largeFontStyle
     content = new MigPane {
       add(new StateRelationsPane(currentState, selectedState, actions), "wrap")
-      add(new StateAgreementsPane(selectedState, actions), "grow, push")
+      add(new StateAgreementsPane(stage, selectedState, actions), "grow, push")
     }
   }
 
@@ -204,7 +205,7 @@ class StateRelationsPane(currentState: State, selectedState: State, actions: Wor
   }
 }
 
-class StateAgreementsPane(selectedState: State, actions: WorldStateDiplomacyActions) extends MigPane() {
+class StateAgreementsPane(stage: Stage, selectedState: State, actions: WorldStateDiplomacyActions) extends MigPane() {
 
   private val agreements = actions.agreements(selectedState)
   private val vassalAgreements = agreements.collect { case v: VassalAgreement if v.vassal == selectedState => v }
@@ -214,7 +215,7 @@ class StateAgreementsPane(selectedState: State, actions: WorldStateDiplomacyActi
   private val truces = agreements.collect { case t: TruceAgreement => t }
 
   private def addWar(war: WarAgreement): Unit = {
-    add(new WarPane(war, actions), "grow, push, wrap")
+    add(new WarPane(stage, war, actions), "grow, push, wrap")
   }
 
   if (vassalAgreements.nonEmpty) {
@@ -319,6 +320,16 @@ class StateActionsPane(currentState: State, selectedState: State, actions: World
     }
   }
 
+  private val callAllyToWarButtons = actions.allyCanJoinWars(currentState, selectedState).map { war =>
+    new MediumButton {
+      text = Localization("diplomacy.callAlly", war.oppositeLeader(currentState, actions.diplomacyEngine).name)
+      onAction = { _ =>
+        actions.sendMessage(new AskJoinWar(currentState, selectedState, war))
+        parentFrame.showDiplomacyPane()
+      }
+    }
+  }
+
   if (actions.canProposePeace(currentState, selectedState)) {
     add(proposePeace, "wrap")
   }
@@ -345,6 +356,10 @@ class StateActionsPane(currentState: State, selectedState: State, actions: World
 
   if (actions.canProposeOverlordship(currentState, selectedState)) {
     add(proposeOverlordship, "wrap")
+  }
+
+  if (callAllyToWarButtons.nonEmpty) {
+    callAllyToWarButtons.foreach(add(_, "wrap"))
   }
 }
 
@@ -765,9 +780,10 @@ class ClaimsTable(claims: List[Claim]) extends TableView[Claim] {
   items = new ObservableBuffer[Claim]() ++ claims
 }
 
-class WarPane(war: WarAgreement, diplomacyActions: WorldStateDiplomacyActions) extends MigPane {
-  add(BigText(war.fullWarName), "center, wrap")
-  add(buildTable, "grow, push")
+class WarPane(stage: Stage, war: WarAgreement, diplomacyActions: WorldStateDiplomacyActions) extends MigPane {
+  add(BigText(war.fullWarName), "center")
+  add(showBattlesButton, "center, wrap")
+  add(buildTable, "grow, push, span 2")
 
   private case class WarTableRow(attacker: Option[State], warTarget: Option[WarTarget], defender: Option[State])
 
@@ -851,5 +867,28 @@ class WarPane(war: WarAgreement, diplomacyActions: WorldStateDiplomacyActions) e
     tableView.items = ObservableBuffer() ++ tableRows
     tableView
 
+  }
+
+  def showBattlesButton: Node = {
+    val pane = new ScrollPane {
+      fitToWidth = true
+      content = new BattleReportPane(war.battles)
+    }
+
+    val dialog = new Stage {
+      title = Localization("battleReport.title")
+      scene = new Scene {
+        content = pane
+      }
+    }
+
+    new BigButton {
+      text = Localization("battleReport.battles")
+      onAction = { _ =>
+        import ModalDialog._
+        dialog.showDialog(stage)
+      }
+      disable = war.battles.isEmpty
+    }
   }
 }

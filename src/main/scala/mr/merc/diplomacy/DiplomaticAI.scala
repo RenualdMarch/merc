@@ -295,8 +295,8 @@ class DiplomaticAI(state: State, actions: WorldStateDiplomacyActions) extends Lo
 
   private def proposeAlliance():List[AllianceProposal] = {
     val otherStates = actions.regions.map(_.owner).toSet - state
-    otherStates.filter { s =>
-      situation.areRivalsOfRivals(state, s) || actions.relationships(state)(s) > MinRelationshipToStartAlliance
+    otherStates.filter { s => !situation.isInWar(s) && (situation.areRivalsOfRivals(state, s) ||
+        actions.relationships(state)(s) > MinRelationshipToStartAlliance)
     }.map(a => new AllianceProposal(state, a)).toList
   }
 

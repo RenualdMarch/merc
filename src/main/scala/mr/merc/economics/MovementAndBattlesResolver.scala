@@ -85,7 +85,7 @@ class MovementAndBattlesResolver(state: WorldState) {
           }.filter(_._2.nonEmpty).toMap
 
           new OneProvinceBattle(state.worldHexField.buildTerrainHexField(state.seasonOfYear.season), mv.to, additionalAttackers + (mv.from -> attackersSoldiers.toList),
-            defendersSoldiers, additionalDefenders)
+            defendersSoldiers, additionalDefenders, state.turn)
         }
       } else Nil
     }
@@ -95,7 +95,7 @@ class MovementAndBattlesResolver(state: WorldState) {
       second <- singleAttacks if first.attackers.contains(second.province) && second.attackers.contains(first.province)
     } yield new TwoProvinceBattle(state.worldHexField.buildTerrainHexField(state.seasonOfYear.season), first.province, second.province, first.attackers,
       first.defenders, first.additionalDefenders, second.attackers, second.defenders,
-      second.additionalDefenders)
+      second.additionalDefenders, state.turn)
 
     singleAttacks ::: twoProvinceBattles
   }

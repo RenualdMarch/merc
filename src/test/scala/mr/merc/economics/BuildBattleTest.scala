@@ -28,7 +28,7 @@ class BuildBattleTest extends FunSuite with Matchers {
     val hexField = build4ProvinceHexField()
     hexField.hex(0, 0).mapObj = Some(FourSeasonsHouse(SlavicHuman))
 
-    val oneProvinceBattle = new OneProvinceBattle(hexField.buildTerrainHexField(Seasons.Summer), province1, Map(province3 -> w3), w1 ++ w2, Map(province4 -> w4))
+    val oneProvinceBattle = new OneProvinceBattle(hexField.buildTerrainHexField(Seasons.Summer), province1, Map(province3 -> w3), w1 ++ w2, Map(province4 -> w4), 0)
     val gameField = oneProvinceBattle.gameField
 
     gameField.players.toSet shouldBe Set(state1, state2, state3, state4).map(_.toPlayer)
@@ -64,7 +64,7 @@ class BuildBattleTest extends FunSuite with Matchers {
     val w4 = List(new Warrior(WarriorType.HeavyBladeInfantry, WarriorCompetence.Professional, state4.primeCulture, state4))
 
     val twoProvinceBattle = new TwoProvinceBattle(hexField.buildTerrainHexField(Seasons.Summer), province4, province2, Map(province2 -> w4), w2,
-      Map(province3 -> w3), Map(province4 -> w1), Nil, Map())
+      Map(province3 -> w3), Map(province4 -> w1), Nil, Map(), 0)
     val gameField = twoProvinceBattle.gameField
 
     gameField.players.toSet shouldBe Set(state1, state2, state3, state4).map(_.toPlayer)

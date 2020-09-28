@@ -4,7 +4,7 @@ import mr.merc.diplomacy.DiplomaticAgreement.AgreementBreakingDetails
 import mr.merc.diplomacy.DiplomaticAgreement.WarAgreement.WarTarget
 import mr.merc.diplomacy.RelationshipEvent._
 import mr.merc.diplomacy.WorldDiplomacy.RelationshipBonus
-import mr.merc.economics.Culture
+import mr.merc.economics.{BattleReport, Culture}
 import mr.merc.politics.{Province, State}
 import mr.merc.economics.WorldConstants.Diplomacy._
 import mr.merc.local.Localization
@@ -164,6 +164,14 @@ object DiplomaticAgreement {
   case class WarAgreement(var attackers: Set[State], var defenders: Set[State], warInitiator: State,
                           warVictim: State, startingTurn: Int, var targets: Set[WarTarget], fullWarName: String)
     extends DiplomaticAgreement(startingTurn, None) {
+
+    private var _battles:List[BattleReport] = Nil
+
+    def battles:List[BattleReport] = _battles
+
+    def addBattle(report: BattleReport): Unit = {
+      _battles ::= report
+    }
 
     override def sides: Set[State] = attackers ++ defenders
 

@@ -432,6 +432,17 @@ trait WorldStateDiplomacyActions {
     )
   }
 
+  def recordBattle(report: BattleReport): Unit = {
+    val totalSides = (report.side1 ::: report.side2 ::: report.provincesInBattle.map(_.owner)
+      ::: report.provincesInBattle.map(_.controller)).toSet
+
+    diplomacyEngine.wars.filter { war =>
+      totalSides.subsetOf(war.sides)
+    }.foreach {
+      _.addBattle(report)
+    }
+  }
+
   def claims(state: State): List[Claim] = diplomacyEngine.claims(state)
 
   def claimsAgainst(state: State): List[Claim] = diplomacyEngine.claimsAgainst(state)
@@ -460,6 +471,14 @@ trait WorldStateDiplomacyActions {
   def isPossibleMessage(message: DiplomaticMessage): Boolean = message.isPossible(diplomacyEngine, turn)
 
   def relationships(state: State): Map[State, Int] = diplomacyEngine.relationships(state, turn)
+
+  def wars(state: State):List[WarAgreement] = diplomacyEngine.wars(state)
+
+  def allyCanJoinWars(currentState: State, ally:State):List[WarAgreement] = {
+    if (diplomacyEngine.areAllies(currentState, ally)) {
+      wars(currentState).filterNot(_.sides.contains(ally))
+    } else Nil
+  }
 
   def relationshipsDescribed(state: State): Map[State, List[RelationshipBonus]] = diplomacyEngine.relationshipsDescribed(state, turn)
 
