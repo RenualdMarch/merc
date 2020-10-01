@@ -33,8 +33,8 @@ class ConditionalAI(config: AIConfiguration) extends BattleAI with AIQueueAdapte
       soldierStates = Map()
       List(EndMoveModelEvent)
     } else {
-      debug(s"AI decided to do ${stream.head.get}")
-      stream.head.get
+      debug(s"AI decided to do ${stream.head}")
+      stream.head.getOrElse(List(EndMoveModelEvent))
     }
   }
 

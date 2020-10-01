@@ -439,3 +439,5 @@ saurians=Saurians
 drakes=Drakes
 undead=Undead
 demons=Demons
+battleReport.regular=Regular army
+battleReport.militia=Militia

@@ -1,12 +1,14 @@
 requirement failed: Buying and selling differ
 
 propose peace and accept if war stalls - write battles to war history
-war battles info
 when vassal is at war - not orders overlord to join, but kindly asks
 army dissapeared visually - ????
+diplomatic info about new events
+too many soldiers are being recruited, and they must be recruited in order
+soldier damage is not shown on minimap - smth is not refreshed!
+state dissapeared, war should dissapear also
+reputation change after annexation?
 
-
-polish battle reports
 
 Not high priority:
 allow hire people from other cultures with some political configurations, now it is possible to hire primary culture warrior anywhere

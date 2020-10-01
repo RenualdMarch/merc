@@ -4,11 +4,12 @@ import mr.merc.army.Warrior
 import mr.merc.economics.BattleReport
 import mr.merc.economics.BattleReport.{Draw, Side1Won, Side2Won}
 import mr.merc.local.Localization
+import mr.merc.politics.Province
 import org.tbee.javafx.scene.layout.MigPane
 import scalafx.scene.control.ScrollPane
 import scalafx.Includes._
 import scalafx.scene.image.ImageView
-import scalafx.scene.layout.{BorderPane, StackPane}
+import scalafx.scene.layout.StackPane
 import scalafx.scene.paint.Color
 import scalafx.scene.shape.Rectangle
 
@@ -28,7 +29,20 @@ class OneBattleReportPane(battleReport:BattleReport) extends MigPane {
   private val secondSide = battleReport.side2.map(_.name).mkString(",")
   private val warriorColumns = 4
 
+  def province:Province = {
+    battleReport.provincesInBattle match {
+      case List(p) => p
+      case List(first, second) =>
+        battleReport.result match {
+          case BattleReport.Side1Won =>  second
+          case BattleReport.Side2Won => first
+          case BattleReport.Draw => first
+        }
+    }
+  }
+
   add(BigText(Localization("battleReport.vs", firstSide, secondSide)), "wrap")
+  add(BigText(province.name), "wrap")
   add(battleReport.result match {
     case Side1Won => BigText(Localization("battleReport.victory", firstSide))
     case Side2Won => BigText(Localization("battleReport.victory", secondSide))
@@ -48,6 +62,14 @@ class OneBattleReportPane(battleReport:BattleReport) extends MigPane {
     new WarriorCell(w, false)
   }
 
+  private val side1MilitiaWarriors = battleReport.side1Militia.map { w =>
+    new WarriorCell(w, w.isAlive)
+  }
+
+  private val side2MilitiaWarriors = battleReport.side2Militia.map { w =>
+    new WarriorCell(w, w.isAlive)
+  }
+
   private val side2Warriors = battleReport.side2Survived.map { w =>
     new WarriorCell(w, true)
   } ++ battleReport.side2Lost.map { w =>
@@ -56,9 +78,26 @@ class OneBattleReportPane(battleReport:BattleReport) extends MigPane {
 
   private val constraints = Stream.continually(100d / warriorColumns).take(warriorColumns).toList
 
-  private val side1 = GridPaneBuilder.buildWithoutCaption(constraints, side1Warriors)
-  private val side2 = GridPaneBuilder.buildWithoutCaption(constraints, side2Warriors)
+  private val side1Regular = GridPaneBuilder.buildWithoutCaption(constraints, side1Warriors)
+  private val side2Regular = GridPaneBuilder.buildWithoutCaption(constraints, side2Warriors)
+  private val side1Militia = GridPaneBuilder.buildWithoutCaption(constraints, side1MilitiaWarriors)
+  private val side2Militia = GridPaneBuilder.buildWithoutCaption(constraints, side2MilitiaWarriors)
 
-  add(side1, "left")
-  add(side2, "right")
+  add(new MigPane {
+    add(BigText(Localization("battleReport.regular")), "center, wrap")
+    add(side1Regular, "wrap")
+    if (side1MilitiaWarriors.nonEmpty) {
+      add(BigText(Localization("battleReport.militia")), "center, wrap")
+      add(side1Militia, "wrap")
+    }
+  }, "left")
+
+  add(new MigPane {
+    add(BigText(Localization("battleReport.regular")), "center, wrap")
+    add(side2Regular, "wrap")
+    if (side2MilitiaWarriors.nonEmpty) {
+      add(BigText(Localization("battleReport.militia")), "center, wrap")
+      add(side2Militia, "wrap")
+    }
+  }, "right")
 }

@@ -16,6 +16,8 @@ import mr.merc.util.MercUtils._
 
 abstract sealed class Battle(worldHexField: TerrainHexField, turn: Int) {
 
+  private var militia: (List[Warrior], List[Warrior]) = (Nil, Nil)
+
   val allWarriors: List[Warrior]
 
   def participants: Set[State] = sides._1 ++ sides._2
@@ -30,8 +32,9 @@ abstract sealed class Battle(worldHexField: TerrainHexField, turn: Int) {
 
   def placement: Map[Province, List[Warrior]]
 
+  def setMilitia(militia: List[Warrior]): (List[Warrior], List[Warrior])
+
   def putWarriors(hexField: TerrainHexField): Unit = {
-    //putMilitiaSoldiers(hexField)
     placement.foreach { case (province, list) =>
       if (provinces.contains(province)) {
         putWarriorsToProvince(list, province, hexField)
@@ -41,26 +44,31 @@ abstract sealed class Battle(worldHexField: TerrainHexField, turn: Int) {
     }
   }
 
-  def putMilitiaSoldiers(hexField: TerrainHexField): Unit = {
-    def randomMilitiaSoldier(culture: Culture, owner: State): Soldier = {
+  def putMilitiaSoldiers(hexField: TerrainHexField): List[Warrior] = {
+    def randomMilitiaSoldier(culture: Culture, owner: State): Warrior = {
       val selectedType = culture.warriorViewNames.possibleWarriors.collect {
         case ((wt, wc), _) if wc == WarriorCompetence.Militia => wt
       }.randomElement()
-      new Warrior(selectedType, Militia, culture, owner).soldier
+      new Warrior(selectedType, Militia, culture, owner)
     }
 
-    for {
+    val seq = for {
       hex <- hexField.hexes
       house <- hex.mapObj.collect { case hs: House => hs }
-    } {
+    } yield {
       hex.province match {
         case Some(p) =>
           if (p.owner == p.controller) {
-            hex.soldier = Some(randomMilitiaSoldier(house.culture, p.owner))
-          }
-        case None => sys.error(s"Province must be present in hex $hex in hexField $hexField")
+            val w = randomMilitiaSoldier(house.culture, p.owner)
+            hex.soldier = Some(w.soldier)
+            Some(w)
+          } else None
+        case None =>
+          sys.error(s"Province must be present in hex $hex in hexField $hexField")
       }
     }
+
+    seq.flatten.toList
   }
 
   def putWarriorsToProvince(warriors: List[Warrior], province: Province, hexField: TerrainHexField): Unit = {
@@ -108,7 +116,8 @@ abstract sealed class Battle(worldHexField: TerrainHexField, turn: Int) {
 
   lazy val gameField: GameField = {
     val battleHexField = terrainHexFieldFromProvinces(worldHexField)
-    putMilitiaSoldiers(battleHexField)
+    val mil = putMilitiaSoldiers(battleHexField)
+    this.militia = setMilitia(mil)
     putWarriors(battleHexField)
     val (first, second) = sides
     val allSides = Set(first.map(_.toPlayer), second.map(_.toPlayer))
@@ -147,7 +156,7 @@ abstract sealed class Battle(worldHexField: TerrainHexField, turn: Int) {
         one.province.regionWarriors.receiveWarriors(warriors)
 
         BattleReport(List(one.province), one.attackersSet.toList, one.defendersSet.toList, result,
-          side1Survived, side2Survived, side1Lost, side2Lost, turn)
+          side1Survived, side2Survived, side1Lost, side2Lost, militia._1, militia._2, turn)
 
       case two: TwoProvinceBattle =>
         val result: ReportBattleResult = if (two.allAttackers1.exists(_.isAlive)) {
@@ -166,7 +175,7 @@ abstract sealed class Battle(worldHexField: TerrainHexField, turn: Int) {
         val (side2Survived, side2Lost) = two.allAttackers2.partition(_.isAlive)
 
         BattleReport(two.provinces, two.attackers1Set.toList, two.attackers2Set.toList, result,
-          side1Survived, side2Survived, side1Lost, side2Lost, turn)
+          side1Survived, side2Survived, side1Lost, side2Lost, militia._1, militia._2, turn)
 
       case rebellion: RebellionOneProvinceBattle =>
         val currentController = rebellion.province.owner
@@ -184,7 +193,7 @@ abstract sealed class Battle(worldHexField: TerrainHexField, turn: Int) {
         actions.newRebelStateArised(currentController, rebellion.rebelState, rebellion.province)
 
         BattleReport(List(rebellion.province), List(currentController), List(rebellion.rebelState), result,
-          side1Survived, side2Survived, side1Lost, side2Lost, turn)
+          side1Survived, side2Survived, side1Lost, side2Lost, militia._1, militia._2, turn)
     }
 
     actions.recordBattle(report)
@@ -212,7 +221,8 @@ abstract sealed class Battle(worldHexField: TerrainHexField, turn: Int) {
 }
 
 case class BattleReport(provincesInBattle: List[Province], side1: List[State], side2: List[State], result: ReportBattleResult, side1Survived: List[Warrior],
-                        side2Survived: List[Warrior], side1Lost: List[Warrior], side2Lost: List[Warrior], turn: Int)
+                        side2Survived: List[Warrior], side1Lost: List[Warrior], side2Lost: List[Warrior],
+                        side1Militia: List[Warrior], side2Militia: List[Warrior], turn: Int)
 
 object BattleReport {
 
@@ -232,6 +242,10 @@ class OneProvinceBattle(worldHexField: TerrainHexField, val province: Province, 
   override val allWarriors: List[Warrior] = defenders ++ attackers.values.flatten ++ additionalDefenders.values.flatten
 
   override def provinces: List[Province] = List(province)
+
+  override def setMilitia(militia: List[Warrior]): (List[Warrior], List[Warrior]) = {
+    (Nil, militia)
+  }
 
   def additionalProvinces: List[Province] = (attackers.keySet ++ additionalDefenders.keySet).toList
 
@@ -281,6 +295,10 @@ class TwoProvinceBattle(worldHexField: TerrainHexField, val province1: Province,
       province2Attackers |+| province1AdditionalDefenders |+| province2AdditionalDefenders
   }
 
+  override def setMilitia(militia: List[Warrior]): (List[Warrior], List[Warrior]) = {
+    militia.partition(_.owner == province1.owner)
+  }
+
   val attackers1Set: Set[State] = province2Defenders.map(_.owner).toSet ++
     province1Attackers.values.flatten.map(_.owner) ++ province2AdditionalDefenders.values.flatten.map(_.owner)
 
@@ -310,6 +328,8 @@ class RebellionOneProvinceBattle(worldHexField: TerrainHexField, val province: P
     new Warrior(selectedType, Militia, rebelState.primeCulture, rebelState)
   }
 
+  override def setMilitia(militia: List[Warrior]): (List[Warrior], List[Warrior]) = (Nil, Nil)
+
   val rebels: List[Warrior] = houses.map(_ => generateRebel).toList
 
   override val allWarriors: List[Warrior] = rebels ::: loyalists
@@ -324,11 +344,12 @@ class RebellionOneProvinceBattle(worldHexField: TerrainHexField, val province: P
     putWarriorsToProvince(loyalists, province, hexField)
   }
 
-  override def putMilitiaSoldiers(hexField: TerrainHexField): Unit = {
+  override def putMilitiaSoldiers(hexField: TerrainHexField): List[Warrior] = {
     val hexesWithHouses = hexField.hexes.filter(_.mapObj.exists(_.isInstanceOf[House]))
     hexesWithHouses.zip(rebels).foreach { case (hex, w) =>
       hex.soldier = Some(w.soldier)
     }
+    Nil
   }
 
   override def sides: (Set[State], Set[State]) = {
