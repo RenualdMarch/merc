@@ -29,15 +29,17 @@ class MarketDay(product: Product, val price: Double, val turn: Int) {
 
   private def priorityDemands:List[DemandRequest] = {
     demand.collect {
-      case bd:BusinessDemandRequest => bd
       case w:WarriorDemandRequest => w
-    } toList
+    }.toList :::
+    demand.collect {
+      case bd:BusinessDemandRequest => bd
+    }.toList
   }
 
   private def noPriorityDemands: List[DemandRequest] = {
     demand.collect {
-      case bd:BusinessDemandRequest => None
-      case w:WarriorDemandRequest => None
+      case _:BusinessDemandRequest => None
+      case _:WarriorDemandRequest => None
       case x => Some(x)
     }.flatten.toList
   }
@@ -76,9 +78,15 @@ class MarketDay(product: Product, val price: Double, val turn: Int) {
         (totalSupply - priorityDemandSize) / noPriorityDemandSize
       } else 0
 
-      val fulfilledDemands = priorityDemands.map { s  =>
-        FulfilledDemandRequest(s.count * priorityDiv, price, s)
-      } ::: noPriorityDemands.map { s  =>
+      val remainingCount = Math.min(priorityDemandSize, totalSupply)
+      val (fulfilledPriorityDemands, _) = priorityDemands.foldLeft((List[FulfilledDemandRequest](), remainingCount)) {
+        case ((acc, remaining), s)  =>
+        val toFulfill = Math.min(remaining, s.count)
+        val newRemaining = remaining - toFulfill
+        (FulfilledDemandRequest(toFulfill, price, s) :: acc, newRemaining)
+      }
+
+      val fulfilledDemands = fulfilledPriorityDemands ::: noPriorityDemands.map { s  =>
         FulfilledDemandRequest(s.count * noPriorityDiv, price, s)
       }
 

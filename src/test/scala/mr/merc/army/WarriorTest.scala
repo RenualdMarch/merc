@@ -66,10 +66,10 @@ class WarriorTest extends FunSuite with Matchers {
 
     val w = new Warrior(warriorType, Professional, culture, state)
 
-    val sum = w.needs.values.sum / 2
+    val sum = w.needs.values.sum / 4
 
     val fullNeeds = w.needs.map { case (p, c) =>
-      FulfilledDemandRequest(c / 2, 1.0, WarriorDemandRequest(w, p, c))
+      FulfilledDemandRequest(c / 4, 1.0, WarriorDemandRequest(w, p, c))
     }
 
     fullNeeds.foreach(w.buyDemand)
@@ -79,7 +79,7 @@ class WarriorTest extends FunSuite with Matchers {
     w.hpPercentage should be < 1.0
     w.historicalNeeds should have size 1
     val head = w.historicalNeeds.head
-    head.demanded shouldBe head.received |*| 2
+    head.demanded shouldBe head.received |*| 4
     head.demanded shouldBe w.needs
 
     w.hpPercentage = 0

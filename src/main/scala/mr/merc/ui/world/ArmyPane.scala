@@ -149,7 +149,7 @@ class WarriorRecruitmentPane(controller: ArmyPaneController, stage: Stage) exten
   val recruitWarriorButton = BigButton(Localization("army.recruit"))
   recruitWarriorButton.disable = !controller.canRecruit
   recruitWarriorButton.onAction = { _ =>
-    val dialog = new SelectRecruitWarriorDialog(controller.possibleWarriorToRecruit())
+    val dialog = new SelectRecruitWarriorDialog(stage, controller.possibleWarriorToRecruit())
     dialog.showDialog(stage)
     dialog.dialogResult.foreach { case RecruitWarriorOrder(wt, wc, c, st) =>
       controller.recruitWarrior(wt, wc, c)
@@ -330,7 +330,7 @@ object SelectRecruitWarriorDialog {
 
 }
 
-class SelectRecruitWarriorDialog(possibleChoices: List[RecruitWarriorOrder]) extends DialogStage[RecruitWarriorOrder] {
+class SelectRecruitWarriorDialog(owner: Stage, possibleChoices: List[RecruitWarriorOrder]) extends DialogStage[RecruitWarriorOrder] {
 
   class ParentWarriorPane(child: RecruitWarriorOrder) extends BorderPane {
     center = new WarriorTypeOrderPane(child)
@@ -341,7 +341,20 @@ class SelectRecruitWarriorDialog(possibleChoices: List[RecruitWarriorOrder]) ext
       dialogResult = Some(child)
     }
 
-    MercTooltip.applyCenterTooltip(this, new WarriorTypeInfoPane(child.warrior))
+    //MercTooltip.applyCenterTooltip(this, new WarriorTypeInfoPane(child.warrior))
+  }
+
+  override def additionalButtons:List[Button] = {
+    List(new BigButton{
+      text = Localization("soldier.info")
+      disable <== dialogResultProperty.map(_.isEmpty)
+      onAction = { _ =>
+        dialogResult.foreach { dr =>
+          import ModalDialog._
+          new WarriorTypeInfoPane(dr.warrior).showDialog(owner)
+        }
+      }
+    })
   }
 
   override protected def dialogContent: Region = {

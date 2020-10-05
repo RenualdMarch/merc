@@ -244,8 +244,10 @@ object DiplomaticMessage {
       allies.foreach { a =>
         if (diplomacy.areAllies(who, a)) {
           diplomacy.sendMessage(new AskJoinWar(who, a, war.get), currentTurn)
-        } else if (diplomacy.isVassal(who, a) || diplomacy.isVassal(a, who)) {
+        } else if (diplomacy.isVassal(who, a)) {
           diplomacy.sendMessage(new OrderJoinWar(who, a, war.get),currentTurn)
+        } else if (diplomacy.isVassal(a, who)) {
+          diplomacy.sendMessage(new VassalKindlyAsksOverlordToJoinWar(who, a, war.get),currentTurn)
         }
       }
     }
@@ -327,6 +329,13 @@ object DiplomaticMessage {
     override def messageTitle: String = Localization("diplomacy.orderJoinWar.title", from.name)
 
     override def body: String = Localization("diplomacy.orderJoinWar.body", from.name, warAgreement.localizeWar)
+  }
+
+  class VassalKindlyAsksOverlordToJoinWar(from: State, to: State, warAgreement: WarAgreement) extends OrderJoinWar(from, to, warAgreement) {
+
+    override def messageTitle: String = Localization("diplomacy.kindlyAskToJoinWar.title", from.name)
+
+    override def body: String = Localization("diplomacy.kindlyAskToJoinWar.body", from.name, warAgreement.localizeWar)
   }
 
   class AgreeJoinWar(val from: State, val to: State, warAgreement: WarAgreement) extends DiplomaticDeclaration {

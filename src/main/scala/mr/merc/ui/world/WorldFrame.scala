@@ -35,7 +35,7 @@ import scalafx.stage.FileChooser
 
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.Future
-import scala.util.{Failure, Success}
+import scala.util.{Failure, Success, Try}
 
 object WorldFrame {
   val PixelsPerScroll = 200
@@ -186,28 +186,28 @@ class WorldFrame(val sceneManager: SceneManager, worldState: WorldState) extends
 
     Future(worldState.nextTurn(true)).map { battles =>
       Platform.runLater {
-        waitDialog.close()
-        if (battles.nonEmpty) {
-          playBattles(battles, () => {
+        Try {
+          if (battles.nonEmpty) {
+            playBattles(battles, () => {
+              worldState.sendBattleReports()
+              totalRefresh()
+              sceneManager.showFrame(this)
+              showMailPane()
+            })
+          } else {
             worldState.sendBattleReports()
             totalRefresh()
             sceneManager.showFrame(this)
             showMailPane()
-          })
-        } else {
-          worldState.sendBattleReports()
-          totalRefresh()
-          sceneManager.showFrame(this)
-          showMailPane()
+          }
+        } match {
+          case Success(()) =>
+            waitDialog.close()
+          case Failure(ex) =>
+            waitDialog.close()
+            error(ex.getMessage, ex)
         }
       }
-    } onComplete {
-      case Success(()) => // doNothing
-      case Failure(ex) =>
-        Platform.runLater {
-          waitDialog.close()
-        }
-        error(ex.getMessage, ex)
     }
 
     waitDialog.showDialog(sceneManager.stage)

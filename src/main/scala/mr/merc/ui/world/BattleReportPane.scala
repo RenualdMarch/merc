@@ -19,7 +19,6 @@ class BattleReportPane(battles:List[BattleReport]) extends ScrollPane {
       add(new OneBattleReportPane(br), "wrap")
     }
   }
-  fitToWidth = true
   style = Components.largeFontStyle
 }
 

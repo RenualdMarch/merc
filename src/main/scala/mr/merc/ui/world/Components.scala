@@ -104,7 +104,12 @@ object DoubleFormatter {
 }
 
 abstract class DialogStage[T] extends Stage with Logging {
-  var dialogResult: Option[T] = None
+  val dialogResultProperty: ObjectProperty[Option[T]] = ObjectProperty(None)
+
+  def dialogResult = dialogResultProperty.value
+  def dialogResult_=(t:Option[T]): Unit = {
+    dialogResultProperty.value = t
+  }
 
   protected def onOkButtonPressed(): Unit = {
 
@@ -126,8 +131,11 @@ abstract class DialogStage[T] extends Stage with Logging {
     dialogResult = None
   }
 
+  protected def additionalButtons:List[Button] = Nil
+
   private val buttonsPane = new MigPane()
   buttonsPane.add(okButton)
+  additionalButtons.foreach(buttonsPane.add(_))
   buttonsPane.add(cancelButton)
 
   protected def dialogContent:Region
