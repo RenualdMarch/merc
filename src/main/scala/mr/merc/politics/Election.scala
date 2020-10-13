@@ -5,6 +5,8 @@ import mr.merc.economics.MapUtil.FloatOperations._
 import mr.merc.economics.MapUtil.NumericOperations.CollectionMapWithOperations
 import mr.merc.economics.Culture
 
+import scala.collection.concurrent.TrieMap
+
 class Election(currentParty: Party, primaryCulture: Culture, possibleParties: List[Party]) {
 
   import Election._
@@ -39,9 +41,7 @@ object Election {
     def choose(parties: List[Party]): PopulationElectionReport = {
       val groups = population.politicalViews.currentViews(population.literacy).pointsOfView |*| population.populationCount
       val votesByGroups = groups.map { case (position, count) =>
-        val diff = parties.groupBy(p => position.diffWithPosition(p.politicalPosition))
-        val minKey = diff.keySet.min
-        val mostPopularParties = diff(minKey)
+        val mostPopularParties = PopulationElection.mostPopularParties(position, parties)
         val countPerParty = count / mostPopularParties.size
         mostPopularParties.map(_ -> countPerParty).toMap
       }.sumAll
@@ -50,6 +50,18 @@ object Election {
       }
       val zeros = (parties.toSet -- votes.keySet).map(_ -> 0d).toMap
       PopulationElectionReport(population, votes ++ zeros)
+    }
+  }
+
+  object PopulationElection {
+    private val cache = new TrieMap[(PoliticalPosition, List[Party]), List[Party]]()
+
+    def mostPopularParties(politicalPosition: PoliticalPosition, parties: List[Party]): List[Party] = {
+      cache.getOrElseUpdate(politicalPosition -> parties, {
+        val diff = parties.groupBy(p => politicalPosition.diffWithPosition(p.politicalPosition))
+        val minKey = diff.keySet.min
+        diff(minKey)
+      })
     }
   }
 

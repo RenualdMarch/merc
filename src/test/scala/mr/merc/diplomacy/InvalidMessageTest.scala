@@ -17,6 +17,6 @@ class InvalidMessageTest extends AbstractDiplomacyTest {
     actions.sendMessage(vp)
 
     actions.mailbox(first) shouldBe Nil
-    actions.mailbox(second) shouldBe Nil
+    actions.mailbox(second) shouldBe List(vp)
   }
 }

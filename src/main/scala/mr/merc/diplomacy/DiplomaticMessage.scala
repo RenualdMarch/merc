@@ -6,6 +6,10 @@ import mr.merc.diplomacy.RelationshipEvent._
 import mr.merc.local.Localization
 import mr.merc.politics.State
 import mr.merc.economics.WorldConstants.Diplomacy._
+import mr.merc.ui.world.{BigText, StateComponentColorName}
+import org.tbee.javafx.scene.layout.MigPane
+import scalafx.scene.Node
+import scalafx.Includes._
 
 sealed trait DiplomaticMessage {
   def from: State
@@ -21,6 +25,8 @@ sealed trait DiplomaticMessage {
   def body: String
 
   def beforeSendAction(diplomacy:WorldDiplomacy, currentTurn:Int):Unit = {}
+
+  def renderInReport: Option[Node]
 }
 
 trait DiplomaticDeclaration extends DiplomaticMessage {
@@ -67,6 +73,8 @@ object DiplomaticMessage {
     override def messageTitle: String = Localization("diplomacy.proposeAlliance.title", from.name)
 
     override def body: String = Localization("diplomacy.proposeAlliance.body", from.name)
+
+    override def renderInReport: Option[Node] = None
   }
 
   class AllianceAccepted(val from: State, val to: State) extends DiplomaticDeclaration {
@@ -79,6 +87,12 @@ object DiplomaticMessage {
     override def messageTitle: String = Localization("diplomacy.acceptedAlliance.title", from.name)
 
     override def body: String = Localization("diplomacy.acceptedAlliance.body", from.name)
+
+    override def renderInReport: Option[Node] = Some(new MigPane {
+      add(new StateComponentColorName(to))
+      add(BigText(Localization("messages.acceptedAlliance")))
+      add(new StateComponentColorName(from))
+    })
   }
 
   class AllianceRejected(val from: State, val to: State) extends DiplomaticDeclaration {
@@ -91,6 +105,8 @@ object DiplomaticMessage {
     override def messageTitle: String = Localization("diplomacy.rejectedAlliance.title", from.name)
 
     override def body: String = Localization("diplomacy.rejectedAlliance.body", from.name)
+
+    override def renderInReport: Option[Node] = None
   }
 
   class VassalizationProposal(val from: State, val to: State) extends DiplomaticProposal {
@@ -119,6 +135,8 @@ object DiplomaticMessage {
     override def messageTitle: String = Localization("diplomacy.proposeVassalization.title", from.name)
 
     override def body: String = Localization("diplomacy.proposeVassalization.body", from.name)
+
+    override def renderInReport: Option[Node] = None
   }
 
   class VassalizationAccepted(val from: State, val to: State) extends DiplomaticDeclaration {
@@ -131,6 +149,12 @@ object DiplomaticMessage {
     override def messageTitle: String = Localization("diplomacy.acceptedVassalization.title", from.name)
 
     override def body: String = Localization("diplomacy.acceptedVassalization.body", from.name)
+
+    override def renderInReport: Option[Node] = Some(new MigPane {
+      add(new StateComponentColorName(from))
+      add(BigText(Localization("messages.acceptedVassalization")))
+      add(new StateComponentColorName(to))
+    })
   }
 
   class VassalizationRejected(val from: State, val to: State) extends DiplomaticDeclaration {
@@ -143,6 +167,8 @@ object DiplomaticMessage {
     override def messageTitle: String = Localization("diplomacy.rejectedVassalization.title", from.name)
 
     override def body: String = Localization("diplomacy.rejectedVassalization.body", from.name)
+
+    override def renderInReport: Option[Node] = None
   }
 
   class OverlordshipProposal(val from: State, val to: State) extends DiplomaticProposal {
@@ -171,6 +197,8 @@ object DiplomaticMessage {
     override def messageTitle: String = Localization("diplomacy.proposeOverlordship.title", from.name)
 
     override def body: String = Localization("diplomacy.proposeOverlordship.body", from.name)
+
+    override def renderInReport: Option[Node] = None
   }
 
   class OverlordshipAccepted(val from: State, val to: State) extends DiplomaticDeclaration {
@@ -183,6 +211,12 @@ object DiplomaticMessage {
     override def messageTitle: String = Localization("diplomacy.acceptedOverlordship.title", from.name)
 
     override def body: String = Localization("diplomacy.acceptedOverlordship.body", from.name)
+
+    override def renderInReport: Option[Node] = Some(new MigPane {
+      add(new StateComponentColorName(to))
+      add(BigText(Localization("messages.acceptedVassalization")))
+      add(new StateComponentColorName(from))
+    })
   }
 
   class OverlordshipRejected(val from: State, val to: State) extends DiplomaticDeclaration {
@@ -195,6 +229,8 @@ object DiplomaticMessage {
     override def messageTitle: String = Localization("diplomacy.rejectedOverlordship.title", from.name)
 
     override def body: String = Localization("diplomacy.rejectedOverlordship.body", from.name)
+
+    override def renderInReport: Option[Node] = None
   }
 
   class DeclareWar(val from: State, val to: State, target: WarTarget, attackerAllies:Set[State]) extends CustomDiplomaticQuestion {
@@ -269,6 +305,13 @@ object DiplomaticMessage {
     override def messageTitle: String = Localization("diplomacy.declareWar.title", from.name)
 
     override def body: String = Localization("diplomacy.declareWar.body", from.name, war.get.targets.map(_.localizeTarget).mkString("\n"))
+
+    override def renderInReport: Option[Node] = Some(new MigPane{
+      add(new StateComponentColorName(from))
+      add(BigText(Localization("messages.declaredWar")))
+      add(new StateComponentColorName(to), "wrap")
+      add(BigText(Localization("messages.declaredWar.reason") + " " + target.localizeTarget), "span 3")
+    })
   }
 
   class AskJoinWar(val from: State, val to: State, val warAgreement: WarAgreement) extends DiplomaticProposal {
@@ -304,6 +347,8 @@ object DiplomaticMessage {
 
     override def messageTitle: String = Localization("diplomacy.askJoinWar.title", from.name)
 
+    override def renderInReport: Option[Node] = None
+
     override def body: String = Localization("diplomacy.askJoinWar.body", from.name, warAgreement.localizeWar)
   }
 
@@ -328,6 +373,8 @@ object DiplomaticMessage {
 
     override def messageTitle: String = Localization("diplomacy.orderJoinWar.title", from.name)
 
+    override def renderInReport: Option[Node] = None
+
     override def body: String = Localization("diplomacy.orderJoinWar.body", from.name, warAgreement.localizeWar)
   }
 
@@ -348,6 +395,14 @@ object DiplomaticMessage {
     override def messageTitle: String = Localization("diplomacy.agreeJoinWar.title", from.name)
 
     override def body: String = Localization("diplomacy.agreeJoinWar.body", from.name, warAgreement.localizeWar)
+
+    override def renderInReport: Option[Node] = Some(new MigPane{
+      add(new StateComponentColorName(from))
+      add(BigText(Localization("messages.joinedWar.with")))
+      add(new StateComponentColorName(to))
+      add(BigText(Localization("messages.joinedWar.reason")), "wrap")
+      add(BigText(Localization(warAgreement.localizeWar)), "span 4")
+    })
   }
 
   class DeclineJoinWar(val from: State, val to: State, warAgreement: WarAgreement) extends DiplomaticDeclaration {
@@ -360,6 +415,15 @@ object DiplomaticMessage {
     override def messageTitle: String = Localization("diplomacy.declineJoinWar.title", from.name)
 
     override def body: String = Localization("diplomacy.declineJoinWar.body", from.name, warAgreement.localizeWar)
+
+    override def renderInReport: Option[Node] = Some(new MigPane{
+      add(new StateComponentColorName(from))
+      add(BigText(Localization("messages.declinedJoinWar.with")))
+      add(new StateComponentColorName(to))
+      add(BigText(Localization("messages.declinedJoinWar.reason")), "wrap")
+      add(BigText(warAgreement.localizeWar), "span 4")
+    })
+
   }
 
   case class ProposePeace(from: State, to: State, warAgreement: WarAgreement, acceptedTargets: Set[WarTarget])
@@ -387,6 +451,8 @@ object DiplomaticMessage {
 
     override def body: String = Localization("diplomacy.proposePeace.body", from.name,
       WarAgreement.localizeTargetsList(acceptedTargets.toList))
+
+    override def renderInReport: Option[Node] = None
   }
 
   class AcceptedPeaceProposal(val from: State, val to: State, warAgreement: WarAgreement, acceptedTargets: Set[WarTarget])
@@ -401,6 +467,14 @@ object DiplomaticMessage {
 
     override def body: String = Localization("diplomacy.peaceAccepted.body", from.name,
       WarAgreement.localizeTargetsList(acceptedTargets.toList))
+
+    override def renderInReport: Option[Node] = Some(new MigPane{
+      add(new StateComponentColorName(from))
+      add(BigText(Localization("messages.acceptedPeace.with")))
+      add(new StateComponentColorName(to))
+      add(BigText(Localization("messages.acceptedPeace.terms")), "wrap")
+      add(BigText(WarAgreement.localizeTargetsList(acceptedTargets.toList)), "span 4")
+    })
   }
 
   class AcceptedOthersPeaceProposal(val from:State, val to:State, warAgreement: WarAgreement, acceptedTargets:Set[WarTarget])
@@ -415,6 +489,12 @@ object DiplomaticMessage {
 
     override def body: String = Localization("diplomacy.otherPeaceAccepted.body", from.name,
       WarAgreement.localizeTargetsList(acceptedTargets.toList))
+
+    override def renderInReport: Option[Node] = Some(new MigPane{
+      add(new StateComponentColorName(to))
+      add(BigText(Localization("messages.othersPeace")), "wrap")
+      add(BigText(WarAgreement.localizeTargetsList(acceptedTargets.toList)), "span 2")
+    })
   }
 
   class DeclinedPeaceProposal(val from: State, val to: State, warAgreement: WarAgreement, acceptedTargets: Set[WarTarget])
@@ -429,6 +509,8 @@ object DiplomaticMessage {
 
     override def body: String = Localization("diplomacy.peaceDeclined.body", from.name,
       WarAgreement.localizeTargetsList(acceptedTargets.toList))
+
+    override def renderInReport: Option[Node] = None
   }
 
   case class ProposeSeparatePeace(from: State, to: State, warAgreement: WarAgreement, acceptedTargets: Set[WarTarget],
@@ -470,6 +552,8 @@ object DiplomaticMessage {
       Localization("proposeSeparatePeace.fromIsLeader.body", from.name,
         WarAgreement.localizeTargetsList(acceptedTargets.toList))
     else sys.error(s"$separateState is not to [$to] and is not from [$from]")
+
+    override def renderInReport: Option[Node] = None
   }
 
   case class AcceptedSeparatePeaceProposal(from: State, to: State, warAgreement: WarAgreement, acceptedTargets: Set[WarTarget],
@@ -484,6 +568,12 @@ object DiplomaticMessage {
 
     override def body: String = Localization("diplomacy.separatePeaceAccepted.body", from.name,
       WarAgreement.localizeTargetsList(acceptedTargets.toList))
+
+    override def renderInReport: Option[Node] = Some(new MigPane{
+      add(new StateComponentColorName(from))
+      add(BigText(Localization("messages.acceptedSeparatePeace")))
+      add(new StateComponentColorName(to))
+    })
   }
 
   case class DeclinedSeparatePeaceProposal(from: State, to: State, warAgreement: WarAgreement, acceptedTargets: Set[WarTarget],
@@ -498,6 +588,8 @@ object DiplomaticMessage {
 
     override def body: String = Localization("diplomacy.separatePeaceDeclined.body", from.name,
       WarAgreement.localizeTargetsList(acceptedTargets.toList))
+
+    override def renderInReport: Option[Node] = None
   }
 
   case class OtherAcceptedSeparatePeaceProposal(from: State, to: State, warAgreement: WarAgreement, acceptedTargets: Set[WarTarget]) extends DiplomaticDeclaration {
@@ -511,5 +603,7 @@ object DiplomaticMessage {
 
     override def body: String = Localization("diplomacy.otherSeparatePeaceAccepted.body", from.name,
       WarAgreement.localizeTargetsList(acceptedTargets.toList))
+
+    override def renderInReport: Option[Node] = None
   }
 }

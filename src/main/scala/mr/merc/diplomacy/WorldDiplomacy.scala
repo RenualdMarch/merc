@@ -16,6 +16,12 @@ import scala.util.Random
 class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
   def regions: List[Province] = actions.regions
 
+  private var currentTurnMessages:List[DiplomaticMessage] = Nil
+
+  def turnMessagesReport:List[DiplomaticMessage] = currentTurnMessages.reverse
+
+  private var savedTurn = -1
+
   private def states: Set[State] = regions.toSet.map { p: Province => p.owner }
 
   private var agreements: List[DiplomaticAgreement] = Nil
@@ -145,6 +151,12 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
     message.beforeSendAction(this, currentTurn)
     val messages = mailbox.getOrElse(message.to, Nil)
     mailbox += message.to -> (message :: messages)
+
+    if (currentTurn != savedTurn) {
+      currentTurnMessages = Nil
+      savedTurn = currentTurn
+    }
+    currentTurnMessages ::= message
   }
 
   def existsMessages(states: Set[State]): Boolean = {

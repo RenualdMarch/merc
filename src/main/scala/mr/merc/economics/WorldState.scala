@@ -25,11 +25,12 @@ import mr.merc.players.NamesGenerator
 import mr.merc.politics.IssuePosition.{EconomyPosition, RegimePosition}
 import mr.merc.politics.Regime.{Absolute, Constitutional, Democracy}
 import mr.merc.politics.{Election, Party, Province, State}
-import mr.merc.ui.world.{BattleReportPane, ElectionResultsPane}
+import mr.merc.ui.world.{BattleReportPane, ElectionResultsPane, PastDiplomaticMessagesPane}
 import scalafx.beans.property.ObjectProperty
 import mr.merc.util.FxPropertyUtils.PropertyBindingMap
 import scalafx.scene.layout.Region
 import scalafx.scene.paint.Color
+import scalafx.Includes._
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -84,6 +85,14 @@ class WorldState(val regions: List[Province], var playerState: State, val worldH
 
     if (aiBattlesEnabled) {
       this.aiTurn(onlyAnswer = false)
+    }
+
+    states.keysIterator.foreach { s =>
+      s.mailBox.addMessage(new InformationDomesticMessage(Localization("battleReport.sender"),
+        Localization("messages.events")) {
+        override def body: Region = new PastDiplomaticMessagesPane(WorldState.this)
+
+      })
     }
 
     info(s"Total money is $totalMoney")
@@ -412,6 +421,10 @@ trait WorldStateDiplomacyActions {
   var colorStream: Stream[Color]
 
   val diplomacyEngine = new WorldDiplomacy(this)
+
+  def neighbours(state: State):Set[State] = states(state).to[Set].flatMap(_.neighbours).map(_.owner)
+
+  def playerNeighbours = neighbours(playerState)
 
   def stateInfo: List[StateInfo] = states.toList.map { case (state, provinces) =>
     StateInfo(

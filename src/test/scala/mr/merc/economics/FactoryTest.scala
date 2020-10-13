@@ -408,6 +408,17 @@ class FactoryTest extends FunSuite with BeforeAndAfter with MockitoSugar with Ma
     val factory2 = new IndustrialFactory(region1, WineTest, 2, 0, 0, 20, 10)
 
     assert(factory1.isBankrupt === false)
+    assert(factory2.isBankrupt === false)
+
+    factory2.newDay(zeroTaxes, 1d, 1)
+    factory2.endOfDay()
+    factory2.newDay(zeroTaxes, 1d, 2)
+    factory2.endOfDay()
+    factory2.newDay(zeroTaxes, 1d, 3)
+    factory2.endOfDay()
+    factory2.newDay(zeroTaxes, 1d, 4)
+    factory2.endOfDay()
+
     assert(factory2.isBankrupt === true)
   }
 }
