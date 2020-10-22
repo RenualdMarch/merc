@@ -42,13 +42,13 @@ class OneBattleReportPane(battleReport:BattleReport) extends MigPane {
     }
   }
 
-  add(BigText(Localization("battleReport.vs", firstSide, secondSide)), "wrap")
-  add(BigText(province.name), "wrap")
+  add(BigText(Localization("battleReport.vs", firstSide, secondSide)), "wrap, center, span 2")
+  add(BigText(Localization("battleReport.battleOf", province.name)), "wrap, center, span 2")
   add(battleReport.result match {
     case Side1Won => BigText(Localization("battleReport.victory", firstSide))
     case Side2Won => BigText(Localization("battleReport.victory", secondSide))
     case Draw => BigText(Localization("battleReport.draw"))
-  }, "wrap")
+  }, "wrap, center, span 2")
 
   class WarriorCell(warrior:Warrior, alive:Boolean) extends StackPane {
 

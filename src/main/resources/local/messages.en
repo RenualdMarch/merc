@@ -419,6 +419,7 @@ battleReport.draw=Draw
 battleReport.sender=Minister of Foreign relations
 battleReport.title=Battles report
 battleReport.battles=Show battles
+battleReport.battleOf=Battle of %s
 projectsReport.reporter=Ministry of Economy
 projectsReport.title=Projects report
 projectsReport.completedProjects=Completed
