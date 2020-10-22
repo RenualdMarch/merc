@@ -386,6 +386,8 @@ object DiplomaticMessage {
   }
 
   class AgreeJoinWar(val from: State, val to: State, warAgreement: WarAgreement) extends DiplomaticDeclaration {
+    private val warCopy = warAgreement.clone()
+
     override def ok(diplomacy: WorldDiplomacy, currentTurn: Int): Unit = {}
 
     override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean = true
@@ -401,11 +403,13 @@ object DiplomaticMessage {
       add(BigText(Localization("messages.joinedWar.with")))
       add(new StateComponentColorName(to))
       add(BigText(Localization("messages.joinedWar.reason")), "wrap")
-      add(BigText(Localization(warAgreement.localizeWar)), "span 4")
+      add(BigText(Localization(warCopy.localizeWar)), "span 4")
     })
   }
 
   class DeclineJoinWar(val from: State, val to: State, warAgreement: WarAgreement) extends DiplomaticDeclaration {
+    private val warCopy = warAgreement.clone()
+
     override def ok(diplomacy: WorldDiplomacy, currentTurn: Int): Unit = {}
 
     override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean = true
@@ -421,7 +425,7 @@ object DiplomaticMessage {
       add(BigText(Localization("messages.declinedJoinWar.with")))
       add(new StateComponentColorName(to))
       add(BigText(Localization("messages.declinedJoinWar.reason")), "wrap")
-      add(BigText(warAgreement.localizeWar), "span 4")
+      add(BigText(warCopy.localizeWar), "span 4")
     })
 
   }
@@ -605,5 +609,26 @@ object DiplomaticMessage {
       WarAgreement.localizeTargetsList(acceptedTargets.toList))
 
     override def renderInReport: Option[Node] = None
+  }
+
+  case class StalledWarResolved(from: State, to: State, warAgreement: WarAgreement, acceptedTargets: Set[WarTarget]) extends DiplomaticDeclaration {
+    override def ok(diplomacy: WorldDiplomacy, currentTurn: Int): Unit = {}
+
+    override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean = true
+
+    override def sendTitle: Option[String] = None
+
+    override def messageTitle: String = Localization("diplomacy.stalledPeace.title", from.name)
+
+    override def body: String = Localization("diplomacy.stalledPeace.body", from.name,
+      WarAgreement.localizeTargetsList(acceptedTargets.toList))
+
+    override def renderInReport: Option[Node] = Some(new MigPane{
+      add(new StateComponentColorName(from))
+      add(BigText(Localization("messages.acceptedPeace.with")))
+      add(new StateComponentColorName(to))
+      add(BigText(Localization("messages.acceptedPeace.terms")), "wrap")
+      add(BigText(WarAgreement.localizeTargetsList(acceptedTargets.toList)), "span 4")
+    })
   }
 }

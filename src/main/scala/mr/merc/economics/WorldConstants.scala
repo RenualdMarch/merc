@@ -229,6 +229,8 @@ object WorldConstants {
     val ChanceForWeakClaim = 0.05
     val WeakClaimTime = 100
 
+    val StalledWarTimeUntilPeace = 8
+
     def reputationDescriptionTextKey(badBoy: Double):String = {
       if (badBoy == 0) "diplomacy.reputation.honorable"
       else if (badBoy <= 5) "diplomacy.reputation.respectable"

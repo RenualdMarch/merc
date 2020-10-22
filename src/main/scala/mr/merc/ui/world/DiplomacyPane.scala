@@ -200,7 +200,7 @@ class StateRelationsPane(currentState: State, selectedState: State, actions: Wor
   }
 
   def reputationText: String = {
-    val badBoy = actions.diplomacyEngine.badBoy.getOrElse(currentState, 0d)
+    val badBoy = actions.diplomacyEngine.badBoy.getOrElse(selectedState, 0d)
     Localization(WorldConstants.Diplomacy.reputationDescriptionTextKey(badBoy)) + s" ($badBoy)"
   }
 }
@@ -871,21 +871,23 @@ class WarPane(stage: Stage, war: WarAgreement, diplomacyActions: WorldStateDiplo
 
   def showBattlesButton: Node = {
     val pane = new ScrollPane {
-      prefHeight <== stage.height - 50
+      style = Components.largeFontStyle
+      prefHeight <== stage.height - 400
       content = new BattleReportPane(war.battles)
-    }
-
-    val dialog = new Stage {
-      title = Localization("battleReport.title")
-      scene = new Scene {
-        content = pane
-      }
     }
 
     new BigButton {
       text = Localization("battleReport.battles")
       onAction = { _ =>
         import ModalDialog._
+
+        val dialog = new Stage {
+          title = Localization("battleReport.title")
+          scene = new Scene {
+            content = pane
+          }
+        }
+
         dialog.showDialog(stage)
       }
       disable = war.battles.isEmpty

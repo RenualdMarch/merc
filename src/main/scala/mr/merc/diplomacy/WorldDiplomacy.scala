@@ -410,7 +410,12 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
         if (!hasClaimOverState(cs.demander, cs.giver)) {
           increaseBadBoy(cs.demander, CrackedStateBadBoy)
         }
-        val provinces = actions.regions.filter(_.owner == cs.giver)
+        val provinces = if (cs.partiallyApplied) {
+            actions.regions.filter(ow => ow.owner == cs.giver && ow.controller != ow.owner)
+          } else {
+            actions.states(cs.giver)
+          }
+
         val max = provinces.maxBy(_.regionPopulation.populationCount)
         max.controller = max.owner
         provinces.filterNot(_ == max).foreach { p =>
@@ -497,7 +502,7 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
     } ++ possibleCulturesToLiberate(defender).map {c =>
       val provinces = regions.filter(_.owner == defender).filter(_.culture == c)
       LiberateCulture(attacker, defender, c, provinces.toSet)
-    } ++ List(CrackState(attacker, defender), TakeMoney(attacker, defender))
+    } ++ List(CrackState(attacker, defender, false), TakeMoney(attacker, defender))
   }.toSet
 
   def possibleWarTargets(warAgreement: WarAgreement, state: State): Set[WarTarget] = {
@@ -505,7 +510,7 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
     val allies = warAgreement.sideByState(state)
     val possible:Set[WarTarget] = enemies.flatMap { en =>
       List(
-        CrackState(state, en),
+        CrackState(state, en, false),
         Vassalize(state, en),
         TakeMoney(state, en)) ++
         regions.filter(r => r.owner == en && allies.contains(r.controller)).map { r =>
@@ -525,6 +530,41 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
     if (possibleWarTargets(war, warTarget.demander).contains(warTarget)) {
       war.targets += warTarget
     }
+  }
+
+
+  def resolveStalledWars(): Unit = {
+    wars.foreach { war =>
+      val lastBattle = if (war.battles.nonEmpty) {
+        war.battles.maxBy(_.turn).turn
+      } else war.startingTurn
+
+      if (actions.turn - lastBattle > WorldConstants.Diplomacy.StalledWarTimeUntilPeace) {
+        resolveStalledWar(war)
+      }
+    }
+  }
+
+  def resolveStalledWar(war: WarAgreement): Unit = {
+    war.targets.filter {
+      case TakeProvince(demander, giver, province) =>
+        war.sideByState(demander).contains(province.controller)
+      case WarAgreement.LiberateCulture(demander, giver, culture, provinces) =>
+        provinces.exists(p => war.sideByState(demander).contains(p.controller))
+      case WarAgreement.CrackState(demander, giver, _) =>
+        actions.states(giver).exists(p => war.sideByState(demander).contains(p.controller))
+      case _:WarAgreement.TakeMoney => false
+      case _:WarAgreement.Vassalize => false
+    }.foreach {
+      case tp:TakeProvince => applyWarTarget(war, tp, actions.turn)
+      case lc@LiberateCulture(demander, giver, culture, provinces) =>
+        val controlled = provinces.filter(p => war.sideByState(demander).contains(p.controller))
+        val newTarget = LiberateCulture(demander, giver, culture, controlled)
+        applyWarTarget(war, newTarget, actions.turn)
+      case cs:CrackState =>
+        applyWarTarget(war, cs.copy(partiallyApplied = true), actions.turn)
+    }
+
   }
 
 }

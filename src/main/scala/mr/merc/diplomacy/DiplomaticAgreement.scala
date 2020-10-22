@@ -165,9 +165,9 @@ object DiplomaticAgreement {
                           warVictim: State, startingTurn: Int, var targets: Set[WarTarget], fullWarName: String)
     extends DiplomaticAgreement(startingTurn, None) {
 
-    private var _battles:List[BattleReport] = Nil
+    private var _battles: List[BattleReport] = Nil
 
-    def battles:List[BattleReport] = _battles
+    def battles: List[BattleReport] = _battles
 
     def addBattle(report: BattleReport): Unit = {
       _battles ::= report
@@ -274,6 +274,12 @@ object DiplomaticAgreement {
         attackersLeader(diplomacy)
       else sys.error(s"state $state doesn't belong to war $this")
     }
+
+    override def clone(): WarAgreement = {
+      val war = this.copy()
+      this.battles.foreach(war.addBattle)
+      war
+    }
   }
 
   object WarAgreement {
@@ -379,7 +385,7 @@ object DiplomaticAgreement {
     }
 
     // every province became separate state
-    case class CrackState(demander: State, giver: State) extends WarTarget {
+    case class CrackState(demander: State, giver: State, partiallyApplied: Boolean) extends WarTarget {
       override def validTarget(wa: WarAgreement, diplomacy: WorldDiplomacy): Option[WarTarget] = {
         if (giverCanGiveInThisWar(wa, diplomacy) && diplomacy.regions.count(_.owner == giver) > 1) {
           Some(this)

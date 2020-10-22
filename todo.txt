@@ -1,11 +1,5 @@
 requirement failed: Buying and selling differ
 
-diplomatic info about new events
-propose peace and accept if war stalls - write battles to war history
-battle pane padding on the left - rework it using save/load
-add scroll pane on battles pane
-smth very buggy with reputation - its one for all
-
 state dissapeared, war should dissapear also - could not reproduce
 
 Not high priority:
@@ -36,14 +30,16 @@ Undead
 Dwarfs
 ???
 
++Saurian
++Drakes
++Trolls
+
+
 +Aquana
 +Minotaurs
 +Frozen
-+Drakes
-+Saurian
 +Nagas
 +Merfolks
-+Trolls
 
 Polishing:
 issues - balance production and needs multipliers

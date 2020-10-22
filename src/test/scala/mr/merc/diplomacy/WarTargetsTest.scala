@@ -75,7 +75,7 @@ class WarTargetsTest extends AbstractDiplomacyTest {
     val List(firstProvince1, firstProvince2) = actions.regions.filter(_.owner == first)
     val List(secondProvince1, secondProvince2) = actions.regions.filter(_.owner == second)
 
-    actions.sendMessage(new DeclareWar(first, second, new CrackState(first, second), Set()))
+    actions.sendMessage(new DeclareWar(first, second, CrackState(first, second, false), Set()))
     actions.processUnansweredMessages()
 
     val agreement = actions.agreements(first).head.asInstanceOf[WarAgreement]

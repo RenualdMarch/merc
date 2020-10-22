@@ -24,6 +24,8 @@ class BattleReportPane(battles:List[BattleReport]) extends ScrollPane {
 
 class OneBattleReportPane(battleReport:BattleReport) extends MigPane {
 
+  this.style = "-fx-border-color: black;-fx-border-width: 1;-fx-border-insets: 3px; -fx-background-insets: 3px;"
+
   private val firstSide = battleReport.side1.map(_.name).mkString(",")
   private val secondSide = battleReport.side2.map(_.name).mkString(",")
   private val warriorColumns = 4
@@ -49,8 +51,11 @@ class OneBattleReportPane(battleReport:BattleReport) extends MigPane {
   }, "wrap")
 
   class WarriorCell(warrior:Warrior, alive:Boolean) extends StackPane {
+
+    this.style = "-fx-border-color: black;-fx-border-width: 1;-fx-border-insets: 3px; -fx-background-insets: 3px;"
+
     children.addAll(
-      Rectangle(72, 72, if (alive) Color.Transparent else Color.Red),
+      Rectangle(72 + 12, 72 + 12, if (alive) Color.White else Color.Red),
       new ImageView(warrior.image)
     )
   }
@@ -83,20 +88,24 @@ class OneBattleReportPane(battleReport:BattleReport) extends MigPane {
   private val side2Militia = GridPaneBuilder.buildWithoutCaption(constraints, side2MilitiaWarriors)
 
   add(new MigPane {
+    this.style = "-fx-border-color: black;-fx-border-width: 1;-fx-border-insets: 3px; -fx-background-insets: 3px;"
+
     add(BigText(Localization("battleReport.regular")), "center, wrap")
     add(side1Regular, "wrap")
     if (side1MilitiaWarriors.nonEmpty) {
       add(BigText(Localization("battleReport.militia")), "center, wrap")
       add(side1Militia, "wrap")
     }
-  }, "left")
+  }, "left, push, grow")
 
   add(new MigPane {
+    this.style = "-fx-border-color: black;-fx-border-width: 1;-fx-border-insets: 3px; -fx-background-insets: 3px;"
+
     add(BigText(Localization("battleReport.regular")), "center, wrap")
     add(side2Regular, "wrap")
     if (side2MilitiaWarriors.nonEmpty) {
       add(BigText(Localization("battleReport.militia")), "center, wrap")
       add(side2Militia, "wrap")
     }
-  }, "right")
+  }, "right, push, grow")
 }

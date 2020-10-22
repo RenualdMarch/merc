@@ -1,13 +1,13 @@
 package mr.merc.economics
 
-import cats.Eval
+import cats.data.NonEmptyList
 import cats.kernel.Monoid
 import mr.merc.ai.BattleAI
 import mr.merc.army.{Warrior, WarriorCompetence, WarriorType}
 import mr.merc.battle.BattleModel
 import mr.merc.diplomacy.Claim.{StrongProvinceClaim, VassalizationClaim, WeakProvinceClaim}
 import mr.merc.diplomacy.DiplomaticAgreement.{AllianceAgreement, WarAgreement}
-import mr.merc.diplomacy.DiplomaticAgreement.WarAgreement.{TakeMoney, TakeProvince, WarTarget}
+import mr.merc.diplomacy.DiplomaticAgreement.WarAgreement.{CrackState, LiberateCulture, TakeMoney, TakeProvince, WarTarget}
 import mr.merc.diplomacy.DiplomaticMessage._
 import mr.merc.diplomacy.WorldDiplomacy.RelationshipBonus
 import mr.merc.diplomacy._
@@ -64,6 +64,9 @@ class WorldState(val regions: List[Province], var playerState: State, val worldH
     this.states.keysIterator.foreach(_.mailBox.clearMessages())
 
     turn = turn + 1
+
+    diplomacyEngine.resolveStalledWars()
+
     val day = new WorldMarketDay(this, turn)
     day.trade()
     controlledRegions.foreach { r =>
@@ -425,6 +428,7 @@ trait WorldStateDiplomacyActions {
   def neighbours(state: State):Set[State] = states(state).to[Set].flatMap(_.neighbours).map(_.owner)
 
   def playerNeighbours = neighbours(playerState)
+
 
   def stateInfo: List[StateInfo] = states.toList.map { case (state, provinces) =>
     StateInfo(
