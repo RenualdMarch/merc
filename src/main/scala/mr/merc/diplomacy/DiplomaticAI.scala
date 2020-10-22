@@ -234,7 +234,7 @@ class DiplomaticAI(state: State, actions: WorldStateDiplomacyActions) extends Lo
         demanderSide.contains(province.controller)
       case LiberateCulture(_, _, _, provinces) =>
         provinces.forall (p => demanderSide.contains(p.controller))
-      case CrackState(_, giver) =>
+      case CrackState(_, giver, _) =>
         actions.regions.filter(_.owner == giver).forall(p => demanderSide.contains(p.controller))
       case TakeMoney(_, _) => true
       case Vassalize(_, giver) =>

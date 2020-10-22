@@ -557,7 +557,7 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
       case _:WarAgreement.Vassalize => false
     }.foreach {
       case tp:TakeProvince => applyWarTarget(war, tp, actions.turn)
-      case lc@LiberateCulture(demander, giver, culture, provinces) =>
+      case LiberateCulture(demander, giver, culture, provinces) =>
         val controlled = provinces.filter(p => war.sideByState(demander).contains(p.controller))
         val newTarget = LiberateCulture(demander, giver, culture, controlled)
         applyWarTarget(war, newTarget, actions.turn)
