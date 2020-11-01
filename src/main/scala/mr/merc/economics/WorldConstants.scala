@@ -231,6 +231,8 @@ object WorldConstants {
 
     val StalledWarTimeUntilPeace = 8
 
+    val DeleteLastTurnEvents = false
+
     def reputationDescriptionTextKey(badBoy: Double):String = {
       if (badBoy == 0) "diplomacy.reputation.honorable"
       else if (badBoy <= 5) "diplomacy.reputation.respectable"
@@ -253,6 +255,12 @@ object WorldConstants {
     val PowerDifferenceToStartWar = 3
     val MaxBudgetSpendingOnWarriors = 0.3
     val TotalArmySumToBeTiredOfWar = 5
+  }
+
+  object Animation {
+    val SoldierViewSpriteChangeDuration = 70
+    val SoldierAttackSpeed = 300
+    val SoldierMovementSpeed = 300
   }
 }
 

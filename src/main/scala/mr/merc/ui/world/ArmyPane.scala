@@ -282,7 +282,7 @@ class WarriorTypeInfoPane(example: Warrior) extends MigPane("") with WorldInterf
 
   val attacksInfo: Pane = {
     val migPane = new MigPane("wrap 5")
-    val viewInfo = example.soldierView(1d, false).viewInfo
+    val viewInfo = example.soldierView(1d, false, false).viewInfo
     (st.attacks zip viewInfo.attacks).foreach { case (at, atView) =>
       migPane.add(new ImageView(atView.attackImage))
       migPane.add(MediumText(Localization(at.attackType.name)))
@@ -420,7 +420,8 @@ class ArmyPaneController(province: Province, provinceView: ProvinceView, worldSt
   }
 
   def dragStartPossible(from: Province): Boolean = {
-    from.owner == worldState.playerState
+    val key = if (from == province) None else Some(from)
+    province.regionWarriors.warriorDestinations.getOrElse(key, Nil).exists(_.owner == worldState.playerState)
   }
 
   def disposeSoldier(warrior: Warrior): Unit = {

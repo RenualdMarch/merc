@@ -19,9 +19,17 @@ import scalafx.scene.shape.Rectangle
 import MailPane.RowType
 import scalafx.scene.Node
 
-class MailPane(playerState:State, actions: WorldStateDiplomacyActions) extends PaneWithTwoHorizontalChildren(0.4) {
+class MailPane(playerState:State, actions: WorldStateDiplomacyActions, refreshWorldFrame: () => Unit) extends PaneWithTwoHorizontalChildren(0.4) {
   val titles = new MailTitles(playerState, actions)
-  val mail = new MailView(actions, playerState, titles.selectedMessage, () => titles.refresh())
+
+  def refresh(message: DiplomaticMessage): Unit = {
+    titles.refresh()
+    if (message.shouldRefreshMapAfterAnswer) {
+      refreshWorldFrame()
+    }
+  }
+
+  val mail = new MailView(actions, playerState, titles.selectedMessage, refresh)
   setTwoChildren(titles, mail)
 }
 
@@ -77,7 +85,7 @@ class MailTitles(playerState:State, actions: WorldStateDiplomacyActions) extends
   }
 }
 
-class MailView(actions: WorldStateDiplomacyActions, playerState:State, selectedMessage: ReadOnlyObjectProperty[RowType], refreshTable: () => Unit) extends BorderPane {
+class MailView(actions: WorldStateDiplomacyActions, playerState:State, selectedMessage: ReadOnlyObjectProperty[RowType], refreshTable: DiplomaticMessage => Unit) extends BorderPane {
 
   style = Components.largeFontStyle
 
@@ -119,7 +127,7 @@ class MessageViewParent(message:DiplomaticMessage) extends BorderPane {
   }
 }
 
-class DeclarationMessageView(actions: WorldStateDiplomacyActions, message: DiplomaticDeclaration, refreshTable: () => Unit) extends MessageViewParent(message) {
+class DeclarationMessageView(actions: WorldStateDiplomacyActions, message: DiplomaticDeclaration, refreshTable: DiplomaticMessage => Unit) extends MessageViewParent(message) {
 
   val textPane = new TextArea() {
     text = message.body
@@ -131,7 +139,7 @@ class DeclarationMessageView(actions: WorldStateDiplomacyActions, message: Diplo
     text = Localization("diplomacy.acknowledge")
     onAction = {_ =>
       actions.acknowledgeMessage(message)
-      refreshTable()
+      refreshTable(message)
     }
   }
 
@@ -141,7 +149,7 @@ class DeclarationMessageView(actions: WorldStateDiplomacyActions, message: Diplo
   }
 }
 
-class QuestionMessageView(actions: WorldStateDiplomacyActions, message: DiplomaticProposal, refreshTable: () => Unit) extends MessageViewParent(message) {
+class QuestionMessageView(actions: WorldStateDiplomacyActions, message: DiplomaticProposal, refreshTable: DiplomaticMessage => Unit) extends MessageViewParent(message) {
   val textPane = new TextArea() {
     text = message.body
     editable = false
@@ -152,7 +160,7 @@ class QuestionMessageView(actions: WorldStateDiplomacyActions, message: Diplomat
     text = Localization("diplomacy.accept")
     onAction = {_ =>
       actions.answerMessage(message, true)
-      refreshTable()
+      refreshTable(message)
     }
   }
 
@@ -160,7 +168,7 @@ class QuestionMessageView(actions: WorldStateDiplomacyActions, message: Diplomat
     text = Localization("diplomacy.decline")
     onAction = {_ =>
       actions.answerMessage(message, false)
-      refreshTable()
+      refreshTable(message)
     }
   }
 
@@ -171,7 +179,7 @@ class QuestionMessageView(actions: WorldStateDiplomacyActions, message: Diplomat
   }
 }
 
-class DeclareWarMessageView(actions: WorldStateDiplomacyActions, message: DeclareWar, refreshTable: () => Unit) extends MessageViewParent(message) {
+class DeclareWarMessageView(actions: WorldStateDiplomacyActions, message: DeclareWar, refreshTable: DiplomaticMessage => Unit) extends MessageViewParent(message) {
   private val allies = actions.allies(message.to)
 
   val textPane = new TextArea() {
@@ -202,7 +210,7 @@ class DeclareWarMessageView(actions: WorldStateDiplomacyActions, message: Declar
     text = Localization("diplomacy.okWar")
     onAction = { _ =>
       actions.answerDeclareWar(message, selectedAllies.value)
-      refreshTable()
+      refreshTable(message)
     }
   }
 

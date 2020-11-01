@@ -117,6 +117,12 @@ class BattleView(model: BattleModel, scalingFactor: Double, soldierDrawer: Soldi
   }
 
   private def handleEndMoveEvent(player: Player) {
+    mapView.addMovement(new MomentaryMovement({
+      soldierDrawer.soldiers.foreach { s =>
+        s.reloadHp()
+        s.refreshBars()
+      }
+    }))
     // do nothing by now
   }
 }

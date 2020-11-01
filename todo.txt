@@ -1,23 +1,12 @@
 requirement failed: Buying and selling differ
 
-little ok on battle result
-was not able to return sent warriors
-scroll in battles
-cirlces above soldiers on world map - only below should be shown
-make attacks little faster - speed up movement animation
-Khaz Modan Clan proposes peace on following terms: what terms???
-accepted peace with other controller????
-add all attack sounds
 unit dissapears not immediately in case of default animation
-map refresh on accepting peace proposal
 army after battle is not visible!!!
-remove healing or animate it
-hit point bar lies when healing occurs
 should not be possible to declare war while in truce?
-in battle report don't show regular army on militia when they are absent
 
 
-
+add all attack sounds
+accepted peace with other controller????
 state dissapeared, war should dissapear also - could not reproduce
 
 Not high priority:
@@ -27,6 +16,8 @@ idle animation for soldiers on world map
 make cultures for castles/walls
 check conditional AI logic - unused expression
 state rating pane
+animate healing
+
 
 add more cultures, at least two cultures per race:
 Marashy culture as indian?

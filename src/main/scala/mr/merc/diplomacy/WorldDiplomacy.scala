@@ -153,7 +153,10 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
     mailbox += message.to -> (message :: messages)
 
     if (currentTurn != savedTurn) {
-      currentTurnMessages = Nil
+      if (WorldConstants.Diplomacy.DeleteLastTurnEvents) {
+        currentTurnMessages = Nil
+      }
+
       savedTurn = currentTurn
     }
     currentTurnMessages ::= message

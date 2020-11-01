@@ -184,11 +184,11 @@ object SoldierTypeViewInfo {
   }
 
   private def createDeathAnimation(stand: MImage): List[MImage] = {
-    val size = 5
+    val size = 4
     val startingAlpha = stand.alpha
     val list = List.fill(size)(startingAlpha)
-    val increment = BigDecimal(1.0) / size
-    val result = (increment to 1.0 by increment).reverse
+    val increment = BigDecimal(0.8) / size
+    val result = (increment to 0.8 by increment).reverse
     val multiplyers = result.take(size)
     val alpha = (list zip multiplyers).map(p => p._1 * p._2)
 

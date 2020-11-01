@@ -11,11 +11,12 @@ import mr.merc.map.hex.view.TerrainHexView
 
 class ProjectileView(start: Option[List[MImage]], move: Option[List[MImage]], end: Option[List[MImage]],
                      from: (Int, Int), to: (Int, Int), speed: Int, factor: Double, sounds: Map[ProjectileSoundState, Sound]) extends Sprite[ProjectileState](
-  Map(ProjectileStart -> start.getOrElse(List(MImage.emptyImage)),
+  Map(ProjectileNotStarted -> List(MImage.emptyImage),
+    ProjectileStart -> start.getOrElse(List(MImage.emptyImage)),
     ProjectileMovement -> move.getOrElse(List(MImage.emptyImage)),
     ProjectileEnd -> end.getOrElse(List(MImage.emptyImage)),
-    ProjectileNotRender -> List(MImage.emptyImage)),
-  ProjectileNotRender, factor, mirroringEnabled = false) {
+    ProjectileFinished -> List(MImage.emptyImage)),
+  ProjectileNotStarted, factor, mirroringEnabled = false) {
 
   val movement = new LinearMovement(from._1, from._2, to._1, to._2, speed)
   movement.start()
@@ -23,7 +24,7 @@ class ProjectileView(start: Option[List[MImage]], move: Option[List[MImage]], en
   centered = Some(TerrainHexView.side(factor))
 
   override def state_=(st: ProjectileState) {
-    super.state = st
+    super.state_=(st)
     val soundState = st match {
       case ProjectileStart => Some(ProjectileStartSound)
       case ProjectileEnd => Some(ProjectileEndSound)
@@ -31,7 +32,7 @@ class ProjectileView(start: Option[List[MImage]], move: Option[List[MImage]], en
       case _ => None
     }
 
-    soundState flatMap (s => sounds.get(s)) foreach (_.play)
+    soundState flatMap (s => sounds.get(s)) foreach (_.play())
   }
 
   override def updateTime(time: Int): Int = {
@@ -51,7 +52,7 @@ class ProjectileView(start: Option[List[MImage]], move: Option[List[MImage]], en
             this.state = ProjectileEnd
             coords = to
           } else {
-            this.state = ProjectileNotRender
+            this.state = ProjectileFinished
           }
 
         case ProjectileMovement =>
@@ -59,11 +60,11 @@ class ProjectileView(start: Option[List[MImage]], move: Option[List[MImage]], en
             if (end.isDefined) {
               this.state = ProjectileEnd
             } else {
-              this.state = ProjectileNotRender
+              this.state = ProjectileFinished
             }
           }
-        case ProjectileEnd => this.state = ProjectileNotRender
-        case _ => // do nothing in this case
+        case ProjectileEnd => this.state = ProjectileFinished
+         case _ => // do nothing in this case
       }
     }
 
@@ -79,4 +80,6 @@ object ProjectileMovement extends ProjectileState
 
 object ProjectileEnd extends ProjectileState
 
-object ProjectileNotRender extends ProjectileState
+object ProjectileFinished extends ProjectileState
+
+object ProjectileNotStarted extends ProjectileState

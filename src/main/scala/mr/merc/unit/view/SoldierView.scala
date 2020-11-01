@@ -1,5 +1,6 @@
 package mr.merc.unit.view
 
+import mr.merc.economics.WorldConstants
 import mr.merc.map.hex.Direction
 import mr.merc.map.hex.view.TerrainHexView
 import mr.merc.map.hex.TerrainHexField
@@ -44,6 +45,8 @@ class SoldierView(val soldier: Soldier, factor: Double, drawOval: Boolean = true
 
   private val ovalSize = 12
 
+  duration = WorldConstants.Animation.SoldierViewSpriteChangeDuration
+
   private var _viewHp: Double = soldier.hp
   def viewHp: Double = _viewHp
   def viewHp_=(v:Double): Unit = {
@@ -60,7 +63,7 @@ class SoldierView(val soldier: Soldier, factor: Double, drawOval: Boolean = true
   lazy val sounds = SoldierTypeViewInfo(soldier.soldierType.viewName).sounds
 
   val healthBar = new VerticalBarView(healthBarWidth, healthBarHeight, Color.White, Color.Red, hpPercent)
-  val xpBar = new VerticalBarView(xpBarWidth, xpBarHeight, Color.White, Color.White, xpPercent)
+  //val xpBar = new VerticalBarView(xpBarWidth, xpBarHeight, Color.White, Color.White, xpPercent)
 
   def hpPercent = viewHp / soldier.soldierType.hp
   def xpPercent = soldier.exp.toDouble / soldier.soldierType.exp
@@ -102,9 +105,8 @@ class SoldierView(val soldier: Soldier, factor: Double, drawOval: Boolean = true
   }
 
   def refreshBars() {
-    if (healthBar.fillPercentage != hpPercent || xpBar.fillPercentage != xpPercent) {
+    if (healthBar.fillPercentage != hpPercent) {
       healthBar.fillPercentage = hpPercent
-      //xpBar.fillPercentage = xpPercent
       markAsDirty()
     }
   }

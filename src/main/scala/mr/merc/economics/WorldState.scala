@@ -380,8 +380,9 @@ trait WorldStateArmyActions {
       case None => from.regionWarriors.planSendWarriors(warriors, None)
       case Some(p) =>
         warriors.groupBy(_.owner).foreach { case (state, list) =>
-          if (canPlanMoveArmy(from, p, state))
+          if (canPlanMoveArmy(from, p, state)) {
             from.regionWarriors.planSendWarriors(list, to)
+          }
         }
     }
   }

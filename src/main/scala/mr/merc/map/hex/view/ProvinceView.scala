@@ -104,7 +104,7 @@ class ProvinceView(season: Season, val province: Province, field: FourSeasonsTer
 
   def refreshSoldiers(): Unit = {
     cleanSoldiers(currentMap)
-    currentMap = province.regionWarriors.allWarriors.map(w => w.soldier -> w.soldierView(1d, true)).toMap
+    currentMap = province.regionWarriors.allWarriors.map(w => w.soldier -> w.soldierView(1d, true, false)).toMap
     province.regionWarriors.warriorDestinations.foreach { case (destination, soldiers) =>
       (hexesForSoldiers(destination) zip soldiers).foreach { case (h, w) =>
           h.soldier = Some(w.soldier)

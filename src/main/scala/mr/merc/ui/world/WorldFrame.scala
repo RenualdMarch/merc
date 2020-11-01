@@ -161,7 +161,7 @@ class WorldFrame(val sceneManager: SceneManager, worldState: WorldState) extends
   }
 
   def showMailPane(): Unit = {
-    val pane = new MailPane(worldState.playerState, worldState)
+    val pane = new MailPane(worldState.playerState, worldState, () => totalRefresh())
     interfacePane.setFullPanel(new InterfacePane(pane, () => hideFullPane()))
   }
 

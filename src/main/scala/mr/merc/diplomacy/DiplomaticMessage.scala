@@ -27,6 +27,8 @@ sealed trait DiplomaticMessage {
   def beforeSendAction(diplomacy:WorldDiplomacy, currentTurn:Int):Unit = {}
 
   def renderInReport: Option[Node]
+
+  def shouldRefreshMapAfterAnswer:Boolean
 }
 
 trait DiplomaticDeclaration extends DiplomaticMessage {
@@ -75,6 +77,8 @@ object DiplomaticMessage {
     override def body: String = Localization("diplomacy.proposeAlliance.body", from.name)
 
     override def renderInReport: Option[Node] = None
+
+    override def shouldRefreshMapAfterAnswer: Boolean = false
   }
 
   class AllianceAccepted(val from: State, val to: State) extends DiplomaticDeclaration {
@@ -93,6 +97,8 @@ object DiplomaticMessage {
       add(BigText(Localization("messages.acceptedAlliance")))
       add(new StateComponentColorName(from))
     })
+
+    override def shouldRefreshMapAfterAnswer: Boolean = false
   }
 
   class AllianceRejected(val from: State, val to: State) extends DiplomaticDeclaration {
@@ -107,6 +113,8 @@ object DiplomaticMessage {
     override def body: String = Localization("diplomacy.rejectedAlliance.body", from.name)
 
     override def renderInReport: Option[Node] = None
+
+    override def shouldRefreshMapAfterAnswer: Boolean = false
   }
 
   class VassalizationProposal(val from: State, val to: State) extends DiplomaticProposal {
@@ -137,6 +145,8 @@ object DiplomaticMessage {
     override def body: String = Localization("diplomacy.proposeVassalization.body", from.name)
 
     override def renderInReport: Option[Node] = None
+
+    override def shouldRefreshMapAfterAnswer: Boolean = false
   }
 
   class VassalizationAccepted(val from: State, val to: State) extends DiplomaticDeclaration {
@@ -155,6 +165,8 @@ object DiplomaticMessage {
       add(BigText(Localization("messages.acceptedVassalization")))
       add(new StateComponentColorName(to))
     })
+
+    override def shouldRefreshMapAfterAnswer: Boolean = false
   }
 
   class VassalizationRejected(val from: State, val to: State) extends DiplomaticDeclaration {
@@ -169,6 +181,8 @@ object DiplomaticMessage {
     override def body: String = Localization("diplomacy.rejectedVassalization.body", from.name)
 
     override def renderInReport: Option[Node] = None
+
+    override def shouldRefreshMapAfterAnswer: Boolean = false
   }
 
   class OverlordshipProposal(val from: State, val to: State) extends DiplomaticProposal {
@@ -199,6 +213,8 @@ object DiplomaticMessage {
     override def body: String = Localization("diplomacy.proposeOverlordship.body", from.name)
 
     override def renderInReport: Option[Node] = None
+
+    override def shouldRefreshMapAfterAnswer: Boolean = false
   }
 
   class OverlordshipAccepted(val from: State, val to: State) extends DiplomaticDeclaration {
@@ -217,6 +233,8 @@ object DiplomaticMessage {
       add(BigText(Localization("messages.acceptedVassalization")))
       add(new StateComponentColorName(from))
     })
+
+    override def shouldRefreshMapAfterAnswer: Boolean = false
   }
 
   class OverlordshipRejected(val from: State, val to: State) extends DiplomaticDeclaration {
@@ -231,6 +249,8 @@ object DiplomaticMessage {
     override def body: String = Localization("diplomacy.rejectedOverlordship.body", from.name)
 
     override def renderInReport: Option[Node] = None
+
+    override def shouldRefreshMapAfterAnswer: Boolean = false
   }
 
   class DeclareWar(val from: State, val to: State, target: WarTarget, attackerAllies:Set[State]) extends CustomDiplomaticQuestion {
@@ -312,6 +332,8 @@ object DiplomaticMessage {
       add(new StateComponentColorName(to), "wrap")
       add(BigText(Localization("messages.declaredWar.reason") + " " + target.localizeTarget), "span 3")
     })
+
+    override def shouldRefreshMapAfterAnswer: Boolean = false
   }
 
   class AskJoinWar(val from: State, val to: State, val warAgreement: WarAgreement) extends DiplomaticProposal {
@@ -349,6 +371,8 @@ object DiplomaticMessage {
 
     override def renderInReport: Option[Node] = None
 
+    override def shouldRefreshMapAfterAnswer: Boolean = false
+
     override def body: String = Localization("diplomacy.askJoinWar.body", from.name, warAgreement.localizeWar)
   }
 
@@ -374,6 +398,8 @@ object DiplomaticMessage {
     override def messageTitle: String = Localization("diplomacy.orderJoinWar.title", from.name)
 
     override def renderInReport: Option[Node] = None
+
+    override def shouldRefreshMapAfterAnswer: Boolean = false
 
     override def body: String = Localization("diplomacy.orderJoinWar.body", from.name, warAgreement.localizeWar)
   }
@@ -405,6 +431,8 @@ object DiplomaticMessage {
       add(BigText(Localization("messages.joinedWar.reason")), "wrap")
       add(BigText(Localization(warCopy.localizeWar)), "span 4")
     })
+
+    override def shouldRefreshMapAfterAnswer: Boolean = false
   }
 
   class DeclineJoinWar(val from: State, val to: State, warAgreement: WarAgreement) extends DiplomaticDeclaration {
@@ -427,6 +455,8 @@ object DiplomaticMessage {
       add(BigText(Localization("messages.declinedJoinWar.reason")), "wrap")
       add(BigText(warCopy.localizeWar), "span 4")
     })
+
+    override def shouldRefreshMapAfterAnswer: Boolean = false
 
   }
 
@@ -457,6 +487,8 @@ object DiplomaticMessage {
       WarAgreement.localizeTargetsList(acceptedTargets.toList))
 
     override def renderInReport: Option[Node] = None
+
+    override def shouldRefreshMapAfterAnswer: Boolean = false
   }
 
   class AcceptedPeaceProposal(val from: State, val to: State, warAgreement: WarAgreement, acceptedTargets: Set[WarTarget])
@@ -479,6 +511,8 @@ object DiplomaticMessage {
       add(BigText(Localization("messages.acceptedPeace.terms")), "wrap")
       add(BigText(WarAgreement.localizeTargetsList(acceptedTargets.toList)), "span 4")
     })
+
+    override def shouldRefreshMapAfterAnswer: Boolean = true
   }
 
   class AcceptedOthersPeaceProposal(val from:State, val to:State, warAgreement: WarAgreement, acceptedTargets:Set[WarTarget])
@@ -499,6 +533,8 @@ object DiplomaticMessage {
       add(BigText(Localization("messages.othersPeace")), "wrap")
       add(BigText(WarAgreement.localizeTargetsList(acceptedTargets.toList)), "span 2")
     })
+
+    override def shouldRefreshMapAfterAnswer: Boolean = true
   }
 
   class DeclinedPeaceProposal(val from: State, val to: State, warAgreement: WarAgreement, acceptedTargets: Set[WarTarget])
@@ -515,6 +551,8 @@ object DiplomaticMessage {
       WarAgreement.localizeTargetsList(acceptedTargets.toList))
 
     override def renderInReport: Option[Node] = None
+
+    override def shouldRefreshMapAfterAnswer: Boolean = false
   }
 
   case class ProposeSeparatePeace(from: State, to: State, warAgreement: WarAgreement, acceptedTargets: Set[WarTarget],
@@ -558,6 +596,8 @@ object DiplomaticMessage {
     else sys.error(s"$separateState is not to [$to] and is not from [$from]")
 
     override def renderInReport: Option[Node] = None
+
+    override def shouldRefreshMapAfterAnswer: Boolean = false
   }
 
   case class AcceptedSeparatePeaceProposal(from: State, to: State, warAgreement: WarAgreement, acceptedTargets: Set[WarTarget],
@@ -578,6 +618,8 @@ object DiplomaticMessage {
       add(BigText(Localization("messages.acceptedSeparatePeace")))
       add(new StateComponentColorName(to))
     })
+
+    override def shouldRefreshMapAfterAnswer: Boolean = true
   }
 
   case class DeclinedSeparatePeaceProposal(from: State, to: State, warAgreement: WarAgreement, acceptedTargets: Set[WarTarget],
@@ -594,6 +636,8 @@ object DiplomaticMessage {
       WarAgreement.localizeTargetsList(acceptedTargets.toList))
 
     override def renderInReport: Option[Node] = None
+
+    override def shouldRefreshMapAfterAnswer: Boolean = false
   }
 
   case class OtherAcceptedSeparatePeaceProposal(from: State, to: State, warAgreement: WarAgreement, acceptedTargets: Set[WarTarget]) extends DiplomaticDeclaration {
@@ -609,6 +653,8 @@ object DiplomaticMessage {
       WarAgreement.localizeTargetsList(acceptedTargets.toList))
 
     override def renderInReport: Option[Node] = None
+
+    override def shouldRefreshMapAfterAnswer: Boolean = false
   }
 
   case class StalledWarResolved(from: State, to: State, warAgreement: WarAgreement, acceptedTargets: Set[WarTarget]) extends DiplomaticDeclaration {
@@ -630,5 +676,7 @@ object DiplomaticMessage {
       add(BigText(Localization("messages.acceptedPeace.terms")), "wrap")
       add(BigText(WarAgreement.localizeTargetsList(acceptedTargets.toList)), "span 4")
     })
+
+    override def shouldRefreshMapAfterAnswer: Boolean = true
   }
 }

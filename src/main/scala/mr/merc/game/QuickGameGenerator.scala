@@ -7,7 +7,7 @@ import mr.merc.map.GameField
 import scalafx.scene.paint.Color
 
 import scala.util.Random
-import mr.merc.army.{Warrior, WarriorCompetence, WarriorType}
+import mr.merc.army.{Warrior, WarriorCompetence}
 import mr.merc.economics.{Culture, PoliticalSystem}
 import mr.merc.politics.{Party, State}
 import mr.merc.util.MercUtils._
@@ -26,10 +26,10 @@ class QuickGameGenerator(player1: Player = Player("Human", Color.Yellow),
   }
 
   override def generateGame: GameField = {
-    val field = new RandomTerrainGenerator(0, 0.05).generateMap(5, 10, 0)
+    val field = new RandomTerrainGenerator(0.5, 0.05).generateMap(5, 10, Random.nextInt())
     val humans = soldiersList(state1)
     val ais = soldiersList(state2)
-    val indices = List(4, 6, 8, 10, 12, 14, 16).map(_ / 2)
+    val indices = List(2, 3, 4, 5, 6, 7, 8)
     indices zip humans foreach {
       case (i, s) =>
         field.hex(0, i).soldier = Some(s)

@@ -48,12 +48,12 @@ class Warrior(val warriorType: WarriorType, val competence: WarriorCompetence, v
 
   val soldier:Soldier = new Soldier(warriorType.name, soldierType, player)
 
-  @transient private lazy val cache = CacheFactoryMap.memo[(Double, Boolean), SoldierView] {
-    case (factor, circles) => new SoldierView(soldier, factor, circles, circles)
+  @transient private lazy val cache = CacheFactoryMap.memo[(Double, Boolean, Boolean), SoldierView] {
+    case (factor, circles, drawState) => new SoldierView(soldier, factor, circles, drawState)
   }
 
-  def soldierView(factor: Double, circles:Boolean):SoldierView = {
-    val sv = cache(factor, circles)
+  def soldierView(factor: Double, circles:Boolean, drawState: Boolean):SoldierView = {
+    val sv = cache(factor, circles, drawState)
     sv.refreshBars()
     sv
   }
@@ -81,5 +81,5 @@ class Warrior(val warriorType: WarriorType, val competence: WarriorCompetence, v
     historicalNeedsRecords = historicalNeeds.takeRight(historicalRecords)
   }
 
-  def image:Image = soldierView(1d, false).images(StandState).head.image
+  def image:Image = soldierView(1d, false, false).images(StandState).head.image
 }

@@ -284,8 +284,14 @@ object DiplomaticAgreement {
 
   object WarAgreement {
 
-    def localizeTargetsList(targets: List[WarTarget]): String = targets.map(t =>
-      Localization("diplomacy.demands", t.demander.name) + " " + t.localizeTarget).mkString("\n")
+    def localizeTargetsList(targets: List[WarTarget]): String = {
+      if (targets.isEmpty) {
+        Localization("diplomacy.proposePeace.whitePeace")
+      } else {
+        targets.map(t =>
+          Localization("diplomacy.demands", t.demander.name) + " " + t.localizeTarget).mkString("\n")
+      }
+    }
 
     object WarTarget {
 

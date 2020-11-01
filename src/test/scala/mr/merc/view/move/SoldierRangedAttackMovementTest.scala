@@ -11,7 +11,7 @@ import mr.merc.map.hex.NE
 import mr.merc.unit.view.ProjectileStart
 import mr.merc.unit.view.ProjectileMovement
 import mr.merc.unit.view.ProjectileEnd
-import mr.merc.unit.view.ProjectileNotRender
+import mr.merc.unit.view.ProjectileFinished
 import mr.merc.unit.AttackResult
 import mr.merc.map.hex.TerrainHexField
 import mr.merc.map.hex.TerrainHex
@@ -44,7 +44,7 @@ class SoldierRangedAttackMovementTest extends FunSuite {
     val movement = new SoldierRangedAttackMovement(from, to, NE,
       attackerView, defenderView, result, fieldView)
     movement.start()
-    assert(movement.projectileView.state === ProjectileNotRender)
+    assert(movement.projectileView.state === ProjectileFinished)
     assert(attackerView.index === 0)
     movement.update(attackerView.duration)
     assert(attackerView.index === 1)
@@ -63,7 +63,7 @@ class SoldierRangedAttackMovementTest extends FunSuite {
     assert(movement.projectileView.state === ProjectileEnd)
     movement.update(100000)
     assert(attackerView.index === 0)
-    assert(movement.projectileView.state === ProjectileNotRender)
+    assert(movement.projectileView.state === ProjectileFinished)
     assert(movement.isOver)
   }
 }

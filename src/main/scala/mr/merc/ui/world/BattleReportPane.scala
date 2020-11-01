@@ -90,8 +90,11 @@ class OneBattleReportPane(battleReport:BattleReport) extends MigPane {
   add(new MigPane {
     this.style = "-fx-border-color: black;-fx-border-width: 1;-fx-border-insets: 3px; -fx-background-insets: 3px;"
 
-    add(BigText(Localization("battleReport.regular")), "center, wrap")
-    add(side1Regular, "wrap")
+    if (side1Warriors.nonEmpty) {
+      add(BigText(Localization("battleReport.regular")), "center, wrap")
+      add(side1Regular, "wrap")
+    }
+
     if (side1MilitiaWarriors.nonEmpty) {
       add(BigText(Localization("battleReport.militia")), "center, wrap")
       add(side1Militia, "wrap")
@@ -100,9 +103,10 @@ class OneBattleReportPane(battleReport:BattleReport) extends MigPane {
 
   add(new MigPane {
     this.style = "-fx-border-color: black;-fx-border-width: 1;-fx-border-insets: 3px; -fx-background-insets: 3px;"
-
-    add(BigText(Localization("battleReport.regular")), "center, wrap")
-    add(side2Regular, "wrap")
+    if (side2Warriors.nonEmpty) {
+      add(BigText(Localization("battleReport.regular")), "center, wrap")
+      add(side2Regular, "wrap")
+    }
     if (side2MilitiaWarriors.nonEmpty) {
       add(BigText(Localization("battleReport.militia")), "center, wrap")
       add(side2Militia, "wrap")

@@ -318,6 +318,7 @@ diplomacy.declineJoinWar.body=My ruler, %s declined to join war %s
 diplomacy.proposePeace.button=Propose peace
 diplomacy.proposePeace.title=Peace proposal from %s
 diplomacy.proposePeace.body=%s proposes peace on following terms: \n %s
+diplomacy.proposePeace.whitePeace=White peace
 diplomacy.proposeSeparatePeace.button=Propose separate peace
 diplomacy.proposeSeparatePeace.title=Separate peace proposal from %s
 diplomacy.proposeSeparatePeace.fromIsLeader.body=Other side leader %s proposes us separate peace on following terms: \n %s

@@ -1,5 +1,6 @@
 package mr.merc.view.move
 
+import mr.merc.economics.WorldConstants
 import mr.merc.map.hex.view.TerrainHexView
 import mr.merc.unit.view.SoldierView
 import mr.merc.unit.view.MoveState
@@ -8,7 +9,7 @@ import mr.merc.sound.Sound
 import mr.merc.map.hex.view.TerrainHexFieldView
 
 class SoldierMoveMovement(val from: TerrainHexView, val to: TerrainHexView, val soldier: SoldierView, fieldView: TerrainHexFieldView) extends Movement {
-  private val movementSpeed = 200
+  private val movementSpeed = WorldConstants.Animation.SoldierMovementSpeed
   private val linearMovement = new LinearMovement(from.x, from.y, to.x, to.y, movementSpeed)
 
   override def start() {
@@ -16,7 +17,7 @@ class SoldierMoveMovement(val from: TerrainHexView, val to: TerrainHexView, val 
     soldier.state = MoveState
     linearMovement.start()
     updateSoldierCoords()
-    soldier.sounds.get(MovementSound).foreach(_.play)
+    soldier.sounds.get(MovementSound).foreach(_.play())
   }
 
   private def updateSoldierCoords() {
@@ -29,7 +30,7 @@ class SoldierMoveMovement(val from: TerrainHexView, val to: TerrainHexView, val 
     updateSoldierCoords()
   }
 
-  def isOver = linearMovement.isOver
+  def isOver: Boolean = linearMovement.isOver
 
   override def drawables = List(soldier)
 }

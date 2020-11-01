@@ -1,7 +1,7 @@
 package mr.merc.view.move
 
 import mr.merc.map.hex.Direction
-import mr.merc.unit.view.{DefenceState, Projectile, ProjectileEnd, ProjectileNotRender, ProjectileStart, SoldierTypeViewInfo, SoldierView, SoldierViewAttackState, StandState}
+import mr.merc.unit.view.{DefenceState, Projectile, ProjectileEnd, ProjectileFinished, ProjectileStart, SoldierTypeViewInfo, SoldierView, SoldierViewAttackState, StandState}
 
 import mr.merc.unit.AttackResult
 import mr.merc.unit.sound.PainSound
@@ -64,13 +64,13 @@ class SoldierRangedAttackMovement(val fromHex: TerrainHexView, val toHex: Terrai
       }
     }
 
-    if (Set(ProjectileNotRender, ProjectileEnd).contains(projectileView.state) &&
+    if (Set(ProjectileFinished, ProjectileEnd).contains(projectileView.state) &&
       !painSoundPlayed && attackerFinishedHisThrowingMove && result.success) {
       defender.sounds.get(PainSound).foreach(_.play())
       painSoundPlayed = true
     }
 
-    if (!numbersAreOver) {
+    if (!numbersAreOver && numberMovements.nonEmpty) {
       numberMovements.foreach(_.update(time))
       if (!hpChangeMovement.isOver) {
         hpChangeMovement.start()
@@ -78,9 +78,9 @@ class SoldierRangedAttackMovement(val fromHex: TerrainHexView, val toHex: Terrai
     }
   }
 
-  def isOver = projectileView.state == ProjectileNotRender && attackerFinishedHisThrowingMove && numbersAreOver
+  def isOver = projectileView.state == ProjectileFinished && attackerFinishedHisThrowingMove && numbersAreOver
 
-  private def numberMovements = if ((projectileView.state == ProjectileEnd || projectileView.state == ProjectileNotRender) && attackerFinishedHisThrowingMove) {
+  private def numberMovements = if ((projectileView.state == ProjectileEnd || projectileView.state == ProjectileFinished) && attackerFinishedHisThrowingMove) {
     damageNumberMovement ++ drainNumberMovement
   } else {
     Nil

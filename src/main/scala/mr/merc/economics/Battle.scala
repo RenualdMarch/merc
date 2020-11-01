@@ -8,7 +8,7 @@ import mr.merc.economics.BattleReport.{Draw, ReportBattleResult, Side1Won, Side2
 import mr.merc.map.GameField
 import mr.merc.map.hex.{TerrainHex, TerrainHexField}
 import mr.merc.map.objects.House
-import mr.merc.map.terrain.Empty
+import mr.merc.map.terrain.{Empty, WaterKind}
 import mr.merc.map.terrain.FourSeasonsMapObjects.FourSeasonsHouse
 import mr.merc.politics.{Province, State}
 import mr.merc.unit.Soldier
@@ -73,7 +73,9 @@ abstract sealed class Battle(worldHexField: TerrainHexField, turn: Int) {
 
   def putWarriorsToProvince(warriors: List[Warrior], province: Province, hexField: TerrainHexField): Unit = {
     val (x, y) = hexField.hexes.filter(_.province.contains(province)).map(h => (h.x, h.y)).medianBySquares
-    hexField.closest(hexField.hex(x, y)).filter(h => h.soldier.isEmpty).filter(_.terrain != Empty).zip(warriors).foreach { case (hex, warrior: Warrior) =>
+    hexField.closest(hexField.hex(x, y)).filter(h => h.soldier.isEmpty).
+      filter(x => x.terrain != Empty && x.terrain.kind != WaterKind).zip(warriors).foreach {
+      case (hex, warrior: Warrior) =>
       hex.soldier = Some(warrior.soldier)
     }
   }
@@ -106,6 +108,7 @@ abstract sealed class Battle(worldHexField: TerrainHexField, turn: Int) {
           val hex = new TerrainHex(x, y, originalHex.terrain)
           hex.mapObj = originalHex.mapObj
           hex.province = originalHex.province
+          hex.soldier = None
           hex
         case None => new TerrainHex(x, y, Empty)
       }

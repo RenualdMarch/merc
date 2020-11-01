@@ -1,5 +1,6 @@
 package mr.merc.view.move
 
+import mr.merc.economics.WorldConstants
 import mr.merc.map.hex.view.TerrainHexView
 import mr.merc.unit.view.{DefenceState, SoldierView, SoldierViewAttackState, StandState}
 import mr.merc.map.hex.Direction
@@ -24,7 +25,7 @@ object SoldierAttackMovement {
 
 class SoldierAttackMovement(val fromHex: TerrainHexView, val toHex: TerrainHexView, val dir: Direction,
   val attacker: SoldierView, val defender: SoldierView,
-  val result: AttackResult, field: TerrainHexFieldView, val attackSpeed: Int = 200) extends Movement {
+  val result: AttackResult, field: TerrainHexFieldView, val attackSpeed: Int = WorldConstants.Animation.SoldierAttackSpeed) extends Movement {
 
   val fromX = fromHex.coords._1
   val fromY = fromHex.coords._2
@@ -83,7 +84,7 @@ class SoldierAttackMovement(val fromHex: TerrainHexView, val toHex: TerrainHexVi
     attacker.state = state
     attacker.index = 0
 
-    attacker.sounds.get(AttackSound(result.attackIndex, result.success)).foreach(_.play)
+    attacker.sounds.get(AttackSound(result.attackIndex, result.success)).foreach(_.play())
   }
 
   private def frameListIndex: Int = {

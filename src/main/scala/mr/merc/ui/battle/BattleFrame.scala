@@ -164,6 +164,20 @@ class BattleFrame(sceneManager: SceneManager, gameField:GameField, ai:Map[Player
     dialog.show()
   }
 
+  this.onScroll = { event =>
+    val delta = event.getDeltaY
+    val diff = delta * 7
+    val d = diff / mapView.pixelHeight
+    val v = keepHValueInBounds(battleCanvas.vvalue.value - d)
+    battleCanvas.vvalue.value = v
+  }
+
+  private def keepHValueInBounds(hv: Double): Double = {
+    if (hv < 0) 0
+    else if (hv > 1) 1
+    else hv
+  }
+
   def showAttackSelectionDialog(attacker: Soldier, defender: Soldier, attackerHex: TerrainHex,
     defenderHex: TerrainHex): Option[Attack] = {
 
