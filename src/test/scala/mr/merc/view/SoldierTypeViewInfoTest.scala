@@ -152,17 +152,15 @@ class SoldierTypeViewInfoTest extends FunSuite with Matchers {
     assert(stand(0).imagePath.get === "/images/units/testType2/im15.png")
 
     val death = vt.images(DeathState)
-    assert(death.size === 5)
+    assert(death.size === 4)
     assert(death(0).imagePath.get === "/images/units/testType2/im15.png")
-    death(0).alpha should be(1f +- 0.01f)
+    death(0).alpha should be(0.8f +- 0.01f)
     assert(death(1).imagePath.get === "/images/units/testType2/im15.png")
-    death(1).alpha should be(0.8f +- 0.01f)
+    death(1).alpha should be(0.6f +- 0.01f)
     assert(death(2).imagePath.get === "/images/units/testType2/im15.png")
-    death(2).alpha should be(0.6f +- 0.01f)
+    death(2).alpha should be(0.4f +- 0.01f)
     assert(death(3).imagePath.get === "/images/units/testType2/im15.png")
-    death(3).alpha should be(0.4f +- 0.01f)
-    assert(death(4).imagePath.get === "/images/units/testType2/im15.png")
-    death(4).alpha should be(0.2f +- 0.01f)
+    death(3).alpha should be(0.2f +- 0.01f)
   }
 
   test("sounds") {
@@ -233,7 +231,7 @@ class SoldierTypeViewInfoTest extends FunSuite with Matchers {
     assert(stand.head.imagePath.get === "/images/units/oneImageSoldier/im14.png")
 
     val death = vt.images(DeathState)
-    assert(death.size === 5)
+    assert(death.size === 4)
     death foreach {
       _.imagePath shouldBe Some("/images/units/oneImageSoldier/im14.png")
     }
@@ -282,7 +280,7 @@ class SoldierTypeViewInfoTest extends FunSuite with Matchers {
     assert(stand(2).imagePath.get === "/images/units/testSoldier2/im17.png")
 
     val death = vt.images(DeathState)
-    assert(death.size === 5)
+    assert(death.size === 4)
     death foreach {
       _.imagePath shouldBe Some("/images/units/testSoldier2/im15.png")
     }

@@ -38,6 +38,9 @@ class SoldierViewTest extends FunSuite {
     view.updateTime(10000)
     view.state = DeathState
     view.updateTime(10000)
+    view.updateTime(10000)
+    view.updateTime(10000)
+    view.updateTime(10000)
     assert(view.state === NoState)
   }
 

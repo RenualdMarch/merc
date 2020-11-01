@@ -128,7 +128,7 @@ class ProvinceViewTest extends FunSuite with MockitoSugar with BeforeAndAfter wi
 
     val wasSoldier = field.hexes.find(_.soldier.nonEmpty).get
 
-    sd.soldiers shouldBe Set(warrior.soldierView(1d, true, true))
+    sd.soldiers shouldBe Set(warrior.soldierView(1d, true, false))
 
     field.hex(4, 4).province = Some(region)
     regionWarriors.planSendWarriors(List(warrior), Some(region))
@@ -141,7 +141,7 @@ class ProvinceViewTest extends FunSuite with MockitoSugar with BeforeAndAfter wi
     val isSoldier = field.hexes.find(_.soldier.nonEmpty).get
     wasSoldier should not be isSoldier
 
-    sd.soldiers shouldBe Set(warrior.soldierView(1d, true, true))
+    sd.soldiers shouldBe Set(warrior.soldierView(1d, true, false))
 
     regionWarriors.sendWarriorsToDestinations()
     provinceView.refreshSoldiers()
