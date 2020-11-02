@@ -28,10 +28,6 @@ libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.3"
 
 libraryDependencies += "org.mockito" % "mockito-core" % "2.23.0" % "test"
 
-libraryDependencies += "com.projectdarkstar.ext.jorbis" % "jorbis" % "0.0.17"
-
-libraryDependencies += "de.huxhorn.sulky" % "de.huxhorn.sulky.3rdparty.jlayer" % "1.0"
-
 libraryDependencies += "com.miglayout" % "miglayout-javafx" % "5.1"
 
 libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.0.6"

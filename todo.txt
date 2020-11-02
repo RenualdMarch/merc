@@ -2,12 +2,13 @@ requirement failed: Buying and selling differ
 
 unit dissapears not immediately in case of default animation
 army after battle is not visible!!!
-should not be possible to declare war while in truce?
+add relations to others and relations to them tab
 
+add all attack and pain sounds
 
-add all attack sounds
 accepted peace with other controller????
 state dissapeared, war should dissapear also - could not reproduce
+
 
 Not high priority:
 allow hire people from other cultures with some political configurations, now it is possible to hire primary culture warrior anywhere

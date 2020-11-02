@@ -295,7 +295,7 @@ class DiplomaticAI(state: State, actions: WorldStateDiplomacyActions) extends Lo
 
   private def proposeAlliance():List[AllianceProposal] = {
     val otherStates = actions.regions.map(_.owner).toSet - state
-    otherStates.filter { s => !situation.isInWar(s) && (situation.areRivalsOfRivals(state, s) ||
+    otherStates.filter { s => !situation.isInWar(s) && (situation.areRivalsOfRivals(state, s) &&
         actions.relationships(state)(s) > MinRelationshipToStartAlliance)
     }.map(a => new AllianceProposal(state, a)).toList
   }
@@ -318,6 +318,7 @@ class DiplomaticAI(state: State, actions: WorldStateDiplomacyActions) extends Lo
 
     if (needsOverlord) {
       otherStates.filter { s =>
+        actions.relationships(state)(s) > MinRelationshipForVassalization &&
         situation.shareBorder(state, s) && !situation.areRivals(state, s)
           situation.powerDifference(s, state) > PowerDifferenceForVassalization
       }.map(s => new OverlordshipProposal(state, s)).toList

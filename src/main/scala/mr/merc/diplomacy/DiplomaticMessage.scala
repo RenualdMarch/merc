@@ -1,7 +1,7 @@
 package mr.merc.diplomacy
 
 import mr.merc.diplomacy.DiplomaticAgreement.WarAgreement._
-import mr.merc.diplomacy.DiplomaticAgreement.{AllianceAgreement, VassalAgreement, WarAgreement}
+import mr.merc.diplomacy.DiplomaticAgreement.{AllianceAgreement, TruceAgreement, VassalAgreement, WarAgreement}
 import mr.merc.diplomacy.RelationshipEvent._
 import mr.merc.local.Localization
 import mr.merc.politics.State
@@ -315,6 +315,7 @@ object DiplomaticMessage {
         case v: VassalAgreement if v.vassal == from => true
         case v: VassalAgreement if v.sides == Set(from, to) => true
         case aa: AllianceAgreement if aa.sides == Set(from, to) => true
+        case ta: TruceAgreement if ta.sides == Set(from, to) => false
         case wa: WarAgreement => wa.onDifferentSides(Set(from, to)) && Some(wa) != war
         case _ => false
       }

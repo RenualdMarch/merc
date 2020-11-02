@@ -1,28 +1,29 @@
 package mr.merc.sound
 
-import scala.concurrent._
-import ExecutionContext.Implicits.global
 import mr.merc.conf.Conf
+import scalafx.scene.media.MediaPlayer.Status
+import scalafx.scene.media.{Media, MediaPlayer}
 
 object SoundPlayer {
-  def playSound(path: String, s: Status => Unit) {
+
+  private var cache:List[MediaPlayer] = Nil
+
+  def playSound(path: String, s: Status => Unit): Option[MediaPlayer] = {
     if (Conf.bool("Sound")) {
-      Future {
-        renderer(path, s).play(getClass.getResourceAsStream(path))
+      val sound = new Media(getClass.getResource(path).toURI.toString)
+
+      val (finished, notFinished) = cache.partition(_.status.value == MediaPlayer.Status.Stopped.delegate)
+      val player = new MediaPlayer(sound)
+
+      player.status.onChange {
+        s(scalafx.scene.media.MediaPlayer.Status(player.status.value))
       }
-    }
-  }
+      player.autoPlay = true
+      finished.foreach(_.dispose())
 
-  private def renderer(path: String, s: Status => Unit): BaseAudioRenderer = {
-    val lowercase = path.toLowerCase
-    if (lowercase.endsWith("ogg")) {
-      new JOrbisOggRenderer(s)
-    } else if (lowercase.endsWith("mp3")) {
-      new JavaLayerMp3Renderer(s)
-    } else {
-      throw new IllegalArgumentException("Renderer for path " + path + " is not found!")
-    }
+      cache = player :: notFinished
+      Some(player)
+    } else None
   }
-
 }
 

@@ -1,40 +1,40 @@
 <sounds>
 	<!-- effects -->
-	<sound name="fireExplosion" path="fire.ogg"/>
+	<sound name="fireExplosion" path="fire.mp3"/>
 	
 	<!-- attacks -->
-	<sound name="magicAttack1" path="magic-missile-1.ogg"/>
-	<sound name="magicAttack1Fail" path="magic-missile-1-miss.ogg"/>
-	<sound name="spear" path="spear.ogg"/>
-	<sound name="spearFail" path="spear-miss.ogg"/>
-	<sound name="staff" path="staff.ogg"/>
-	<sound name="bow" path="bow.ogg"/>
-	<sound name="bowFail" path="bow-miss.ogg"/>
-	<sound name="crossbow" path="crossbow.ogg"/>
-	<sound name="crossbowFail" path="crossbow-miss.ogg"/>
-	<sound name="dagger" path="dagger-swish.ogg"/>
-	<sound name="club" path="club.ogg"/>
-	<sound name="sword" path="sword-1.ogg"/>
-	<sound name="miss1" path="miss-1.ogg"/>
-	<sound name="miss3" path="miss-1.ogg"/>
-	<sound name="mace" path="mace.ogg"/>
-	<sound name="fist" path="fist.ogg"/>
-	<sound name="claws" path="claws.ogg"/>
-	<sound name="axe" path="axe.ogg"/>
+	<sound name="magicAttack1" path="magic-missile-1.mp3"/>
+	<sound name="magicAttack1Fail" path="magic-missile-1-miss.mp3"/>
+	<sound name="spear" path="spear.mp3"/>
+	<sound name="spearFail" path="spear-miss.mp3"/>
+	<sound name="staff" path="staff.mp3"/>
+	<sound name="bow" path="bow.mp3"/>
+	<sound name="bowFail" path="bow-miss.mp3"/>
+	<sound name="crossbow" path="crossbow.mp3"/>
+	<sound name="crossbowFail" path="crossbow-miss.mp3"/>
+	<sound name="dagger" path="dagger-swish.mp3"/>
+	<sound name="club" path="club.mp3"/>
+	<sound name="sword" path="sword-1.mp3"/>
+	<sound name="miss1" path="miss-3.mp3"/>
+	<sound name="miss3" path="miss-3.mp3"/>
+	<sound name="mace" path="mace.mp3"/>
+	<sound name="fist" path="fist.mp3"/>
+	<sound name="claws" path="claws.mp3"/>
+	<sound name="axe" path="axe.mp3"/>
 		
 	<!-- movements -->
-	<sound name="horseMovement" path="horse-elf-canter.ogg"/>
-	<sound name="gryphonMovement" path="gryphon-shriek-1.ogg"/>
+	<sound name="horseMovement" path="horse-elf-canter.mp3"/>
+	<sound name="gryphonMovement" path="gryphon-shriek-1.mp3"/>
 
 	<!-- pain -->
-	<sound name="horsePain" path="horse-die.ogg"/>
-	<sound name="humanPain1" path="human-die-1.ogg"/>
-	<sound name="elfPain1" path="elf-hit-1.ogg"/>
-	<sound name="elfPain2" path="elf-hit-2.ogg"/>
-	<sound name="orcPain2" path="orc-hit-2.ogg"/>
-	<sound name="dwarfPain1" path="dwarf-hit-1.ogg"/>
-	<sound name="gryphonPain1" path="gryphon-hit-3.ogg"/>
-	<sound name="skeletonPain3" path="skeleton-big-hit-3.ogg"/>
+	<sound name="horsePain" path="horse-die.mp3"/>
+	<sound name="humanPain1" path="human-die-1.mp3"/>
+	<sound name="elfPain1" path="elf-hit-1.mp3"/>
+	<sound name="elfPain2" path="elf-hit-2.mp3"/>
+	<sound name="orcPain2" path="orc-hit-2.mp3"/>
+	<sound name="dwarfPain1" path="dwarf-hit-1.mp3"/>
+	<sound name="gryphonPain1" path="gryphon-hit-3.mp3"/>
+	<sound name="skeletonPain3" path="skeleton-big-hit-3.mp3"/>
 
 
 </sounds>

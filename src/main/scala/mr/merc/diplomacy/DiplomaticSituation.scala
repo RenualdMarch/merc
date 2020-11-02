@@ -20,7 +20,7 @@ class DiplomaticSituation(diplomacy:WorldDiplomacy) {
   }
 
   def shareBorder(state1: State, state2:State):Boolean = {
-    diplomacy.regions.exists {p =>
+    diplomacy.regions.exists { p =>
       p.neighbours.exists(n =>
         (p.owner == state1 && n.owner == state2) ||
           (p.owner == state2 && n.owner == state1))

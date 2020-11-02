@@ -90,10 +90,9 @@ class ProvinceView(season: Season, val province: Province, field: FourSeasonsTer
 
   private var currentMap:Map[Soldier, SoldierView] = Map()
 
-  def cleanSoldiers(map:Map[Soldier, SoldierView]): Unit = {
-    val map = view.soldiersDrawer.soldiers.map(s => s.soldier -> s).toMap
+  def cleanSoldiers(): Unit = {
     province.hexes.foreach { h =>
-      h.soldier.flatMap(map.get).foreach { soldier =>
+      h.soldier.flatMap(currentMap.get).foreach { soldier =>
         view.soldiersDrawer.removeSoldier(soldier)
       }
       h.soldier = None
@@ -103,7 +102,7 @@ class ProvinceView(season: Season, val province: Province, field: FourSeasonsTer
   }
 
   def refreshSoldiers(): Unit = {
-    cleanSoldiers(currentMap)
+    cleanSoldiers()
     currentMap = province.regionWarriors.allWarriors.map(w => w.soldier -> w.soldierView(1d, true, false)).toMap
     province.regionWarriors.warriorDestinations.foreach { case (destination, soldiers) =>
       (hexesForSoldiers(destination) zip soldiers).foreach { case (h, w) =>

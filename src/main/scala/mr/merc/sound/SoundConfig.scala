@@ -15,7 +15,6 @@ object SoundConfig {
       val name = (node \ "@name").toString()
       val path = pathToSounds + (node \ "@path").toString()
       (name, new Sound(path))
-
     }
 
     sounds.toMap

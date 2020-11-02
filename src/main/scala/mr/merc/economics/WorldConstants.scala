@@ -178,7 +178,7 @@ object WorldConstants {
     val SeparatePeaceRelationshipChange = -100
     val SeparatePeaceDuration = 40
 
-    val TruceDuration = 20
+    val TruceDuration = 12
     val TruceRelationshipChange = -100
     val BrokenTruceRelationshipChange = -200
     val BrokenTruceDuration = 60
