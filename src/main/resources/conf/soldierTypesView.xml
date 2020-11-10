@@ -2776,6 +2776,117 @@
         </sounds>
     </view>
 
+    <view name="OrcsLatin-Dimacherius">
+        <attack1 imageName="greatsword-orcish"/>
+        <stand>
+            <image name="dimacherius"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <pain sound="orcPain2"/>
+        </sounds>
+    </view>
+    <view name="OrcsLatin-Gallus">
+        <attack1 imageName="greatsword-orcish"/>
+        <stand>
+            <image name="gallus"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <pain sound="orcPain2"/>
+        </sounds>
+    </view>
+    <view name="OrcsLatin-Elder">
+        <attack1 imageName="staff-magic"/>
+        <attack2 imageName="fireball" projectile="Fireball"/>
+        <stand>
+            <image name="elder"/>
+        </stand>
+        <sounds>
+            <attack1 succ="staff" fail="miss1"/>
+            <attack2 succ="magicAttack1" fail="magicAttack1Fail"/>
+            <pain sound="orcPain2"/>
+        </sounds>
+    </view>
+    <view name="OrcsLatin-Shaman">
+        <attack1 imageName="staff-magic"/>
+        <attack2 imageName="fireball" projectile="Fireball"/>
+        <stand>
+            <image name="shaman"/>
+        </stand>
+        <sounds>
+            <attack1 succ="staff" fail="miss1"/>
+            <attack2 succ="magicAttack1" fail="magicAttack1Fail"/>
+            <pain sound="orcPain2"/>
+        </sounds>
+    </view>
+    <view name="OrcsLatin-Essedarius">
+        <attack1 imageName="claws"/>
+        <stand>
+            <image name="essedarius"/>
+        </stand>
+        <sounds>
+            <attack1 succ="claws" fail="miss1"/>
+            <move sound="wolfMovement"/>
+            <pain sound="wolfPain1"/>
+        </sounds>
+    </view>
+    <view name="OrcsLatin-EssedariusVulpis">
+        <attack1 imageName="claws"/>
+        <stand>
+            <image name="essedarius-vulpis"/>
+        </stand>
+        <sounds>
+            <attack1 succ="claws" fail="miss1"/>
+            <move sound="wolfMovement"/>
+            <pain sound="wolfPain1"/>
+        </sounds>
+    </view>
+    <view name="OrcsLatin-Secutor">
+        <attack1 imageName="greatsword-orcish"/>
+        <stand>
+            <image name="secutor"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <pain sound="orcPain2"/>
+        </sounds>
+    </view>
+    <view name="OrcsLatin-SecutorLeonis">
+        <attack1 imageName="greatsword-orcish"/>
+        <stand>
+            <image name="secutor-leonis"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <pain sound="orcPain2"/>
+        </sounds>
+    </view>
+    <view name="OrcsLatin-Venator">
+        <attack1 imageName="sword-orcish"/>
+        <attack2 imageName="bow-orcish" projectile="Arrow"/>
+        <stand>
+            <image name="venator"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <attack2 succ="bow" fail="bowFail"/>
+            <pain sound="orcPain2"/>
+        </sounds>
+    </view>
+    <view name="OrcsLatin-VenatorFaber">
+        <attack1 imageName="sword-orcish"/>
+        <attack2 imageName="bow-orcish" projectile="Arrow"/>
+        <stand>
+            <image name="venator-faber"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <attack2 succ="bow" fail="bowFail"/>
+            <pain sound="orcPain2"/>
+        </sounds>
+    </view>
+
     <!-- dwarfes -->
     <view name="DwarfWesnoth-Fighter">
         <attack1 imageName="axe">

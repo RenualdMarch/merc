@@ -25,6 +25,7 @@
 	<!-- movements -->
 	<sound name="horseMovement" path="horse-elf-canter.mp3"/>
 	<sound name="gryphonMovement" path="gryphon-shriek-1.mp3"/>
+	<sound name="wolfMovement" path="wolf-growl-1.mp3"/>
 
 	<!-- pain -->
 	<sound name="horsePain" path="horse-die.mp3"/>
@@ -35,6 +36,6 @@
 	<sound name="dwarfPain1" path="dwarf-hit-1.mp3"/>
 	<sound name="gryphonPain1" path="gryphon-hit-3.mp3"/>
 	<sound name="skeletonPain3" path="skeleton-big-hit-3.mp3"/>
-
+	<sound name="wolfPain1" path="wolf-hit-1.mp3"/>
 
 </sounds>

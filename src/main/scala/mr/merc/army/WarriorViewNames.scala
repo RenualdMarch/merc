@@ -153,6 +153,19 @@ object WarriorViewNames {
     (BladeArcher, Professional) -> "OrcsWesnoth-Crossbow",
   ))
 
+  val LatinOrcCulture = WarriorViewNames(Map(
+    (BladeCavalry, Militia) -> "OrcsLatin-Essedarius",
+    (BladeCavalry, Professional) -> "OrcsLatin-EssedariusVulpis",
+    (FireWizard, Militia) -> "OrcsLatin-Shaman",
+    (FireWizard, Professional) -> "OrcsLatin-Elder",
+    (HeavyBladeInfantry, Militia) -> "OrcsLatin-Secutor",
+    (HeavyBladeInfantry, Professional) -> "OrcsLatin-SecutorLeonis",
+    (LightBladeInfantry, Militia) -> "OrcsLatin-Gallus",
+    (LightBladeInfantry, Professional) -> "OrcsLatin-Dimacherius",
+    (BladeArcher, Militia) -> "OrcsLatin-Venator",
+    (BladeArcher, Professional) -> "OrcsLatin-VenatorFaber",
+  ))
+
   val WesnothDwarfCulture = WarriorViewNames(Map(
     (BladeCavalry, Militia) -> "DwarfWesnoth-Rider",
     (BladeCavalry, Professional) -> "DwarfWesnoth-Master",

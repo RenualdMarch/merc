@@ -26,11 +26,19 @@ import scalafx.scene.control.TabPane.TabClosingPolicy
 
 class DiplomacyPane(actions: WorldStateDiplomacyActions, currentState: State, stage: Stage, parentFrame:WorldFrame) extends PaneWithTwoHorizontalChildren(0.45) {
 
+  private var selectedTab:Int = 0
+
   private val tablePane = new StatesTablePane(actions, currentState)
   private val property = tablePane.selectedItem
   private val selectedPane = new BorderPane {
     center <== property.map(Option.apply).map {
-      case Some(p) => new StateDiplomacyPane(currentState, p, actions, stage, parentFrame)
+      case Some(p) =>
+        val pane = new StateDiplomacyPane(currentState, p, actions, stage, parentFrame)
+        pane.tabPane.selectionModel.value.select(selectedTab)
+        pane.tabPane.selectionModel.value.selectedIndexProperty().onChange { (_, _, v) =>
+          selectedTab = v.intValue()
+        }
+        pane
       case None => new javafx.scene.layout.Pane()
     }
   }
@@ -145,7 +153,7 @@ class StatesTablePane(actions: WorldStateDiplomacyActions, currentState: State) 
 class StateDiplomacyPane(currentState: State, selectedStateInfo: StateInfo, actions: WorldStateDiplomacyActions, stage: Stage, parentFrame:WorldFrame) extends MigPane {
   private val selectedState = selectedStateInfo.state
 
-  private val tabPane = new TabPane {
+  val tabPane = new TabPane {
     style = Components.mediumFontStyle
     tabClosingPolicy = TabClosingPolicy.Unavailable
   }
@@ -155,7 +163,11 @@ class StateDiplomacyPane(currentState: State, selectedStateInfo: StateInfo, acti
     style = Components.largeFontStyle
     content = new MigPane {
       add(new StateRelationsPane(currentState, selectedState, actions), "wrap")
-      add(new StateAgreementsPane(stage, selectedState, actions), "grow, push")
+      add(new ScrollPane {
+        style = Components.largeFontStyle
+        content = new StateAgreementsPane(stage, selectedState, actions)
+        fitToWidth = true
+      }.delegate, "grow, push")
     }
   }
 
@@ -177,7 +189,13 @@ class StateDiplomacyPane(currentState: State, selectedStateInfo: StateInfo, acti
     }
   }
 
-  tabPane.tabs.addAll(relationsTab, actionsPane, claimsPane)
+  val allRelations = new Tab {
+    text = Localization("diplomacy.allRelations")
+    style = Components.largeFontStyle
+    content = new StateRelationsToOtherStatesPane(selectedState, actions)
+  }
+
+  tabPane.tabs.addAll(relationsTab, actionsPane, claimsPane, allRelations)
   add(BigText(selectedState.name), "wrap")
   add(tabPane, "grow, push")
 }
@@ -893,4 +911,35 @@ class WarPane(stage: Stage, war: WarAgreement, diplomacyActions: WorldStateDiplo
       disable = war.battles.isEmpty
     }
   }
+}
+
+class StateRelationsToOtherStatesPane(state: State, actions: WorldStateDiplomacyActions) extends MigPane {
+  val table = new TableView[State]()
+
+  val stateColumn = new TableColumn[State, StateComponentColorName] {
+
+    text = Localization("diplomacy.state")
+
+    cellFactory = p => new TableCell[State, StateComponentColorName] {
+      override def updateItem(t: StateComponentColorName, b: Boolean): Unit = {
+        super.updateItem(t, b)
+        setGraphic(t)
+      }
+    }
+    cellValueFactory = p => {
+      ObjectProperty(new StateComponentColorName(p.value))
+    }
+    editable = false
+  }
+
+  val relationsToState = new StringColumn[State](Localization("diplomacy.relationsFromThem"), x => actions.relationships(x)(state).toString)
+
+  val relationsFromState = new StringColumn[State](Localization("diplomacy.relationsToThem"), x => actions.relationships(state)(x).toString)
+
+  table.columns ++= List(stateColumn, relationsToState, relationsFromState)
+
+  val states = actions.states.keySet.filterNot(_ == state)
+  table.items = new ObservableBuffer[State]() ++ states
+
+  add(table, "grow, push")
 }

@@ -1,24 +1,23 @@
 requirement failed: Buying and selling differ
 
-unit dissapears not immediately in case of default animation
-army after battle is not visible!!!
-add relations to others and relations to them tab
-
-add all attack and pain sounds
-
-accepted peace with other controller????
-state dissapeared, war should dissapear also - could not reproduce
+rebalance initial political parties
+Redo recruitment pane
+add state colors on battle report
+wars list on diplomacy pane
+projected gain on budget pane totally incorrect
+soldiers start battle on water!!11
+cann't propose peace - null pointer in css.foreach
 
 
 Not high priority:
 allow hire people from other cultures with some political configurations, now it is possible to hire primary culture warrior anywhere
 when hiring soldiers, use actual population(manpower pools?)
-idle animation for soldiers on world map
 make cultures for castles/walls
 check conditional AI logic - unused expression
 state rating pane
 animate healing
-
+idle animation for soldiers on battle
+idle animation for soldiers on world map
 
 add more cultures, at least two cultures per race:
 Marashy culture as indian?
@@ -31,7 +30,6 @@ Elves
 - more dark elves \ Tharis ???
 
 Orcs
-- latin orcs \ _Orcei Gladiatores
 - more northern orcs \ _Northern Orcs
 
 Undead

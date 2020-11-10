@@ -13,7 +13,7 @@ import mr.merc.local.Localization
 object Conf {
   private implicit val executor = ExecutionContext.fromExecutor(Executors.newSingleThreadExecutor())
   val confPath = "merc.properties"
-  val defaultConf = Map("Sound" -> "true", "Music" -> "true", "DevMode" -> "true", "BattleMapScaling" -> "2") ++ localizationProps
+  val defaultConf = Map("Sound" -> "true", "Music" -> "false", "DevMode" -> "true", "BattleMapScaling" -> "2") ++ localizationProps
 
   private def localizationProps: Map[String, String] = {
     val currentLanguage = Locale.getDefault().getLanguage

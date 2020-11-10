@@ -11,16 +11,16 @@ import mr.merc.map.hex.TerrainHexField
 import mr.merc.map.terrain.FourSeasonsMapObjects._
 import mr.merc.map.terrain.FourSeasonsTerrainTypes._
 
-class ProvinceView(season: Season, val province: Province, field: FourSeasonsTerrainHexField, currentField:TerrainHexField, view: TerrainHexFieldView) {
+class ProvinceView(season: Season, val province: Province, field: FourSeasonsTerrainHexField, currentField: TerrainHexField, view: TerrainHexFieldView) {
 
-  private def housesPerCulture(map:Map[Culture, Int]):Map[FourSeasonsHouse, Int] = {
+  private def housesPerCulture(map: Map[Culture, Int]): Map[FourSeasonsHouse, Int] = {
     val (minorityWithoutHouses, majorityWithHouses) = map.partition(_._2 < HousePerPopulation)
 
     val majMap = majorityWithHouses.map { case (cul, count) =>
       FourSeasonsHouse(cul) -> count / HousePerPopulation
     }
 
-    val minMap:Map[FourSeasonsHouse, Int] = if (minorityWithoutHouses.isEmpty) Map()
+    val minMap: Map[FourSeasonsHouse, Int] = if (minorityWithoutHouses.isEmpty) Map()
     else {
       Map(FourSeasonsHouse(minorityWithoutHouses.maxBy(_._2)._1) -> 1)
     }
@@ -41,7 +41,7 @@ class ProvinceView(season: Season, val province: Province, field: FourSeasonsTer
 
     val hexesStream = field.closest(province.capital).
       filterNot(h => h.terrainMap == FourSeasonsWater || h.terrainMap == FourSeasonsRiver ||
-      h.terrainMap == FourSeasonsMountain || h.terrainMap == FourSeasonsDecForest || h.terrainMap == FourSeasonsCastle).
+        h.terrainMap == FourSeasonsMountain || h.terrainMap == FourSeasonsDecForest || h.terrainMap == FourSeasonsCastle).
       filter(province.hexes.contains)
 
     val housesStream = hexesStream.grouped(2).map(_.head).toStream
@@ -69,7 +69,7 @@ class ProvinceView(season: Season, val province: Province, field: FourSeasonsTer
     }
   }
 
-  def neighbourHexes(neigbour:EconomicRegion):Set[FourSeasonsTerrainHex] = {
+  def neighbourHexes(neigbour: EconomicRegion): Set[FourSeasonsTerrainHex] = {
     province.hexes.filter { h =>
       field.neighboursSet(h).exists(_.province.contains(neigbour))
     }
@@ -88,7 +88,7 @@ class ProvinceView(season: Season, val province: Province, field: FourSeasonsTer
     }
   }
 
-  private var currentMap:Map[Soldier, SoldierView] = Map()
+  private var currentMap: Map[Soldier, SoldierView] = Map()
 
   def cleanSoldiers(): Unit = {
     province.hexes.foreach { h =>
@@ -106,11 +106,13 @@ class ProvinceView(season: Season, val province: Province, field: FourSeasonsTer
     currentMap = province.regionWarriors.allWarriors.map(w => w.soldier -> w.soldierView(1d, true, false)).toMap
     province.regionWarriors.warriorDestinations.foreach { case (destination, soldiers) =>
       (hexesForSoldiers(destination) zip soldiers).foreach { case (h, w) =>
-          h.soldier = Some(w.soldier)
-          currentField.hex(h.x, h.y).soldier = Some(w.soldier)
-          val sv = currentMap(w.soldier)
-          sv.coords = view.hex(h).coords
-          view.soldiersDrawer.addSoldier(sv)
+        h.soldier = Some(w.soldier)
+        currentField.hex(h.x, h.y).soldier = Some(w.soldier)
+        val sv = currentMap(w.soldier)
+        sv.coords = view.hex(h).coords
+        view.soldiersDrawer.addSoldier(sv)
+        sv.reloadHp()
+        sv.refreshBars()
       }
     }
   }

@@ -18,7 +18,7 @@ class PoliticalSystem(startingRulingParty: Party) {
 
   def nextElectionTurn:Option[Int] =
     if(rulingParty.votersPolicy == NoVoting) None
-    else Some(lastElectionTurn + 5 * 4)
+    else Some(lastElectionTurn + WorldConstants.Diplomacy.ElectionCycle)
 
   def isElectionNow(turn:Int):Boolean = nextElectionTurn.contains(turn)
 

@@ -39,9 +39,9 @@ class SoldierView(val soldier: Soldier, factor: Double, drawOval: Boolean = true
   private val healthBarHeight = Math.min(soldier.soldierType.hp, maxHp) * 2 * TerrainHexView.side(factor) / 3 / maxHp
   private val healthBarWidth = 4
 
-  private val maxXp = 200
-  private val xpBarHeight = Math.min(soldier.soldierType.exp, maxXp) * TerrainHexView.side(factor) / maxXp
-  private val xpBarWidth = 4
+  //private val maxXp = 200
+  //private val xpBarHeight = Math.min(soldier.soldierType.exp, maxXp) * TerrainHexView.side(factor) / maxXp
+  //private val xpBarWidth = 4
 
   private val ovalSize = 12
 

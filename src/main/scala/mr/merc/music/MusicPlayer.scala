@@ -17,11 +17,7 @@ object MusicPlayer {
 
   def playMusic() {
     if (Conf.bool("Music")) {
-      new Sound(randomSong, s => {
-        if (s == Status.Stopped) {
-          playMusic()
-        }
-      }).play()
+      new Sound(randomSong, playMusic).play()
     }
   }
 }

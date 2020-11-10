@@ -13,7 +13,7 @@ object Culture {
 
   private val elvishCultures = List(WoodElves, DesertElves, DarkElves)
 
-  private val orcishCultures = List(WesnothOrcs)
+  private val orcishCultures = List(WesnothOrcs, LaticOrcs)
 
   private val dwarfishCultures = List(WesnothDwarfes)
 
@@ -672,6 +672,58 @@ object Culture {
         "Shattered Hand",
         "Stormreaver",
         "Thunderlord"))
+  }
+
+  case object LaticOrcs extends Culture("latinOrcs", Orcs, "orcCity", Color.Pink) {
+
+    override val warriorViewNames: WarriorViewNames = WarriorViewNames.LatinOrcCulture
+
+    override val cultureInfo: CultureInfo = new CultureInfo(StateForm("empire", "republic"),
+      List(
+        "Iz Zredka",
+        "Bhord Mudzard",
+        "Dhadgral",
+        "Kruzrodh",
+        "Bezgal",
+        "Korgrur",
+        "Lugholgrird",
+        "Krummoror",
+        "Brolbrudh Ded",
+        "Mugnagh Brukh",
+        "Ver Krada",
+        "Kredh Muzigh",
+        "Olgrugh",
+        "Drobridh",
+        "Brilzu",
+        "Gagmerd",
+        "Arduccugh",
+        "Uggoggard",
+        "Ugad Og",
+        "Razdron Brudh",
+        "Uz Bherbro",
+        "Bhadh Nigedh",
+        "Grocrun",
+        "Vredrodh",
+        "Zrulkug",
+        "Odga",
+        "Goddugard",
+        "Gerkrulgrodh",
+        "Garig Chudh",
+        "Liggan Gokh"
+      ),
+      List(
+        "Zar Bharrodh",
+        "Drakh Kredgrul",
+        "Lardrug",
+        "Chorir",
+        "Dholgrag",
+        "Vizgu",
+        "Grammiggiz",
+        "Chirgoldrur",
+        "Zrugrogh Zral",
+        "Grubrerd Dodh"
+      )
+    )
   }
 
   case object WesnothDwarfes extends Culture("dwarfs", Dwarfs, "dwarfCity", Color.White) {
