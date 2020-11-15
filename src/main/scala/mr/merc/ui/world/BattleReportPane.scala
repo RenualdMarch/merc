@@ -8,8 +8,9 @@ import mr.merc.politics.Province
 import org.tbee.javafx.scene.layout.MigPane
 import scalafx.scene.control.ScrollPane
 import scalafx.Includes._
+import scalafx.geometry.Pos
 import scalafx.scene.image.ImageView
-import scalafx.scene.layout.StackPane
+import scalafx.scene.layout.{HBox, StackPane}
 import scalafx.scene.paint.Color
 import scalafx.scene.shape.Rectangle
 
@@ -26,8 +27,8 @@ class OneBattleReportPane(battleReport:BattleReport) extends MigPane {
 
   this.style = "-fx-border-color: black;-fx-border-width: 1;-fx-border-insets: 3px; -fx-background-insets: 3px;"
 
-  private val firstSide = battleReport.side1.map(_.name).mkString(",")
-  private val secondSide = battleReport.side2.map(_.name).mkString(",")
+  private def firstSide = battleReport.side1.map(x => new StateComponentColorName(x))
+  private def secondSide = battleReport.side2.map(x => new StateComponentColorName(x))
   private val warriorColumns = 4
 
   def province:Province = {
@@ -42,11 +43,26 @@ class OneBattleReportPane(battleReport:BattleReport) extends MigPane {
     }
   }
 
-  add(BigText(Localization("battleReport.vs", firstSide, secondSide)), "wrap, center, span 2")
+  add(new HBox {
+    firstSide.foreach(x => children.add(x))
+    children.add(BigText(Localization("battleReport.vs")))
+    secondSide.foreach(x => children.add(x))
+    alignment = Pos.Center
+  }.delegate, "center, wrap, span 2")
   add(BigText(Localization("battleReport.battleOf", province.name)), "wrap, center, span 2")
   add(battleReport.result match {
-    case Side1Won => BigText(Localization("battleReport.victory", firstSide))
-    case Side2Won => BigText(Localization("battleReport.victory", secondSide))
+    case Side1Won =>
+      new HBox {
+        children.add(BigText(Localization("battleReport.victory")))
+        firstSide.foreach(x => children.add(x))
+        alignment = Pos.Center
+      }
+    case Side2Won =>
+      new HBox {
+        children.add(BigText(Localization("battleReport.victory")))
+        secondSide.foreach(x => children.add(x))
+        alignment = Pos.Center
+      }
     case Draw => BigText(Localization("battleReport.draw"))
   }, "wrap, center, span 2")
 

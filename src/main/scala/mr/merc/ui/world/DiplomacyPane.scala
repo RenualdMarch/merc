@@ -690,7 +690,7 @@ class ProposePeacePane(currentState: State, selectedState: State, actions: World
     }
   }
 
-  override val css: Option[String] = None
+  override def css: Option[String] = None
 
 }
 

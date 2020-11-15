@@ -331,6 +331,8 @@ object WorldGenerationConstants {
 
   val LandPercentage = 0.7
 
+  val PoliticalIssueVariation = 0.2
+
 /*
   val WorldMapWidth = 50
   val WorldMapHeight = 50

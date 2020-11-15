@@ -9,7 +9,7 @@ import scalafx.scene.control._
 import scalafx.scene.image.{Image, ImageView}
 import scalafx.scene.layout.{BorderPane, Pane, Region}
 import mr.merc.util.FxPropertyUtils._
-import scalafx.beans.property.{ObjectProperty, ReadOnlyObjectProperty}
+import scalafx.beans.property.{IntegerProperty, ObjectProperty, ReadOnlyObjectProperty}
 import EconomicLocalization._
 import javafx.scene.control.TableCell
 import mr.merc.army.WarriorCompetence
@@ -65,7 +65,7 @@ class ArmySupplyPane(controller: ArmyPaneController, stage: Stage) extends PaneW
   val leftPane = PaneWithTwoVerticalChildren(warriorsTable, recruitmentPane, 0.6)
   val eitherProperty = bindTwoProperties(warriorsTable.selectedWarrior, recruitmentPane.projectsPane.selectedRow)
 
-  private def f(either:Either[Warrior, BusinessProject]) = Option(either) match {
+  private def f(either: Either[Warrior, BusinessProject]) = Option(either) match {
     case Some(Left(warrior)) =>
       recruitmentPane.projectsPane.projectsTable.delegate.getSelectionModel.clearSelection()
       new WarriorInfoPane(warrior).delegate
@@ -141,6 +141,7 @@ class WarriorsTablePane(controller: ArmyPaneController) extends BorderPane with 
   center = table
 
   val selectedWarrior: ReadOnlyObjectProperty[Warrior] = table.getSelectionModel.selectedItemProperty()
+
   def warriorsTable: TableView[Warrior] = table
 }
 
@@ -151,9 +152,13 @@ class WarriorRecruitmentPane(controller: ArmyPaneController, stage: Stage) exten
   recruitWarriorButton.onAction = { _ =>
     val dialog = new SelectRecruitWarriorDialog(stage, controller.possibleWarriorToRecruit())
     dialog.showDialog(stage)
-    dialog.dialogResult.foreach { case RecruitWarriorOrder(wt, wc, c, st) =>
-      controller.recruitWarrior(wt, wc, c)
-    }
+    dialog.dialogResult.foreach(_.foreach { case RecruitWarriorOrder(wt, wc, c, st, count) =>
+      for {
+        _ <- 0 until count
+      } {
+        controller.recruitWarrior(wt, wc, c)
+      }
+    })
   }
 
   add(projectsPane, "grow, push, wrap")
@@ -183,7 +188,7 @@ class WarriorInfoPane(warrior: Warrior) extends BorderPane {
 }
 
 class WarriorSupplyPane(warrior: Warrior) extends MigPane {
-  def buildSupplyChart():Option[LineChart[Number, Number]] = {
+  def buildSupplyChart(): Option[LineChart[Number, Number]] = {
     val size = warrior.historicalNeeds.size
     warrior.historicalNeeds.headOption.map { first =>
       val xAxis = new NumberAxis(first.turn, first.turn + size - 1, 1)
@@ -324,60 +329,95 @@ class WarriorTypeInfoPane(example: Warrior) extends MigPane("") with WorldInterf
 
 object SelectRecruitWarriorDialog {
 
-  case class RecruitWarriorOrder(warriorType: WarriorType, warriorCulture: Culture, competence: WarriorCompetence, owner: State) {
-    def warrior:Warrior = new Warrior(warriorType, competence, warriorCulture, owner)
+  case class RecruitWarriorOrder(warriorType: WarriorType, warriorCulture: Culture, competence: WarriorCompetence, owner: State, var count: Int) {
+    def warrior: Warrior = new Warrior(warriorType, competence, warriorCulture, owner)
   }
 
 }
 
-class SelectRecruitWarriorDialog(owner: Stage, possibleChoices: List[RecruitWarriorOrder]) extends DialogStage[RecruitWarriorOrder] {
+class SelectRecruitWarriorDialog(owner: Stage, possibleChoices: List[RecruitWarriorOrder]) extends DialogStage[List[RecruitWarriorOrder]] {
 
-  class ParentWarriorPane(child: RecruitWarriorOrder) extends BorderPane {
-    center = new WarriorTypeOrderPane(child)
-    styleClass.add("party-pane")
+  private lazy val choices = possibleChoices.map(_.copy())
 
-    this.onMouseClicked = { _ =>
-      this.requestFocus()
-      dialogResult = Some(child)
-    }
-
-    //MercTooltip.applyCenterTooltip(this, new WarriorTypeInfoPane(child.warrior))
-  }
-
-  override def additionalButtons:List[Button] = {
-    List(new BigButton{
-      text = Localization("soldier.info")
-      disable <== dialogResultProperty.map(_.isEmpty)
-      onAction = { _ =>
-        dialogResult.foreach { dr =>
-          import ModalDialog._
-          new WarriorTypeInfoPane(dr.warrior).showDialog(owner)
-        }
-      }
-    })
-  }
+  dialogResultProperty.value = Some(choices)
 
   override protected def dialogContent: Region = {
-    val gridPane = new MigPane("wrap 4", "")
-    possibleChoices.foreach { c =>
-      gridPane.add(new ParentWarriorPane(c), "grow")
+    val tableView = new TableView[RecruitWarriorOrder]()
+    tableView.style = Components.largeFontStyle
+
+    val imageColumn = new TableColumn[RecruitWarriorOrder, ImageView] {
+      text = ""
+      cellFactory = p => new TableCell[RecruitWarriorOrder, ImageView] {
+        override def updateItem(t: ImageView, b: Boolean): Unit = {
+          super.updateItem(t, b)
+          setGraphic(t)
+        }
+      }
+      cellValueFactory = p => {
+        ObjectProperty {
+          new ImageView(p.value.warrior.image)
+        }
+      }
+      editable = false
     }
-    gridPane
+
+    val name = new StringColumn[RecruitWarriorOrder](Localization("soldier.type"), x =>
+      Localization(x.warriorType.name))
+
+    val prof = new StringColumn[RecruitWarriorOrder](Localization("soldier.level"), x =>
+      EconomicLocalization.localizeWarriorCompetence(x.competence))
+
+    val info = new TableColumn[RecruitWarriorOrder, Button] {
+      text = ""
+      cellFactory = p => new TableCell[RecruitWarriorOrder, Button] {
+        override def updateItem(t: Button, b: Boolean): Unit = {
+          super.updateItem(t, b)
+          setGraphic(t)
+        }
+      }
+      cellValueFactory = p => {
+        ObjectProperty {
+          new BigButton {
+            text = Localization("soldier.info")
+            onAction = { _ =>
+              new WarriorTypeInfoPane(p.value.warrior).showDialog(owner)
+            }
+          }
+        }
+      }
+      editable = false
+    }
+
+    val counter = new TableColumn[RecruitWarriorOrder, Int] {
+      cellValueFactory = p => {
+        ObjectProperty(p.value.count)
+      }
+      cellFactory = p => {
+        new TableCell[RecruitWarriorOrder, Int] {
+          val spinner = new Spinner[Int](0, Int.MaxValue, 0, 1)
+
+          spinner.value.onChange { (o, oldValue, newValue) =>
+            val order = getTableColumn.getTableView.getItems.get(getTableRow.getIndex)
+            order.count = newValue
+          }
+
+          override def updateItem(t: Int, b: Boolean): Unit = {
+            super.updateItem(t, b)
+            setGraphic(spinner)
+          }
+        }
+
+      }
+    }
+
+    tableView.columns ++= List(imageColumn, name, prof, info, counter)
+    tableView.items = new ObservableBuffer[RecruitWarriorOrder]() ++ choices
+    tableView.prefWidth = 1200
+    tableView.prefHeight = 800
+    tableView
   }
 
-  override protected def css: Option[String] = Some("/css/partyPane.css")
-}
-
-class WarriorTypeOrderPane(order: RecruitWarriorOrder) extends MigPane() {
-
-  val w = order.warrior
-
-  import EconomicLocalization._
-
-  add(new ImageView(w.image), "wrap, center, grow, push")
-  add(BigText(localizeCulture(order.warriorCulture)), "wrap, center")
-  add(BigText(localizeWarriorCompetence(order.competence)), "wrap, center")
-  add(BigText(Localization(order.warriorType.name)), "wrap, center")
+  override protected def css: Option[String] = Some ("/css/partyPane.css")
 }
 
 class ArmyMovementPane(controller: ArmyPaneController, province: Province) extends MigPane with WorldInterfaceJavaNode {
@@ -456,7 +496,7 @@ class ArmyPaneController(province: Province, provinceView: ProvinceView, worldSt
 
   def possibleWarriorToRecruit(): List[RecruitWarriorOrder] = {
     worldState.possibleWarriorsToRecruit(province).map { case (wt, wc, c) =>
-      RecruitWarriorOrder(wt, c, wc, province.owner)
+      RecruitWarriorOrder(wt, c, wc, province.owner, 0)
     }.sortBy(ord => (ord.warriorType.name, ord.competence.toString))
   }
 }

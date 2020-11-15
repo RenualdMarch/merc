@@ -6,6 +6,7 @@ import mr.merc.economics.Population._
 import mr.merc.economics.TaxPolicy._
 import mr.merc.politics.IssuePosition._
 import mr.merc.economics.WorldConstants.Enterprises._
+import mr.merc.economics.WorldGenerationConstants
 
 import scala.collection.mutable
 import scala.util.Random
@@ -447,24 +448,24 @@ case class PoliticalPosition(migration: MigrationPosition,
 object PoliticalViews {
   def initPoliticalViews(populationType: PopulationType, random: Random = Random): PoliticalViews = {
     implicit class variation(d:Double) {
-      def r: Double = d + random.nextDouble() * 1
+      def r: Double = d + random.nextDouble() * WorldGenerationConstants.PoliticalIssueVariation
     }
     def migration = Migration.popularity(0.r, 1.r, 1.r, 0.r)
     def regime = Regime.popularity(1.r, 0.5.r, 0.r, 0.r, 0.5.r, 1.r)
     def foreignPolicy = ForeignPolicy.popularity(0.7.r, 0.3.r, 0.3.r, 0.7.r)
     def aristocraticPolicy = ForeignPolicy.popularity(1.r, 0.r, 0.8.r, 0.2.r)
-    def poorEconomy = Economy.popularity(1.r, 0.5.r, 0.5.r, 0.5.r)
-    def middleEconomy = Economy.popularity(0.5.r, 1.r, 0.5.r, 0.5.r)
+    def poorEconomy = Economy.popularity(1.r, 0.r, 0.5.r, 0.5.r)
+    def middleEconomy = Economy.popularity(1.r, 0.r, 0.5.r, 0.5.r)
     def aristorcraticEconomy = Economy.popularity(1.r, 0.r, 1.r, 0.r)
     def capitalistEconomy = Economy.popularity(0.r, 1.r, 0.r, 1.r)
-    def poorSocial = SocialPolicy.popularity(0.2.r, 0.3.r, 0.4.r, 0.2.r, 0.5.r, 0.8.r)
-    def mediumSocial = SocialPolicy.popularity(0.5.r, 0.3.r, 0.2.r, 1.r, 0.5.r, 0.r)
-    def upperSocial = SocialPolicy.popularity(1.r, 0.r, 0.r, 1.r, 0.2.r, 0.r)
-    def poorVoters = VotersPolicy.popularity(1.r, 0.5.r, 0.3.r, 0.r, 0.2.r, 0.2.r,
-      0.r,0.3.r,0.4.r,1.r,0.1.r,0.1.r)
-    def middleVoters = VotersPolicy.popularity(1.r, 0.2.r, 0.5.r, 0.r, 0.2.r, 0.2.r,
-      0.r,0.4.r,1.r,0.5.r,0.1.r,0.1.r)
-    def upperVoters = VotersPolicy.popularity(1.r, 0.7.r, 0.3.r, 0.r, 0.2.r, 0.2.r,
+    def poorSocial = SocialPolicy.popularity(1.r, 0.r, 0.r, 0.2.r, 0.4.r, 0.4.r)
+    def mediumSocial = SocialPolicy.popularity(0.65.r, 0.35.r, 0.r, 0.65.r, 0.35.r, 0.r)
+    def upperSocial = SocialPolicy.popularity(1.r, 0.r, 0.r, 0.8.r, 0.2.r, 0.r)
+    def poorVoters = VotersPolicy.popularity(1.r, 0.4.r, 0.2.r, 0.r, 0.1.r, 0.1.r,
+      0.r,0.2.r,0.4.r,1.r,0.1.r,0.1.r)
+    def middleVoters = VotersPolicy.popularity(1.r, 0.2.r, 0.4.r, 0.r, 0.1.r, 0.1.r,
+      0.r,0.4.r,1.r,0.2.r,0.1.r,0.1.r)
+    def upperVoters = VotersPolicy.popularity(1.r, 0.3.r, 0.1.r, 0.r, 0.1.r, 0.1.r,
       0.r,0.8.r,0.6.r,0.2.r,0.1.r,0.1.r)
 
     populationType match {
@@ -482,12 +483,12 @@ object PoliticalViews {
         PoliticalViews(migration, regime, foreignPolicy, middleEconomy, mediumSocial, middleVoters)
       case Clergy =>
         PoliticalViews(migration, regime, foreignPolicy, middleEconomy, mediumSocial,
-          VotersPolicy.popularity(1.r, 0.5.r, 0.3.r, 0.r, 0.r, 1.r,
-            1.r, 0.5.r, 0.3.r, 0.r, 0.r, 1.r))
+          VotersPolicy.popularity(1.r, 0.3.r, 0.1.r, 0.r, 0.r, 1.r,
+            1.r, 0.3.r, 0.1.r, 0.r, 0.r, 1.r))
       case Mages =>
         PoliticalViews(migration, regime, foreignPolicy, middleEconomy, mediumSocial,
-          VotersPolicy.popularity(1.r, 0.5.r, 0.3.r, 0.r, 1.r, 0.r,
-            1.r, 0.5.r, 0.3.r, 0.r, 1.r, 0.r))
+          VotersPolicy.popularity(1.r, 0.3.r, 0.1.r, 0.r, 1.r, 0.r,
+            1.r, 0.3.r, 0.1.r, 0.r, 1.r, 0.r))
       case Traders =>
         PoliticalViews(migration, regime, foreignPolicy,
           Economy.popularity(0.r, 1.r, 0.r, 1.r),

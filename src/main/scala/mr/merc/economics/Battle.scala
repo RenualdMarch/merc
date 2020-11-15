@@ -84,7 +84,9 @@ abstract sealed class Battle(worldHexField: TerrainHexField, turn: Int) {
     val intersection = hexField.hexes.filter(_.province.contains(province)).toSet
     require(intersection.nonEmpty, s"province $province doesn't belong to hexField $hexField")
 
-    hexField.closest(intersection).filter(_.soldier.isEmpty).filter(_.terrain != Empty).zip(warriors).foreach { case (hex, warrior) =>
+    hexField.closest(intersection).filter(_.soldier.isEmpty).
+      filter(t => t.terrain != Empty && t.terrain.kind != WaterKind).zip(warriors).foreach {
+      case (hex, warrior) =>
       hex.soldier = Some(warrior.soldier)
     }
   }

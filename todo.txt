@@ -1,13 +1,11 @@
 requirement failed: Buying and selling differ
 
-rebalance initial political parties
-Redo recruitment pane
-add state colors on battle report
 wars list on diplomacy pane
 projected gain on budget pane totally incorrect
-soldiers start battle on water!!11
-cann't propose peace - null pointer in css.foreach
+province names on map?
 
+Polishing
+rebalance political parties and views
 
 Not high priority:
 allow hire people from other cultures with some political configurations, now it is possible to hire primary culture warrior anywhere

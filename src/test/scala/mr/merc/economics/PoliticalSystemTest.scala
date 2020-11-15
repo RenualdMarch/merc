@@ -15,7 +15,7 @@ class PoliticalSystemTest extends FunSuite {
     assert(coalition1 === Set(aristocratic))
 
     val coalition2 = politicalSystem.findCoalition(Map(aristocratic -> 0.2, benevolent -> 0.4, socialDemocratic -> 0.4))
-    assert(coalition2 === Set(aristocratic, benevolent))
+    assert(coalition2 === Set(socialDemocratic, benevolent))
   }
 
   test("applyElectionResults") {

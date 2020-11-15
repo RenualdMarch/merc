@@ -2,6 +2,7 @@ package mr.merc.ui.world
 
 import java.text.DecimalFormat
 
+import javafx.beans.value.WritableValue
 import mr.merc.local.Localization
 import mr.merc.log.Logging
 import org.tbee.javafx.scene.layout.MigPane
@@ -9,7 +10,7 @@ import scalafx.beans.binding.{ObjectBinding, StringBinding}
 import scalafx.beans.property.{ObjectProperty, ReadOnlyObjectProperty, ReadOnlyStringProperty, StringProperty}
 import scalafx.scene.{Node, Scene}
 import scalafx.scene.layout.{BorderPane, ColumnConstraints, GridPane, Region}
-import scalafx.scene.control.{Button, TableColumn}
+import scalafx.scene.control.{Button, Spinner, TableCell, TableColumn}
 import scalafx.scene.text.{Font, Text}
 import scalafx.stage.Stage
 import scalafx.Includes._
@@ -200,5 +201,31 @@ object GridPaneBuilder {
       style = "-fx-border-color: black;-fx-border-width: 1 1 1 1; -fx-padding: 10 10 10 10;"
     }
     buildWithCaption(constraints, nodes.map(mediumText), captions.map(mediumText))
+  }
+}
+
+class IntSpinnerCell[T] extends javafx.scene.control.TableCell[T, Int] {
+  private val spinner = new Spinner[Int](0, Int.MaxValue, 0, 1)
+  private var ignoreUpdate = false // flag preventing updates triggered from ui/initialisation
+
+  spinner.value.onChange { (o, oldValue, newValue) =>
+    if (!ignoreUpdate) {
+      ignoreUpdate = true
+      val property = getTableColumn.getCellObservableValue(getTableRow.getIndex).asInstanceOf[WritableValue[Int]]
+      property.setValue(newValue)
+      ignoreUpdate = false
+    }
+  }
+
+  override def updateItem(item:Int, empty:Boolean): Unit = {
+    super.updateItem(item, empty)
+    if (empty) {
+      setGraphic(null)
+    } else {
+      ignoreUpdate = true
+      spinner.valueFactory.value.setValue(item)
+      setGraphic(spinner)
+      ignoreUpdate = false
+    }
   }
 }

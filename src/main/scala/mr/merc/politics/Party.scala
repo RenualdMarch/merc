@@ -27,7 +27,7 @@ case class Party(name: String,
 object Party {
   val absolute = Party("party.monarchistic", Color.White, ClosedBorders, Absolute, Expansionism, StateEconomy, NoSocialSecurity, NoVoting)
 
-  val benevolent = Party("party.enlightenedMonarchistic", Color.LightGray, OpenBorders, Absolute, Expansionism, StateEconomy, LifeNeedsSocialSecurity, NoVoting)
+  val benevolent = Party("party.enlightenedMonarchistic", Color.LightGray, OpenBorders, Absolute, Pacifism, FreeMarket, LifeNeedsSocialSecurity, NoVoting)
 
   val magocratic = Party("party.magocratic", Color.Brown, ClosedBorders, Constitutional, Expansionism, StateEconomy, NoSocialSecurity, MagesOnly)
 
