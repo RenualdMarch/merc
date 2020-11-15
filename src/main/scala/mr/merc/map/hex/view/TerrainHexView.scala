@@ -1,17 +1,19 @@
 package mr.merc.map.hex.view
 
+import javafx.scene.text.TextAlignment
 import scalafx.scene.canvas.GraphicsContext
 import mr.merc.image.MImage
 import mr.merc.map.terrain._
 import mr.merc.map.hex._
 import scalafx.scene.paint.Color
-import scalafx.scene.text.Font
-import scalafx.scene.text.FontWeight
+import scalafx.scene.text.{Font, FontPosture, FontWeight}
 import scalafx.scene.image.Image
 import mr.merc.ui.common.ImageHelper._
 import mr.merc.unit.SoldierDefence
 import mr.merc.ui.common.geom.Line
+import mr.merc.ui.world.Components
 import mr.merc.util.CacheFactoryMap
+import scalafx.geometry.VPos
 
 
 object TerrainHexView {
@@ -238,10 +240,25 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
     }
   }
 
+  def drawProvinceNames(gc: GraphicsContext, xOffset: Int, yOffset: Int): Unit = {
+    hex.province.foreach { province =>
+      if (province.capital.x == hex.x && province.capital.y + 2 == hex.y) {
+        gc.save()
+        gc.stroke = Color.White
+        gc.font = Font.apply(Font.default.family, FontWeight.Bold, Components.largeFontSize * 2)
+        gc.textBaseline = VPos.Center
+        gc.textAlign = TextAlignment.CENTER
+        gc.fill = Color.Black
+        gc.fillText(province.name, this.x + xOffset + side / 2, this.y + yOffset + side)
+        gc.strokeText(province.name, this.x + xOffset + side / 2, this.y + yOffset + side)
+        gc.restore()
+      }
+    }
+  }
+
   def drawTerrainImage(gc: GraphicsContext, xOffset: Int, yOffset: Int) {
     val x = this.x + xOffset
     val y = this.y + yOffset
-
 
     image.scaledImage(factor).drawCenteredImage(gc, x, y, side, side)
     elements foreach (_.drawItself(gc, x, y, factor))
@@ -288,6 +305,8 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
         drawCastleAndWalls(gc, xOffset, yOffset)
         drawMapObjectIfNeeded(gc, xOffset, yOffset)
         drawSecondaryImageIfNeeded(gc, xOffset, yOffset)
+      case ProvinceNamesStage =>
+        drawProvinceNames(gc, xOffset, yOffset)
     }
   }
 
@@ -330,7 +349,6 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
       if (hex.terrain.isNot(WaterKind)) {
         drawLine(sameOwnerBorders, Color.Black, 1)
         drawLine(differentOwnerBorders, province.owner.color, 4)
-
       }
     }
   }
@@ -396,3 +414,5 @@ case object BuildingsForestMountainsStage extends HexDrawingStage
 case object EndInterfaceDrawing extends HexDrawingStage
 
 case object ProvinceBordersStage extends HexDrawingStage
+
+case object ProvinceNamesStage extends HexDrawingStage

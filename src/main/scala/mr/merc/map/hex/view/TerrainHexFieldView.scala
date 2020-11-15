@@ -176,7 +176,7 @@ class TerrainHexFieldView(field: TerrainHexField, val soldiersDrawer: SoldiersDr
   private val terrainWorldLayer = new CanvasLayer {
     def updateLayer(gc: GraphicsContext, viewRect: Rectangle2D) {
       val dirty = calculateVisibleHexes(viewRect).filter(_.terrainDirty)
-      List(TerrainImageStage, BuildingsForestMountainsStage, ProvinceBordersStage).foreach { stage =>
+      List(TerrainImageStage, BuildingsForestMountainsStage, ProvinceBordersStage, ProvinceNamesStage).foreach { stage =>
         dirty foreach (_.drawItself(gc, stage, -viewRect.minX.toInt, -viewRect.minY.toInt))
       }
       dirty.foreach(_.terrainDirty = false)
@@ -184,7 +184,7 @@ class TerrainHexFieldView(field: TerrainHexField, val soldiersDrawer: SoldiersDr
 
     def drawLayer(gc: GraphicsContext, viewRect: Rectangle2D) {
       val visibleHexes = calculateVisibleHexes(viewRect)
-      List(TerrainImageStage, BuildingsForestMountainsStage, ProvinceBordersStage).foreach { stage =>
+      List(TerrainImageStage, BuildingsForestMountainsStage, ProvinceBordersStage, ProvinceNamesStage).foreach { stage =>
         visibleHexes foreach (_.drawItself(gc, stage, -viewRect.minX.toInt, -viewRect.minY.toInt))
       }
       visibleHexes.foreach(_.terrainDirty = false)

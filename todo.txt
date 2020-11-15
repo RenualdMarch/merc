@@ -2,7 +2,6 @@ requirement failed: Buying and selling differ
 
 wars list on diplomacy pane
 projected gain on budget pane totally incorrect
-province names on map?
 
 Polishing
 rebalance political parties and views
