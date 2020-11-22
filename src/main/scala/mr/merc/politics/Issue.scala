@@ -64,6 +64,14 @@ object IssuePosition {
       TariffTax -> tariff.max,
       TransitTax -> transit.max
     )
+
+    def minMaxTaxPolicy: Map[Income, MinMax[Double]] = {
+      require(minTaxPolicy.keySet == maxTaxPolicy.keySet)
+
+      minTaxPolicy.keysIterator.map { k =>
+        k -> MinMax(minTaxPolicy(k), maxTaxPolicy(k))
+      }.toMap
+    }
   }
 
   trait ForeignPolicyPosition extends IssuePosition
@@ -177,10 +185,10 @@ object Economy extends Issue[EconomyPosition] {
     override def positionNumber: Int = 0
 
     val tariff = MinMax(0.3, 1)
-    val corporateTax = MinMax(0.3, 1)
-    val salaryTax = MinMax(0.3, 1)
+    val corporateTax = MinMax(0.3, 0.8)
+    val salaryTax = MinMax(0.3, 0.8)
     val salesTax = MinMax(0.3, 1)
-    val transit = MinMax(0.1, 0.5)
+    val transit = MinMax(0.1, 1)
 
     val stateCanBuildFactory: Boolean = true
     val stateCanExpandFactory: Boolean = true
@@ -196,11 +204,11 @@ object Economy extends Issue[EconomyPosition] {
 
     override def positionNumber: Int = 2
 
-    val tariff = MinMax(0, 0.2)
-    val corporateTax = MinMax(0, 0.2)
-    val salaryTax = MinMax(0, 0.2)
-    val salesTax = MinMax(0, 0.2)
-    val transit = MinMax(0, 0.1)
+    val tariff = MinMax(0, 0.5)
+    val corporateTax = MinMax(0, 0.5)
+    val salaryTax = MinMax(0, 0.5)
+    val salesTax = MinMax(0, 0.5)
+    val transit = MinMax(0, 0.25)
 
     val stateCanBuildFactory: Boolean = true
     val stateCanExpandFactory: Boolean = false

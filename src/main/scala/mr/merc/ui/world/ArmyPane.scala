@@ -9,12 +9,11 @@ import scalafx.scene.control._
 import scalafx.scene.image.{Image, ImageView}
 import scalafx.scene.layout.{BorderPane, Pane, Region}
 import mr.merc.util.FxPropertyUtils._
-import scalafx.beans.property.{IntegerProperty, ObjectProperty, ReadOnlyObjectProperty}
+import scalafx.beans.property.{ObjectProperty, ReadOnlyObjectProperty}
 import EconomicLocalization._
 import javafx.scene.control.TableCell
 import mr.merc.army.WarriorCompetence
 import mr.merc.economics._
-import mr.merc.util.{GuiUtils, MercTooltip}
 import org.tbee.javafx.scene.layout.MigPane
 import scalafx.Includes._
 import scalafx.scene.control.TabPane.TabClosingPolicy
@@ -25,11 +24,10 @@ import mr.merc.ui.world.SelectRecruitWarriorDialog.RecruitWarriorOrder
 import ModalDialog._
 import mr.merc.map.terrain._
 import mr.merc.unit._
-import scalafx.scene.{Node, Scene}
 import Localization._
+import javafx.geometry.Pos
 import mr.merc.image.MImage
 import mr.merc.unit.view.AttackView
-import mr.merc.util.MercTooltip.TooltipRecalculateWithCoords
 import scalafx.scene.chart.{AreaChart, LineChart, NumberAxis, XYChart}
 
 
@@ -370,6 +368,7 @@ class SelectRecruitWarriorDialog(owner: Stage, possibleChoices: List[RecruitWarr
     val info = new TableColumn[RecruitWarriorOrder, Button] {
       text = ""
       cellFactory = p => new TableCell[RecruitWarriorOrder, Button] {
+        setAlignment(Pos.CENTER_LEFT)
         override def updateItem(t: Button, b: Boolean): Unit = {
           super.updateItem(t, b)
           setGraphic(t)
@@ -394,6 +393,7 @@ class SelectRecruitWarriorDialog(owner: Stage, possibleChoices: List[RecruitWarr
       }
       cellFactory = p => {
         new TableCell[RecruitWarriorOrder, Int] {
+          setAlignment(Pos.CENTER_LEFT)
           val spinner = new Spinner[Int](0, Int.MaxValue, 0, 1)
 
           spinner.value.onChange { (o, oldValue, newValue) =>
@@ -497,7 +497,7 @@ class ArmyPaneController(province: Province, provinceView: ProvinceView, worldSt
   def possibleWarriorToRecruit(): List[RecruitWarriorOrder] = {
     worldState.possibleWarriorsToRecruit(province).map { case (wt, wc, c) =>
       RecruitWarriorOrder(wt, c, wc, province.owner, 0)
-    }.sortBy(ord => (ord.warriorType.name, ord.competence.toString))
+    }.sortBy(ord => (ord.competence.toString, ord.warriorType.name)).reverse
   }
 }
 

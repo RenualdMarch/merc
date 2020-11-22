@@ -253,11 +253,13 @@ trait WorldStateParliamentActions {
 
   def changeRulingParty(state: State, newParty: Party): Unit = {
     state.politicalSystem.changeAbsoluteRulingParty(newParty)
+    state.changeBudgetPolicyAfterRulingPartyChange()
     playerPoliticalSystemProperty.forceInvalidation()
   }
 
   def usurpPower(state: State, newParty: Party): Unit = {
     state.politicalSystem.usurpPower(newParty)
+    state.changeBudgetPolicyAfterRulingPartyChange()
     playerPoliticalSystemProperty.forceInvalidation()
   }
 
@@ -266,6 +268,7 @@ trait WorldStateParliamentActions {
 
   def giveUpPower(state: State, newParty: Party): Unit = {
     state.politicalSystem.giveUpPower(newParty, this.turn)
+    state.changeBudgetPolicyAfterRulingPartyChange()
     playerPoliticalSystemProperty.forceInvalidation()
   }
 
@@ -279,6 +282,7 @@ trait WorldStateParliamentActions {
       if (state.politicalSystem.isElectionNow(turn)) {
         val electionResults = state.politicalSystem.doElectionsNow(turn,
           state.primeCulture, possibleParties(state.politicalSystem), states(state))
+        state.changeBudgetPolicyAfterRulingPartyChange()
         state.mailBox.addMessage(new InformationDomesticMessage(Localization("election.commission"),
           Localization("election.results")) {
           override def body: Region = new ElectionResultsPane(electionResults, state)

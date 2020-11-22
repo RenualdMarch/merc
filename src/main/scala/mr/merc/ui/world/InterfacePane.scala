@@ -55,7 +55,7 @@ trait WorldInterfaceJavaNode {
 }
 
 trait WorldInterfaceWhiteJavaNode {
-  self: javafx.scene.layout.Region =>
+  self: javafx.scene.Parent =>
 
   getStyleClass.add("whitePane")
   getStylesheets.add("/css/worldPane.css")

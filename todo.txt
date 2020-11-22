@@ -1,7 +1,7 @@
 requirement failed: Buying and selling differ
 
-wars list on diplomacy pane
-projected gain on budget pane totally incorrect
+add random events that should give casus bellis instead of silently as of now
+pacifist and expansionist difference - ? in ai and in system of events, expansionist should receive events
 
 Polishing
 rebalance political parties and views

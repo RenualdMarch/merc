@@ -392,6 +392,12 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
     removeDisappearedStates()
   }
 
+  private def giveAllMoneyToAnnexor(giver: State, demander: State): Unit = {
+    val money = giver.budget.moneyReserve
+    giver.budget.spendMoneyOnReparations(giver.budget.moneyReserve)
+    demander.budget.receiveMoneyFromReparations(money)
+  }
+
   private def applyWarTarget(warAgreement: WarAgreement, warTarget: WarTarget, currentTurn: Int): List[DiplomaticAgreement] = {
     List(warTarget).flatMap(_.validTarget(warAgreement, this)).flatMap {
       case tp: TakeProvince =>
@@ -400,6 +406,9 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
         }
         tp.province.owner = tp.demander
         tp.province.controller = tp.demander
+        if (!regions.exists(_.owner == tp.giver)) {
+          giveAllMoneyToAnnexor(tp.giver, tp.demander)
+        }
         Nil
       case lc: LiberateCulture =>
         increaseBadBoy(lc.demander, LiberateCultureBadBoy)
@@ -407,6 +416,9 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
         lc.provinces.foreach { p =>
           p.owner = newState
           p.controller = newState
+        }
+        if (!regions.exists(_.owner == lc.giver)) {
+          giveAllMoneyToAnnexor(lc.giver, lc.demander)
         }
         Nil
       case cs: CrackState =>

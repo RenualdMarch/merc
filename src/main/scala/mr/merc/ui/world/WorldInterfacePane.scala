@@ -9,6 +9,9 @@ import scalafx.Includes._
 
 
 class WorldInterfacePane(frame: WorldFrame, val worldCanvas: CanvasLayers, terrainField: TerrainHexField, factor:Double, pixelWidth:Int, pixelHeight:Int) extends Pane {
+
+  private val emptyPane = new Pane with WorldInterfaceNode
+
   private val minimapChild = new Minimap(terrainField, worldCanvas, factor, pixelWidth, pixelHeight, false)
   private val minimap: Pane = new MinimapParent(minimapChild)
   private val endTurnButton = BigButton(Localization("next.turn"))
@@ -16,7 +19,7 @@ class WorldInterfacePane(frame: WorldFrame, val worldCanvas: CanvasLayers, terra
     frame.nextTurn()
   }
 
-  children = List(worldCanvas, minimap, endTurnButton)
+  children = List(worldCanvas, minimap, endTurnButton, emptyPane)
 
   worldCanvas.prefWidth <== this.width - minimap.width
   worldCanvas.prefHeight <== this.height
@@ -43,6 +46,11 @@ class WorldInterfacePane(frame: WorldFrame, val worldCanvas: CanvasLayers, terra
     endTurnButton.layoutY <== minimap.layoutY - 50
     endTurnButton.prefWidth <== minimap.width
     endTurnButton.prefHeight = 50
+
+    emptyPane.layoutX <== this.width - this.width / 5
+    emptyPane.layoutY = 0
+    emptyPane.prefWidth <== this.width / 5
+    emptyPane.prefHeight <== this.height - this.width / 5 - endTurnButton.prefHeight
   }
 
   private var rightTopPanel: Option[Pane] = None
@@ -51,14 +59,15 @@ class WorldInterfacePane(frame: WorldFrame, val worldCanvas: CanvasLayers, terra
 
   private var fullPanel: Option[Pane] = None
 
-  def setRightTopPanel(pane: Pane): Unit = {
+  def setRightTopPanel(pane: Pane, remove: Boolean = true): Unit = {
     removeRightTopPanel()
+
     rightTopPanel = Some(pane)
     children.add(pane)
     pane.layoutX <== this.width - this.width / 5
     pane.layoutY = 0
     pane.prefWidth <== this.width / 5
-    pane.prefHeight <== this.height - this.width / 5
+    pane.prefHeight <== this.height - this.width / 5 - endTurnButton.prefHeight
     pane.requestFocus()
   }
 

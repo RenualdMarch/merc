@@ -15,7 +15,7 @@ class WorldMenu(parent: WorldFrame) extends MenuBar {
   val gameMenu = new Menu(Localization("menu.game"))
   val viewMenu = new Menu(Localization("menu.view"))
 
-  this.menus.addAll(politicsMenu, diplomacyMenu, viewMenu, gameMenu)
+  this.menus.addAll(politicsMenu, diplomacyMenu/*, viewMenu*/, gameMenu)
 
   val army = new MenuItem(Localization("menu.defence"))
   val relations = new MenuItem(Localization("menu.relations"))
@@ -26,13 +26,17 @@ class WorldMenu(parent: WorldFrame) extends MenuBar {
   emailMenu.onAction = { _ =>
     parent.showMailPane()
   }
+  val allWars = new MenuItem(Localization("menu.allWars"))
+  allWars.onAction = { _ =>
+    parent.showWarsPane()
+  }
 
   val foreignTradeMenu = new MenuItem(Localization("menu.foreignTrade"))
   foreignTradeMenu.onAction = { _ =>
     parent.showForeignTradePane()
   }
 
-  diplomacyMenu.items.addAll(emailMenu, relations, foreignTradeMenu, army)
+  diplomacyMenu.items.addAll(emailMenu, relations, allWars, foreignTradeMenu, army)
 
   val budgetMenu = new MenuItem(Localization("menu.budget"))
   budgetMenu.onAction = { _ =>

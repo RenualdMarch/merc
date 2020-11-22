@@ -149,8 +149,8 @@ object WorldConstants {
   }
 
   object Army {
-    private val supply = Map(Weapons -> 50d, Iron -> 50d, Clothes -> 50d, Grain -> 50d)
-    private val recruitmentCost = Map[Product, Double](Weapons -> 50d, Iron -> 50d, Clothes -> 100d)
+    private val supply = Map(Weapons -> 50d, Clothes -> 50d, Grain -> 50d)
+    private val recruitmentCost = Map[Product, Double](Weapons -> 50d, Clothes -> 100d)
 
     val SoldierSupply:Map[WarriorCompetence, Map[Product, Double]] = Map(
       Professional -> (supply |*| 4),

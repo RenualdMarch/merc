@@ -161,9 +161,9 @@ class StateDiplomacyPane(currentState: State, selectedStateInfo: StateInfo, acti
   val relationsTab = new Tab {
     text = Localization("diplomacy.relations")
     style = Components.largeFontStyle
-    content = new MigPane {
+    content = new MigPane("") {
       add(new StateRelationsPane(currentState, selectedState, actions), "wrap")
-      add(new ScrollPane {
+      add(new ScrollPane with WorldInterfaceWhiteNode {
         style = Components.largeFontStyle
         content = new StateAgreementsPane(stage, selectedState, actions)
         fitToWidth = true
@@ -223,7 +223,7 @@ class StateRelationsPane(currentState: State, selectedState: State, actions: Wor
   }
 }
 
-class StateAgreementsPane(stage: Stage, selectedState: State, actions: WorldStateDiplomacyActions) extends MigPane() {
+class StateAgreementsPane(stage: Stage, selectedState: State, actions: WorldStateDiplomacyActions) extends MigPane {
 
   private val agreements = actions.agreements(selectedState)
   private val vassalAgreements = agreements.collect { case v: VassalAgreement if v.vassal == selectedState => v }
@@ -798,7 +798,7 @@ class ClaimsTable(claims: List[Claim]) extends TableView[Claim] {
   items = new ObservableBuffer[Claim]() ++ claims
 }
 
-class WarPane(stage: Stage, war: WarAgreement, diplomacyActions: WorldStateDiplomacyActions) extends MigPane {
+class WarPane(stage: Stage, war: WarAgreement, diplomacyActions: WorldStateDiplomacyActions) extends MigPane with WorldInterfaceWhiteJavaNode {
   add(BigText(war.fullWarName), "center")
   add(showBattlesButton, "center, wrap")
   add(buildTable, "grow, push, span 2")
@@ -867,6 +867,7 @@ class WarPane(stage: Stage, war: WarAgreement, diplomacyActions: WorldStateDiplo
 
     val target = new TableColumn[WarTableRow, String] {
       text = Localization("diplomacy.warTarget")
+      style =  "-fx-alignment: center-right;"
 
       cellValueFactory = p => StringProperty {
         p.value.warTarget match {
@@ -942,4 +943,14 @@ class StateRelationsToOtherStatesPane(state: State, actions: WorldStateDiplomacy
   table.items = new ObservableBuffer[State]() ++ states
 
   add(table, "grow, push")
+}
+
+class AllWarsPane(stage: Stage, actions:WorldStateDiplomacyActions) extends ScrollPane {
+  fitToWidth = true
+  style = Components.largeFontStyle
+  content = new MigPane {
+    actions.diplomacyEngine.wars.foreach { war =>
+      add(new WarPane(stage, war, actions), "wrap, push, grow")
+    }
+  }
 }

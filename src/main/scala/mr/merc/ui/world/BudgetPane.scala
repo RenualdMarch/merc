@@ -121,7 +121,9 @@ class SpendingConfiguration(worldState: WorldStateBudgetActions) extends TopTitl
   center = centerPane
 
   val projectedExpenses: DoubleProperty = new DoubleProperty()
-  projectedExpenses <== scholarsSlider.spendingValue + bureaucratsSlider.spendingValue + pensionsSlider.spendingValue
+  projectedExpenses <== scholarsSlider.spendingValue + bureaucratsSlider.spendingValue +
+    pensionsSlider.spendingValue + armySupplySlider.spendingValue
+
 
 }
 

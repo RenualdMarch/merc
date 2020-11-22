@@ -165,6 +165,11 @@ class WorldFrame(val sceneManager: SceneManager, worldState: WorldState) extends
     interfacePane.setFullPanel(new InterfacePane(pane, () => hideFullPane()))
   }
 
+  def showWarsPane(): Unit = {
+    val pane = new AllWarsPane(sceneManager.stage, worldState)
+    interfacePane.setFullPanel(new InterfacePane(pane, () => hideFullPane()))
+  }
+
   def hideFacePane(): Unit = {
     interfacePane.removeFacePanel()
   }
