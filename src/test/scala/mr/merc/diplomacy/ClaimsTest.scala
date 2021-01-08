@@ -29,16 +29,18 @@ class ClaimsTest extends AbstractDiplomacyTest {
       diplomacyEngine.generateInitialClaimsForNeighbours()
     }
 
+    val end = WorldConstants.Diplomacy.WeakClaimTime
+
     diplomacyEngine.allClaims shouldBe Set(
       StrongProvinceClaim(first, firstProvince1), StrongProvinceClaim(first, firstProvince2),
       StrongProvinceClaim(second, secondProvince1), StrongProvinceClaim(second, secondProvince2),
       StrongProvinceClaim(third, thirdProvince1), StrongProvinceClaim(third, thirdProvince2),
-      WeakProvinceClaim(first, secondProvince1, 100), WeakProvinceClaim(first, secondProvince2, 100),
-      WeakProvinceClaim(first, thirdProvince1, 100), WeakProvinceClaim(first, thirdProvince2, 100),
-      WeakProvinceClaim(second, firstProvince1, 100), WeakProvinceClaim(second, firstProvince2, 100),
-      WeakProvinceClaim(second, thirdProvince1, 100), WeakProvinceClaim(second, thirdProvince2, 100),
-      WeakProvinceClaim(third, secondProvince1, 100), WeakProvinceClaim(third, secondProvince2, 100),
-      WeakProvinceClaim(third, firstProvince1, 100), WeakProvinceClaim(third, firstProvince2, 100),
+      WeakProvinceClaim(first, secondProvince1, end), WeakProvinceClaim(first, secondProvince2, end),
+      WeakProvinceClaim(first, thirdProvince1, end), WeakProvinceClaim(first, thirdProvince2, end),
+      WeakProvinceClaim(second, firstProvince1, end), WeakProvinceClaim(second, firstProvince2, end),
+      WeakProvinceClaim(second, thirdProvince1, end), WeakProvinceClaim(second, thirdProvince2, end),
+      WeakProvinceClaim(third, secondProvince1, end), WeakProvinceClaim(third, secondProvince2, end),
+      WeakProvinceClaim(third, firstProvince1, end), WeakProvinceClaim(third, firstProvince2, end),
     )
 
     secondProvince1.owner = first
@@ -50,12 +52,12 @@ class ClaimsTest extends AbstractDiplomacyTest {
       StrongProvinceClaim(first, firstProvince1), StrongProvinceClaim(first, firstProvince2),
       StrongProvinceClaim(second, secondProvince1), StrongProvinceClaim(second, secondProvince2),
       StrongProvinceClaim(third, thirdProvince1), StrongProvinceClaim(third, thirdProvince2),
-      StrongProvinceClaim(first, secondProvince1), WeakProvinceClaim(first, secondProvince2, 100),
-      WeakProvinceClaim(first, thirdProvince1, 100), WeakProvinceClaim(first, thirdProvince2, 100),
-      WeakProvinceClaim(second, firstProvince1, 100), WeakProvinceClaim(second, firstProvince2, 100),
-      WeakProvinceClaim(second, thirdProvince1, 100), WeakProvinceClaim(second, thirdProvince2, 100),
-      WeakProvinceClaim(third, secondProvince1, 100), WeakProvinceClaim(third, secondProvince2, 100),
-      WeakProvinceClaim(third, firstProvince1, 100), WeakProvinceClaim(third, firstProvince2, 100),
+      StrongProvinceClaim(first, secondProvince1), WeakProvinceClaim(first, secondProvince2, end),
+      WeakProvinceClaim(first, thirdProvince1, end), WeakProvinceClaim(first, thirdProvince2, end),
+      WeakProvinceClaim(second, firstProvince1, end), WeakProvinceClaim(second, firstProvince2, end),
+      WeakProvinceClaim(second, thirdProvince1, end), WeakProvinceClaim(second, thirdProvince2, end),
+      WeakProvinceClaim(third, secondProvince1, end), WeakProvinceClaim(third, secondProvince2, end),
+      WeakProvinceClaim(third, firstProvince1, end), WeakProvinceClaim(third, firstProvince2, end),
     )
   }
 }

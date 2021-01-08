@@ -2,8 +2,6 @@ name:= "Merc"
 
 version := "0.2"
 
-scalaVersion := "2.12.8"
-
 // Add dependency on ScalaFX library
 libraryDependencies += "org.scalafx" %% "scalafx" % "14-R19"
 

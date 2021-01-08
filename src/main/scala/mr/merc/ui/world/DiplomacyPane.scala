@@ -891,7 +891,7 @@ class WarPane(stage: Stage, war: WarAgreement, diplomacyActions: WorldStateDiplo
   def showBattlesButton: Node = {
     val pane = new ScrollPane {
       style = Components.largeFontStyle
-      prefHeight <== stage.height - 400
+      prefHeight <== stage.height - 350
       content = new BattleReportPane(war.battles)
     }
 

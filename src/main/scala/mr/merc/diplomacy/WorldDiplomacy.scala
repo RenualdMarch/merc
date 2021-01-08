@@ -5,10 +5,14 @@ import mr.merc.diplomacy.DiplomaticAgreement.WarAgreement._
 import mr.merc.diplomacy.Claim.{ProvinceClaim, StrongProvinceClaim, VassalizationClaim, WeakProvinceClaim}
 import mr.merc.diplomacy.DiplomaticMessage.DeclareWar
 import mr.merc.diplomacy.WorldDiplomacy.RelationshipBonus
-import mr.merc.politics.{Province, State}
+import mr.merc.politics.{ForeignPolicy, IssuePosition, Province, State}
 import mr.merc.economics.WorldConstants.Diplomacy._
+import mr.merc.economics.message.{DomesticMessage, InformationDomesticMessage}
 import mr.merc.economics.{Culture, WorldConstants, WorldStateDiplomacyActions}
 import mr.merc.local.Localization
+import mr.merc.ui.world.ClaimReceivedDomesticMessagePane
+import scalafx.scene.layout.Region
+import scalafx.Includes._
 
 import scala.util.Random
 
@@ -33,13 +37,79 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
 
   private var mailbox: Map[State, List[DiplomaticMessage]] = Map()
 
-  private var claims: Set[Claim] = Set()
+  private class ClaimsHolder {
+    private var _claims: Set[Claim] = Set()
 
-  def allClaims: Set[Claim] = claims
+    def claims: Set[Claim] = _claims
+
+    def containsAnyClaim(state: State, province: Province): Boolean = {
+      containsStrongClaim(state, province) || containsWeakClaim(state, province)
+    }
+
+    def containsStrongClaim(state: State, province: Province): Boolean = {
+      _claims.contains(StrongProvinceClaim(state, province))
+    }
+
+    def findWeakClaim(state: State, province: Province): Option[WeakProvinceClaim] = {
+      _claims.collectFirst {
+        case wc@WeakProvinceClaim(owner, land, _) if owner == state && province == land => wc
+      }
+    }
+
+    def containsWeakClaim(state: State, province: Province): Boolean = {
+      findWeakClaim(state, province).nonEmpty
+    }
+
+    def containsVassalizationClaim(state: State, possibleVassal: State): Boolean = {
+      _claims.collectFirst {
+        case VassalizationClaim(lord, vassal, _) => lord == state && vassal == possibleVassal
+      }.nonEmpty
+    }
+
+    def safelyAddClaim(claim: Claim): Boolean = {
+      claim match {
+        case wc:WeakProvinceClaim =>
+          if (!containsAnyClaim(wc.state, wc.province)) {
+            _claims += wc
+            true
+          } else false
+        case sc: StrongProvinceClaim =>
+          if (!containsStrongClaim(sc.state, sc.province)) {
+            findWeakClaim(sc.state, sc.province) match {
+              case Some(wc) =>
+                _claims -= wc
+                _claims += sc
+              case None =>
+                _claims += sc
+            }
+            true
+          } else false
+        case vc:VassalizationClaim =>
+          if (!containsVassalizationClaim(vc.state, vc.possibleVassal)) {
+            _claims += vc
+            true
+          } else false
+      }
+    }
+
+    def cleanClaims(actualStates: Set[State]): Unit = {
+      _claims = _claims.filter {
+        case claim: ProvinceClaim => actualStates.contains(claim.state)
+        case VassalizationClaim(state, possibleVassal, claimTurnEnd) =>
+          actualStates.contains(state) && actualStates.contains(possibleVassal)
+      }
+    }
+  }
+
+  private val claimsHolder = new ClaimsHolder()
+
+  def allClaims: Set[Claim] = claimsHolder.claims
 
   def generateInitialStrongClaimsForOwnedTerritories(): Unit = {
-    require(claims.isEmpty, s"Claims is not empty: $claims")
-    claims = regions.map(p => StrongProvinceClaim(p.owner, p)).toSet
+    require(claimsHolder.claims.isEmpty, s"Claims is not empty: ${claimsHolder.claims}")
+    regions.map(p => StrongProvinceClaim(p.owner, p)).foreach { c =>
+      claimsHolder.safelyAddClaim(c)
+    }
   }
 
   def generateInitialClaimsForNeighbours(): Unit = {
@@ -50,25 +120,57 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
   def generateEndTurnClaimsForNeighbours(currentTurn:Int): Unit = {
     generateClaimsForNeighbours(WorldConstants.Diplomacy.ChanceForWeakClaim,
       currentTurn + WorldConstants.Diplomacy.WeakClaimTime)
+    generateWeakClaimsForOwnedTerritoriesWithoutClaims(WorldConstants.Diplomacy.ChanceForWeakClaim,
+      currentTurn + WorldConstants.Diplomacy.WeakClaimTime)
   }
 
   private def generateClaimsForNeighbours(percentage: Double, claimEnd:Int): Unit = {
     for {
-      p <- regions
-      neig <- p.neighbours if !claims.contains(StrongProvinceClaim(p.owner, neig))
+      p <- regions if p.owner.politicalSystem.rulingParty.foreignPolicy == ForeignPolicy.Expansionism
+      neig <- p.neighbours if neig.owner != p.owner
     } {
       if (Random.nextDouble() < percentage) {
-        claims += WeakProvinceClaim(p.owner, neig, claimEnd)
+        val claim = WeakProvinceClaim(p.owner, neig, claimEnd)
+        val added = claimsHolder.safelyAddClaim(claim)
+        if (added) {
+          p.owner.mailBox.addMessage(new InformationDomesticMessage(Localization("battleReport.sender"), Localization("messages.claims.title")) {
+            override def body: Region = new ClaimReceivedDomesticMessagePane(p.owner, claim)
+          })
+
+          claim.province.owner.mailBox.addMessage(new InformationDomesticMessage(Localization("battleReport.sender"), Localization("messages.claims.title")) {
+            override def body: Region = new ClaimReceivedDomesticMessagePane(claim.province.owner, claim)
+          })
+        }
+      }
+    }
+  }
+
+  def generateWeakClaimsForOwnedTerritoriesWithoutClaims(percentage: Double, claimEnd:Int): Unit = {
+    for {
+      p <- regions if !claimsHolder.containsStrongClaim(p.owner, p)
+    } {
+      if (Random.nextDouble() < percentage) {
+        val claim = WeakProvinceClaim(p.owner, p, claimEnd)
+        val added = claimsHolder.safelyAddClaim(claim)
+        if (added) {
+          p.owner.mailBox.addMessage(new InformationDomesticMessage(Localization("battleReport.sender"), Localization("messages.claims.title")) {
+            override def body: Region = new ClaimReceivedDomesticMessagePane(p.owner, claim)
+          })
+        }
       }
     }
   }
 
   def replaceWeakClaimsWithStrongClaimsForOwnedTerritories(currentTurn:Int): Unit = {
-    claims.collect {
+    claimsHolder.claims.collect {
       case wc: WeakProvinceClaim => wc
     }.filter (wc => wc.province.owner == wc.state).foreach { wc =>
       if (wc.claimTurnEnd == currentTurn + 1) {
-        claims = claims + StrongProvinceClaim(wc.state, wc.province) - wc
+        val claim = StrongProvinceClaim(wc.state, wc.province)
+        claimsHolder.safelyAddClaim(claim)
+        wc.state.mailBox.addMessage(new InformationDomesticMessage(Localization("battleReport.sender"), Localization("messages.claims.title")) {
+          override def body: Region = new ClaimReceivedDomesticMessagePane(wc.state, claim)
+        })
       }
     }
   }
@@ -263,7 +365,7 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
     events.filter(e => e.fromState == from && e.toState == to)
 
   def claimsBonuses(from: State): List[RelationshipBonus] = {
-    claims.filter(s => s.state == from && s.targetState != from).flatMap {
+    claimsHolder.claims.filter(s => s.state == from && s.targetState != from).flatMap {
       case _:VassalizationClaim => None
       case str: StrongProvinceClaim => Some(RelationshipBonus(from, str.province.owner, StrongClaimRelationshipBonus,
         Localization("diplomacy.strongClaim", from.name, str.province.name)))
@@ -311,35 +413,13 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
     case wa: WarAgreement if wa.sides.contains(state) => wa
   }
 
-  def addClaim(claim: ProvinceClaim): Unit = {
-    val alreadyClaim = claims.collectFirst {
-      case c: ProvinceClaim if c.province == claim.province && c.state == claim.state => c
-    }
-
-    (alreadyClaim, claim) match {
-      case (Some(_: StrongProvinceClaim), _) =>
-      // no need to add anything
-      case (Some(c: WeakProvinceClaim), wk: WeakProvinceClaim) =>
-        if (c.claimTurnEnd < wk.claimTurnEnd) {
-          claims = claims.filterNot(_ == c) + wk
-        }
-      case (Some(c: WeakProvinceClaim), s: StrongProvinceClaim) =>
-        claims = claims.filterNot(_ == c) + s
-      case (None, c) =>
-        claims += c
-    }
-  }
-
   def addClaim(claim: Claim): Unit = {
-    val alreadyClaim = claims.find(_ == claim)
-    if (alreadyClaim.isEmpty) {
-      claims += claim
-    }
+    claimsHolder.safelyAddClaim(claim)
   }
 
-  def claims(state: State): List[Claim] = this.claims.filter(_.state == state).toList
+  def claims(state: State): List[Claim] = claimsHolder.claims.filter(_.state == state).toList
 
-  def claimsAgainst(state: State): List[Claim] = this.claims.filter(c => c.targetState == state && c.state != state).toList
+  def claimsAgainst(state: State): List[Claim] = claimsHolder.claims.filter(c => c.targetState == state && c.state != state).toList
 
   def joinWar(wa: WarAgreement, ally: State, newSide: State, currentTurn: Int): Unit = {
     if (wa.defenders.contains(ally)) {
@@ -492,7 +572,7 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
 
     mailbox = mailbox.filterKeys(actualStates.contains)
 
-    claims = claims.filter(s => actualStates.contains(s.state))
+    claimsHolder.cleanClaims(actualStates)
   }
 
   def possibleVassalizationWarTargets(state: State): List[State] = {

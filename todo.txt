@@ -1,7 +1,6 @@
 requirement failed: Buying and selling differ
 
-add random events that should give casus bellis instead of silently as of now
-pacifist and expansionist difference - ? in ai and in system of events, expansionist should receive events
+pacifist and expansionist - border friction events with relations degradation
 
 Polishing
 rebalance political parties and views
@@ -15,6 +14,8 @@ state rating pane
 animate healing
 idle animation for soldiers on battle
 idle animation for soldiers on world map
+think about interesting events, look at stellaris
+
 
 add more cultures, at least two cultures per race:
 Marashy culture as indian?

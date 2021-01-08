@@ -1,5 +1,6 @@
 *.log
 logs.txt
+/null
 
 # sbt
 dist/*
@@ -17,4 +18,5 @@ project/project/target
 .cache
 .idea
 .classpath
+.bsp
 /bin

@@ -111,12 +111,12 @@ object WorldConstants {
     def newPrice(currentPrice: Double, supply:Double, demand:Double):Double = {
       val price = ((supply, demand) match {
         case (0, 0) => 1d
-        case (0, _) => EmptySupplyPriceIncrease
-        case (_, 0) => EmptyDemandPriceDecrease
+        case (0, d) => EmptySupplyPriceIncrease + 0.1 * d / (d + 100)
+        case (s, 0) => EmptyDemandPriceDecrease - 0.1 * s / (s + 100)
         case (s, d) =>
-          val q = s/d
+          val q = s / d
           if (q >= 1) {
-            EmptyDemandPriceDecrease + (1 - EmptyDemandPriceDecrease)/q
+            EmptyDemandPriceDecrease + (1 - EmptyDemandPriceDecrease) / q
           } else {
             EmptySupplyPriceIncrease + (1 - EmptySupplyPriceIncrease) * q
           }
@@ -229,7 +229,7 @@ object WorldConstants {
 
     val ChanceForInitialWeakClaim = 0.2
     val ChanceForWeakClaim = 0.05
-    val WeakClaimTime = 100
+    val WeakClaimTime = 10
 
     val StalledWarTimeUntilPeace = 8
 
