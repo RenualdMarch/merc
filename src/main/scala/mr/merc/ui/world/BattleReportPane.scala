@@ -25,6 +25,8 @@ class BattleReportPane(battles:List[BattleReport]) extends ScrollPane {
 
 class OneBattleReportPane(battleReport:BattleReport) extends MigPane {
 
+  private val factor = 1d
+
   this.style = "-fx-border-color: black;-fx-border-width: 1;-fx-border-insets: 3px; -fx-background-insets: 3px;"
 
   private def firstSide = battleReport.side1.map(x => new StateComponentColorName(x))
@@ -66,34 +68,24 @@ class OneBattleReportPane(battleReport:BattleReport) extends MigPane {
     case Draw => BigText(Localization("battleReport.draw"))
   }, "wrap, center, span 2")
 
-  class WarriorCell(warrior:Warrior, alive:Boolean) extends StackPane {
-
-    this.style = "-fx-border-color: black;-fx-border-width: 1;-fx-border-insets: 3px; -fx-background-insets: 3px;"
-
-    children.addAll(
-      Rectangle(72 + 12, 72 + 12, if (alive) Color.White else Color.Red),
-      new ImageView(warrior.image)
-    )
-  }
-
   private val side1Warriors = battleReport.side1Survived.map { w =>
-    new WarriorCell(w, true)
+    new WarriorCell(w, true, factor)
   } ++ battleReport.side1Lost.map { w =>
-    new WarriorCell(w, false)
+    new WarriorCell(w, false, factor)
   }
 
   private val side1MilitiaWarriors = battleReport.side1Militia.map { w =>
-    new WarriorCell(w, w.isAlive)
+    new WarriorCell(w, w.isAlive, factor)
   }
 
   private val side2MilitiaWarriors = battleReport.side2Militia.map { w =>
-    new WarriorCell(w, w.isAlive)
+    new WarriorCell(w, w.isAlive, factor)
   }
 
   private val side2Warriors = battleReport.side2Survived.map { w =>
-    new WarriorCell(w, true)
+    new WarriorCell(w, true, factor)
   } ++ battleReport.side2Lost.map { w =>
-    new WarriorCell(w, false)
+    new WarriorCell(w, false, factor)
   }
 
   private val constraints = Stream.continually(100d / warriorColumns).take(warriorColumns).toList
@@ -128,4 +120,14 @@ class OneBattleReportPane(battleReport:BattleReport) extends MigPane {
       add(side2Militia, "wrap")
     }
   }, "right, push, grow")
+}
+
+class WarriorCell(warrior:Warrior, alive:Boolean, factor: Double) extends StackPane {
+
+  this.style = "-fx-border-color: black;-fx-border-width: 1;-fx-border-insets: 3px; -fx-background-insets: 3px;"
+
+  children.addAll(
+    Rectangle(72 * factor + 12, 72 * factor + 12, if (alive) Color.White else Color.Red),
+    new ImageView(warrior.image(factor))
+  )
 }

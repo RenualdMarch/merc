@@ -35,6 +35,17 @@ object SoldierView {
 class SoldierView(val soldier: Soldier, factor: Double, drawOval: Boolean = true, drawCircleState:Boolean = true)
   extends AbstractSoldierView(SoldierTypeViewInfo(soldier.soldierType.viewName, soldier.owner.color), factor) {
 
+  private var _selected: Boolean = false
+
+  def selected: Boolean = _selected
+
+  def selected_=(v: Boolean): Unit = {
+    if (v != _selected) {
+      _selected = v
+      markAsDirty()
+    }
+  }
+
   private val maxHp = 100
   private val healthBarHeight = Math.min(soldier.soldierType.hp, maxHp) * 2 * TerrainHexView.side(factor) / 3 / maxHp
   private val healthBarWidth = 4
@@ -70,7 +81,11 @@ class SoldierView(val soldier: Soldier, factor: Double, drawOval: Boolean = true
 
   override def drawItself(gc: GraphicsContext, xOffset: Int, yOffset: Int) {
     if ((state == StandState || state == IdleState) && drawOval) {
-      drawOvalUnderSoldier(gc, xOffset: Int, yOffset: Int, soldier.owner.color)
+      if (selected) {
+        drawOvalUnderSoldier(gc, xOffset, yOffset, soldier.owner.color, 0.5)
+      } else {
+        drawOvalUnderSoldier(gc, xOffset, yOffset, soldier.owner.color, 0.25)
+      }
     }
 
     if (state != DeathState && state != NoState && drawCircleState) {

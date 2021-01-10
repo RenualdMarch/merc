@@ -229,6 +229,7 @@ product.weapons=Weapons
 product.preciousmetal=Precious Metal
 product.ritual=%s ritual
 army.warrior=Soldier
+army.warrior.supply=Supply
 army.warriorType=Soldier type
 army.militia=Militia
 army.professional=Professional

@@ -6,16 +6,8 @@ import mr.merc.players.Player
 import mr.merc.map.hex.TerrainHex
 import mr.merc.map.GameField
 import mr.merc.ui.common.SoldierWrapper
-import mr.merc.battle.event.ShowArrow
-import mr.merc.battle.event.HideArrow
-import mr.merc.battle.event.HideMovementOptions
-import mr.merc.battle.event.ShowMovementOptions
-import mr.merc.battle.event.MovementModelEvent
-import mr.merc.battle.event.AttackModelEvent
-import mr.merc.battle.event.EndMoveModelEvent
+import mr.merc.battle.event.{AttackModelEvent, DeselectSoldier, EndMoveModelEvent, HideArrow, HideDefence, HideMovementOptions, MovementModelEvent, SelectSoldier, ShowArrow, ShowDefence, ShowMovementOptions}
 import mr.merc.unit.Attack
-import mr.merc.battle.event.HideDefence
-import mr.merc.battle.event.ShowDefence
 import mr.merc.log.Logging
 import scalafx.geometry.Rectangle2D
 
@@ -72,6 +64,14 @@ class BattleController(gameField: GameField, parent: BattleControllerParent, fac
     }
   }
 
+  private def removeSelectedSoldier(soldier: Soldier): Unit = {
+    battleView.handleEvent(DeselectSoldier(soldier))
+  }
+
+  private def selectSoldier(soldier: Soldier): Unit = {
+    battleView.handleEvent(SelectSoldier(soldier))
+  }
+
   private def removeMovementOptions() {
     if (movementOptionsAreShown) {
       movementOptionsAreShown = false
@@ -112,6 +112,7 @@ class BattleController(gameField: GameField, parent: BattleControllerParent, fac
               visitedHexesList.prev.get
             }
             // TODO think if we should remove selected soldier
+            selectedSoldier.foreach(removeSelectedSoldier)
             selectedSoldier = None
 
             removeArrow()
@@ -148,6 +149,7 @@ class BattleController(gameField: GameField, parent: BattleControllerParent, fac
               battleView.handleEvent(result.buildBattleViewEvent)
             }
 
+            selectedSoldier.foreach(removeSelectedSoldier)
             selectedSoldier = None
             soldierToShow.soldier = None
             removeMovementOptions()
@@ -169,6 +171,7 @@ class BattleController(gameField: GameField, parent: BattleControllerParent, fac
       removeArrow()
       removeDefence()
       removeMovementOptions()
+      selectedSoldier.foreach(removeSelectedSoldier)
       selectedSoldier = None
       soldierToShow.soldier = None
     }
@@ -178,12 +181,15 @@ class BattleController(gameField: GameField, parent: BattleControllerParent, fac
     debug(s"Mouse left clicked in hex (${hex.x}, ${hex.y})")
     hex.soldier match {
       case Some(soldier) =>
+        selectedSoldier.foreach(removeSelectedSoldier)
         selectedSoldier = Some(soldier)
+        selectSoldier(soldier)
         // TODO add if soldier player is human player
         addMovementOptionsForSelectedSoldier()
         removeArrow()
         removeDefence()
       case None =>
+        selectedSoldier.foreach(removeSelectedSoldier)
         selectedSoldier = None
         removeArrow()
         removeDefence()

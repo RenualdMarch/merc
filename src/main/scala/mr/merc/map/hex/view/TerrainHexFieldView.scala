@@ -21,6 +21,8 @@ import scala.collection.mutable
 class TerrainHexFieldView(field: TerrainHexField, val soldiersDrawer: SoldiersDrawer[SoldierView], factor: Double, mode: FieldViewMode = BattleFieldViewMode) extends Logging {
   private val infiniteField = new InfiniteHexField((x, y) => new TerrainHex(x, y, Empty))
 
+  val rectSelector: RectSelector = new RectSelector(this)
+
   val realHexes = field.hexes.map(new TerrainHexView(_, field, this, factor))
 
   def blackHexes: Set[TerrainHexView] = {
@@ -129,6 +131,13 @@ class TerrainHexFieldView(field: TerrainHexField, val soldiersDrawer: SoldiersDr
 
   private var prevResult: (Rectangle2D, List[TerrainHexView]) = (new Rectangle2D(0, 0, 1, 1), Nil)
 
+  def selectedHexes(rectangle2D: Rectangle2D): List[TerrainHexView] = {
+    prevResult._2.filter { hex =>
+      val (x, y) = hex.center
+      rectangle2D.contains(x, y)
+    }
+  }
+
   def calculateVisibleHexes(viewRect: Rectangle2D): List[TerrainHexView] = {
     if (prevResult._1 == viewRect) {
       prevResult._2
@@ -228,9 +237,19 @@ class TerrainHexFieldView(field: TerrainHexField, val soldiersDrawer: SoldiersDr
     }
   }
 
+  private val selectionRectangleLayer = new CanvasLayer {
+    override def updateLayer(gc: GraphicsContext, viewRect: Rectangle2D): Unit = {
+      rectSelector.drawSelectionIfNeeded(gc, viewRect)
+    }
+
+    override def drawLayer(gc: GraphicsContext, viewRect: Rectangle2D): Unit = {
+      rectSelector.drawSelectionIfNeeded(gc, viewRect)
+    }
+  }
+
   def canvasLayers: List[CanvasLayer] = mode match {
     case BattleFieldViewMode => List(terrainBattleLayer, soldierBattleLayer, darkeningBattleLayer, battleInterfaceBattleLayer)
-    case WorldMapViewMode => List(terrainWorldLayer, soldierBattleLayer)
+    case WorldMapViewMode => List(terrainWorldLayer, soldierBattleLayer, selectionRectangleLayer)
   }
 
   def side: Int = realHexes.head.side

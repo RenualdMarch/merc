@@ -15,7 +15,9 @@ import mr.merc.army.WarriorCompetence.{Militia, Professional}
 import scalafx.scene.image.Image
 
 object Warrior {
-  case class WarriorNeedRecord(demanded: Map[Products.Product, Double], received:Map[Products.Product, Double], turn:Int)
+  case class WarriorNeedRecord(demanded: Map[Products.Product, Double], received:Map[Products.Product, Double], turn:Int) {
+    def needsReceivedPercentage:Double = received.values.sum / demanded.values.sum
+  }
 }
 
 class Warrior(val warriorType: WarriorType, val competence: WarriorCompetence, val culture: Culture, val owner: State) {
@@ -81,5 +83,5 @@ class Warrior(val warriorType: WarriorType, val competence: WarriorCompetence, v
     historicalNeedsRecords = historicalNeeds.takeRight(historicalRecords)
   }
 
-  def image:Image = soldierView(1d, false, false).images(StandState).head.image
+  def image(factor: Double):Image = soldierView(1, false, false).images(StandState).head.scaledImage(factor).image
 }

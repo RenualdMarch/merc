@@ -26,3 +26,5 @@ case class ShowArrow(src: TerrainHex, dest: TerrainHex) extends BattleViewEvent
 case object HideArrow extends BattleViewEvent
 case class ShowDefence(scr: TerrainHex, defence: SoldierDefence, drawPolygon: Boolean) extends BattleViewEvent
 case object HideDefence extends BattleViewEvent
+case class SelectSoldier(soldier: Soldier) extends BattleViewEvent
+case class DeselectSoldier(soldier: Soldier) extends BattleViewEvent

@@ -27,10 +27,10 @@ abstract class AbstractSoldierView(val viewInfo: SoldierTypeViewInfo, factor: Do
     result
   }
 
-  def drawOvalUnderSoldier(gc: GraphicsContext, xOffset: Int, yOffset: Int, color: Color) {
+  def drawOvalUnderSoldier(gc: GraphicsContext, xOffset: Int, yOffset: Int, color: Color, alpha: Double) {
     gc.save()
     gc.fill = color
-    gc.globalAlpha = 0.2
+    gc.globalAlpha = alpha
     gc.fillOval(x + xOffset + 12 * factor, y + yOffset + 44 * factor, 48 * factor, 24 * factor)
     gc.globalAlpha = 1
     gc.stroke = color

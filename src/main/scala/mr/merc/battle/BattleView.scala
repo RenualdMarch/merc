@@ -67,6 +67,10 @@ class BattleView(model: BattleModel, scalingFactor: Double, soldierDrawer: Soldi
         mapView.terrainView.defence = Some(wrap(view), defence, drawPolygon)
       case HideDefence =>
         mapView.terrainView.defence = None
+      case SelectSoldier(soldier) =>
+        soldiersMap.get(soldier).foreach(_.selected = true)
+      case DeselectSoldier(soldier) =>
+        soldiersMap.get(soldier).foreach(_.selected = false)
     }
   }
 

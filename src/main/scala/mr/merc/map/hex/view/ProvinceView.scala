@@ -1,5 +1,6 @@
 package mr.merc.map.hex.view
 
+import mr.merc.army.Warrior
 import mr.merc.economics.{Culture, EconomicRegion, FourSeasonsTerrainHex, FourSeasonsTerrainHexField}
 import mr.merc.politics.Province
 import mr.merc.economics.MapUtil.NumericOperations._
@@ -7,7 +8,7 @@ import mr.merc.economics.Seasons.Season
 import mr.merc.unit.Soldier
 import mr.merc.unit.view.SoldierView
 import mr.merc.economics.WorldConstants.Population._
-import mr.merc.map.hex.TerrainHexField
+import mr.merc.map.hex.{Hex, TerrainHexField}
 import mr.merc.map.terrain.FourSeasonsMapObjects._
 import mr.merc.map.terrain.FourSeasonsTerrainTypes._
 
@@ -89,6 +90,7 @@ class ProvinceView(season: Season, val province: Province, field: FourSeasonsTer
   }
 
   private var currentMap: Map[Soldier, SoldierView] = Map()
+  private var soldierToWarrior: Map[Soldier, Warrior] = Map()
 
   def cleanSoldiers(): Unit = {
     province.hexes.foreach { h =>
@@ -99,11 +101,23 @@ class ProvinceView(season: Season, val province: Province, field: FourSeasonsTer
       currentField.hex(h.x, h.y).soldier = None
     }
     currentMap = Map()
+    soldierToWarrior = Map()
+  }
+
+  def warriorByHex(x: Int, y: Int): Option[Warrior] = {
+    currentField.hex(x, y).soldier.flatMap(soldierToWarrior.get)
+  }
+
+  def soldierViewByWarrior(w: Warrior): Option[SoldierView] = {
+    currentMap.get(w.soldier)
   }
 
   def refreshSoldiers(): Unit = {
     cleanSoldiers()
-    currentMap = province.regionWarriors.allWarriors.map(w => w.soldier -> w.soldierView(1d, true, false)).toMap
+    val triple = province.regionWarriors.allWarriors.map(w => (w, w.soldier, w.soldierView(1d, true, false)))
+    currentMap = triple.map { case (_, soldier, view) => soldier -> view}.toMap
+    soldierToWarrior = triple.map { case (warrior, soldier, _) => soldier -> warrior}.toMap
+
     province.regionWarriors.warriorDestinations.foreach { case (destination, soldiers) =>
       (hexesForSoldiers(destination) zip soldiers).foreach { case (h, w) =>
         h.soldier = Some(w.soldier)

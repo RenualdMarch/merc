@@ -1,22 +1,22 @@
 package mr.merc.ui.world
 
 import java.io.File
-
 import javafx.event.EventHandler
 import mr.merc.economics.{Battle, SeasonOfYear, WorldGenerator, WorldState}
 import mr.merc.log.Logging
-import mr.merc.map.hex.view.ProvinceView
+import mr.merc.map.hex.view.{ProvinceView, RectSelector}
 import mr.merc.map.hex.view.TerrainHexFieldView.WorldMapViewMode
 import mr.merc.map.view.MapView
 import mr.merc.politics.{Province, State}
 import mr.merc.ui.common.{CanvasLayers, SceneManager}
 import scalafx.geometry.Rectangle2D
 import scalafx.scene.layout.{BorderPane, Pane}
-import scalafx.scene.input.{KeyCode, KeyEvent, MouseEvent}
+import scalafx.scene.input.{KeyCode, KeyEvent, MouseButton, MouseEvent}
 import scalafx.Includes._
 import javafx.scene.input.{KeyEvent => JKeyEvent}
 import javafx.scene.input.{KeyCode => JKeyCode}
 import mr.merc.ai.BattleAI
+import mr.merc.army.Warrior
 import mr.merc.economics.Seasons.Season
 import mr.merc.game.{GameContainer, SaveLoad}
 import mr.merc.local.Localization
@@ -27,8 +27,10 @@ import org.tbee.javafx.scene.layout.MigPane
 import scalafx.scene.paint.Color
 import scalafx.scene.shape.Rectangle
 import mr.merc.ui.dialog.ModalDialog._
+import scalafx.animation.{Animation, KeyFrame, Timeline}
 import scalafx.application.Platform
 import scalafx.beans.property.ObjectProperty
+import scalafx.event.ActionEvent
 import scalafx.scene.control.Alert
 import scalafx.scene.control.Alert.AlertType
 import scalafx.stage.FileChooser
@@ -44,11 +46,17 @@ object WorldFrame {
 class WorldFrame(val sceneManager: SceneManager, worldState: WorldState) extends Pane with Logging {
   val factor = 1d
 
+  val pulse = 20 ms
+  val timeline = Timeline(KeyFrame(pulse, onFinished = { ev: ActionEvent => redrawLoop() }))
+  timeline.cycleCount = Animation.Indefinite
+  timeline.play()
+
   private val dateProperty = ObjectProperty(worldState.seasonOfYear)
 
-  private var prevCurrentMap:(Season, TerrainHexField) =
+  private var prevCurrentMap: (Season, TerrainHexField) =
     (worldState.seasonOfYear.season, worldState.worldHexField.buildTerrainHexField(worldState.seasonOfYear.season))
-  def currentMap:TerrainHexField = {
+
+  def currentMap: TerrainHexField = {
     if (worldState.seasonOfYear.season != prevCurrentMap._1) {
       prevCurrentMap = (worldState.seasonOfYear.season, worldState.worldHexField.buildTerrainHexField(worldState.seasonOfYear.season))
     }
@@ -84,12 +92,116 @@ class WorldFrame(val sceneManager: SceneManager, worldState: WorldState) extends
 
   this.children = List(stateLabel, menu, dateLabel, interfacePane)
 
-  worldCanvas.onMouseClicked = (event: MouseEvent) => {
-    info(s"clicked on (${event.x}, ${event.y})")
+  private def rectSelector = mapView.terrainView.rectSelector
+
+  worldCanvas.onMousePressed = (event: MouseEvent) => {
+    if (event.primaryButtonDown) {
+      val rect = worldCanvas.viewRect
+      rectSelector.onMouseDown(event.x + rect.minX, event.y + rect.minY)
+    }
+  }
+
+  worldCanvas.onMouseDragged = (event: MouseEvent) => {
     val rect = worldCanvas.viewRect
-    val provinceOpt = mapView.provinceByPixel(event.x + rect.minX toInt, event.y + rect.minY toInt)
+    rectSelector.onMouseMove(event.x + rect.minX, event.y + rect.minY)
+  }
+
+  worldCanvas.onMouseExited = (event: MouseEvent) => {
+    rectSelector.onMouseLeft()
+  }
+
+  worldCanvas.onMouseReleased = (event: MouseEvent) => {
+    if (event.button == MouseButton.Primary) {
+      rectSelector.onMouseUp() match {
+        case Some(hexes) =>
+          val selected = for {
+            hexView <- hexes
+            province <- hexView.hex.province
+            pv <- provinceViewsMap.get(province)
+            w <- pv.warriorByHex(hexView.hex.x, hexView.hex.y)
+          } yield (province, w)
+          if (selected.isEmpty) {
+            selectProvince(event.x, event.y)
+          }  else selectWarriors(filterSelectedWarriors(selected))
+
+        case None => selectProvince(event.x, event.y)
+      }
+    } else if (event.button == MouseButton.Secondary) {
+      if (selectedWarriors.nonEmpty) {
+        val ownersWarriors = selectedWarriors.filter(_._2.owner == worldState.playerState)
+        if (ownersWarriors.isEmpty) {
+          deselectWarriors()
+        } else {
+          provinceByMouse(event.x, event.y).foreach { targetProvince =>
+            ownersWarriors.groupBy(_._1).foreach { case (province, list) =>
+              if (targetProvince == province) {
+                worldState.planMoveArmy(province, None, list.map(_._2))
+              } else {
+                worldState.planMoveArmy(province, Some(targetProvince), list.map(_._2))
+              }
+              provinceViewsMap(province).refreshSoldiers()
+            }
+          }
+        }
+      }
+    }
+  }
+
+  private def filterSelectedWarriors(initialSelection: List[(Province, Warrior)]): List[(Province, Warrior)] = {
+    val currentState = worldState.playerState
+    val playerWarriors = initialSelection.filter(_._2.owner == currentState)
+    if (playerWarriors.nonEmpty) playerWarriors
+    else List(initialSelection.head)
+  }
+
+  private var selectedWarriors: List[(Province, Warrior)] = Nil
+
+  private def selectWarriors(warriors: List[(Province, Warrior)]): Unit = {
+
+    selectedWarriors = warriors
+
+    val pane = selectedWarriors match {
+      case Nil => sys.error("impossible case")
+      case List(x) => new SelectedWarriorPane(x._2)
+      case xs => new SelectedWarriorsPane(xs.map(_._2)).delegate
+    }
+
+    val rightPane = new InterfacePane(pane, () => {
+      interfacePane.removeRightTopPanel()
+      interfacePane.removeFacePanel()
+    })
+    interfacePane.setRightTopPanel(rightPane)
+
+    markSelectedWarriors()
+  }
+
+  private def markSelectedWarriors(): Unit = {
+    selectedWarriors.foreach { case (province, warrior) =>
+      provinceViewsMap(province).soldierViewByWarrior(warrior).foreach(_.selected = true)
+    }
+  }
+
+  private def markUnselectedWarriors(): Unit = {
+    selectedWarriors.foreach { case (province, warrior) =>
+      provinceViewsMap(province).soldierViewByWarrior(warrior).foreach(_.selected = false)
+    }
+  }
+
+  private def deselectWarriors(): Unit = {
+    markUnselectedWarriors()
+    selectedWarriors = Nil
+    interfacePane.removeRightTopPanel()
+  }
+
+  def provinceByMouse(mouseX: Double, mouseY: Double): Option[Province] = {
+    val rect = worldCanvas.viewRect
+    mapView.provinceByPixel(mouseX + rect.minX toInt, mouseY + rect.minY toInt)
+  }
+
+  def selectProvince(mouseX: Double, mouseY: Double) {
+    deselectWarriors()
+    val provinceOpt = provinceByMouse(mouseX, mouseY)
     provinceOpt.foreach { p =>
-      info(s"selected province ${p.name}")
       val pane = new InterfacePane(new ProvinceDetailsPane(p, this), () => {
         interfacePane.removeRightTopPanel()
         interfacePane.removeFacePanel()
@@ -101,6 +213,7 @@ class WorldFrame(val sceneManager: SceneManager, worldState: WorldState) extends
   totalRefresh()
 
   def totalRefresh(): Unit = {
+    deselectWarriors()
     hideFullPane()
     hideFacePane()
     this.mapView = initMapView()
@@ -141,31 +254,37 @@ class WorldFrame(val sceneManager: SceneManager, worldState: WorldState) extends
   }
 
   def showBudgetPane(): Unit = {
+    deselectWarriors()
     val pane = new BudgetPane(worldState)
     interfacePane.setFullPanel(new InterfacePane(pane, () => hideFullPane()))
   }
 
   def showForeignTradePane(): Unit = {
+    deselectWarriors()
     val pane = new StateTradePane(worldState.stateProduction, worldState.playerState)
     interfacePane.setFullPanel(new InterfacePane(pane, () => hideFullPane()))
   }
 
   def showParliamentPane(): Unit = {
+    deselectWarriors()
     val pane = new ParliamentPane(sceneManager, worldState)
     interfacePane.setFullPanel(new InterfacePane(pane, () => hideFullPane()))
   }
 
   def showDiplomacyPane(): Unit = {
+    deselectWarriors()
     val pane = new DiplomacyPane(worldState, worldState.playerState, sceneManager.stage, this)
     interfacePane.setFullPanel(new InterfacePane(pane, () => hideFullPane()))
   }
 
   def showMailPane(): Unit = {
+    deselectWarriors()
     val pane = new MailPane(worldState.playerState, worldState, () => totalRefresh())
     interfacePane.setFullPanel(new InterfacePane(pane, () => hideFullPane()))
   }
 
   def showWarsPane(): Unit = {
+    deselectWarriors()
     val pane = new AllWarsPane(sceneManager.stage, worldState)
     interfacePane.setFullPanel(new InterfacePane(pane, () => hideFullPane()))
   }
@@ -187,6 +306,7 @@ class WorldFrame(val sceneManager: SceneManager, worldState: WorldState) extends
   }
 
   def nextTurn(): Unit = {
+    deselectWarriors()
     val waitDialog = new WaitDialog
 
     Future(worldState.nextTurn(true)).map { battles =>
@@ -270,7 +390,7 @@ class WorldFrame(val sceneManager: SceneManager, worldState: WorldState) extends
     }
   }
 
-  def playBattles(battles: List[Battle], callback:() => Unit): Unit = {
+  def playBattles(battles: List[Battle], callback: () => Unit): Unit = {
     def callbackFunction(remainingBattles: List[Battle])(): Unit = {
       remainingBattles match {
         case Nil =>
@@ -278,7 +398,7 @@ class WorldFrame(val sceneManager: SceneManager, worldState: WorldState) extends
           callback()
         case some :: rem =>
           if (some.isOver) {
-            callbackFunction(rem)
+            callbackFunction(rem)()
           } else {
             val ai = some.gameField.players.map(_ -> BattleAI()).toMap - worldState.playerState.toPlayer
             val battleFrame = new BattleFrame(sceneManager, some.gameField, ai, callbackFunction(rem))
@@ -288,6 +408,10 @@ class WorldFrame(val sceneManager: SceneManager, worldState: WorldState) extends
     }
 
     callbackFunction(battles)()
+  }
+
+  def redrawLoop(): Unit = {
+    worldCanvas.updateCanvas()
   }
 
   def saveGame(): Unit = {

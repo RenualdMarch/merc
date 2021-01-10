@@ -84,7 +84,7 @@ class WarriorsTablePane(controller: ArmyPaneController) extends BorderPane with 
 
   val soldierImageColumn = new TableColumn[Warrior, Image] {
     text = Localization("army.warrior")
-    cellValueFactory = p => ObjectProperty(p.value.image)
+    cellValueFactory = p => ObjectProperty(p.value.image(1d))
     cellFactory = p => new TableCell[Warrior, Image] {
       override def updateItem(t: Image, b: Boolean): Unit = {
         super.updateItem(t, b)
@@ -353,7 +353,7 @@ class SelectRecruitWarriorDialog(owner: Stage, possibleChoices: List[RecruitWarr
       }
       cellValueFactory = p => {
         ObjectProperty {
-          new ImageView(p.value.warrior.image)
+          new ImageView(p.value.warrior.image(1d))
         }
       }
       editable = false
@@ -539,7 +539,7 @@ class WarriorsListTable(province: Province, controller: ArmyPaneController) exte
 
   val soldierImageColumn = new TableColumn[Warrior, Image] {
     text = Localization("army.warrior")
-    cellValueFactory = p => ObjectProperty(p.value.image)
+    cellValueFactory = p => ObjectProperty(p.value.image(1d))
     cellFactory = p => new TableCell[Warrior, Image] {
       override def updateItem(t: Image, b: Boolean): Unit = {
         super.updateItem(t, b)
