@@ -18,6 +18,8 @@ abstract sealed class Battle(worldHexField: TerrainHexField, turn: Int) {
 
   private var militia: (List[Warrior], List[Warrior]) = (Nil, Nil)
 
+  def allMilitia:List[Warrior] = militia._1 ::: militia._2
+
   val allWarriors: List[Warrior]
 
   def participants: Set[State] = sides._1 ++ sides._2

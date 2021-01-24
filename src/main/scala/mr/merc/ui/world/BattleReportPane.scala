@@ -1,18 +1,19 @@
 package mr.merc.ui.world
 
 import mr.merc.army.Warrior
-import mr.merc.economics.BattleReport
+import mr.merc.economics.{Battle, BattleReport}
 import mr.merc.economics.BattleReport.{Draw, Side1Won, Side2Won}
 import mr.merc.local.Localization
-import mr.merc.politics.Province
+import mr.merc.politics.{Province, State}
 import org.tbee.javafx.scene.layout.MigPane
 import scalafx.scene.control.ScrollPane
 import scalafx.Includes._
 import scalafx.geometry.Pos
+import scalafx.scene.Node
 import scalafx.scene.image.ImageView
-import scalafx.scene.layout.{HBox, StackPane}
+import scalafx.scene.layout.{HBox, Pane, Region, StackPane}
 import scalafx.scene.paint.Color
-import scalafx.scene.shape.Rectangle
+import scalafx.scene.shape.{Line, Rectangle}
 
 class BattleReportPane(battles:List[BattleReport]) extends ScrollPane {
   content = new MigPane {
@@ -122,7 +123,9 @@ class OneBattleReportPane(battleReport:BattleReport) extends MigPane {
   }, "right, push, grow")
 }
 
-class WarriorCell(warrior:Warrior, alive:Boolean, factor: Double) extends StackPane {
+class WarriorCell(warrior:Warrior, alive:Boolean, factor: Double, showHpPercentage: Boolean = false) extends StackPane {
+
+
 
   this.style = "-fx-border-color: black;-fx-border-width: 1;-fx-border-insets: 3px; -fx-background-insets: 3px;"
 
@@ -130,4 +133,80 @@ class WarriorCell(warrior:Warrior, alive:Boolean, factor: Double) extends StackP
     Rectangle(72 * factor + 12, 72 * factor + 12, if (alive) Color.White else Color.Red),
     new ImageView(warrior.image(factor))
   )
+
+  if (showHpPercentage) {
+    val actualLength = (factor * 72 + 12) * warrior.hpPercentage
+    val line = new Line() {
+      startX = 0
+      startY = 72 * factor + 10
+      endX = actualLength
+      endY = 72 * factor + 10
+
+      strokeWidth = 4
+      stroke = Color.Red
+    }
+    children.add(line)
+    StackPane.setAlignment(line, Pos.BottomLeft)
+  }
+}
+
+class BeforeBattleDialog(battle: Battle) extends DialogStage[Boolean] {
+
+  lazy val playBattleButton = new BigButton {
+    text = Localization("battleDialog.playBattle")
+    onAction = { _ =>
+      dialogResult = Some(true)
+      close()
+    }
+  }
+
+  lazy val autoBattleButton = new BigButton {
+    text = Localization("battleDialog.autoBattle")
+    onAction = { _ =>
+      dialogResult = Some(false)
+      close()
+    }
+  }
+
+  override def additionalButtons = List(playBattleButton, autoBattleButton)
+
+  private val warriorColumns = 4
+  private val constraints = Stream.continually(100d / warriorColumns).take(warriorColumns).toList
+
+  private def statePane(state: State, warriors: List[Warrior]): MigPane = new MigPane {
+    add(new StateComponentColorName(state), s"center, wrap")
+
+    val pane = GridPaneBuilder.buildWithoutCaption(constraints,
+      warriors.map(w => new WarriorCell(w, true, 1d)))
+
+    add(pane)
+  }
+
+  private def buildAllStatesPanel(states: List[State], map:Map[State, List[Warrior]]): Region = new ScrollPane {
+    fitToWidth = true
+
+    content = new MigPane {
+      states.foreach { st =>
+        add(statePane(st, map(st)), "wrap")
+      }
+    }
+  }
+
+  override protected def dialogContent: Region = {
+    val pane = new PaneWithTwoVerticalChildren()
+
+    val warriors = battle.allWarriors ::: battle.allMilitia
+
+    val (left, right) = battle.sides
+
+    val map = warriors.groupBy(_.owner)
+    pane.setTwoChildren(buildAllStatesPanel(left.toList, map), buildAllStatesPanel(right.toList, map))
+    pane
+  }
+
+  override protected def shouldAddCancelButton: Boolean = false
+
+  override protected def shouldAddOkButton: Boolean = false
+
+  override protected def css: Option[String] = None
 }

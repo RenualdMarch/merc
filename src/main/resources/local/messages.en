@@ -477,3 +477,5 @@ messages.claims.weHaveStrongClaim=We received a permanent claim on
 messages.claims.someoneHasStrongClaim=received a permanent claim on
 messages.claims.vassalizationClaim=recevied a vassalization claim on
 messages.claims.title=Claims change
+battleDialog.playBattle=Play battle
+battleDialog.autoBattle=Auto battle

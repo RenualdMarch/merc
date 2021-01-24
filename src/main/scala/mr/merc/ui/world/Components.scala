@@ -116,13 +116,13 @@ abstract class DialogStage[T] extends Stage with Logging {
 
   }
 
-  private val okButton = BigButton(Localization("common.ok"))
+  protected val okButton = BigButton(Localization("common.ok"))
   okButton.onAction = { _ =>
     onOkButtonPressed()
     close()
   }
 
-  private val cancelButton = BigButton(Localization("common.cancel"))
+  protected val cancelButton = BigButton(Localization("common.cancel"))
   cancelButton.onAction = { _ =>
     dialogResult = None
     close()
@@ -132,18 +132,29 @@ abstract class DialogStage[T] extends Stage with Logging {
     dialogResult = None
   }
 
+  private val actualDialogContent = dialogContent
+
   protected def additionalButtons:List[Button] = Nil
 
+  protected def shouldAddOkButton: Boolean = true
+
+  protected def shouldAddCancelButton: Boolean = true
+
   private val buttonsPane = new MigPane()
-  buttonsPane.add(okButton)
+
+  if (shouldAddOkButton) {
+    buttonsPane.add(okButton)
+  }
+
   additionalButtons.foreach(buttonsPane.add(_))
-  buttonsPane.add(cancelButton)
+
+  if (shouldAddCancelButton) {
+    buttonsPane.add(cancelButton)
+  }
 
   protected def dialogContent:Region
 
   protected def css:Option[String]
-
-  private val actualDialogContent = dialogContent
 
   val contentPane = new MigPane("")
   contentPane.add(actualDialogContent, "grow, push, wrap")

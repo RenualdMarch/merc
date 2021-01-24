@@ -19,8 +19,8 @@ class SelectedWarriorsPane(warriors: List[Warrior]) extends ScrollPane {
 
     warriors.grouped(columns).foreach { line =>
       val (init, last) = line.splitAt(columns - 1)
-      init.foreach(w => add(new WarriorCell(w, true, factor)))
-      last.foreach(w => add(new WarriorCell(w, true, factor), "wrap"))
+      init.foreach(w => add(new WarriorCell(w, true, factor, true)))
+      last.foreach(w => add(new WarriorCell(w, true, factor, true), "wrap"))
     }
   }
 }
@@ -37,6 +37,9 @@ class SelectedWarriorPane(warrior: Warrior) extends MigPane {
 
   add(BigText(Localization("soldier.competence")))
   add(BigText(EconomicLocalization.localizeWarriorCompetence(warrior.competence)), "wrap")
+
+  add(BigText(Localization("army.hp")))
+  add(BigText(s"${warrior.soldier.hp}/${warrior.soldierType.hp}"), "wrap")
 
   add(BigText(Localization("army.warrior.supply")))
   add(BigText(DoubleFormatter().format(warrior.historicalNeeds.last.needsReceivedPercentage * 100) + "%"), "wrap")

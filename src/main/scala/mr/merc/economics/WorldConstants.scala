@@ -227,7 +227,7 @@ object WorldConstants {
     val VassalizedStateBadBoy = 3
     val LiberateCultureBadBoy = 2
 
-    val ChanceForInitialWeakClaim = 0.2
+    val ChanceForInitialWeakClaim = 0.1
     val ChanceForWeakClaim = 0.05
     val WeakClaimTime = 10
 

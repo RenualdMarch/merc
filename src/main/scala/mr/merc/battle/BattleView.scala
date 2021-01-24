@@ -48,7 +48,7 @@ class BattleView(model: BattleModel, scalingFactor: Double, soldierDrawer: Soldi
   }
 
   def handleEvent(event: BattleViewEvent) {
-    info(s"Battle view received event $event")
+    //info(s"Battle view received event $event")
     event match {
       case AttackBattleViewEvent(attackerTerrainHex, defenderTerrainHex, attacker, defender, result) =>
         handleAttackEvent(wrap(attackerTerrainHex), wrap(defenderTerrainHex), attacker, defender, result)

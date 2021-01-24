@@ -391,23 +391,39 @@ class WorldFrame(val sceneManager: SceneManager, worldState: WorldState) extends
   }
 
   def playBattles(battles: List[Battle], callback: () => Unit): Unit = {
-    def callbackFunction(remainingBattles: List[Battle])(): Unit = {
+    def callbackFunction(lastBattle: Option[Battle], remainingBattles: List[Battle])(): Unit = {
+
+      lastBattle.foreach { b =>
+        val report = worldState.concludePlayerBattle(b)
+        val reportPane = new OneBattleReportPane(report)
+        import mr.merc.ui.dialog.ModalDialog._
+        reportPane.showDialog(sceneManager.stage)
+      }
+
       remainingBattles match {
         case Nil =>
-          battles.foreach(worldState.concludePlayerBattle)
           callback()
         case some :: rem =>
           if (some.isOver) {
-            callbackFunction(rem)()
+            callbackFunction(None, rem)()
           } else {
-            val ai = some.gameField.players.map(_ -> BattleAI()).toMap - worldState.playerState.toPlayer
-            val battleFrame = new BattleFrame(sceneManager, some.gameField, ai, callbackFunction(rem))
-            sceneManager.showFrame(battleFrame)
+            import mr.merc.ui.dialog.ModalDialog._
+            val dialog = new BeforeBattleDialog(some)
+            val result = dialog.showDialog(sceneManager.stage).dialogResult.getOrElse(false)
+
+            if (result) {
+              val ai = some.gameField.players.map(_ -> BattleAI()).toMap - worldState.playerState.toPlayer
+              val battleFrame = new BattleFrame(sceneManager, some.gameField, ai, callbackFunction(Some(some), rem))
+              sceneManager.showFrame(battleFrame)
+            } else {
+              worldState.processAiBattles(List(some))
+              callbackFunction(None, rem)()
+            }
           }
       }
     }
 
-    callbackFunction(battles)()
+    callbackFunction(None, battles)()
   }
 
   def redrawLoop(): Unit = {
