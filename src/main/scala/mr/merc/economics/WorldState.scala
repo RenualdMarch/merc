@@ -6,12 +6,13 @@ import mr.merc.ai.BattleAI
 import mr.merc.army.{Warrior, WarriorCompetence, WarriorType}
 import mr.merc.battle.BattleModel
 import mr.merc.diplomacy.Claim.{StrongProvinceClaim, VassalizationClaim, WeakProvinceClaim}
-import mr.merc.diplomacy.DiplomaticAgreement.{AllianceAgreement, WarAgreement}
+import mr.merc.diplomacy.DiplomaticAgreement.{AllianceAgreement, SanctionAgreement, WarAgreement}
 import mr.merc.diplomacy.DiplomaticAgreement.WarAgreement.{CrackState, LiberateCulture, TakeMoney, TakeProvince, WarTarget}
 import mr.merc.diplomacy.DiplomaticMessage._
 import mr.merc.diplomacy.WorldDiplomacy.RelationshipBonus
 import mr.merc.diplomacy._
 import mr.merc.economics.EconomicRegion.ProductionTradingInfo
+import mr.merc.economics.Population.{PopulationType, Scholars}
 import mr.merc.economics.Products.IndustryProduct
 import mr.merc.economics.TaxPolicy.Income
 import mr.merc.economics.WorldConstants.Army.SoldierRecruitmentCost
@@ -25,6 +26,7 @@ import mr.merc.players.NamesGenerator
 import mr.merc.politics.IssuePosition.{EconomyPosition, RegimePosition}
 import mr.merc.politics.Regime.{Absolute, Constitutional, Democracy}
 import mr.merc.politics.{Election, Party, Province, State}
+import mr.merc.technology.TechnologyLevel
 import mr.merc.ui.world.{BattleReportPane, ElectionResultsPane, PastDiplomaticMessagesPane}
 import scalafx.beans.property.ObjectProperty
 import mr.merc.util.FxPropertyUtils.PropertyBindingMap
@@ -69,6 +71,7 @@ class WorldState(val regions: List[Province], var playerState: State, val worldH
 
     val day = new WorldMarketDay(this, turn)
     day.trade()
+    addTechPoints()
     controlledRegions.foreach { r =>
       val ppd = new PopulationMigrationInsideProvince(r.regionPopulation, r.owner)
       ppd.migrateInsideProvince()
@@ -120,6 +123,18 @@ class WorldState(val regions: List[Province], var playerState: State, val worldH
     val (playerBattles, aiBattles) = (battles ++ rebelBattles).partition(_.participants.contains(playerState))
     processAiBattles(aiBattles)
     playerBattles
+  }
+
+  def addTechPoints(): Unit = {
+    states.foreach { case (state, provinces) =>
+      val scholars = provinces.flatMap(_.regionPopulation.popsByType(Scholars)).map(_.populationCount).sum
+      val (lit, total) = provinces.flatMap(p => p.regionPopulation.nonEmptyPops).
+        map(p => (p.literateCount, p.populationCount)).fold((0, 0)) { case ((a, b), (x, y)) =>
+        (a + x, b + y)
+      }
+      val literacy = lit / total.toDouble
+      state.technologyLevel.addPoints(literacy, scholars)
+    }
   }
 
   def processAiBattles(battles: List[Battle]): Unit = {
@@ -430,10 +445,19 @@ trait WorldStateDiplomacyActions {
 
   val diplomacyEngine = new WorldDiplomacy(this)
 
+  lazy val situation: DiplomaticSituation = new DiplomaticSituation(diplomacyEngine)
+
   def neighbours(state: State):Set[State] = states(state).to[Set].flatMap(_.neighbours).map(_.owner)
 
   def playerNeighbours = neighbours(playerState)
 
+  def canTrade(from: State, to: State):Boolean = {
+    !diplomacyEngine.agreements(Set(from, to)).exists {
+      case ag: WarAgreement if ag.onDifferentSides(Set(from, to)) => true
+      case s: SanctionAgreement if s.underSanctions == from && s.initiator == to => true
+      case _ => false
+    }
+  }
 
   def stateInfo: List[StateInfo] = states.toList.map { case (state, provinces) =>
     StateInfo(
@@ -481,13 +505,13 @@ trait WorldStateDiplomacyActions {
     case v: VassalizationClaim => v.possibleVassal
   }.distinct
 
-  def generateNewState(culture: Culture, rulingParty: Party, startingMoney: Int = StateStartingMoney, name: String = ""): State = {
+  def generateNewState(culture: Culture, rulingParty: Party, techLevel: Int, startingMoney: Int = StateStartingMoney, name: String = ""): State = {
     val color = colorStream.head
     colorStream = colorStream.tail
     val stateName = if (name.isEmpty) {
       namesGenerators(culture).stateNames.extract()
     } else name
-    new State(stateName, culture, startingMoney, new PoliticalSystem(rulingParty), color)
+    new State(stateName, culture, startingMoney, new PoliticalSystem(rulingParty), new TechnologyLevel(techLevel), color)
   }
 
   def isPossibleMessage(message: DiplomaticMessage): Boolean = message.isPossible(diplomacyEngine, turn)
@@ -505,10 +529,12 @@ trait WorldStateDiplomacyActions {
   def relationshipsDescribed(state: State): Map[State, List[RelationshipBonus]] = diplomacyEngine.relationshipsDescribed(state, turn)
 
   def sendMessage(message: DiplomaticMessage): Unit = {
-    diplomacyEngine.sendMessage(message, turn)
+    if (message.isPossible(diplomacyEngine, turn)) {
+      diplomacyEngine.sendMessage(message, turn)
 
-    if (message.from == playerState) {
-      aiTurn(onlyAnswer = true)
+      if (message.from == playerState) {
+        aiTurn(onlyAnswer = true)
+      }
     }
   }
 
@@ -599,6 +625,16 @@ trait WorldStateDiplomacyActions {
 
   def canProposeAlliance(from: State, to: State): Boolean = {
     val message = new AllianceProposal(from, to)
+    isPossibleMessage(message)
+  }
+
+  def canEnactSanctions(from: State, to: State): Boolean = {
+    val message = SanctionsEnacted(from, to)
+    isPossibleMessage(message)
+  }
+
+  def canCancelSanctions(from: State, to: State): Boolean = {
+    val message = SanctionsStopped(from, to)
     isPossibleMessage(message)
   }
 

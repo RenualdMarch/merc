@@ -1,7 +1,6 @@
 requirement failed: Buying and selling differ
 
-pacifist and expansionist - border friction events with relations degradation
-add battle report after battle end
+demand vassalization button
 
 Polishing
 rebalance political parties and views

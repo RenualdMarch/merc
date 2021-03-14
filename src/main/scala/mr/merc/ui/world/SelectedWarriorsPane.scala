@@ -33,7 +33,7 @@ class SelectedWarriorPane(warrior: Warrior) extends MigPane {
   add(new StateComponentColorName(warrior.owner), "span 2, center, wrap")
 
   add(BigText(Localization("army.warriorType")))
-  add(BigText(Localization(warrior.warriorType.name)), "wrap")
+  add(BigText(Localization(warrior.soldierType.name)), "wrap")
 
   add(BigText(Localization("soldier.competence")))
   add(BigText(EconomicLocalization.localizeWarriorCompetence(warrior.competence)), "wrap")

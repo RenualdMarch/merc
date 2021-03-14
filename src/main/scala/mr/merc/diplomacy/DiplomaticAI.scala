@@ -1,7 +1,7 @@
 package mr.merc.diplomacy
 
 import mr.merc.diplomacy.Claim.{ProvinceClaim, VassalizationClaim}
-import mr.merc.diplomacy.DiplomaticAgreement.WarAgreement
+import mr.merc.diplomacy.DiplomaticAgreement.{SanctionAgreement, WarAgreement}
 import mr.merc.diplomacy.DiplomaticAgreement.WarAgreement._
 import mr.merc.diplomacy.DiplomaticMessage._
 import mr.merc.economics.{WorldConstants, WorldStateDiplomacyActions}
@@ -14,7 +14,7 @@ class DiplomaticAI(state: State, actions: WorldStateDiplomacyActions) extends Lo
 
   import WorldConstants.AI._
 
-  val situation: DiplomaticSituation = new DiplomaticSituation(actions.diplomacyEngine)
+  val situation: DiplomaticSituation = actions.situation
 
   def aiMove(onlyAnswer: Boolean, random: Random = Random): Unit = {
     answerMessages()
@@ -25,7 +25,13 @@ class DiplomaticAI(state: State, actions: WorldStateDiplomacyActions) extends Lo
 
   def answerMessages(): Unit = {
     actions.mailbox(state).foreach {
-      case m: DiplomaticDeclaration => actions.acknowledgeMessage(m)
+      case m: DiplomaticDeclaration =>
+        actions.acknowledgeMessage(m)
+        m match {
+          case s: SanctionsEnacted =>
+            actions.sendMessage(SanctionsEnacted(state, s.from))
+          case _ => // do nothing
+        }
       case v: VassalizationProposal => actions.answerMessage(v, answerVassalizationProposal(v))
       case ajw: AskJoinWar => actions.answerMessage(ajw, answerAskJoinWar(ajw))
       case pp: ProposePeace => actions.answerMessage(pp, answerProposePeace(pp))
@@ -33,6 +39,19 @@ class DiplomaticAI(state: State, actions: WorldStateDiplomacyActions) extends Lo
       case ap: AllianceProposal => actions.answerMessage(ap, answerAllianceProposal(ap))
       case op: OverlordshipProposal => actions.answerMessage(op, answerOverlordshipProposal(op))
       case dw: DeclareWar => actions.answerDeclareWar(dw, answerDeclareWar(dw))
+    }
+  }
+
+  def rethinkSanctions(): Unit = {
+    actions.agreements(state).collect {
+      case s:SanctionAgreement => s
+    }.foreach { sa =>
+      if (!situation.areRivals(state, sa.underSanctions)) {
+        actions.sendMessage(SanctionsStopped(state, sa.underSanctions))
+      }
+    }
+    situation.rivals(state).foreach { r =>
+      actions.sendMessage(SanctionsEnacted(state, r))
     }
   }
 
@@ -186,6 +205,7 @@ class DiplomaticAI(state: State, actions: WorldStateDiplomacyActions) extends Lo
   def answerDeclareWar(message: DeclareWar): Set[State] = actions.allies(state).toSet
 
   def sendMessages(random: Random = Random): Unit = {
+    rethinkSanctions()
     random.shuffle(possibleMessages()).take(WorldConstants.AI.MaxMessagesPerTurn).foreach { m =>
       actions.sendMessage(m)
     }

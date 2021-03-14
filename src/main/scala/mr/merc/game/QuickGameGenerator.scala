@@ -10,13 +10,14 @@ import scala.util.Random
 import mr.merc.army.{Warrior, WarriorCompetence}
 import mr.merc.economics.{Culture, PoliticalSystem}
 import mr.merc.politics.{Party, State}
+import mr.merc.technology.TechnologyLevel
 import mr.merc.util.MercUtils._
 
 class QuickGameGenerator(player1: Player = Player("Human", Color.Yellow),
   player2: Player = Player("AI", Color.Cyan)) extends GameGenerator {
 
-  private val state1 = new State(player1.name, Culture.cultures.randomElement(), 0, new PoliticalSystem(Party.absolute), color = player1.color)
-  private val state2 = new State(player2.name, Culture.cultures.randomElement(), 0, new PoliticalSystem(Party.absolute), color = player2.color)
+  private val state1 = new State(player1.name, Culture.cultures.randomElement(), 0, new PoliticalSystem(Party.absolute), new TechnologyLevel(0), color = player1.color)
+  private val state2 = new State(player2.name, Culture.cultures.randomElement(), 0, new PoliticalSystem(Party.absolute), new TechnologyLevel(0), color = player2.color)
 
   private def soldiersList(state: State): List[Soldier] = {
     val types = state.primeCulture.warriorViewNames.possibleWarriors.keySet.map(_._1).toList

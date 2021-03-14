@@ -12,7 +12,7 @@ import mr.merc.ui.world.BusinessProjectsReportPane
 import scalafx.Includes._
 import scalafx.scene.layout.Region
 
-class WorldMarketDay(worldState: WorldStateEnterpriseActions, turn: Int) extends Logging {
+class WorldMarketDay(worldState: WorldStateEnterpriseActions with WorldStateDiplomacyActions, turn: Int) extends Logging {
   type PathCache = Map[EconomicRegion, Map[EconomicRegion, List[EconomicRegion]]]
 
   private val regions: List[EconomicRegion] = worldState.controlledRegions
@@ -22,7 +22,7 @@ class WorldMarketDay(worldState: WorldStateEnterpriseActions, turn: Int) extends
   private def newPathCache(): PathCache = {
     regions.par.map { from =>
       from -> {
-        val grid = new EconomicGrid(from)
+        val grid = new EconomicGrid(from, worldState)
         PathFinder.findPossiblePaths(grid, from)
       }
     }.seq.toMap

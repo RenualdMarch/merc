@@ -15,60 +15,94 @@ import mr.merc.army.WarriorCompetence.{Militia, Professional}
 import scalafx.scene.image.Image
 
 object Warrior {
-  case class WarriorNeedRecord(demanded: Map[Products.Product, Double], received:Map[Products.Product, Double], turn:Int) {
-    def needsReceivedPercentage:Double = received.values.sum / demanded.values.sum
+
+  case class WarriorNeedRecord(demanded: Map[Products.Product, Double], received: Map[Products.Product, Double], turn: Int) {
+    def needsReceivedPercentage: Double = received.values.sum / demanded.values.sum
   }
+
 }
 
 class Warrior(val warriorType: WarriorType, val competence: WarriorCompetence, val culture: Culture, val owner: State) {
 
-  private var historicalNeedsRecords:Vector[WarriorNeedRecord] = Vector()
+  private var historicalNeedsRecords: Vector[WarriorNeedRecord] = Vector()
   private val historicalRecords = 30
 
-  def historicalNeeds:Vector[WarriorNeedRecord] = historicalNeedsRecords
+  private var storedTechLevel = -1
 
-  private var currentNeeds:Map[Products.Product, Double] = Map()
+  def historicalNeeds: Vector[WarriorNeedRecord] = historicalNeedsRecords
 
-  def hpPercentage:Double = soldier.hp.toDouble / soldierType.hp
+  private var currentNeeds: Map[Products.Product, Double] = Map()
+
+  def hpPercentage: Double = soldier.hp.toDouble / soldierType.hp
 
   def hpPercentage_=(hp: Double): Unit = {
     soldier.hp = Math.round(soldierType.hp * hp).toInt
   }
 
-  def warriorWeight:Double = competence match {
+  def warriorWeight: Double = competence match {
     case Militia => 1
     case Professional => 2
   }
 
-  def isAlive:Boolean = soldier.hp > 0
+  def isAlive: Boolean = soldier.hp > 0
 
-  def typeName:String = Localization(warriorType.name)
+  def typeName: String = Localization(warriorType.name)
 
-  val player:Player = owner.toPlayer
+  val player: Player = owner.toPlayer
 
-  def soldierType:SoldierType = warriorType.buildSoldierType(competence, culture)
+  private def actualTechLevel: Int = owner.technologyLevel.technologyLevel
 
-  val soldier:Soldier = new Soldier(warriorType.name, soldierType, player)
+  def soldierType: SoldierType = warriorType.buildSoldierType(competence, culture, storedTechLevel)
 
-  @transient private lazy val cache = CacheFactoryMap.memo[(Double, Boolean, Boolean), SoldierView] {
-    case (factor, circles, drawState) => new SoldierView(soldier, factor, circles, drawState)
+  private var storedSoldier = soldier
+
+  def soldier: Soldier = {
+    if (actualTechLevel == storedTechLevel) {
+      storedSoldier
+    } else {
+      storedTechLevel = actualTechLevel
+      clearCache()
+      storedSoldier = new Soldier(warriorType.name, soldierType, player)
+      soldier
+    }
   }
 
-  def soldierView(factor: Double, circles:Boolean, drawState: Boolean):SoldierView = {
+  private def clearCache(): Unit = {
+    _cache = None
+  }
+
+  @transient private var _cache: Option[((Double, Boolean, Boolean)) => SoldierView] = None
+
+  private def cache: ((Double, Boolean, Boolean)) => SoldierView = {
+    if (actualTechLevel != storedTechLevel) {
+      clearCache()
+    }
+
+    _cache match {
+      case Some(value) => value
+      case None =>
+        _cache = Some(CacheFactoryMap.memo[(Double, Boolean, Boolean), SoldierView] {
+          case (factor, circles, drawState) => new SoldierView(soldier, factor, circles, drawState)
+        })
+        _cache.get
+    }
+  }
+
+  def soldierView(factor: Double, circles: Boolean, drawState: Boolean): SoldierView = {
     val sv = cache(factor, circles, drawState)
     sv.refreshBars()
     sv
   }
 
-  def needs:Map[Products.Product, Double] = SoldierSupply(competence)
+  def needs: Map[Products.Product, Double] = SoldierSupply(competence, actualTechLevel)
 
-  def buyDemand(demand:FulfilledDemandRequest): Unit = {
+  def buyDemand(demand: FulfilledDemandRequest): Unit = {
     owner.budget.spendMoneyOnArmySupply(demand.spentMoney)
     currentNeeds |+|= demand.product -> demand.bought
     demand.currentSpentMoney += demand.spentMoney
   }
 
-  def allNeedsReceived(turn:Int): Unit = {
+  def allNeedsReceived(turn: Int): Unit = {
     val expectedTotal = needs.values.sum
     val receivedTotal = currentNeeds.values.sum
     val newHp = NeedsToHP(receivedTotal / expectedTotal)
@@ -83,5 +117,5 @@ class Warrior(val warriorType: WarriorType, val competence: WarriorCompetence, v
     historicalNeedsRecords = historicalNeeds.takeRight(historicalRecords)
   }
 
-  def image(factor: Double):Image = soldierView(1, false, false).images(StandState).head.scaledImage(factor).image
+  def image(factor: Double): Image = soldierView(1, false, false).images(StandState).head.scaledImage(factor).image
 }

@@ -236,30 +236,36 @@ class StateAgreementsPane(stage: Stage, selectedState: State, actions: WorldStat
     add(new WarPane(stage, war, actions), "grow, push, wrap")
   }
 
+  add(BigText(Localization("diplomacy.rivals")), "wrap")
+  actions.situation.rivals(selectedState) match {
+    case Nil => add(MediumText(Localization("diplomacy.noRivals")), "wrap")
+    case list => add(new StateComponentList(list), "wrap")
+  }
+
   if (vassalAgreements.nonEmpty) {
-    add(MediumText(Localization("diplomacy.vassalOf")), "wrap")
+    add(BigText(Localization("diplomacy.vassalOf")), "wrap")
     add(new StateComponentList(vassalAgreements.map(_.overlord)), "wrap")
   }
 
   if (overlordAgreements.nonEmpty) {
-    add(MediumText(Localization("diplomacy.overlordFor")), "wrap")
+    add(BigText(Localization("diplomacy.overlordFor")), "wrap")
     add(new StateComponentList(overlordAgreements.map(_.vassal)), "wrap")
   }
 
   if (allianceAgreements.nonEmpty) {
-    add(MediumText(Localization("diplomacy.alliances")), "wrap")
+    add(BigText(Localization("diplomacy.alliances")), "wrap")
     val alliances = allianceAgreements.flatMap(_.sides - selectedState)
     add(new StateComponentList(alliances), "wrap")
   }
 
   if (truces.nonEmpty) {
-    add(MediumText(Localization("diplomacy.truces")), "wrap")
+    add(BigText(Localization("diplomacy.truces")), "wrap")
     val currentTruces = truces.flatMap(_.sides - selectedState)
     add(new StateComponentList(currentTruces), "wrap")
   }
 
   if (wars.nonEmpty) {
-    add(MediumText(Localization("diplomacy.wars")), "wrap")
+    add(BigText(Localization("diplomacy.wars")), "wrap")
     wars.foreach(addWar)
   }
 }
@@ -338,6 +344,22 @@ class StateActionsPane(currentState: State, selectedState: State, actions: World
     }
   }
 
+  private val enactSanctions = new MediumButton() {
+    text = Localization("diplomacy.sanctions.button")
+    onAction = { _ =>
+      actions.sendMessage(SanctionsEnacted(currentState, selectedState))
+      parentFrame.showDiplomacyPane()
+    }
+  }
+
+  private val cancelSanctions = new MediumButton() {
+    text = Localization("diplomacy.cancelSanctions.button")
+    onAction = { _ =>
+      actions.sendMessage(SanctionsStopped(currentState, selectedState))
+      parentFrame.showDiplomacyPane()
+    }
+  }
+
   private val callAllyToWarButtons = actions.allyCanJoinWars(currentState, selectedState).map { war =>
     new MediumButton {
       text = Localization("diplomacy.callAlly", war.oppositeLeader(currentState, actions.diplomacyEngine).name)
@@ -362,6 +384,14 @@ class StateActionsPane(currentState: State, selectedState: State, actions: World
 
   if (actions.inWarAgainst(currentState, selectedState)) {
     add(addWarTarget, "wrap")
+  }
+
+  if (actions.canEnactSanctions(currentState, selectedState)) {
+    add(enactSanctions, "wrap")
+  }
+
+  if (actions.canCancelSanctions(currentState, selectedState)) {
+    add(cancelSanctions, "wrap")
   }
 
   if (actions.canProposeAlliance(currentState, selectedState)) {

@@ -68,6 +68,9 @@ object DiplomaticAgreement {
           if (warIsValid) None
           else Some(AgreementBreakingDetails.forced(first, second))
         case _: WarAgreement => None
+        case s:SanctionAgreement if s.sides == sides =>
+          Some(AgreementBreakingDetails.forced(s.initiator))
+        case _:SanctionAgreement => None
       }
     }
 
@@ -111,7 +114,9 @@ object DiplomaticAgreement {
           if (wa.removeSides(Set(vassal), diplomacy)) None
           else Some(AgreementBreakingDetails.forced(vassal))
         case _: WarAgreement => None
-
+        case s:SanctionAgreement if s.sides == sides =>
+          Some(AgreementBreakingDetails.forced(s.initiator))
+        case _:SanctionAgreement => None
       }
     }
 
@@ -143,6 +148,7 @@ object DiplomaticAgreement {
         case _: VassalAgreement => None
         case _: AllianceAgreement => None
         case _: WarAgreement => None
+        case _: SanctionAgreement => None
       }
 
 
@@ -158,7 +164,35 @@ object DiplomaticAgreement {
       List(RelationshipBonus(first, second, TruceRelationshipChange, Localization("diplomacy.truce", first.name, second.name)),
         RelationshipBonus(second, first, TruceRelationshipChange, Localization("diplomacy.truce", first.name, second.name)))
     }
+  }
 
+  class SanctionAgreement(val initiator:State, val underSanctions:State, val startingTurn: Int)
+    extends DiplomaticAgreement(startingTurn, None) {
+
+    def sides: Set[State] = Set(initiator, underSanctions)
+
+    override def isPreviousAgreementBroken(agreement: DiplomaticAgreement, diplomacy: WorldDiplomacy): Option[AgreementBreakingDetails] = {
+      agreement match {
+        case ag: AllianceAgreement if ag.sides == sides => Some(AgreementBreakingDetails.forced(initiator))
+        case _ : AllianceAgreement => None
+        case ag: VassalAgreement if ag.sides == sides => Some(AgreementBreakingDetails.voluntary(initiator))
+        case _ : VassalAgreement => None
+        case ag: TruceAgreement => None
+        case ag: SanctionAgreement if
+          ag.initiator == this.initiator && ag.underSanctions == this.underSanctions =>
+          Some(AgreementBreakingDetails.extended)
+        case _: SanctionAgreement => None
+        case ag: WarAgreement => None
+      }
+    }
+
+    override def voluntaryBreakingAgreementEvent(breaker: State, currentTurn: Int): Set[RelationshipEvent] = Set()
+
+    override def relationshipBonus: List[RelationshipBonus] = List(
+      RelationshipBonus(underSanctions, initiator, SanctionsRelationshipChange, Localization("diplomacy.sanctions"))
+    )
+
+    override def durationEndAgreementEvent(currentTurn: Int): Set[RelationshipEvent] = Set()
   }
 
   case class WarAgreement(var attackers: Set[State], var defenders: Set[State], warInitiator: State,
@@ -182,6 +216,7 @@ object DiplomaticAgreement {
       case aa: AllianceAgreement if onDifferentSides(aa.sides) => Some(AgreementBreakingDetails.forced(aa.first, aa.second))
       case _: AllianceAgreement => None
       case _: WarAgreement => None
+      case _: SanctionAgreement => None
     }
 
     def attackersLeader(diplomacy: WorldDiplomacy): State = diplomacy.getOverlord(warInitiator).getOrElse(warInitiator)

@@ -13,23 +13,28 @@ abstract class WarriorType(val name: String) {
 
   def baseHp: Int
 
-  def hp(competence: WarriorCompetence): Int = {
-    competence match {
+  import mr.merc.economics.WorldConstants.Technology.increaseValue
+
+  def hp(competence: WarriorCompetence, techLevel: Int): Int = {
+    increaseValue(competence match {
       case Professional => baseHp
       case Militia => baseHp * 2 / 3
-    }
+    }, techLevel)
   }
 
   def movement: Int
 
   def baseAttacks: List[Attack]
 
-  private def attacks(competence: WarriorCompetence): List[Attack] = {
-    competence match {
+
+  private def attacks(competence: WarriorCompetence, techLevel: Int): List[Attack] = {
+    (competence match {
       case Professional => baseAttacks
       case Militia => baseAttacks.map { at =>
         at.copy(damage = at.damage * 2 / 3)
       }
+    }).map { attack =>
+      attack.copy(damage = increaseValue(attack.damage, techLevel))
     }
   }
   def moveCost: Map[TerrainKind, Int]
@@ -42,9 +47,9 @@ abstract class WarriorType(val name: String) {
     case Professional => 2
   }
 
-  def buildSoldierType(c:WarriorCompetence, culture: Culture):SoldierType = SoldierType(
-    name, level(c), hp(c), movement, 0, level(c),
-    attacks(c), moveCost, defence, resistance, attributes, viewName(culture, c))
+  def buildSoldierType(c:WarriorCompetence, culture: Culture, techLevel: Int):SoldierType = SoldierType(
+    s"$name $techLevel", level(c), hp(c, techLevel), movement, 0, level(c),
+    attacks(c, techLevel), moveCost, defence, resistance, attributes, viewName(culture, c))
 }
 
 

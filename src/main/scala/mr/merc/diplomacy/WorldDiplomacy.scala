@@ -492,7 +492,7 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
         Nil
       case lc: LiberateCulture =>
         increaseBadBoy(lc.demander, LiberateCultureBadBoy)
-        val newState = actions.generateNewState(lc.culture, lc.demander.rulingParty)
+        val newState = actions.generateNewState(lc.culture, lc.demander.rulingParty, lc.giver.technologyLevel.technologyLevel, 0)
         lc.provinces.foreach { p =>
           p.owner = newState
           p.controller = newState
@@ -514,7 +514,7 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
         val max = provinces.maxBy(_.regionPopulation.populationCount)
         max.controller = max.owner
         provinces.filterNot(_ == max).foreach { p =>
-          val newState = actions.generateNewState(p.culture, cs.demander.rulingParty)
+          val newState = actions.generateNewState(p.culture, cs.demander.rulingParty, cs.giver.technologyLevel.technologyLevel, 0)
           p.owner = newState
           p.controller = newState
         }

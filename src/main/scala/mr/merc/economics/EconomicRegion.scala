@@ -145,10 +145,11 @@ trait EconomicRegion {
   }
 }
 
-class EconomicGrid(region:EconomicRegion) extends PossibleGrid[EconomicRegion] {
+class EconomicGrid(region:EconomicRegion, diplomacy: WorldStateDiplomacyActions) extends PossibleGrid[EconomicRegion] {
 
-  // TODO add cases of war and economic blockades
-  override def isBlocked(t: EconomicRegion) = false
+  override def isBlocked(t: EconomicRegion): Boolean = if (region.owner != t.owner) {
+    !diplomacy.canTrade(region.owner, t.owner)
+  } else false
 
   def neighbours(t: EconomicRegion): List[EconomicRegion] = t.economicNeighbours.toList
 

@@ -13,6 +13,7 @@ import mr.merc.army.WarriorCompetence.Professional
 import mr.merc.army.{Warrior, WarriorType}
 import mr.merc.economics.PopulationMigrationOutsideProvince.PopulationMovementBetweenProvinces
 import mr.merc.map.terrain.FourSeasonsTerrainTypes._
+import mr.merc.technology.TechnologyLevel
 
 import scala.util.Random
 
@@ -120,7 +121,7 @@ class WorldGenerator(field:FourSeasonsTerrainHexField) {
     val color = colorStream.head
     colorStream = colorStream.tail
     val name = namesGenerators(culture).stateNames.extract()
-    new State(name, culture, StateStartingMoney, new PoliticalSystem(Party.aristocratic), color)
+    new State(name, culture, StateStartingMoney, new PoliticalSystem(Party.aristocratic), new TechnologyLevel(0), color)
   }
 
   private def divideIntoContinuousParts(connectivityMap: ConnectivityMap, sizes:List[Int]):List[ConnectivityMap] = {

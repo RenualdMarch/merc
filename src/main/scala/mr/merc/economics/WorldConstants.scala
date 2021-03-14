@@ -7,6 +7,7 @@ import MapUtil.FloatOperations._
 import mr.merc.army.WarriorCompetence
 import mr.merc.politics.IssuePosition.RegimePosition
 import mr.merc.politics.Regime.{Constitutional, Democracy}
+import mr.merc.util.CacheFactoryMap
 
 object WorldConstants {
 
@@ -152,9 +153,14 @@ object WorldConstants {
     private val supply = Map(Weapons -> 50d, Clothes -> 50d, Grain -> 50d)
     private val recruitmentCost = Map[Product, Double](Weapons -> 50d, Clothes -> 100d)
 
-    val SoldierSupply:Map[WarriorCompetence, Map[Product, Double]] = Map(
-      Professional -> (supply |*| 4),
-      Militia -> supply)
+    import WorldConstants.Technology.increaseValue
+
+    @transient lazy val SoldierSupply: ((WarriorCompetence, Int)) => Map[Product, Double] = CacheFactoryMap.memo[(WarriorCompetence, Int), Map[Product, Double]] {
+      case ((wc, level)) => wc match {
+        case WarriorCompetence.Militia => supply |*| increaseValue(1d, level)
+        case WarriorCompetence.Professional => supply |*| increaseValue(4d, level)
+      }
+    }
 
     val SoldierRecruitmentCost:Map[WarriorCompetence, Map[Product, Double]] = Map(
       Professional -> (recruitmentCost |*| 4),
@@ -170,6 +176,27 @@ object WorldConstants {
     val HpGainStep = 0.05
   }
 
+  object Technology {
+    val TechPointsMultiplier = 100d
+
+    val WarriorStrengthIncreasePerLevel = 0.05
+
+    def increaseValue(value: Int, techLevel: Int): Int = {
+      (value * (1 + WarriorStrengthIncreasePerLevel * techLevel)).toInt
+    }
+
+    def increaseValue(value: Double, techLevel: Double): Double = {
+      value * (1 + WarriorStrengthIncreasePerLevel * techLevel)
+    }
+
+    def pointsToLevel(level: Int): Double = level * 1000
+
+    def pointsForTurn(literacy: Double, scholarsCount: Int): Double = {
+      val multiplier = Math.log10(scholarsCount)
+      (1 + literacy) / 2 * multiplier * TechPointsMultiplier
+    }
+  }
+
   object Diplomacy {
     val DeclareWarRelationshipChange:Int  = -20
 
@@ -179,6 +206,7 @@ object WorldConstants {
     val WarRelationshipChange:Int = -50
     val SeparatePeaceRelationshipChange = -100
     val SeparatePeaceDuration = 40
+    val SanctionsRelationshipChange = -30
 
     val TruceDuration = 12
     val TruceRelationshipChange = -100

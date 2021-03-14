@@ -1,7 +1,7 @@
 package mr.merc.diplomacy
 
 import mr.merc.diplomacy.DiplomaticAgreement.WarAgreement._
-import mr.merc.diplomacy.DiplomaticAgreement.{AllianceAgreement, TruceAgreement, VassalAgreement, WarAgreement}
+import mr.merc.diplomacy.DiplomaticAgreement.{AllianceAgreement, SanctionAgreement, TruceAgreement, VassalAgreement, WarAgreement}
 import mr.merc.diplomacy.RelationshipEvent._
 import mr.merc.local.Localization
 import mr.merc.politics.State
@@ -679,5 +679,73 @@ object DiplomaticMessage {
     })
 
     override def shouldRefreshMapAfterAnswer: Boolean = true
+  }
+
+  case class SanctionsEnacted(from: State, to: State) extends DiplomaticDeclaration {
+
+    override def beforeSendAction(diplomacy: WorldDiplomacy, currentTurn: Int): Unit = {
+      diplomacy.addAgreement(new SanctionAgreement(from, to, currentTurn))
+    }
+
+    override def ok(diplomacy: WorldDiplomacy, currentTurn: Int): Unit = {}
+
+    override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean = {
+      !diplomacy.agreements(Set(from, to)).exists {
+        case _: VassalAgreement => true
+        case _: AllianceAgreement => true
+        case _: SanctionAgreement => true
+        case wa: WarAgreement if wa.onDifferentSides(Set(from, to)) => true
+        case _ => false
+      }
+    }
+
+    override def sendTitle: Option[String] = Some(Localization("diplomacy.sanctions.button"))
+
+    override def messageTitle: String = Localization("diplomacy.sanctions.title")
+
+    override def body: String = Localization("diplomacy.sanctions.body", from.name)
+
+    override def renderInReport: Option[Node] = Some(new MigPane {
+      add(new StateComponentColorName(from))
+      add(BigText(Localization("diplomacy.sanctions.report")))
+      add(new StateComponentColorName(to))
+    })
+
+    override def shouldRefreshMapAfterAnswer: Boolean = false
+  }
+
+  case class SanctionsStopped(from: State, to: State) extends DiplomaticDeclaration {
+
+    override def beforeSendAction(diplomacy: WorldDiplomacy, currentTurn: Int): Unit = {
+      diplomacy.agreements(Set(from, to)).find {
+        case ag: SanctionAgreement => ag.initiator == from && ag.underSanctions == to
+        case _ => false
+      }.foreach { da =>
+        diplomacy.cancelAgreement(from, da, currentTurn)
+      }
+    }
+
+    override def ok(diplomacy: WorldDiplomacy, currentTurn: Int): Unit = {}
+
+    override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean = {
+      diplomacy.agreements(Set(from, to)).exists {
+        case ag: SanctionAgreement => ag.initiator == from && ag.underSanctions == to
+        case _ => false
+      }
+    }
+
+    override def sendTitle: Option[String] = Some(Localization("diplomacy.cancelSanctions.button"))
+
+    override def messageTitle: String = Localization("diplomacy.cancelSanctions.title")
+
+    override def body: String = Localization("diplomacy.cancelSanctions.body", from.name)
+
+    override def renderInReport: Option[Node] = Some(new MigPane {
+      add(new StateComponentColorName(from))
+      add(BigText(Localization("diplomacy.cancelSanctions.report")))
+      add(new StateComponentColorName(to))
+    })
+
+    override def shouldRefreshMapAfterAnswer: Boolean = false
   }
 }

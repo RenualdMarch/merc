@@ -139,7 +139,7 @@ class WarTargetsTest extends AbstractDiplomacyTest {
     actions.sendMessage(new DeclareWar(first, second, new TakeProvince(first, second, secondProvince1), Set()))
     actions.processUnansweredMessages()
 
-    val newState = actions.generateNewState(second.primeCulture, second.rulingParty)
+    val newState = actions.generateNewState(second.primeCulture, second.rulingParty, 0)
 
     secondProvince1.owner = newState
     secondProvince1.controller = newState

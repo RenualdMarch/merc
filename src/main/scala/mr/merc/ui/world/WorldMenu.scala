@@ -31,12 +31,17 @@ class WorldMenu(parent: WorldFrame) extends MenuBar {
     parent.showWarsPane()
   }
 
+  val techs = new MenuItem(Localization("techonloy.technologyMenu"))
+  techs.onAction = { _ =>
+    parent.showTechnologyPane()
+  }
+
   val foreignTradeMenu = new MenuItem(Localization("menu.foreignTrade"))
   foreignTradeMenu.onAction = { _ =>
     parent.showForeignTradePane()
   }
 
-  diplomacyMenu.items.addAll(emailMenu, relations, allWars, foreignTradeMenu, army)
+  diplomacyMenu.items.addAll(emailMenu, relations, allWars, foreignTradeMenu, techs, army)
 
   val budgetMenu = new MenuItem(Localization("menu.budget"))
   budgetMenu.onAction = { _ =>
