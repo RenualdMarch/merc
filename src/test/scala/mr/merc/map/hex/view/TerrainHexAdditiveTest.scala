@@ -7,6 +7,7 @@ import mr.merc.map.hex._
 import mr.merc.map.hex.TerrainHex
 import mr.merc.map.hex.TerrainHexField
 import mr.merc.map.view.SoldiersDrawer
+import mr.merc.map.terrain.TerrainType._
 
 class TerrainHexAdditiveTest extends FunSuite {
 

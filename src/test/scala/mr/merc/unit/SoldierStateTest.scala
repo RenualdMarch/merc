@@ -3,7 +3,9 @@ package mr.merc.unit
 import org.scalatest.FunSuite
 import mr.merc.players.Player
 import mr.merc.map.hex.TerrainHex
-import mr.merc.map.terrain.DesertSand
+import mr.merc.map.terrain.TerrainType._
+import mr.merc.unit.SoldierState._
+import mr.merc.unit.AttackAttribute._
 
 class SoldierStateTest extends FunSuite{
     val soldierType = new SoldierType("type0", 1, 20, 1, 10, 1, 
@@ -28,8 +30,8 @@ class SoldierStateTest extends FunSuite{
 	}
 	
 	test("slowed unit possible damage is halfed when") {
-	  val someType = Util.soldierType(100, 50, 10, 3, Set())
-	  val anotherType = Util.soldierType(40, 20, 3, 2, Set())
+	  val someType = TestUtil.soldierType(100, 50, 10, 3, Set())
+	  val anotherType = TestUtil.soldierType(40, 20, 3, 2, Set())
       val attackerHex = new TerrainHex(0, 0, DesertSand)
       val defenderHex = new TerrainHex(1, 0, DesertSand)
 	  val attacker = new Soldier("1", someType, Player("1"))
@@ -44,7 +46,7 @@ class SoldierStateTest extends FunSuite{
 	}
 	
 	test("slowing dissapears after new turn begins") {
-	  val someType = Util.soldierType(100, 50, 10, 3, Set())
+	  val someType = TestUtil.soldierType(100, 50, 10, 3, Set())
 	  val soldier = new Soldier("1", someType, Player("1")) 
 	  soldier.addState(Slowed)
 	  assert(soldier.state === Set(Slowed))
@@ -53,8 +55,8 @@ class SoldierStateTest extends FunSuite{
 	}
 	
 	test("slowing is taken into account when filtering attacks") {
-	  val attackerType = Util.soldierType(100, 50, 10, 5, Set())
-	  val defenderType = Util.soldierType(25, 50, 5, 3, Set(Slow))
+	  val attackerType = TestUtil.soldierType(100, 50, 10, 5, Set())
+	  val defenderType = TestUtil.soldierType(25, 50, 5, 3, Set(Slow))
 	  val attackerHex = new TerrainHex(0, 0, DesertSand)
       val defenderHex = new TerrainHex(1, 0, DesertSand)
 	  val attacker = new Soldier("1", attackerType, Player("1"))
@@ -68,8 +70,8 @@ class SoldierStateTest extends FunSuite{
 	}
 	
 	test("slowing is taken into account when filtering attacks if unit is already slowed") {
-	  val attackerType = Util.soldierType(100, 50, 10, 5, Set())
-	  val defenderType = Util.soldierType(30, 50, 5, 3, Set())
+	  val attackerType = TestUtil.soldierType(100, 50, 10, 5, Set())
+	  val defenderType = TestUtil.soldierType(30, 50, 5, 3, Set())
 	  val attackerHex = new TerrainHex(0, 0, DesertSand)
       val defenderHex = new TerrainHex(1, 0, DesertSand)
 	  val attacker = new Soldier("1", attackerType, Player("1"))
@@ -84,8 +86,8 @@ class SoldierStateTest extends FunSuite{
 	}
 	
 	test("unit become slowed after successful attack of unit with slowing attriubute") {
-	  val attackerType = Util.soldierType(100, 50, 10, 1, Set())
-	  val defenderType = Util.soldierType(30, 50, 5, 1, Set(Slow))
+	  val attackerType = TestUtil.soldierType(100, 50, 10, 1, Set())
+	  val defenderType = TestUtil.soldierType(30, 50, 5, 1, Set(Slow))
 	  val attackerHex = new TerrainHex(0, 0, DesertSand)
       val defenderHex = new TerrainHex(1, 0, DesertSand)
 	  val attacker = new Soldier("1", attackerType, Player("1"))

@@ -2,17 +2,15 @@ package mr.merc.ai
 
 import org.scalatest.FunSuite
 import mr.merc.map.hex.TerrainHex
-import mr.merc.map.terrain.DesertSand
+import mr.merc.map.terrain.TerrainType._
 import mr.merc.unit.Soldier
 import mr.merc.players.Player
 import org.scalatest._
-import mr.merc.unit.Firststrike
-import mr.merc.unit.Berserk
-import mr.merc.unit.Drain
+import mr.merc.unit.AttackAttribute._
 
 class AttackResultPredictorTest extends FunSuite with Matchers {
 
-  import mr.merc.unit.Util._
+  import mr.merc.unit.TestUtil._
 
   val attackerHex = new TerrainHex(0, 0, DesertSand)
   val defenderHex = new TerrainHex(0, 1, DesertSand)

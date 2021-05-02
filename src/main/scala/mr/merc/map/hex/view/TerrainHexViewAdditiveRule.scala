@@ -2,7 +2,7 @@ package mr.merc.map.hex.view
 
 import mr.merc.map.terrain._
 import mr.merc.map.hex._
-
+import mr.merc.map.terrain.TerrainKind._
 
 object TerrainHexViewAdditiveRule {
   // first is drawn first

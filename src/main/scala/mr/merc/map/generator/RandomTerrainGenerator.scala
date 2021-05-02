@@ -5,7 +5,8 @@ import mr.merc.map.hex.TerrainHexField
 import mr.merc.map.hex.TerrainHex
 import mr.merc.map.terrain._
 import mr.merc.map.objects._
-
+import mr.merc.map.terrain.TerrainKind._
+import mr.merc.map.terrain.TerrainType._
 import scala.util.Random
 
 class RandomTerrainGenerator(houseChance: Double = 0.1, bridgeChance: Double = 0.1) extends MapGenerator {

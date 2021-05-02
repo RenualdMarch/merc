@@ -6,6 +6,14 @@ object AttackType {
 
   private val map = List(Blade, Impact, Cold, Pierce, Fire, Arcane).map(t => (t.name, t)).toMap
   def apply(name:String): AttackType = map(name)
+
+  case object Blade extends AttackType
+  case object Impact extends AttackType
+  case object Cold extends AttackType
+  case object Pierce extends AttackType
+  case object Fire extends AttackType
+  case object Arcane extends AttackType
+
 }
 
 sealed abstract class AttackType extends Product {
@@ -15,10 +23,3 @@ sealed abstract class AttackType extends Product {
     classSymbol.name.toString
   }
 }
-
-case object Blade extends AttackType
-case object Impact extends AttackType
-case object Cold extends AttackType
-case object Pierce extends AttackType
-case object Fire extends AttackType
-case object Arcane extends AttackType

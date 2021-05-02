@@ -3,15 +3,15 @@ import org.scalatest.FunSuite
 import org.scalatest.BeforeAndAfter
 import mr.merc.map.hex.TerrainHexField
 import mr.merc.map.hex.TerrainHex
-import mr.merc.map.terrain.{GrassKind, GreenGrass}
+import mr.merc.map.terrain.TerrainType._
 import mr.merc.players.Player
 import mr.merc.map.GameField
-import mr.merc.battle.event.AttackModelEvent
-import mr.merc.battle.event.AttackModelEventResult
-import mr.merc.battle.event.MovementModelEvent
-import mr.merc.battle.event.MovementModelEventResult
 import mr.merc.battle.BattleModel
 import mr.merc.battle.event.MovementModelEvent
+import AttackType._
+import mr.merc.unit.SoldierTypeAttribute._
+import mr.merc.map.terrain.TerrainKind._
+import mr.merc.unit.DefenceType._
 
 class SkirmisherAttributeTest extends FunSuite with BeforeAndAfter {
   var field: TerrainHexField = _

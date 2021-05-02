@@ -5,6 +5,11 @@ import scala.util.Random
 import mr.merc.map.hex.TerrainHex
 import mr.merc.map.objects.{House, MapObject, WoodenBridge}
 import mr.merc.map.terrain._
+import mr.merc.map.terrain.TerrainKind._
+import DefenceType._
+import SoldierState._
+import mr.merc.unit.SoldierTypeAttribute._
+import mr.merc.unit.AttackAttribute._
 
 object Attack {
   private val maxChance = 100

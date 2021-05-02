@@ -1,5 +1,8 @@
 package mr.merc.unit
 
+import SoldierState._
+import mr.merc.unit.AttackAttribute._
+
 // TODO remove defenders attack ?
 // TODO make damage equal zero when success is false
 case class AttackResult(isAttackerAttackingThisRound: Boolean, attacker: Soldier, defender: Soldier, attackersAttack: Attack, success: Boolean, damage: Int, drained: Int) {

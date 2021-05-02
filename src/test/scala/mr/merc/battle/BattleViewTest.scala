@@ -16,14 +16,16 @@ import org.mockito.ArgumentMatcher
 import mr.merc.view.move._
 import mr.merc.unit.view.SoldierView
 import mr.merc.unit.Attack
-import mr.merc.unit.Impact
+import mr.merc.unit.AttackType._
 import mr.merc.unit.AttackResult
 import mr.merc.battle.event.AttackBattleViewEvent
 import mr.merc.map.hex.SE
 import mr.merc.map.hex.NW
-import mr.merc.map.terrain.{GrassKind, GreenGrass}
+import mr.merc.map.terrain.TerrainType._
 import mr.merc.view.Sprite
 import org.mockito.ArgumentMatchers._
+import mr.merc.unit.AttackType._
+import mr.merc.map.terrain.TerrainKind._
 
 class BattleViewTest extends FunSuite with BeforeAndAfter with MockitoSugar {
   val field = new TerrainHexField(10, 10, (x, y) => new TerrainHex(x, y, GreenGrass))

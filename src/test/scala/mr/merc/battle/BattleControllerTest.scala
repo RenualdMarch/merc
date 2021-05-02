@@ -8,10 +8,13 @@ import mr.merc.map.hex.TerrainHex
 import mr.merc.players.Player
 import mr.merc.unit._
 import mr.merc.map.hex.view.TerrainHexFieldView
-import mr.merc.map.terrain.{GrassKind, GreenGrass}
+import mr.merc.map.terrain.TerrainType._
 import scalafx.beans.property.BooleanProperty
 import scalafx.geometry.Rectangle2D
 import mr.merc.map.view.SoldiersDrawer
+import mr.merc.unit.AttackType._
+import mr.merc.map.terrain.TerrainKind._
+import DefenceType._
 
 class BattleControllerTest extends FunSuite with BeforeAndAfter {
   var controller: BattleController = _

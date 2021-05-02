@@ -2,7 +2,7 @@ package mr.merc.map.objects
 
 import org.scalatest.FunSuite
 import mr.merc.map.hex.TerrainHex
-import mr.merc.map.terrain.GreenGrass
+import mr.merc.map.terrain.TerrainType._
 import mr.merc.map.hex.TerrainHexField
 import mr.merc.image.MImage
 

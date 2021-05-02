@@ -31,8 +31,8 @@ class VassalTest extends AbstractDiplomacyTest {
     vag.vassal shouldBe second
     vag.overlord shouldBe first
 
-    actions.relationships(first)(second) shouldBe OverlordRelationshipChange + SameRaceRelationshipBonus
-    actions.relationships(second)(first) shouldBe VassalRelationshipChange + SameRaceRelationshipBonus
+    actions.relationships(first)(second) shouldBe OverlordRelationshipChange + SameRaceRelationshipBonus + NeighboursWithoutClaimsRelationshipBonus
+    actions.relationships(second)(first) shouldBe VassalRelationshipChange + SameRaceRelationshipBonus + NeighboursWithoutClaimsRelationshipBonus
   }
 
   test("decline vassal offer") {
@@ -53,8 +53,8 @@ class VassalTest extends AbstractDiplomacyTest {
     actions.agreements(second) should have size 0
     actions.agreements(third) should have size 0
 
-    actions.relationships(first)(second) shouldBe VassalRejectionRelationshipChange + SameRaceRelationshipBonus
-    actions.relationships(second)(first) shouldBe SameRaceRelationshipBonus
+    actions.relationships(first)(second) shouldBe VassalRejectionRelationshipChange + SameRaceRelationshipBonus+ NeighboursWithoutClaimsRelationshipBonus
+    actions.relationships(second)(first) shouldBe SameRaceRelationshipBonus+ NeighboursWithoutClaimsRelationshipBonus
   }
 
   test("propose overlordship") {
@@ -80,8 +80,8 @@ class VassalTest extends AbstractDiplomacyTest {
     vag.sides shouldBe Set(first, second)
     vag.signingTurn shouldBe actions.turn
 
-    actions.relationships(first)(second) shouldBe VassalRelationshipChange + SameRaceRelationshipBonus
-    actions.relationships(second)(first) shouldBe OverlordRelationshipChange + SameRaceRelationshipBonus
+    actions.relationships(first)(second) shouldBe VassalRelationshipChange + SameRaceRelationshipBonus + NeighboursWithoutClaimsRelationshipBonus
+    actions.relationships(second)(first) shouldBe OverlordRelationshipChange + SameRaceRelationshipBonus + NeighboursWithoutClaimsRelationshipBonus
 
     vag.vassal shouldBe first
     vag.overlord shouldBe second
@@ -105,7 +105,7 @@ class VassalTest extends AbstractDiplomacyTest {
     actions.agreements(second) should have size 0
     actions.agreements(third) should have size 0
 
-    actions.relationships(first)(second) shouldBe VassalRejectionRelationshipChange + SameRaceRelationshipBonus
-    actions.relationships(second)(first) shouldBe SameRaceRelationshipBonus
+    actions.relationships(first)(second) shouldBe VassalRejectionRelationshipChange + SameRaceRelationshipBonus + NeighboursWithoutClaimsRelationshipBonus
+    actions.relationships(second)(first) shouldBe SameRaceRelationshipBonus + NeighboursWithoutClaimsRelationshipBonus
   }
 }

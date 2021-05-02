@@ -1,6 +1,7 @@
 package mr.merc.unit
 
 import org.scalatest.FunSuite
+import mr.merc.unit.AttackType._
 
 class AttackTypeTest extends FunSuite{
 	test("get by name") {

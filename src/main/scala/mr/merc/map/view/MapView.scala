@@ -6,7 +6,7 @@ import mr.merc.unit.view.SoldierView
 import mr.merc.view.move.Movement
 import mr.merc.log.Logging
 import mr.merc.map.hex.view.TerrainHexFieldView.{BattleFieldViewMode, FieldViewMode}
-import mr.merc.map.terrain.WaterKind
+import mr.merc.map.terrain.TerrainKind._
 import mr.merc.politics.Province
 
 // TODO add update method which handles case when soldiers changed

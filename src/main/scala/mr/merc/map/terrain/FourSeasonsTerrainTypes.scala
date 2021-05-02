@@ -3,6 +3,7 @@ package mr.merc.map.terrain
 import mr.merc.economics.{Culture, FourSeasonsMapObject}
 import mr.merc.economics.Seasons.{Autumn, Spring, Summer, Winter}
 import mr.merc.map.objects.{Flowers, Signpost, SummerHouse, WinterHouse, WoodenBridge}
+import mr.merc.map.terrain.TerrainType._
 
 object FourSeasonsTerrainTypes {
   import mr.merc.economics.Seasons._

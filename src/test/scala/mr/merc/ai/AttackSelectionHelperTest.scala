@@ -1,14 +1,13 @@
 package mr.merc.ai
 
 import org.scalatest.FunSuite
-import mr.merc.unit.Util._
-import mr.merc.unit.Soldier
+import mr.merc.unit.TestUtil._
+import mr.merc.unit.{Attack, AttackType, Soldier}
 import mr.merc.players.Player
 import mr.merc.map.hex.TerrainHex
-import mr.merc.map.terrain._
-import mr.merc.unit.Attack
-import mr.merc.unit.Impact
-import mr.merc.unit.Magical
+import mr.merc.map.terrain.TerrainType._
+import AttackType._
+import mr.merc.unit.AttackAttribute._
 
 class AttackSelectionHelperTest extends FunSuite {
   test("single attack is selected") {

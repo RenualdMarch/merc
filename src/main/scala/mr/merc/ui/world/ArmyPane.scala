@@ -29,7 +29,9 @@ import javafx.geometry.Pos
 import mr.merc.image.MImage
 import mr.merc.unit.view.AttackView
 import scalafx.scene.chart.{AreaChart, LineChart, NumberAxis, XYChart}
-
+import AttackType._
+import mr.merc.map.terrain.TerrainKind._
+import DefenceType._
 
 class ArmyPane(province: Province, provinceView: ProvinceView, worldState: WorldState, stage: Stage) extends BorderPane {
   private val controller = new ArmyPaneController(province, provinceView, worldState)

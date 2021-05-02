@@ -234,7 +234,7 @@ object WorldConstants {
     val OverlordshipRejectionDuration = 10
     val OverlordshipRejectionRelationshipChange = -20
 
-    val NeighboursWithoutClaimsRelationshipChange = 30
+    val NeighboursWithoutClaimsRelationshipBonus = 30
 
     val ClaimsOnThemRelationshipChange = -25
     val ClaimsOnUsRelationshipChange = -50

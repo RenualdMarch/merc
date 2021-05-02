@@ -3,6 +3,7 @@ package mr.merc.map.hex.view
 import org.scalatest.FunSuite
 import mr.merc.map.hex._
 import mr.merc.map.terrain._
+import mr.merc.map.terrain.TerrainType._
 
 class TerrainHexAdditiveRuleTest extends FunSuite {
   val rule = new TerrainHexViewAdditiveRule

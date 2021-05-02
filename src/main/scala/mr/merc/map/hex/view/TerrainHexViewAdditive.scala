@@ -4,7 +4,8 @@ import mr.merc.map.terrain._
 import mr.merc.map.hex.Direction
 import mr.merc.map.hex.N
 import mr.merc.map.hex.NW
-
+import mr.merc.map.terrain.TerrainKind._
+import mr.merc.map.terrain.TerrainType._
 
 object TerrainHexViewAdditive {
   def extractAdditives(view: TerrainHexView): List[TerrainHexViewAdditive] = {

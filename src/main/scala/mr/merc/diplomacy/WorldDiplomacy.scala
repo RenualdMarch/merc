@@ -369,8 +369,9 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
   def claimsBonuses(from: State): List[RelationshipBonus] = {
     claimsHolder.claims.filter(s => s.state == from || s.targetState == from).flatMap {
       case vc: VassalizationClaim =>
-        List(RelationshipBonus(vc.state, vc.possibleVassal, VassalizationClaimsOnThemRelationshipChange,
-          Localization("diplomacy.hasVassalizationClaim", vc.state, vc.possibleVassal)),
+        List(
+          RelationshipBonus(vc.state, vc.possibleVassal, VassalizationClaimsOnThemRelationshipChange,
+            Localization("diplomacy.hasVassalizationClaim", vc.state, vc.possibleVassal)),
           RelationshipBonus(vc.possibleVassal, vc.state, VassalizationClaimsOnUsRelationshipChange,
             Localization("diplomacy.hasVassalizationClaim", vc.state, vc.possibleVassal)))
       case str: ProvinceClaim =>
@@ -414,15 +415,15 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
   }
 
   def neighboursBonuses(state: State): List[RelationshipBonus] = {
-    val neighbours = regions.filter(_.owner == state).toSet.flatMap { p =>
+    val neighbours = regions.filter(_.owner == state).flatMap { p =>
       p.neighbours.map(_.owner)
-    } - state
+    }.toSet - state
 
     neighbours.filter { n =>
       !hasClaimOverState(state, n) && !hasClaimOverState(n, state)
     }.map { n =>
-      RelationshipBonus(n, state, NeighboursWithoutClaimsRelationshipChange,
-        Localization("diplomacy.neigsAtPeace", state.name, n))
+      RelationshipBonus(state, n, NeighboursWithoutClaimsRelationshipBonus,
+        Localization("diplomacy.neigsAtPeace", state.name, n.name))
     }.toList
   }
 

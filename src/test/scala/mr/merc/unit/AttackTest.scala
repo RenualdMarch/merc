@@ -5,8 +5,10 @@ import org.scalatest.FunSuite
 import org.scalatest.BeforeAndAfter
 import mr.merc.map.hex.TerrainHex
 import mr.merc.players.Player
-import mr.merc.map.terrain._
+import mr.merc.map.terrain.TerrainType._
 import mr.merc.map.objects._
+import mr.merc.unit.AttackType._
+import mr.merc.unit.DefenceType._
 
 class AttackTest extends FunSuite with BeforeAndAfter {
   val player1 = Player("1")

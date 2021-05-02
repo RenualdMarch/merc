@@ -9,8 +9,13 @@ class AllianceTest extends AbstractDiplomacyTest {
   test("simple accept alliance") {
     val List(first, second, third) = states
 
-    actions.relationships(first) shouldBe Map(second -> SameRaceRelationshipBonus, third -> SameRaceRelationshipBonus)
-    actions.relationships(second) shouldBe Map(first -> SameRaceRelationshipBonus, third -> SameRaceRelationshipBonus)
+    println(actions.relationshipsDescribed(first)(second))
+
+    actions.relationships(first) shouldBe Map(second -> (SameRaceRelationshipBonus + NeighboursWithoutClaimsRelationshipBonus),
+      third -> (SameRaceRelationshipBonus + NeighboursWithoutClaimsRelationshipBonus))
+    actions.relationships(second) shouldBe Map(
+      first -> (SameRaceRelationshipBonus + NeighboursWithoutClaimsRelationshipBonus),
+      third -> (SameRaceRelationshipBonus + NeighboursWithoutClaimsRelationshipBonus))
 
     val ap = new AllianceProposal(first, second)
     actions.sendMessage(ap)
@@ -36,8 +41,8 @@ class AllianceTest extends AbstractDiplomacyTest {
     ag.sides shouldBe Set(first, second)
     ag.signingTurn shouldBe actions.turn
 
-    actions.relationships(first)(second) shouldBe (AllianceRelationshipChange + SameRaceRelationshipBonus)
-    actions.relationships(second)(first) shouldBe (AllianceRelationshipChange + SameRaceRelationshipBonus)
+    actions.relationships(first)(second) shouldBe (AllianceRelationshipChange + SameRaceRelationshipBonus + NeighboursWithoutClaimsRelationshipBonus)
+    actions.relationships(second)(first) shouldBe (AllianceRelationshipChange + SameRaceRelationshipBonus + NeighboursWithoutClaimsRelationshipBonus)
   }
 
   test("simple decline alliance") {
@@ -60,7 +65,7 @@ class AllianceTest extends AbstractDiplomacyTest {
     actions.agreements(second) should have size 0
     actions.agreements(third) should have size 0
 
-    actions.relationships(first)(second) shouldBe (AllianceRejectionRelationshipChange + SameRaceRelationshipBonus)
-    actions.relationships(second)(first) shouldBe SameRaceRelationshipBonus
+    actions.relationships(first)(second) shouldBe (AllianceRejectionRelationshipChange + SameRaceRelationshipBonus + NeighboursWithoutClaimsRelationshipBonus)
+    actions.relationships(second)(first) shouldBe (SameRaceRelationshipBonus + + NeighboursWithoutClaimsRelationshipBonus)
   }
 }

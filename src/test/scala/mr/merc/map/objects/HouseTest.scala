@@ -4,7 +4,7 @@ import mr.merc.economics.Culture.LatinHuman
 import org.scalatest.FunSuite
 import mr.merc.map.hex.TerrainHexField
 import mr.merc.map.hex.TerrainHex
-import mr.merc.map.terrain.GreenGrass
+import mr.merc.map.terrain.TerrainType._
 
 class HouseTest extends FunSuite {
   val field = new TerrainHexField(5, 5, (x:Int, y:Int) => {

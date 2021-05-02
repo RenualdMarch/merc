@@ -1,12 +1,10 @@
 package mr.merc.view.move
 
 import org.scalatest.FunSuite
-import mr.merc.unit.Soldier
-import mr.merc.unit.SoldierType
+import mr.merc.unit.{AttackResult, Soldier, SoldierType, TestUtil}
 import mr.merc.unit.view.{DefenceState, SoldierView, SoldierViewAttackState, StandState}
 import mr.merc.map.hex.NE
 import mr.merc.players.Player
-import mr.merc.unit.AttackResult
 import mr.merc.map.hex.view.TerrainHexView
 import mr.merc.map.hex.TerrainHexField
 import mr.merc.map.hex.TerrainHex
@@ -25,8 +23,8 @@ class SoldierAttackMovementTest extends FunSuite with BeforeAndAfter {
   }
 
   test("animation") {
-    val soldier = new Soldier("1", SoldierType("testSoldier2"), Player("1"))
-    val enemy = new Soldier("2", SoldierType("testSoldier2"), Player("2"))
+    val soldier = new Soldier("1", TestUtil.testSoldierType2, Player("1"))
+    val enemy = new Soldier("2", TestUtil.testSoldierType2, Player("2"))
     val soldierView = new SoldierView(soldier, 1.0)
     val enemyView = new SoldierView(enemy, 1.0)
     val direction = NE

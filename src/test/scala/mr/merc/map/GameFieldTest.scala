@@ -2,9 +2,11 @@ package mr.merc.map
 
 import org.scalatest.FunSuite
 import mr.merc.players.Player
-import mr.merc.unit.{GrassDefence, Soldier, SoldierType}
+import mr.merc.unit.{Soldier, SoldierType}
 import mr.merc.map.hex._
-import mr.merc.map.terrain._
+import mr.merc.map.terrain.TerrainType._
+import mr.merc.map.terrain.TerrainKind._
+import mr.merc.unit.DefenceType._
 
 class GameFieldTest extends FunSuite {
   val soldierType = new SoldierType("someType", 10, 10, 6, 10, 1,

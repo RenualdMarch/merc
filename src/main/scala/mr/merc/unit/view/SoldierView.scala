@@ -15,6 +15,7 @@ import scalafx.scene.canvas.GraphicsContext
 import mr.merc.unit._
 import mr.merc.map.hex.view.TerrainHexFieldView
 import mr.merc.map.view.SoldiersDrawer
+import mr.merc.map.terrain.TerrainType._
 
 object SoldierView {
   private[view] val attackDistancePercentage = 0.6

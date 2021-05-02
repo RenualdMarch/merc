@@ -1,6 +1,7 @@
 package mr.merc.map.hex
 
-import mr.merc.map.terrain.{GreenGrass, TerrainType}
+import mr.merc.map.terrain.TerrainType
+import mr.merc.map.terrain.TerrainType._
 import mr.merc.map.objects.MapObject
 import mr.merc.politics.Province
 import mr.merc.unit.Soldier

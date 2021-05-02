@@ -3,7 +3,7 @@ package mr.merc.map.objects.view
 import mr.merc.image.MImage
 import mr.merc.map.hex.{Direction, TerrainHex, TerrainHexField}
 import mr.merc.map.objects.MapObject
-import mr.merc.map.terrain.GrassKind
+import mr.merc.map.terrain.TerrainKind._
 import mr.merc.util.MercUtils
 
 abstract class MapObjectView {

@@ -2,8 +2,7 @@ package mr.merc.ai.conditional
 
 import org.scalatest.FunSuite
 import mr.merc.players.Player
-import mr.merc.unit.SoldierType
-import mr.merc.unit.Soldier
+import mr.merc.unit.{Soldier, SoldierType, TestUtil}
 import mr.merc.map.hex.TerrainHexField
 import mr.merc.map.hex.TerrainHex
 import mr.merc.map.GameField
@@ -17,7 +16,7 @@ class BattleModelHelperTest extends FunSuite {
 
   val sides = Set(Set(player1, player2), Set(player3))
 
-  val soldierType = SoldierType("testSoldier")
+  val soldierType = TestUtil.testSoldierType
   val soldier1 = new Soldier("1", soldierType, player1)
   val soldier2 = new Soldier("2", soldierType, player2)
   val soldier3 = new Soldier("3", soldierType, player3)

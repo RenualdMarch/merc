@@ -3,7 +3,7 @@ package mr.merc.view.move
 import org.scalatest.FunSuite
 import mr.merc.unit.SoldierType
 import mr.merc.unit.Attack
-import mr.merc.unit.Impact
+import mr.merc.unit.AttackType._
 import mr.merc.unit.view.SoldierView
 import mr.merc.unit.Soldier
 import mr.merc.players.Player

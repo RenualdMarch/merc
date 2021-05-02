@@ -2,10 +2,13 @@ package mr.merc.unit
 
 import org.scalatest.FunSuite
 import mr.merc.players.Player
-import mr.merc.map.terrain.DesertSand
+import mr.merc.map.terrain.TerrainType._
 import mr.merc.map.hex.TerrainHex
+import mr.merc.unit.AttackAttribute._
+
+
 class MagicalAttributeTest extends FunSuite {
-  import Util._
+  import TestUtil._
   val attackerType = soldierType(100, 50, 10, 1, Set(Magical))
   val strongDefenderType = soldierType(100, 90, 10, 1, Set())
   val weakDefenderType = soldierType(100, 30, 10, 1, Set())

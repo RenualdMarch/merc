@@ -17,6 +17,7 @@ import mr.merc.map.objects.view.{WallImage, WallView}
 import mr.merc.unit.view.SoldierView
 
 import scala.collection.mutable
+import mr.merc.map.terrain.TerrainType._
 
 class TerrainHexFieldView(field: TerrainHexField, val soldiersDrawer: SoldiersDrawer[SoldierView], factor: Double, mode: FieldViewMode = BattleFieldViewMode) extends Logging {
   private val infiniteField = new InfiniteHexField((x, y) => new TerrainHex(x, y, Empty))

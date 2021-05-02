@@ -5,10 +5,13 @@ import mr.merc.map.hex.TerrainHexField
 import mr.merc.unit._
 import mr.merc.map.hex.TerrainHex
 import mr.merc.players.Player
-import mr.merc.map.terrain._
+import mr.merc.map.terrain.TerrainType._
 import mr.merc.map.GameField
 import mr.merc.battle.BattleModel
 import org.scalatest.BeforeAndAfter
+import AttackType._
+import mr.merc.map.terrain.TerrainKind._
+import DefenceType._
 
 class AIAgentTest extends FunSuite with BeforeAndAfter {
   val conf = AIConfiguration(0.4, 0, 0, 1, 10, 1)

@@ -22,7 +22,9 @@ object Localization {
   private def getMessage(language: String, key: String, params: Any*) = {
     messages(language).get(key) match {
       case Some(message) => putParamsInMessage(message, params: _*).replace("\\n", "\n")
-      case None => key
+      case None => key + (if (params.nonEmpty)
+        params.mkString(" ["," ", "]")
+      else "")
     }
   }
 

@@ -10,6 +10,7 @@ import mr.merc.ui.common.ScrollPaneLike
 import scalafx.Includes._
 
 import scalafx.scene.input.MouseEvent
+import mr.merc.map.terrain.TerrainKind._
 
 class Minimap(private var field: TerrainHexField, pane: ScrollPaneLike, factor: Double, pixelWidth:Int, pixelHeight:Int, battleMode:Boolean) extends Pane {
   private val mapCanvas = new Canvas()

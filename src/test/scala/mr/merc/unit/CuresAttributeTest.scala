@@ -3,11 +3,14 @@ package mr.merc.unit
 import org.scalatest.FunSuite
 import org.scalatest.BeforeAndAfter
 import mr.merc.map.hex.TerrainHexField
-import mr.merc.map.terrain.{DesertSand, SandKind}
-import mr.merc.battle.BattleModel
+import mr.merc.map.terrain.TerrainType._
+import mr.merc.unit.SoldierTypeAttribute._
 import mr.merc.map.hex.TerrainHex
-import mr.merc.map.GameField
+import mr.merc.unit.SoldierState._
 import mr.merc.players.Player
+import mr.merc.unit.AttackType._
+import mr.merc.map.terrain.TerrainKind._
+import mr.merc.unit.DefenceType._
 
 class CuresAttributeTest extends FunSuite with BeforeAndAfter {
   var field: TerrainHexField = _

@@ -1,5 +1,7 @@
 package mr.merc.unit
 
+import SoldierState._
+
 object BeforeTurnAction {
   def filterActions(input:Set[BeforeTurnAction]):Set[BeforeTurnAction] = {
 	input.groupBy(target).mapValues(_.toList.sortBy(priority).head).values.toSet

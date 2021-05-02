@@ -4,6 +4,7 @@ import org.scalatest.FunSuite
 import mr.merc.map.terrain._
 import org.scalatest.BeforeAndAfter
 import mr.merc.map.hex._
+import mr.merc.map.terrain.TerrainType._
 
 class TerrainHexViewAdditiveTest extends FunSuite with BeforeAndAfter {
 

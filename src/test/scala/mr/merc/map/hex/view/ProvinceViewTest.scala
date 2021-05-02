@@ -7,8 +7,8 @@ import mr.merc.economics.Culture._
 import mr.merc.economics.Population.Humans
 import mr.merc.economics.Seasons.Summer
 import mr.merc.economics._
-import mr.merc.map.hex.{TerrainHex, TerrainHexField}
-import mr.merc.map.terrain.{Castle, FourSeasonsTerrainTypes, ShallowWater}
+import mr.merc.map.terrain.TerrainType._
+import mr.merc.map.terrain.FourSeasonsTerrainTypes
 import mr.merc.map.view.SoldiersDrawer
 import mr.merc.politics.{Party, Province, State}
 import mr.merc.unit.Soldier

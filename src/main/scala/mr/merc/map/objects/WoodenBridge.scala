@@ -5,7 +5,7 @@ import mr.merc.map.hex.TerrainHex
 import mr.merc.image.MImage
 import mr.merc.map.hex.TerrainHexField
 import mr.merc.map.objects.view.MapObjectView
-import mr.merc.map.terrain.{MountainKind, RoadKind, WaterKind}
+import mr.merc.map.terrain.TerrainKind._
 
 object WoodenBridge extends MapObject("woodenBridge") {
   private[objects] def imagePath(fileName: String) = "/images/terrain/" + name + "/" + fileName + ".png"

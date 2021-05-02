@@ -3,11 +3,16 @@ package mr.merc.unit
 import mr.merc.economics.Culture.LatinHuman
 import org.scalatest.FunSuite
 import mr.merc.map.hex.TerrainHexField
-import mr.merc.map.terrain.{DesertSand, SandKind, WallsKind}
+import mr.merc.map.terrain.TerrainType._
 import org.scalatest.BeforeAndAfter
 import mr.merc.map.hex.TerrainHex
 import mr.merc.map.objects.{House, SummerHouse}
 import mr.merc.players.Player
+import mr.merc.unit.SoldierTypeAttribute._
+import AttackType._
+import mr.merc.map.terrain.TerrainKind._
+import mr.merc.unit.DefenceType._
+import mr.merc.unit.SoldierState._
 
 class HealingAtVillageTest extends FunSuite with BeforeAndAfter {
   var field: TerrainHexField = _

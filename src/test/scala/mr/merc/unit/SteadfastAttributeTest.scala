@@ -1,14 +1,11 @@
 package mr.merc.unit
 
 import org.scalatest.FunSuite
-import org.scalatest.FunSuite
-import org.scalatest.BeforeAndAfter
-import mr.merc.map.hex.TerrainHexField
-import mr.merc.battle.BattleModel
-import mr.merc.map.hex.TerrainHex
-import mr.merc.map.GameField
-import mr.merc.map.terrain.SandKind
 import mr.merc.players.Player
+import mr.merc.unit.AttackType._
+import mr.merc.map.terrain.TerrainKind._
+import mr.merc.unit.DefenceType._
+import mr.merc.unit.SoldierTypeAttribute._
 
 class SteadfastAttributeTest extends FunSuite {
   def simpleSoldierType(attributes: Set[SoldierTypeAttribute] = Set(), resistance: Int) = new SoldierType("1", 1, 20, 10, 5, 1,

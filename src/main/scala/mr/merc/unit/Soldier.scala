@@ -5,7 +5,9 @@ import mr.merc.map.hex.TerrainHexField
 import mr.merc.map.hex.TerrainHex
 import mr.merc.map.objects.House
 import mr.merc.map.objects.WoodenBridge
-import mr.merc.map.terrain._
+import mr.merc.unit.SoldierTypeAttribute._
+import mr.merc.map.terrain.TerrainKind._
+import SoldierState._
 
 class Soldier(val name: String, initialSoldierType: SoldierType, val owner: Player) {
   private var _soldierType = initialSoldierType

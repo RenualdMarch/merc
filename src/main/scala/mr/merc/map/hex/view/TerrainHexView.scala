@@ -14,7 +14,7 @@ import mr.merc.ui.common.geom.Line
 import mr.merc.ui.world.Components
 import mr.merc.util.CacheFactoryMap
 import scalafx.geometry.VPos
-
+import mr.merc.map.terrain.TerrainKind._
 
 object TerrainHexView {
 

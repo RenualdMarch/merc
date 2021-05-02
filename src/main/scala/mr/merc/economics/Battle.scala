@@ -8,11 +8,12 @@ import mr.merc.economics.BattleReport.{Draw, ReportBattleResult, Side1Won, Side2
 import mr.merc.map.GameField
 import mr.merc.map.hex.{TerrainHex, TerrainHexField}
 import mr.merc.map.objects.House
-import mr.merc.map.terrain.{Empty, WaterKind}
+import mr.merc.map.terrain.TerrainType._
 import mr.merc.map.terrain.FourSeasonsMapObjects.FourSeasonsHouse
 import mr.merc.politics.{Province, State}
 import mr.merc.unit.Soldier
 import mr.merc.util.MercUtils._
+import mr.merc.map.terrain.TerrainKind._
 
 abstract sealed class Battle(worldHexField: TerrainHexField, turn: Int) {
 

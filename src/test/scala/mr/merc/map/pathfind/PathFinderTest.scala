@@ -9,7 +9,8 @@ import mr.merc.map.hex.TerrainHexField
 import mr.merc.map.hex.TerrainHex
 import mr.merc.map.terrain._
 import mr.merc.map.objects._
-import mr.merc.map.terrain.FourSeasonsMapObjects.FourSeasonsHouse
+import mr.merc.map.terrain.TerrainType._
+import mr.merc.map.terrain.TerrainKind._
 
 class PathFinderTest extends FunSuite {
   val finder = PathFinder

@@ -3,10 +3,8 @@ package mr.merc.ai
 import mr.merc.map.hex.TerrainHex
 import mr.merc.unit.Soldier
 import mr.merc.unit.Attack
-import mr.merc.unit.Berserk
-import mr.merc.unit.Firststrike
 import mr.merc.unit.SoldierState
-import mr.merc.unit.Drain
+import mr.merc.unit.AttackAttribute._
 
 object AttackResultPredictor {
 

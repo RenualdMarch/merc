@@ -8,7 +8,7 @@ import mr.merc.unit.Soldier
 import mr.merc.players.Player
 import mr.merc.ai.AttackResultPrediction
 import mr.merc.unit.Attack
-import mr.merc.unit.Impact
+import mr.merc.unit.AttackType._
 
 class TargetInfoTest extends FunSuite {
   val conf = AIConfiguration(0.65, 0, 0, 0, 10, 1)

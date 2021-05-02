@@ -4,6 +4,11 @@ import mr.merc.army.WarriorCompetence._
 import mr.merc.economics.Culture
 import mr.merc.map.terrain._
 import mr.merc.unit._
+import AttackType._
+import TerrainKind._
+import DefenceType._
+import mr.merc.unit.AttackAttribute._
+import SoldierTypeAttribute._
 
 abstract class WarriorType(val name: String) {
 

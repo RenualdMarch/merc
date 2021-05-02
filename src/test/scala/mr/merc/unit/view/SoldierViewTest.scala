@@ -30,7 +30,7 @@ class SoldierViewTest extends FunSuite {
   }
 
   test("after setting state to death after animation is finished, noState is used") {
-    val soldierType = SoldierType("testSoldier")
+    val soldierType = TestUtil.testSoldierType
     val soldier = new Soldier("1", soldierType, Player("1"))
     val view = new SoldierView(soldier, 1.0)
 
@@ -45,7 +45,7 @@ class SoldierViewTest extends FunSuite {
   }
 
   test("after setting idle state after animation is over, standing state is used") {
-    val soldierType = SoldierType("testSoldier")
+    val soldierType = TestUtil.testSoldierType
     val soldier = new Soldier("1", soldierType, Player("1"))
     val view = new SoldierView(soldier, 1.0)
 

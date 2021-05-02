@@ -3,9 +3,9 @@ package mr.merc.map
 import mr.merc.map.hex.TerrainHexField
 import mr.merc.players.Player
 import mr.merc.map.hex.TerrainHex
-import mr.merc.map.terrain.{Empty, EmptyKind}
+import mr.merc.map.terrain.TerrainType._
 import mr.merc.unit.Soldier
-import mr.merc.unit.Skirmisher
+import mr.merc.unit.SoldierTypeAttribute._
 
 // TODO add allies support
 class GameField(val hexField: TerrainHexField, val players: List[Player], val sides:Set[Set[Player]]) {

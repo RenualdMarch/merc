@@ -4,9 +4,9 @@ import org.scalatest.FunSuite
 import mr.merc.players.Player
 
 class BeforeTurnActionTest extends FunSuite{
-    val soldier1 = new Soldier("1", SoldierType("testSoldier"), Player("1"))
-    val soldier2 = new Soldier("2", SoldierType("testSoldier"), Player("1"))
-    val soldier3 = new Soldier("3", SoldierType("testSoldier"), Player("1"))
+    val soldier1 = new Soldier("1", TestUtil.testSoldierType, Player("1"))
+    val soldier2 = new Soldier("2", TestUtil.testSoldierType, Player("1"))
+    val soldier3 = new Soldier("3", TestUtil.testSoldierType, Player("1"))
     
 	test("1 event for each soldier remains") {
 	  val event1 = new Regeneration(soldier1)
