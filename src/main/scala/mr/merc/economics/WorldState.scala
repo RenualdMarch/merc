@@ -121,7 +121,7 @@ class WorldState(val regions: List[Province], var playerState: State, val worldH
     val rebelBattles = processRebels(battles.flatMap(_.provinces).toSet)
 
     val (playerBattles, aiBattles) = (battles ++ rebelBattles).partition(_.participants.contains(playerState))
-    processAiBattles(aiBattles)
+    processAiBattles(aiBattles, false)
     playerBattles
   }
 
@@ -137,8 +137,8 @@ class WorldState(val regions: List[Province], var playerState: State, val worldH
     }
   }
 
-  def processAiBattles(battles: List[Battle]): Unit = {
-    battles.filterNot(_.participants.contains(playerState)).foreach { b =>
+  def processAiBattles(battles: List[Battle], autoBattle: Boolean): Unit = {
+    battles.filter(p => !p.participants.contains(playerState) || autoBattle).foreach { b =>
       info(s"Battle between ${b.gameField.sides}")
       val model = new BattleModel(b.gameField)
       val aiMap = b.gameField.players.map(p => p -> BattleAI()).toMap
@@ -172,7 +172,7 @@ class WorldState(val regions: List[Province], var playerState: State, val worldH
     states.keysIterator.foreach { state =>
       state.mailBox.addMessage(new InformationDomesticMessage(Localization("battleReport.sender"),
         Localization("battleReport.title")) {
-        override def body: Region = new BattleReportPane(thisTurnBattles.toList)
+        override def body: Region = new BattleReportPane(battleReports)
       })
     }
   }
@@ -430,7 +430,7 @@ object WorldStateDiplomacyActions {
 
 }
 
-trait WorldStateDiplomacyActions {
+trait WorldStateDiplomacyActions extends Logging {
   def playerState: State
 
   def regions: List[Province]
@@ -529,6 +529,8 @@ trait WorldStateDiplomacyActions {
   def relationshipsDescribed(state: State): Map[State, List[RelationshipBonus]] = diplomacyEngine.relationshipsDescribed(state, turn)
 
   def sendMessage(message: DiplomaticMessage): Unit = {
+    debug(s"Sending message $message")
+
     if (message.isPossible(diplomacyEngine, turn)) {
       diplomacyEngine.sendMessage(message, turn)
 

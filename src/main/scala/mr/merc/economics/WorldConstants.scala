@@ -234,8 +234,13 @@ object WorldConstants {
     val OverlordshipRejectionDuration = 10
     val OverlordshipRejectionRelationshipChange = -20
 
-    val StrongClaimRelationshipBonus = -20
-    val WeakClaimRelationshipBonus = -10
+    val NeighboursWithoutClaimsRelationshipChange = 30
+
+    val ClaimsOnThemRelationshipChange = -25
+    val ClaimsOnUsRelationshipChange = -50
+
+    val VassalizationClaimsOnUsRelationshipChange = -30
+    val VassalizationClaimsOnThemRelationshipChange = -15
 
     val SameCultureRelationshipBonus = 20
     val SameRaceRelationshipBonus = 10
@@ -260,6 +265,10 @@ object WorldConstants {
     val WeakClaimTime = 10
 
     val StalledWarTimeUntilPeace = 8
+    val RelationsForBeingFriend = 50
+    val RelationsForBeingEnemy = -50
+
+    val RelationsForBeingNeighboursAtPeace = 40
 
     val DeleteLastTurnEvents = false
 

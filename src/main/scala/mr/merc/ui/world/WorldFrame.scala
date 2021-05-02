@@ -122,7 +122,7 @@ class WorldFrame(val sceneManager: SceneManager, worldState: WorldState) extends
           } yield (province, w)
           if (selected.isEmpty) {
             selectProvince(event.x, event.y)
-          }  else selectWarriors(filterSelectedWarriors(selected))
+          } else selectWarriors(filterSelectedWarriors(selected))
 
         case None => selectProvince(event.x, event.y)
       }
@@ -316,32 +316,48 @@ class WorldFrame(val sceneManager: SceneManager, worldState: WorldState) extends
     deselectWarriors()
     val waitDialog = new WaitDialog
 
-    Future(worldState.nextTurn(true)).map { battles =>
-      Platform.runLater {
-        Try {
-          if (battles.nonEmpty) {
-            playBattles(battles, () => {
+    info("creating nextTurn Future{}")
+    Future {
+      info("Starting nextTurn calculation in Future{}")
+      worldState.nextTurn(true)
+    } onComplete {
+      case Success(battles) =>
+        info("Next turn calculation in Future{} finished with success")
+        Platform.runLater {
+          Try {
+            if (battles.nonEmpty) {
+              playBattles(battles, () => {
+                worldState.sendBattleReports()
+                totalRefresh()
+                sceneManager.showFrame(this)
+                showMailPane()
+              })
+            } else {
               worldState.sendBattleReports()
               totalRefresh()
               sceneManager.showFrame(this)
               showMailPane()
-            })
-          } else {
-            worldState.sendBattleReports()
-            totalRefresh()
-            sceneManager.showFrame(this)
-            showMailPane()
+            }
+          } match {
+            case Success(()) =>
+              info("Closing wait dialog")
+              waitDialog.close()
+            case Failure(ex) =>
+              info("Closing wait dialog")
+              waitDialog.close()
+              error(ex.getMessage, ex)
           }
-        } match {
-          case Success(()) =>
-            waitDialog.close()
-          case Failure(ex) =>
-            waitDialog.close()
-            error(ex.getMessage, ex)
         }
-      }
+      case Failure(ex) =>
+        warn("Next turn calculation in Future{} finished with failure")
+        Platform.runLater {
+          info("Closing wait dialog")
+          waitDialog.close()
+          error(ex.getMessage, ex)
+        }
     }
 
+    info("Showing wait dialog for nextTurn")
     waitDialog.showDialog(sceneManager.stage)
   }
 
@@ -423,7 +439,7 @@ class WorldFrame(val sceneManager: SceneManager, worldState: WorldState) extends
               val battleFrame = new BattleFrame(sceneManager, some.gameField, ai, callbackFunction(Some(some), rem))
               sceneManager.showFrame(battleFrame)
             } else {
-              worldState.processAiBattles(List(some))
+              worldState.processAiBattles(List(some), true)
               callbackFunction(None, rem)()
             }
           }

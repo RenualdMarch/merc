@@ -39,6 +39,7 @@ class DiplomaticAI(state: State, actions: WorldStateDiplomacyActions) extends Lo
       case ap: AllianceProposal => actions.answerMessage(ap, answerAllianceProposal(ap))
       case op: OverlordshipProposal => actions.answerMessage(op, answerOverlordshipProposal(op))
       case dw: DeclareWar => actions.answerDeclareWar(dw, answerDeclareWar(dw))
+      case vd: VassalizationDemand => actions.answerMessage(vd, answerVassalizationDemand(vd))
     }
   }
 
@@ -59,6 +60,11 @@ class DiplomaticAI(state: State, actions: WorldStateDiplomacyActions) extends Lo
     if (!situation.shareBorder(state, message.from)) false
     else if (actions.relationships(state)(message.from) < MinRelationshipForVassalization) false
     else if (situation.areRivals(state, message.from)) false
+    else situation.powerDifference(message.from, state) > PowerDifferenceForVassalization
+  }
+
+  def answerVassalizationDemand(message: VassalizationDemand) : Boolean = {
+    if (!situation.shareBorder(state, message.from)) false
     else situation.powerDifference(message.from, state) > PowerDifferenceForVassalization
   }
 

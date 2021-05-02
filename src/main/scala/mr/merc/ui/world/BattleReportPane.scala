@@ -9,11 +9,12 @@ import org.tbee.javafx.scene.layout.MigPane
 import scalafx.scene.control.ScrollPane
 import scalafx.Includes._
 import scalafx.geometry.Pos
-import scalafx.scene.Node
+import scalafx.scene.{Node, Scene}
 import scalafx.scene.image.ImageView
 import scalafx.scene.layout.{HBox, Pane, Region, StackPane}
 import scalafx.scene.paint.Color
 import scalafx.scene.shape.{Line, Rectangle}
+import scalafx.stage.{Screen, StageStyle}
 
 class BattleReportPane(battles:List[BattleReport]) extends ScrollPane {
   content = new MigPane {
@@ -170,8 +171,8 @@ class BeforeBattleDialog(battle: Battle) extends DialogStage[Boolean] {
 
   override def additionalButtons = List(playBattleButton, autoBattleButton)
 
-  private val warriorColumns = 4
-  private val constraints = Stream.continually(100d / warriorColumns).take(warriorColumns).toList
+  private lazy val warriorColumns = 4
+  private lazy val constraints = Stream.continually(100d / warriorColumns).take(warriorColumns).toList
 
   private def statePane(state: State, warriors: List[Warrior]): MigPane = new MigPane {
     add(new StateComponentColorName(state), s"center, wrap")
@@ -201,6 +202,8 @@ class BeforeBattleDialog(battle: Battle) extends DialogStage[Boolean] {
 
     val map = warriors.groupBy(_.owner)
     pane.setTwoChildren(buildAllStatesPanel(left.toList, map), buildAllStatesPanel(right.toList, map))
+    pane.prefWidth = Screen.primary.visualBounds.width - 200
+    pane.prefHeight = Screen.primary.visualBounds.height - 200
     pane
   }
 
@@ -209,4 +212,6 @@ class BeforeBattleDialog(battle: Battle) extends DialogStage[Boolean] {
   override protected def shouldAddOkButton: Boolean = false
 
   override protected def css: Option[String] = None
+
+  this.initStyle(StageStyle.Undecorated)
 }

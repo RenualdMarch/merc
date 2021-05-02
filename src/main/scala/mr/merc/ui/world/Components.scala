@@ -1,10 +1,10 @@
 package mr.merc.ui.world
 
 import java.text.DecimalFormat
-
 import javafx.beans.value.WritableValue
 import mr.merc.local.Localization
 import mr.merc.log.Logging
+import mr.merc.main.Main.screenRect
 import org.tbee.javafx.scene.layout.MigPane
 import scalafx.beans.binding.{ObjectBinding, StringBinding}
 import scalafx.beans.property.{ObjectProperty, ReadOnlyObjectProperty, ReadOnlyStringProperty, StringProperty}
@@ -105,6 +105,7 @@ object DoubleFormatter {
 }
 
 abstract class DialogStage[T] extends Stage with Logging {
+
   val dialogResultProperty: ObjectProperty[Option[T]] = ObjectProperty(None)
 
   def dialogResult = dialogResultProperty.value
@@ -131,6 +132,8 @@ abstract class DialogStage[T] extends Stage with Logging {
   this.onCloseRequest = { _ =>
     dialogResult = None
   }
+
+  def windowSize: Option[(Double, Double)] = None
 
   private val actualDialogContent = dialogContent
 
@@ -161,13 +164,14 @@ abstract class DialogStage[T] extends Stage with Logging {
   contentPane.add(buttonsPane, "center")
 
   val pane = new PaneForTooltip(contentPane)
-  val currentScene = new Scene {
+  val (w, h) = windowSize.getOrElse((-1d, -1d))
+  val currentScene = new Scene(w, h) {
     css.foreach {c =>
       stylesheets.add(c)
     }
     content = pane
   }
-  scene = currentScene
+  this.scene = currentScene
   actualDialogContent.width.onChange {
     Option(currentScene.window.value).foreach(_.sizeToScene())
   }
@@ -186,6 +190,7 @@ class StringColumn[T](title: String, f: T => String) extends TableColumn[T, Stri
 object GridPaneBuilder {
 
   def buildWithoutCaption(constraints:List[Double], nodes:List[Node]): GridPane = {
+    require(constraints != null, s"Constraints are $constraints")
     val cc = constraints.map { c =>
       new ColumnConstraints {
         percentWidth = c

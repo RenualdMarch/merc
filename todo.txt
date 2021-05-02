@@ -1,6 +1,16 @@
 requirement failed: Buying and selling differ
 
-demand vassalization button
+friendship treaty - prevents creating claims and declaring wars, but can join wars with allies
+friendship treaty - drops all claims
+drop claim button
+after vassalization claims against overlord are dropped
+alliance claims against each other are dropped and not created any more
+ask allies to join your war
+
+totally rework AI diplomacy with new features
+
+Add kings and ministry
+
 
 Polishing
 rebalance political parties and views

@@ -2,11 +2,13 @@ package mr.merc.diplomacy
 
 import mr.merc.diplomacy.Claim.{ProvinceClaim, StrongProvinceClaim, WeakProvinceClaim}
 import mr.merc.diplomacy.DiplomaticAgreement.WarAgreement
+import mr.merc.diplomacy.DiplomaticSituation.{Hates, Likes, RivalPair}
+import mr.merc.economics.WorldConstants
 import mr.merc.politics.{Province, State}
 
 class DiplomaticSituation(diplomacy:WorldDiplomacy) {
 
-  def rivalsPairs:Set[(State, State)] = {
+  def rivalsPairs:Set[RivalPair] = {
     val provinceClaims:List[ProvinceClaim] = diplomacy.allClaims.collect {
       case c:StrongProvinceClaim if c.province.owner != c.state => c
       case c:WeakProvinceClaim if c.province.owner != c.state => c
@@ -15,8 +17,26 @@ class DiplomaticSituation(diplomacy:WorldDiplomacy) {
     provinceClaims.flatMap { pc =>
       val first = pc.province.owner
       val second = pc.state
-      Set(first -> second, second -> first)
+      Set(RivalPair(first, second), RivalPair(second, first))
     }.toSet
+  }
+
+  def hatePairs: Set[Hates] = {
+    diplomacy.states.flatMap { state =>
+      diplomacy.relationships(state, diplomacy.currentTurn).collect {
+        case (otherState, relations) if relations <= WorldConstants.Diplomacy.RelationsForBeingEnemy =>
+          Hates(state, otherState)
+      }
+    }
+  }
+
+  def likePairs:Set[Likes] = {
+    diplomacy.states.flatMap { state =>
+      diplomacy.relationships(state, diplomacy.currentTurn).collect {
+        case (otherState, relations) if relations >= WorldConstants.Diplomacy.RelationsForBeingFriend =>
+          Likes(state, otherState)
+      }
+    }
   }
 
   def shareBorder(state1: State, state2:State):Boolean = {
@@ -29,8 +49,31 @@ class DiplomaticSituation(diplomacy:WorldDiplomacy) {
 
   def rivals(state:State):List[State] = {
     rivalsPairs.collect {
-      case (`state`, other) => other
+      case RivalPair(`state`, other) => other
     }.toList
+  }
+
+  def haters(state: State):List[State] = {
+    hatePairs.filter(_.whomIsHated == state).map(_.whoHates).toList
+  }
+
+  def likers(state: State): List[State] = {
+    likePairs.filter(_.whomIsLiked == state).map(_.whoLikes).toList
+  }
+
+  def likersMinusFriends(state: State): List[State] = {
+    likers(state) diff friends(state)
+  }
+
+  def hatersWithoutRivals(state: State): List[State] = {
+    haters(state) diff rivals(state)
+  }
+
+  def friends(state: State): List[State] = {
+    val pairs = likePairs
+    likers(state).filter { liker =>
+      pairs.contains(Likes(state, liker))
+    }
   }
 
   def inWar(state:State):List[WarAgreement] = diplomacy.wars(state)
@@ -46,13 +89,12 @@ class DiplomaticSituation(diplomacy:WorldDiplomacy) {
 
   def areRivals(state1:State, state2: State): Boolean = {
     val pairs = rivalsPairs
-    pairs.contains((state1, state2)) || pairs.contains((state2, state1))
+    pairs.contains(RivalPair(state1, state2)) || pairs.contains(RivalPair(state2, state1))
   }
 
   def neighbouringProvinces(state: State):List[Province] = {
     val original = provinces(state).toSet
     (original.flatMap(_.neighbours) -- original).toList
-
   }
 
   def areRivalsOfRivals(state1:State, state2: State): Boolean = {
@@ -93,4 +135,13 @@ class DiplomaticSituation(diplomacy:WorldDiplomacy) {
     rivalsOfRivalsSet.toList
   }
 
+}
+
+object DiplomaticSituation {
+
+  case class RivalPair(rival1: State, rival2: State)
+
+  case class Likes(whoLikes: State, whomIsLiked: State)
+
+  case class Hates(whoHates: State, whomIsHated: State)
 }

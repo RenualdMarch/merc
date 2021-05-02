@@ -308,7 +308,7 @@ object WorldGenerator extends Logging {
     ws.diplomacyEngine.generateInitialClaimsForNeighbours()
     0 until TradeDaysBeforeStart foreach(_ => ws.nextTurn(false))
     info(s"World generation took ${(System.currentTimeMillis() - timeBefore) / 1000d} seconds")
-    ws.initialAiDiplomacy()
+    //ws.initialAiDiplomacy()
     ws
   }
 

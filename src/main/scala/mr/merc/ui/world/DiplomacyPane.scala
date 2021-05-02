@@ -89,6 +89,11 @@ class StatesTablePane(actions: WorldStateDiplomacyActions, currentState: State) 
     p => actions.relationships(p.state)(currentState).toString
   )
 
+  private val relationsFromUsColumn = new StringColumn[StateInfo](
+    Localization("diplomacy.relationsToThem"),
+    p => actions.relationships(currentState)(p.state).toString
+  )
+
   private val armyColumn = new StringColumn[StateInfo](Localization("army"), _.army.toString)
 
   private val incomeColumn = new StringColumn[StateInfo](Localization("budget.income"),
@@ -135,8 +140,8 @@ class StatesTablePane(actions: WorldStateDiplomacyActions, currentState: State) 
     editable = false
   }
 
-  statesTable.columns ++= List(stateColumn, cultureColumn, relationsColumn, armyColumn, literacyColumn,
-    partyColumn, moneyReservesColumn, incomeColumn, spendingColumn)
+  statesTable.columns ++= List(stateColumn, cultureColumn, relationsColumn, relationsFromUsColumn,
+    armyColumn, literacyColumn, partyColumn, moneyReservesColumn, incomeColumn, spendingColumn)
 
   private val buffer = new ObservableBuffer[StateInfo]()
   val relationships = actions.relationships(currentState)
@@ -242,6 +247,24 @@ class StateAgreementsPane(stage: Stage, selectedState: State, actions: WorldStat
     case list => add(new StateComponentList(list), "wrap")
   }
 
+  add(BigText(Localization("diplomacy.friends")), "wrap")
+  actions.situation.friends(selectedState) match {
+    case Nil => add(MediumText(Localization("diplomacy.noFriends")), "wrap")
+    case list => add(new StateComponentList(list), "wrap")
+  }
+
+  add(BigText(Localization("diplomacy.haters")), "wrap")
+  actions.situation.hatersWithoutRivals(selectedState) match {
+    case Nil => add(MediumText(Localization("diplomacy.noHaters")), "wrap")
+    case list => add(new StateComponentList(list), "wrap")
+  }
+
+  add(BigText(Localization("diplomacy.likers")), "wrap")
+  actions.situation.likersMinusFriends(selectedState) match {
+    case Nil => add(MediumText(Localization("diplomacy.noLikers")), "wrap")
+    case list => add(new StateComponentList(list), "wrap")
+  }
+
   if (vassalAgreements.nonEmpty) {
     add(BigText(Localization("diplomacy.vassalOf")), "wrap")
     add(new StateComponentList(vassalAgreements.map(_.overlord)), "wrap")
@@ -328,6 +351,14 @@ class StateActionsPane(currentState: State, selectedState: State, actions: World
     }
   }
 
+  private val demandVassalization = new MediumButton {
+    text = Localization("diplomacy.demandVassalization.button")
+    onAction = { _ =>
+      actions.sendMessage(new VassalizationDemand(currentState, selectedState))
+      parentFrame.showDiplomacyPane()
+    }
+  }
+
   private val proposeOverlordship = new MediumButton() {
     text = Localization("diplomacy.proposeOverlordship.button")
     onAction = { _ =>
@@ -400,6 +431,7 @@ class StateActionsPane(currentState: State, selectedState: State, actions: World
 
   if (actions.canProposeVassalization(currentState, selectedState)) {
     add(proposeVassalization, "wrap")
+    add(demandVassalization, "wrap")
   }
 
   if (actions.canProposeOverlordship(currentState, selectedState)) {

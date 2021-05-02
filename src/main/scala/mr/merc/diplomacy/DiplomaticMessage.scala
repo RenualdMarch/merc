@@ -118,6 +118,7 @@ object DiplomaticMessage {
   }
 
   class VassalizationProposal(val from: State, val to: State) extends DiplomaticProposal {
+
     override def accept(diplomacy: WorldDiplomacy, currentTurn: Int): Unit = {
       diplomacy.addAgreement(new VassalAgreement(from, to, currentTurn))
       diplomacy.sendMessage(new VassalizationAccepted(to, from), currentTurn)
@@ -743,6 +744,59 @@ object DiplomaticMessage {
     override def renderInReport: Option[Node] = Some(new MigPane {
       add(new StateComponentColorName(from))
       add(BigText(Localization("diplomacy.cancelSanctions.report")))
+      add(new StateComponentColorName(to))
+    })
+
+    override def shouldRefreshMapAfterAnswer: Boolean = false
+  }
+
+  class VassalizationDemand(val from: State, val to: State) extends DiplomaticProposal {
+
+    override def accept(diplomacy: WorldDiplomacy, currentTurn: Int): Unit = {
+      diplomacy.addAgreement(new VassalAgreement(from, to, currentTurn))
+      diplomacy.sendMessage(new VassalizationAccepted(to, from), currentTurn)
+    }
+
+    override def decline(diplomacy: WorldDiplomacy, currentTurn: Int): Unit = {
+      diplomacy.sendMessage(new VassalizationUltimatumRejected(to, from), currentTurn)
+      diplomacy.sendMessage(new DeclareWar(from, to, Vassalize(from, to), Set()), currentTurn)
+    }
+
+    override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean = {
+      val agreements = diplomacy.agreements(from) ::: diplomacy.agreements(to)
+      !agreements.exists {
+        case v: VassalAgreement if Set(v.overlord, v.vassal) == Set(from, to) => true
+        case v: VassalAgreement if Set(from, to).contains(v.vassal) => true
+        case wa: WarAgreement => wa.onDifferentSides(Set(from, to))
+        case _ => false
+      }
+    }
+
+    override def sendTitle: Option[String] = Some(Localization("diplomacy.demandVassalization.button"))
+
+    override def messageTitle: String = Localization("diplomacy.demandVassalization.title", from.name)
+
+    override def body: String = Localization("diplomacy.demandVassalization.body", from.name)
+
+    override def renderInReport: Option[Node] = None
+
+    override def shouldRefreshMapAfterAnswer: Boolean = false
+  }
+
+  class VassalizationUltimatumRejected(val from: State, val to: State) extends DiplomaticDeclaration {
+    override def ok(diplomacy: WorldDiplomacy, currentTurn: Int): Unit = {}
+
+    override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean = true
+
+    override def sendTitle: Option[String] = None
+
+    override def messageTitle: String = Localization("diplomacy.demandVassalizationRejected.title", from.name)
+
+    override def body: String = Localization("diplomacy.demandVassalizationRejected.body", from.name)
+
+    override def renderInReport: Option[Node] = Some(new MigPane {
+      add(new StateComponentColorName(from))
+      add(BigText(Localization("messages.acceptedVassalizationDemand")))
       add(new StateComponentColorName(to))
     })
 
