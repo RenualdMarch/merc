@@ -4,16 +4,14 @@ import mr.merc.army.{Warrior, WarriorCompetence, WarriorType}
 import mr.merc.diplomacy.DiplomaticAgreement.WarAgreement
 import mr.merc.diplomacy.DiplomaticAgreement.WarAgreement.TakeProvince
 import mr.merc.economics.Culture.LatinHuman
-import mr.merc.map.hex.{TerrainHex, TerrainHexField}
-import mr.merc.map.terrain.GreenGrass
 import mr.merc.politics.{Party, Province, State}
 import org.scalatest.{BeforeAndAfter, FunSuite, Matchers}
 import mr.merc.map.terrain.FourSeasonsTerrainTypes._
 
 class SoldierMovementAITest extends FunSuite with Matchers with BeforeAndAfter {
 
-  val state1:State = new State("1", Culture.LatinHuman, 0, new PoliticalSystem(Party.absolute))
-  val state2:State = new State("2", Culture.FrenchHuman, 0, new PoliticalSystem(Party.absolute))
+  val state1:State = new State("1", Culture.LatinHuman, 0, Party.absolute, 0)
+  val state2:State = new State("2", Culture.FrenchHuman, 0, Party.absolute, 0)
 
   var province1:Province = _
   var province2:Province = _

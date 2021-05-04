@@ -830,6 +830,117 @@
             <pain sound="humanPain1"/>
         </sounds>
     </view>
+    <view name="HumanWesnoth-GrandKnight">
+        <attack1 imageName="spear"/>
+        <stand>
+            <image name="grand-knight"/>
+        </stand>
+        <sounds>
+            <attack1 succ="spear" fail="spearFail"/>
+            <move sound="horseMovement"/>
+            <pain sound="horsePain"/>
+        </sounds>
+    </view>
+    <view name="HumanWesnoth-GrandMarhsal">
+        <attack1 imageName="greatsword-human">
+            <image name="marshal-attack-sword1"/>
+            <image name="marshal-attack-sword2"/>
+            <image name="marshal-attack-sword3"/>
+            <image name="marshal-attack-sword4"/>
+            <image name="marshal-attack-sword5"/>
+        </attack1>
+        <stand>
+            <image name="marshal"/>
+        </stand>
+        <defence>
+            <image name="marshal-defend-1"/>
+            <image name="marshal-defend-2"/>
+        </defence>
+        <death>
+            <image name="marshal-die-1"/>
+            <image name="marshal-die-2"/>
+            <image name="marshal-die-3"/>
+            <image name="marshal-die-4"/>
+            <image name="marshal-die-5"/>
+            <image name="marshal-die-6"/>
+            <image name="marshal-die-7"/>
+            <image name="marshal-die-8"/>
+            <image name="marshal-die-9"/>
+            <image name="marshal-die-10"/>
+        </death>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+
+    </view>
+    <view name="HumanWesnoth-GreatMage">
+        <attack1 imageName="staff-magic">
+            <all>
+                <succ>
+                    <image name="great-mage-attack-staff-1"/>
+                    <image name="great-mage-attack-staff-2"/>
+                </succ>
+            </all>
+        </attack1>
+        <attack2 imageName="fireball" projectile="Fireball">
+            <all>
+                <succ>
+                    <image name="great-mage-attack-magic-1"/>
+                    <image name="great-mage-attack-magic-2"/>
+                </succ>
+            </all>
+        </attack2>
+        <stand>
+            <image name="great-mage"/>
+        </stand>
+        <defence>
+            <image name="great-mage-defend"/>
+        </defence>
+        <sounds>
+            <attack1 succ="staff" fail="miss1"/>
+            <attack2 succ="magicAttack1" fail="magicAttack1Fail"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanWesnoth-IronMauler">
+        <attack1 imageName="mace-spiked">
+            <image name="siegetrooper-attack-1"/>
+            <image name="siegetrooper-attack-2"/>
+            <image name="siegetrooper-attack-3"/>
+            <image name="siegetrooper-attack-4"/>
+            <image name="siegetrooper-attack-5"/>
+            <image name="siegetrooper-attack-6"/>
+        </attack1>
+        <stand>
+            <image name="siegetrooper"/>
+        </stand>
+        <defence>
+            <image name="siegetrooper-defend-1"/>
+            <image name="siegetrooper-defend-2"/>
+        </defence>
+        <sounds>
+            <attack1 succ="mace" fail="miss1"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanWesnoth-RoyalWarrior">
+        <attack1 imageName="mace-spiked">
+            <image name="royal-warrior-attack1"/>
+            <image name="royal-warrior-attack2"/>
+        </attack1>
+        <stand>
+            <image name="royal-warrior"/>
+        </stand>
+        <defence>
+            <image name="royal-warrior-defend"/>
+        </defence>
+        <sounds>
+            <attack1 succ="mace" fail="miss1"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+
     <view name="HumanCeresian-Acolyte">
         <attack1 imageName="fist-human"/>
         <attack2 imageName="fireball" projectile="Fireball"/>
@@ -1000,6 +1111,58 @@
             <pain sound="humanPain1"/>
         </sounds>
     </view>
+    <view name="HumanDark-Longswordsman">
+        <attack1 imageName="greatsword-human"/>
+        <stand>
+            <image name="sword-longswordsman"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+
+    </view>
+    <view name="HumanDark-Spearman">
+        <attack1 imageName="spear"/>
+        <stand>
+            <image name="spear-spearman"/>
+        </stand>
+        <sounds>
+            <attack1 succ="spear" fail="spearFail"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanDark-Halberdier">
+        <attack1 imageName="spear"/>
+        <stand>
+            <image name="spear-halberdier"/>
+        </stand>
+        <sounds>
+            <attack1 succ="spear" fail="spearFail"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanDark-Deathmaster">
+        <attack1 imageName="spear"/>
+        <stand>
+            <image name="spear-deathmaster"/>
+        </stand>
+        <sounds>
+            <attack1 succ="spear" fail="spearFail"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanChaos-HellGuardian">
+        <attack1 imageName="greatsword-human"/>
+        <stand>
+            <image name="hell-guardian"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+
     <view name="HumanLavinian-Bowman">
         <attack1 imageName="sword-human-short"/>
         <attack2 imageName="bow" projectile="Arrow">
@@ -1136,6 +1299,81 @@
             <pain sound="humanPain1"/>
         </sounds>
     </view>
+    <view name="HumanLavinian-Centurion">
+        <attack1 imageName="spear">
+            <image name="centurion-attack-spear-1"/>
+            <image name="centurion-attack-spear-2"/>
+        </attack1>
+        <stand>
+            <image name="centurion"/>
+        </stand>
+        <defence>
+            <image name="centurion-defend"/>
+        </defence>
+        <death>
+            <image name="centurion-death-1"/>
+            <image name="centurion-death-2"/>
+            <image name="centurion-death-3"/>
+            <image name="centurion-death-4"/>
+            <image name="centurion-death-5"/>
+            <image name="centurion-death-6"/>
+        </death>
+        <sounds>
+            <attack1 succ="spear" fail="spearFail"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanLavinian-Aquilifer">
+        <attack1 imageName="sword-human">
+            <image name="aquilifer-attack-1"/>
+            <image name="aquilifer-attack-2"/>
+            <image name="aquilifer-attack-3"/>
+        </attack1>
+        <stand>
+            <image name="aquilifer"/>
+        </stand>
+        <defence>
+            <image name="aquilifer-defend-2"/>
+        </defence>
+        <death>
+            <image name="aquilifer-death-1"/>
+            <image name="aquilifer-death-2"/>
+            <image name="aquilifer-death-3"/>
+            <image name="aquilifer-death-4"/>
+            <image name="aquilifer-death-5"/>
+            <image name="aquilifer-death-6"/>
+        </death>
+
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanLavinian-Praetorian">
+        <attack1 imageName="sword-human">
+            <image name="praetorian-attack-gladius-1"/>
+            <image name="praetorian-attack-gladius-2"/>
+            <image name="praetorian-attack-gladius-3"/>
+        </attack1>
+        <stand>
+            <image name="praetorian"/>
+        </stand>
+        <defence>
+            <image name="praetorian-defend-2"/>
+        </defence>
+        <death>
+            <image name="praetorian-death-1"/>
+            <image name="praetorian-death-2"/>
+            <image name="praetorian-death-3"/>
+            <image name="praetorian-death-4"/>
+        </death>
+
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+
     <view name="HumanOracles-Oracle">
         <attack1 imageName="fist-human"/>
         <attack2 imageName="fireball" projectile="Fireball"/>
@@ -1169,6 +1407,27 @@
             <attack1 succ="sword" fail="miss1"/>
             <move sound="horseMovement"/>
             <pain sound="horsePain"/>
+        </sounds>
+    </view>
+    <view name="HumanDardo-Cavalier">
+        <attack1 imageName="sword-human"/>
+        <stand>
+            <image name="cavalier"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <move sound="horseMovement"/>
+            <pain sound="horsePain"/>
+        </sounds>
+    </view>
+    <view name="HumanDardo-Captain">
+        <attack1 imageName="spear"/>
+        <stand>
+            <image name="captain"/>
+        </stand>
+        <sounds>
+            <attack1 succ="spear" fail="spearFail"/>
+            <pain sound="humanPain1"/>
         </sounds>
     </view>
     <view name="HumanDardo-Hoplite">
@@ -1299,6 +1558,16 @@
             <pain sound="humanPain1"/>
         </sounds>
     </view>
+    <view name="HumanChevalier-Pikeman">
+        <attack1 imageName="spear"/>
+        <stand>
+            <image name="pikeman"/>
+        </stand>
+        <sounds>
+            <attack1 succ="spear" fail="spearFail"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
     <view name="HumanChevalier-Horseman">
         <attack1 imageName="spear"/>
         <stand>
@@ -1352,6 +1621,38 @@
             <attack1 succ="sword" fail="miss1"/>
             <move sound="horseMovement"/>
             <pain sound="horsePain"/>
+        </sounds>
+    </view>
+    <view name="HumanChevalier-HeavyRider">
+        <attack1 imageName="sword-human"/>
+        <stand>
+            <image name="heavy-rider"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <move sound="horseMovement"/>
+            <pain sound="horsePain"/>
+        </sounds>
+    </view>
+    <view name="HumanChevalier-GrandKnight">
+        <attack1 imageName="spear"/>
+        <stand>
+            <image name="grand-knight"/>
+        </stand>
+        <sounds>
+            <attack1 succ="spear" fail="spearFail"/>
+            <move sound="horseMovement"/>
+            <pain sound="horsePain"/>
+        </sounds>
+    </view>
+    <view name="HumanChevalier-Greatsword">
+        <attack1 imageName="sword-human"/>
+        <stand>
+            <image name="greatsword"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <pain sound="humanPain1"/>
         </sounds>
     </view>
     <view name="HumanChevalier-Siegebowman">
@@ -1414,6 +1715,17 @@
         <attack1 imageName="spear"/>
         <stand>
             <image name="cataphract"/>
+        </stand>
+        <sounds>
+            <attack1 succ="spear" fail="spearFail"/>
+            <move sound="horseMovement"/>
+            <pain sound="horsePain"/>
+        </sounds>
+    </view>
+    <view name="HumanDuneWesnoth-Sunderer">
+        <attack1 imageName="spear"/>
+        <stand>
+            <image name="sunderer"/>
         </stand>
         <sounds>
             <attack1 succ="spear" fail="spearFail"/>
@@ -1492,6 +1804,27 @@
             <pain sound="humanPain1"/>
         </sounds>
     </view>
+    <view name="HumanDuneWesnoth-Marauder">
+        <attack1 imageName="sword-human"/>
+        <stand>
+            <image name="marauder"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <move sound="horseMovement"/>
+            <pain sound="horsePain"/>
+        </sounds>
+    </view>
+    <view name="HumanDuneWesnoth-Ranger">
+        <attack1 imageName="scimitar"/>
+        <stand>
+            <image name="ranger"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
     <view name="HumanCeresians-Knight-Commander">
         <attack1 imageName="sword-human"/>
         <stand>
@@ -1513,7 +1846,7 @@
             <move sound="horseMovement"/>
             <pain sound="horsePain"/>
         </sounds>
-    </view> <!-- not used-->
+    </view>
     <view name="HumanCeresians-Cavalryman">
         <attack1 imageName="sword-human"/>
         <stand>
@@ -1523,6 +1856,28 @@
             <attack1 succ="sword" fail="miss1"/>
             <move sound="horseMovement"/>
             <pain sound="horsePain"/>
+        </sounds>
+    </view>
+    <view name="HumanCeresians-Metropolitan">
+        <attack1 imageName="fist-human"/>
+        <attack2 imageName="fireball" projectile="Fireball"/>
+        <stand>
+            <image name="metropolitan"/>
+        </stand>
+        <sounds>
+            <attack1 succ="fist"/>
+            <attack2 succ="magicAttack1" fail="magicAttack1Fail"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
+    <view name="HumanCeresians-Champion">
+        <attack1 imageName="sword-human"/>
+        <stand>
+            <image name="champion"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <pain sound="humanPain1"/>
         </sounds>
     </view>
     <view name="HumanMountain-Eremit">
@@ -1635,7 +1990,7 @@
             <pain sound="humanPain1"/>
         </sounds>
     </view>
-    <view name="HumanLuz-crossbow">
+    <view name="HumanLuz-Crossbow">
         <attack1 imageName="club"/>
         <attack2 imageName="crossbow-human" projectile="Arrow"/>
         <stand>
@@ -1658,7 +2013,7 @@
             <attack2 succ="magicAttack1" fail="magicAttack1Fail"/>
             <pain sound="humanPain1"/>
         </sounds>
-    </view> <!-- not used -->
+    </view>
     <view name="HumanLuz-Cleric">
         <attack1 imageName="staff-magic"/>
         <attack2 imageName="fireball" projectile="Fireball"/>
@@ -1714,6 +2069,27 @@
             <pain sound="horsePain"/>
         </sounds>
     </view>
+    <view name="HumanLuz-Paladin">
+        <attack1 imageName="sword-human"/>
+        <stand>
+            <image name="paladin"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <move sound="horseMovement"/>
+            <pain sound="horsePain"/>
+        </sounds>
+    </view>
+    <view name="HumanLuz-HolyWarrior">
+        <attack1 imageName="hammer-dwarven-runic"/>
+        <stand>
+            <image name="holy-warrior"/>
+        </stand>
+        <sounds>
+            <attack1 succ="mace" fail="miss1"/>
+            <pain sound="humanPain1"/>
+        </sounds>
+    </view>
     <view name="HumanLuz-Rider">
         <attack1 imageName="sword-human"/>
         <stand>
@@ -1723,6 +2099,16 @@
             <attack1 succ="sword" fail="miss1"/>
             <move sound="horseMovement"/>
             <pain sound="horsePain"/>
+        </sounds>
+    </view>
+    <view name="HumanLuz-Miliz">
+        <attack1 imageName="spear"/>
+        <stand>
+            <image name="miliz"/>
+        </stand>
+        <sounds>
+            <attack1 succ="spear" fail="spearFail"/>
+            <pain sound="humanPain1"/>
         </sounds>
     </view>
     <view name="HumanLuz-Keeper">
@@ -1836,7 +2222,7 @@
             <attack2 succ="bow" fail="bowFail"/>
             <pain sound="elfPain2"/>
         </sounds>
-    </view> <!-- Not used -->
+    </view>
     <view name="ElvesWesnoth-Sharpshooter">
         <stand>
             <image name="sharpshooter"/>
@@ -2069,6 +2455,61 @@
             <pain sound="elfPain1"/>
         </sounds>
     </view>
+    <view name="ElvesWesnoth-Rider">
+        <attack1 imageName="sword-elven">
+            <image name="rider-melee-1"/>
+            <image name="rider-melee-2"/>
+        </attack1>
+        <defence>
+            <image name="rider-defend2"/>
+        </defence>
+        <move>
+            <image name="rider-moving"/>
+        </move>
+        <stand>
+            <image name="rider"/>
+        </stand>
+
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <move sound="horseMovement"/>
+            <pain sound="horsePain"/>
+        </sounds>
+    </view>
+    <view name="ElvesWesnoth-Marshal">
+        <attack1 imageName="sword-elven">
+            <all>
+                <succ>
+                    <image name="marshal"/>
+                    <image name="marshal-melee-1"/>
+                    <image name="marshal-melee-2"/>
+                </succ>
+            </all>
+        </attack1>
+        <attack2 imageName="bow-elven" projectile="Arrow">
+            <all>
+                <succ>
+                    <image name="marshal-bow"/>
+                    <image name="marshal-bow-attack1"/>
+                    <image name="marshal-bow-attack2"/>
+                    <image name="marshal-bow-attack3"/>
+                    <image name="marshal-bow-attack4"/>
+                </succ>
+            </all>
+        </attack2>
+        <defence>
+            <image name="marshal-defend"/>
+        </defence>
+        <stand>
+            <image name="marshal"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <attack2 succ="bow" fail="bowFail"/>
+            <pain sound="elfPain2"/>
+        </sounds>
+    </view>
+
     <view name="ElvesDesert-Archer">
         <attack1 imageName="sword-elven">
             <all>
@@ -2106,6 +2547,47 @@
             <image name="archer-idle-5"/>
             <image name="archer-idle-6"/>
         </idle>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <attack2 succ="bow" fail="bowFail"/>
+            <pain sound="elfPain2"/>
+        </sounds>
+    </view>
+    <view name="ElvesDesert-Marksman">
+        <stand>
+            <image name="marksman"/>
+        </stand>
+        <attack1 imageName="sword-elven">
+            <all>
+                <succ>
+                    <image name="marksman-sword"/>
+                    <image name="marksman-sword-1"/>
+                    <image name="marksman-sword-2"/>
+                    <image name="marksman-sword-3"/>
+                </succ>
+            </all>
+        </attack1>
+        <attack2 imageName="bow-elven" projectile="Arrow">
+            <all>
+                <succ>
+                    <image name="marksman-bow"/>
+                    <image name="marksman-bow-attack1"/>
+                    <image name="marksman-bow-attack2"/>
+                    <image name="marksman-bow-attack3"/>
+                    <image name="marksman-bow-attack4"/>
+                </succ>
+            </all>
+        </attack2>
+        <defence>
+            <image name="marksman-bow-defend"/>
+        </defence>
+        <death>
+            <image name="marksman-die-1"/>
+            <image name="marksman-die-2"/>
+            <image name="marksman-die-3"/>
+            <image name="marksman-die-4"/>
+            <image name="marksman-die-5"/>
+        </death>
         <sounds>
             <attack1 succ="sword" fail="miss1"/>
             <attack2 succ="bow" fail="bowFail"/>
@@ -2264,6 +2746,26 @@
             <pain sound="horsePain"/>
         </sounds>
     </view>
+    <view name="ElvesDesert-Rider">
+        <attack1 imageName="sword-elven">
+            <image name="rider-melee-1"/>
+            <image name="rider-melee-2"/>
+        </attack1>
+        <defence>
+            <image name="rider-defend2"/>
+        </defence>
+        <move>
+            <image name="rider-moving"/>
+        </move>
+        <stand>
+            <image name="rider"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <move sound="horseMovement"/>
+            <pain sound="horsePain"/>
+        </sounds>
+    </view>
     <view name="ElvesDesert-Outrider">
         <attack1 imageName="sword-elven">
             <all>
@@ -2342,6 +2844,41 @@
             <pain sound="elfPain1"/>
         </sounds>
     </view>
+    <view name="ElvesDesert-Marshal">
+        <attack1 imageName="sword-elven">
+            <all>
+                <succ>
+                    <image name="marshal"/>
+                    <image name="marshal-melee-1"/>
+                    <image name="marshal-melee-2"/>
+                </succ>
+            </all>
+        </attack1>
+        <attack2 imageName="bow-elven" projectile="Arrow">
+            <all>
+                <succ>
+                    <image name="marshal-bow"/>
+                    <image name="marshal-bow-attack1"/>
+                    <image name="marshal-bow-attack2"/>
+                    <image name="marshal-bow-attack3"/>
+                    <image name="marshal-bow-attack4"/>
+                </succ>
+            </all>
+        </attack2>
+        <defence>
+            <image name="marshal-defend"/>
+        </defence>
+        <stand>
+            <image name="marshal"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <attack2 succ="bow" fail="bowFail"/>
+            <pain sound="elfPain2"/>
+        </sounds>
+    </view>
+
+
     <view name="DarkElvesEE-Enchantress">
         <attack1 imageName="staff-elven"/>
         <attack2 imageName="fireball" projectile="Fireball"/>
@@ -2505,7 +3042,14 @@
             <pain sound="elfPain2"/>
         </sounds>
     </view>
-
+    <view name="DarkElvesEE-Marshal">
+        <attack1 imageName="sword-elven"/>
+        <stand>
+            <image name="marshal"/>
+        </stand>
+        <attack1 succ="sword" fail="miss1"/>
+        <pain sound="elfPain2"/>
+    </view>
 
     <!-- orcs -->
     <view name="OrcsWesnoth-Archer">
@@ -2713,6 +3257,78 @@
             <pain sound="orcPain2"/>
         </sounds>
     </view>
+    <view name="OrcsWesnoth-Slurbow">
+        <attack1 imageName="sword-orcish">
+            <all>
+                <succ>
+                    <image name="slurbow-melee"/>
+                    <image name="slurbow-melee-attack-1"/>
+                    <image name="slurbow-melee-attack-2"/>
+                    <image name="slurbow-melee-attack-3"/>
+                    <image name="slurbow-melee-attack-4"/>
+                </succ>
+            </all>
+        </attack1>
+        <attack2 imageName="crossbow-orcish" projectile="Arrow">
+            <all>
+                <succ>
+                    <image name="slurbow-ranged"/>
+                    <image name="slurbow-ranged-1"/>
+                    <image name="slurbow-ranged-2"/>
+                </succ>
+            </all>
+        </attack2>
+        <defence>
+            <image name="slurbow-ranged-defend"/>
+        </defence>
+        <stand>
+            <image name="slurbow"/>
+        </stand>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <attack2 succ="crossbow" fail="crossbowFail"/>
+            <pain sound="orcPain2"/>
+        </sounds>
+    </view>
+    <view name="OrcsWesnoth-Sovereign">
+        <attack1 imageName="greatsword-orcish">
+            <image name="sovereign-attack-1"/>
+            <image name="sovereign-attack-2"/>
+            <image name="sovereign-attack-3"/>
+            <image name="sovereign-attack-4"/>
+            <image name="sovereign-attack-5"/>
+        </attack1>
+        <stand>
+            <image name="orc-sovereign"/>
+        </stand>
+        <defence>
+            <image name="sovereign-defend-1"/>
+        </defence>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <pain sound="orcPain2"/>
+        </sounds>
+    </view>
+    <view name="OrcsWesnoth-Warlord">
+        <attack1 imageName="greatsword-orcish">
+            <image name="warlord-attack-sword-1"/>
+            <image name="warlord-attack-sword-2"/>
+            <image name="warlord-attack-sword-3"/>
+            <image name="warlord-attack-sword-4"/>
+            <image name="warlord-attack-sword-5"/>
+            <image name="warlord-attack-sword-6"/>
+        </attack1>
+        <stand>
+            <image name="warlord"/>
+        </stand>
+        <defence>
+            <image name="warlord-defend-1"/>
+        </defence>
+        <sounds>
+            <attack1 succ="sword" fail="miss1"/>
+            <pain sound="orcPain2"/>
+        </sounds>
+    </view>
     <view name="OrcsAgeless-Drifter">
         <attack1 imageName="staff-magic"/>
         <attack2 imageName="fireball" projectile="Fireball"/>
@@ -2775,6 +3391,7 @@
             <pain sound="horsePain"/>
         </sounds>
     </view>
+
 
     <view name="OrcsLatin-Dimacherius">
         <attack1 imageName="greatsword-orcish"/>
@@ -3168,6 +3785,18 @@
             <pain sound="dwarfPain1"/>
         </sounds>
     </view>
+    <view name="DwarfWesnoth-Runemaster">
+        <attack1 imageName="hammer-dwarven"/>
+        <attack2 imageName="fireball" projectile="Fireball"/>
+        <stand>
+            <image name="runemaster"/>
+        </stand>
+        <sounds>
+            <attack1 succ="staff" fail="miss1"/>
+            <attack2 succ="magicAttack1" fail="magicAttack1Fail"/>
+            <pain sound="dwarfPain1"/>
+        </sounds>
+    </view>
     <view name="DwarfWesnoth-Arcanister">
         <attack1 imageName="hammer-dwarven"/>
         <attack2 imageName="fireball" projectile="Fireball"/>
@@ -3318,6 +3947,86 @@
         </move>
         <sounds>
             <attack1 succ="spear" fail="spearFail"/>
+            <pain sound="dwarfPain1"/>
+        </sounds>
+    </view>
+    <view name="DwarfWesnoth-Lord">
+        <attack1 imageName="axe">
+            <n>
+                <succ>
+                    <image name="lord-ne"/>
+                    <image name="lord-ne-axe1"/>
+                    <image name="lord-ne-axe2"/>
+                    <image name="lord-ne-axe3"/>
+                    <image name="lord-ne-axe4"/>
+                    <image name="lord-ne-axe5"/>
+                    <image name="lord-ne-axe6"/>
+                    <image name="lord-ne-axe7"/>
+                    <image name="lord-ne-axe8"/>
+                    <image name="lord-ne-axe9"/>
+                </succ>
+            </n>
+            <ne>
+                <succ>
+                    <image name="lord-ne"/>
+                    <image name="lord-ne-axe1"/>
+                    <image name="lord-ne-axe2"/>
+                    <image name="lord-ne-axe3"/>
+                    <image name="lord-ne-axe4"/>
+                    <image name="lord-ne-axe5"/>
+                    <image name="lord-ne-axe6"/>
+                    <image name="lord-ne-axe7"/>
+                    <image name="lord-ne-axe8"/>
+                    <image name="lord-ne-axe9"/>
+                </succ>
+            </ne>
+            <se>
+                <succ>
+                    <image name="lord-se-axe1"/>
+                    <image name="lord-se-axe2"/>
+                    <image name="lord-se-axe3"/>
+                    <image name="lord-se-axe4"/>
+                    <image name="lord-se-axe5"/>
+                    <image name="lord-se-axe6"/>
+                    <image name="lord-se-axe7"/>
+                    <image name="lord-se-axe8"/>
+                    <image name="lord-se-axe9"/>
+                </succ>
+            </se>
+            <s>
+                <succ>
+                    <image name="lord-se-axe1"/>
+                    <image name="lord-se-axe2"/>
+                    <image name="lord-se-axe3"/>
+                    <image name="lord-se-axe4"/>
+                    <image name="lord-se-axe5"/>
+                    <image name="lord-se-axe6"/>
+                    <image name="lord-se-axe7"/>
+                    <image name="lord-se-axe8"/>
+                    <image name="lord-se-axe9"/>
+                </succ>
+            </s>
+        </attack1>
+        <stand>
+            <image name="lord"/>
+        </stand>
+        <defence>
+            <image name="lord-se-defend2"/>
+        </defence>
+        <move>
+            <image name="lord-se-run1"/>
+            <image name="lord-se-run2"/>
+            <image name="lord-se-run3"/>
+            <image name="lord-se-run4"/>
+            <image name="lord-se-run5"/>
+            <image name="lord-se-run6"/>
+            <image name="lord-se-run7"/>
+            <image name="lord-se-run8"/>
+            <image name="lord-se-run9"/>
+            <image name="lord-se-run10"/>
+        </move>
+        <sounds>
+            <attack1 succ="axe" fail="miss3"/>
             <pain sound="dwarfPain1"/>
         </sounds>
     </view>
@@ -3704,6 +4413,36 @@
             <attack1 succ="axe" fail="miss1"/>
             <move sound="horseMovement"/>
             <pain sound="skeletonPain3"/>
+        </sounds>
+    </view>
+    <view name="UndeadWesnoth-Necromancer">
+        <attack1 imageName="staff-magic">
+            <all>
+                <succ>
+                    <image name="necromancer-attack-staff-1"/>
+                    <image name="necromancer-attack-staff-2"/>
+                </succ>
+            </all>
+        </attack1>
+        <attack2 imageName="fireball" projectile="Fireball">
+            <all>
+                <succ>
+                    <image name="necromancer-magic-1"/>
+                    <image name="necromancer-magic-2"/>
+                    <image name="necromancer-magic-3"/>
+                </succ>
+            </all>
+        </attack2>
+        <stand>
+            <image name="necromancer"/>
+        </stand>
+        <defence>
+            <image name="necromancer-defend"/>
+        </defence>
+        <sounds>
+            <attack1 succ="staff" fail="miss1"/>
+            <attack2 succ="magicAttack1" fail="magicAttack1Fail"/>
+            <pain sound="humanPain1"/>
         </sounds>
     </view>
 </views>

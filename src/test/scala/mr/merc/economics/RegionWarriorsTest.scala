@@ -7,7 +7,8 @@ import mr.merc.politics.{Party, State}
 import org.scalatest.{FunSuite, Matchers}
 import scalafx.scene.paint.Color
 import MapUtil.FloatOperations._
-import mr.merc.army.WarriorCompetence.{Militia, Professional}
+import javafx.css.Rule
+import mr.merc.army.WarriorCompetence.{Militia, Professional, Ruler}
 import mr.merc.economics.Culture.{CultureInfo, StateForm}
 
 class RegionWarriorsTest extends FunSuite with Matchers {
@@ -15,11 +16,12 @@ class RegionWarriorsTest extends FunSuite with Matchers {
   val testCulture = new Culture("testCulture", Humans, "testHouse", Color.White) {
     override val warriorViewNames: WarriorViewNames = WarriorViewNames(Map(
       (HeavyMaceInfantry, Professional) -> "oneImageSoldier",
-      (HeavyMaceInfantry, Militia) -> "testSoldier2"))
-    override val cultureInfo: Culture.CultureInfo = CultureInfo(StateForm("a", "b"), Nil, Nil)
+      (HeavyMaceInfantry, Militia) -> "testSoldier2",
+      (HeavyMaceInfantry, Ruler) -> "testSoldier2"))
+    override val cultureInfo: Culture.CultureInfo = CultureInfo(StateForm("a", "b", "c", "d"), Nil, Nil, List("maleA"))
   }
 
-  val state = new State("", testCulture, 0, new PoliticalSystem(Party.absolute))
+  val state = new State("", testCulture, 0, Party.absolute, 1)
 
   val region1 = new EconomicRegion {
     override def owner: State = ???
@@ -130,7 +132,7 @@ class RegionWarriorsTest extends FunSuite with Matchers {
   }
 
   test("generate demands when money are present") {
-    val state = new State("", testCulture, 100000, new PoliticalSystem(Party.absolute))
+    val state = new State("", testCulture, 100000, Party.absolute, 0)
 
     val w1 = new Warrior(HeavyMaceInfantry, Professional, testCulture, state)
     val w2 = new Warrior(HeavyMaceInfantry, Professional, testCulture, state)
@@ -151,7 +153,7 @@ class RegionWarriorsTest extends FunSuite with Matchers {
   }
 
   test("no demands when money are absent") {
-    val state = new State("", testCulture, 0, new PoliticalSystem(Party.absolute))
+    val state = new State("", testCulture, 0, Party.absolute, 0)
 
     val w1 = new Warrior(HeavyMaceInfantry, Professional, testCulture, state)
     val w2 = new Warrior(HeavyMaceInfantry, Professional, testCulture, state)

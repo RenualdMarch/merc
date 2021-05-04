@@ -1,6 +1,6 @@
 package mr.merc.map.hex.view
 
-import mr.merc.army.WarriorCompetence.{Militia, Professional}
+import mr.merc.army.WarriorCompetence.{Militia, Professional, Ruler}
 import mr.merc.army.{Warrior, WarriorViewNames}
 import mr.merc.army.WarriorType.{HeavyBladeInfantry, HeavyMaceInfantry}
 import mr.merc.economics.Culture._
@@ -34,11 +34,12 @@ class ProvinceViewTest extends FunSuite with MockitoSugar with BeforeAndAfter wi
   val testCulture = new Culture("testCulture", Humans, "testHouse", Color.White) {
     override val warriorViewNames: WarriorViewNames = WarriorViewNames(Map(
       (HeavyMaceInfantry, Professional) -> "oneImageSoldier",
-      (HeavyMaceInfantry, Militia) -> "testSoldier2"))
-    override val cultureInfo: CultureInfo = null
+      (HeavyMaceInfantry, Militia) -> "testSoldier2",
+      (HeavyMaceInfantry, Ruler) -> "testSoldier2"))
+    override val cultureInfo: CultureInfo = LatinHuman.cultureInfo
   }
 
-  val state = new State("", testCulture, 0, new PoliticalSystem(Party.absolute))
+  val state = new State("", testCulture, 0, Party.absolute, 0)
 
   // this test assumes that HumanCityHouse is used for LatinHuman culture and HumanVillageHouse for western humans
 
@@ -100,7 +101,7 @@ class ProvinceViewTest extends FunSuite with MockitoSugar with BeforeAndAfter wi
 
   test("soldiers") {
     val region = mock[Province]
-    val state = new State("", LatinHuman, 0, new PoliticalSystem(Party.absolute))
+    val state = new State("", LatinHuman, 0, Party.absolute, 0)
     val regionWarriors = new RegionWarriors(Nil, Set(region))
     when(province.regionWarriors).thenReturn(regionWarriors)
     when(province.regionPopulation).thenReturn(population)

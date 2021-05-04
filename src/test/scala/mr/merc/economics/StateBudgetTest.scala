@@ -1,6 +1,7 @@
 package mr.merc.economics
 
 import mr.merc.army.WarriorViewNames
+import mr.merc.economics.Culture.LatinHuman
 import mr.merc.economics.Population._
 import mr.merc.economics.Products.Grain
 import mr.merc.economics.SpendingPolicy.{BureaucratsSalary, Pensions, ScholarsSalary}
@@ -16,8 +17,8 @@ class StateBudgetTest extends FunSuite {
     val culture = new Culture("testCulture", Humans, "testHouse", Color.Red) {
 
 
-      override val warriorViewNames: WarriorViewNames = null
-      override val cultureInfo: Culture.CultureInfo = null
+      override val warriorViewNames: WarriorViewNames = LatinHuman.warriorViewNames
+      override val cultureInfo: Culture.CultureInfo = LatinHuman.cultureInfo
 
       private val map:CornerPopulationNeeds = Map(
         Lower -> Map(
@@ -44,7 +45,7 @@ class StateBudgetTest extends FunSuite {
     val farmers = new Population(culture, Farmers, 10000, 0, 0, PoliticalViews.averagePoliticalViews)
 
     val region = new EconomicRegion {
-      override def owner: State = new State("testState", culture, 0, new PoliticalSystem(Party.absolute))
+      override def owner: State = new State("testState", culture, 0, Party.absolute, 0)
       owner.taxPolicy.set(TaxPolicy.zeroTaxes.taxPolicyValues)
       owner.budget.refreshTaxPolicy()
 
@@ -87,8 +88,8 @@ class StateBudgetTest extends FunSuite {
 
     val culture = new Culture("testCulture", Humans, "testHouse", Color.Red) {
 
-      override val warriorViewNames: WarriorViewNames = null
-      override val cultureInfo: Culture.CultureInfo = null
+      override val warriorViewNames: WarriorViewNames = LatinHuman.warriorViewNames
+      override val cultureInfo: Culture.CultureInfo = LatinHuman.cultureInfo
 
       private val map:CornerPopulationNeeds = Map(
         Lower -> Map(
@@ -115,7 +116,7 @@ class StateBudgetTest extends FunSuite {
     val farmers = new Population(culture, Farmers, 10000, 0, 0, PoliticalViews.averagePoliticalViews)
 
     val region = new EconomicRegion {
-      override def owner: State = new State("testState", culture, 0, new PoliticalSystem(Party.absolute))
+      override def owner: State = new State("testState", culture, 0, Party.absolute, 0)
       owner.taxPolicy.set(TaxPolicy.zeroTaxes.taxPolicyValues)
       owner.budget.refreshTaxPolicy()
 
@@ -156,8 +157,8 @@ class StateBudgetTest extends FunSuite {
 
     val culture = new Culture("testCulture", Humans, "testHouse", Color.Red) {
 
-      override val warriorViewNames: WarriorViewNames = null
-      override val cultureInfo: Culture.CultureInfo = null
+      override val warriorViewNames: WarriorViewNames = LatinHuman.warriorViewNames
+      override val cultureInfo: Culture.CultureInfo = LatinHuman.cultureInfo
 
       private val map:CornerPopulationNeeds = Map(
         Lower -> Map(
@@ -184,7 +185,7 @@ class StateBudgetTest extends FunSuite {
     val farmers = new Population(culture, Farmers, 10000, 0, 0, PoliticalViews.averagePoliticalViews)
 
     val region = new EconomicRegion {
-      override def owner: State = new State("testState", culture, 0, new PoliticalSystem(Party.absolute))
+      override def owner: State = new State("testState", culture, 0, Party.absolute, 0)
       owner.taxPolicy.set(TaxPolicy.zeroTaxes.taxPolicyValues)
       owner.budget.refreshTaxPolicy()
 

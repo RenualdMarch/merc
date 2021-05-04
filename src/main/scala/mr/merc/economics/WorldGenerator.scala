@@ -117,11 +117,11 @@ class WorldGenerator(field:FourSeasonsTerrainHexField) {
     new RegionMarket(prices)
   }
 
-  private def generateState(culture: Culture):State = {
+  private def generateState(culture: Culture, turn: Int):State = {
     val color = colorStream.head
     colorStream = colorStream.tail
     val name = namesGenerators(culture).stateNames.extract()
-    new State(name, culture, StateStartingMoney, new PoliticalSystem(Party.aristocratic), new TechnologyLevel(0), color)
+    new State(name, culture, StateStartingMoney, Party.aristocratic, turn, new TechnologyLevel(0), color)
   }
 
   private def divideIntoContinuousParts(connectivityMap: ConnectivityMap, sizes:List[Int]):List[ConnectivityMap] = {
@@ -158,7 +158,7 @@ class WorldGenerator(field:FourSeasonsTerrainHexField) {
         val statesMapParts = divideIntoContinuousParts(cultureMap, shuffled)
 
         statesMapParts.map { hexes =>
-          generateState(culture) -> hexes.keys.toList
+          generateState(culture, 0) -> hexes.keys.toList
         }
       }
     }

@@ -23,7 +23,7 @@ class ResourceGatheringTest extends FunSuite with BeforeAndAfter with Matchers {
     aristocrats.newDay(zeroPolicy, 1)
     workers = new Population(LatinHuman, Farmers, 4000, 0, 0, PoliticalViews.averagePoliticalViews)
     workers.newDay(zeroPolicy,1)
-    country = new State("", FrenchHuman, 0, new PoliticalSystem(Party.absolute))
+    country = new State("", FrenchHuman, 0, Party.absolute, 0)
     country.taxPolicy.set(TaxPolicy.zeroTaxes.taxPolicyValues)
     country.budget.refreshTaxPolicy()
 

@@ -33,7 +33,7 @@ class FactoryTest extends FunSuite with BeforeAndAfter with MockitoSugar with Ma
     capitalists.newDay(zeroTaxes, 1)
     craftsmen = new Population(LatinHuman, Craftsmen, 1000, 0, 0, PoliticalViews.averagePoliticalViews)
     craftsmen.newDay(zeroTaxes, 1)
-    owner = new State("", FrenchHuman, 0, new PoliticalSystem(Party.absolute))
+    owner = new State("", FrenchHuman, 0, Party.absolute, 0)
     owner.taxPolicy.set(TaxPolicy.zeroTaxes.taxPolicyValues)
     owner.budget.refreshTaxPolicy()
 

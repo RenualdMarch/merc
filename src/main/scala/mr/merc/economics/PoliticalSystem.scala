@@ -1,12 +1,14 @@
 package mr.merc.economics
 
-import mr.merc.politics.{Election, Party, Province, Regime, StateElectionReport}
+import mr.merc.politics.{Election, Elites, Party, Province, Regime, State, StateElectionReport}
 import MapUtil.FloatOperations._
 import mr.merc.politics.VotersPolicy.NoVoting
 import WorldConstants.Population._
 
-class PoliticalSystem(startingRulingParty: Party) {
+class PoliticalSystem(startingRulingParty: Party, state: State, creationTurn: Int) {
   private var lastElectionTurn = -1
+
+  val elites = new Elites(state, creationTurn, startingRulingParty)
 
   def rulingParty_=(newRulingParty: Party): Unit = {
     _rulingParty = newRulingParty

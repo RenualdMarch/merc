@@ -156,9 +156,10 @@ object WorldConstants {
     import WorldConstants.Technology.increaseValue
 
     @transient lazy val SoldierSupply: ((WarriorCompetence, Int)) => Map[Product, Double] = CacheFactoryMap.memo[(WarriorCompetence, Int), Map[Product, Double]] {
-      case ((wc, level)) => wc match {
+      case (wc, level) => wc match {
         case WarriorCompetence.Militia => supply |*| increaseValue(1d, level)
         case WarriorCompetence.Professional => supply |*| increaseValue(4d, level)
+        case WarriorCompetence.Ruler => Map()
       }
     }
 

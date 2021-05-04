@@ -1,6 +1,6 @@
 package mr.merc.ui.world
 
-import mr.merc.economics.{Culture, Seasons, WorldConstants, WorldStateDiplomacyActions}
+import mr.merc.economics.{Culture, SeasonOfYear, Seasons, WorldConstants, WorldStateDiplomacyActions}
 import mr.merc.politics.{Province, State}
 import mr.merc.util.MercTooltip
 import org.tbee.javafx.scene.layout.MigPane
@@ -848,8 +848,8 @@ class ClaimsTable(claims: List[Claim]) extends TableView[Claim] {
     cellValueFactory = p => StringProperty {
       p.value match {
         case _: Claim.StrongProvinceClaim => ""
-        case claim: Claim.WeakProvinceClaim => Seasons.date(claim.claimTurnEnd).localizedString
-        case Claim.VassalizationClaim(_, _, claimTurnEnd) => Seasons.date(claimTurnEnd).localizedString
+        case claim: Claim.WeakProvinceClaim => SeasonOfYear.date(claim.claimTurnEnd).localizedString
+        case Claim.VassalizationClaim(_, _, claimTurnEnd) => SeasonOfYear.date(claimTurnEnd).localizedString
       }
     }
     editable = false

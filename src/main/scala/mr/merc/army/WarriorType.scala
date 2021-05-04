@@ -24,6 +24,7 @@ abstract class WarriorType(val name: String) {
     increaseValue(competence match {
       case Professional => baseHp
       case Militia => baseHp * 2 / 3
+      case Ruler => baseHp * 3 / 2
     }, techLevel)
   }
 
@@ -38,6 +39,9 @@ abstract class WarriorType(val name: String) {
       case Militia => baseAttacks.map { at =>
         at.copy(damage = at.damage * 2 / 3)
       }
+      case Ruler => baseAttacks.map { at =>
+        at.copy(damage = at.damage * 3 / 2)
+      }
     }).map { attack =>
       attack.copy(damage = increaseValue(attack.damage, techLevel))
     }
@@ -50,6 +54,7 @@ abstract class WarriorType(val name: String) {
   private def level(competence: WarriorCompetence) = competence match {
     case Militia => 1
     case Professional => 2
+    case Ruler => 3
   }
 
   def buildSoldierType(c:WarriorCompetence, culture: Culture, techLevel: Int):SoldierType = SoldierType(
@@ -63,6 +68,7 @@ sealed trait WarriorCompetence
 object WarriorCompetence {
   case object Militia extends WarriorCompetence
   case object Professional extends WarriorCompetence
+  case object Ruler extends WarriorCompetence
 }
 
 

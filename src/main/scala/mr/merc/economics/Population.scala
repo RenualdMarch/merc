@@ -393,28 +393,28 @@ object Population {
   case class PopulationNeeds(illiterateNeeds: CornerPopulationNeeds, literateNeeds: CornerPopulationNeeds)
 
   // removed sealed for test purposes only
-  abstract class Race extends scala.Product with Serializable {
+  abstract class Race(val minAge: Int, val maxAge:Int) extends scala.Product with Serializable {
     def name: String = productPrefix.toLowerCase
   }
 
-  case object Humans extends Race
+  case object Humans extends Race(16, 100)
 
   //
   // DISABLED RACES
   //
-  case object Elves extends Race
+  case object Elves extends Race(100, 1000)
 
-  case object Dwarfs extends Race
+  case object Dwarfs extends Race(50, 500)
 
-  case object Orcs extends Race
+  case object Orcs extends Race(16, 100)
 
-  case object Saurians extends Race
+  //case object Saurians extends Race
 
-  case object Drakes extends Race
+  //case object Drakes extends Race
 
-  case object Undead extends Race
+  case object Undead extends Race(50, 500)
 
-  case object Demons extends Race
+  //case object Demons extends Race
 
   class ProductFulfillmentRecord(prices: Map[Products.Product, Double], needs: Map[PopulationNeedsType, Map[Products.Product, Double]], products: Map[Product, Double]) {
 

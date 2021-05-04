@@ -48,11 +48,11 @@ object UnitsBalance {
     val field = new RandomTerrainGenerator(0, 0.05).generateMap(12, 12, Random.nextInt())
 
     val culture1 = cultureByWarriorType(wt1, wc)
-    val state1 = new State("1", culture1, 0, new PoliticalSystem(Party.absolute), new TechnologyLevel(0))
+    val state1 = new State("1", culture1, 0, Party.absolute, 0, new TechnologyLevel(0))
     val player1 = state1.toPlayer
 
     val culture2 = cultureByWarriorType(wt2, wc)
-    val state2 = new State("2", culture2, 0, new PoliticalSystem(Party.absolute), new TechnologyLevel(0))
+    val state2 = new State("2", culture2, 0, Party.absolute, 0, new TechnologyLevel(0))
     val player2 = state2.toPlayer
 
     val warrior1 = new Warrior(wt1, wc, culture1, state1)

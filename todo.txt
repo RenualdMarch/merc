@@ -11,6 +11,11 @@ totally rework AI diplomacy with new features
 
 Add kings and ministry
 
+Map generation scenarios:
+1) Random, as now
+2) One state per culture
+3) One province per state for culture
+
 
 Polishing
 rebalance political parties and views
@@ -35,7 +40,7 @@ chinese?
 
 Elves
 - deep elves \ Deep Elves ???
-- more dark elves \ Tharis ???
+- more dark elves \ Rashy - darkelves
 
 Orcs
 - more northern orcs \ _Northern Orcs

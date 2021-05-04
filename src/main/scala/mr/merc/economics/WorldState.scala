@@ -59,7 +59,7 @@ class WorldState(val regions: List[Province], var playerState: State, val worldH
     this.aiTurn(onlyAnswer = false)
   }
 
-  def seasonOfYear: SeasonOfYear = Seasons.date(turn)
+  def seasonOfYear: SeasonOfYear = SeasonOfYear.date(turn)
 
   def nextTurn(aiBattlesEnabled: Boolean): List[Battle] = {
     thisTurnBattles.clear()
@@ -511,7 +511,7 @@ trait WorldStateDiplomacyActions extends Logging {
     val stateName = if (name.isEmpty) {
       namesGenerators(culture).stateNames.extract()
     } else name
-    new State(stateName, culture, startingMoney, new PoliticalSystem(rulingParty), new TechnologyLevel(techLevel), color)
+    new State(stateName, culture, startingMoney, rulingParty, turn, new TechnologyLevel(techLevel), color)
   }
 
   def isPossibleMessage(message: DiplomaticMessage): Boolean = message.isPossible(diplomacyEngine, turn)

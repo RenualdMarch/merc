@@ -18,11 +18,11 @@ class PopulationTest extends FunSuite with Matchers {
     RegularNeeds -> Map(Grain -> 3.0, Coal -> 2.0),
     LuxuryNeeds -> Map(Liquor -> 3.0))
 
-  case object TestRace extends Race
+  case object TestRace extends Race(16, 100)
   object TestCulture extends Culture("test",TestRace, "testHouse", Color.Black) {
 
-    override val warriorViewNames: WarriorViewNames = null
-    override val cultureInfo: Culture.CultureInfo = null
+    override val warriorViewNames: WarriorViewNames = LatinHuman.warriorViewNames
+    override val cultureInfo: Culture.CultureInfo = LatinHuman.cultureInfo
 
     private val map: CornerPopulationNeeds = Map(Upper -> smallNeeds, Middle -> smallNeeds, Lower -> smallNeeds)
 
@@ -189,7 +189,7 @@ class PopulationTest extends FunSuite with Matchers {
     regionPopulation.pops.foreach(_.endOfDay())
     assert(pop.currentDayRecord.productFulfillment.needsFulfillment === Map(LifeNeeds -> 1, RegularNeeds -> 1, LuxuryNeeds -> 1))
 
-    val ppd = new PopulationMigrationInsideProvince(regionPopulation, new State("1", TestCulture, 0, new PoliticalSystem(Party.aristocratic)))
+    val ppd = new PopulationMigrationInsideProvince(regionPopulation, new State("1", TestCulture, 0, Party.aristocratic, 0))
     ppd.migrateInsideProvince()
     val traders = regionPopulation.pop(Traders, TestCulture)
     assert(traders.populationCount === 1000)
@@ -225,7 +225,7 @@ class PopulationTest extends FunSuite with Matchers {
     val absoluteRadicalParty = new Party("", Color.White,
       Migration.ClosedBorders, Regime.Absolute, ForeignPolicy.Expansionism,
       Economy.StateEconomy, SocialPolicy.NoSocialSecurity, VotersPolicy.NoVoting)
-    val state = new State("", TestCulture, 0, new PoliticalSystem(absoluteRadicalParty))
+    val state = new State("", TestCulture, 0, absoluteRadicalParty, 0)
 
     pop.politicalHappiness(state) shouldBe 1d
     pop2.politicalHappiness(state) shouldBe (1d - WorldConstants.Population.DifferentCulturePoliticalHappinessPenalty)
@@ -233,7 +233,7 @@ class PopulationTest extends FunSuite with Matchers {
     val radicallyDifferentParty = new Party("", Color.Black,
       Migration.OpenBorders, Regime.Democracy, ForeignPolicy.Pacifism,
       Economy.FreeMarket, SocialPolicy.RegularNeedsSocialSecurity, VotersPolicy.Everyone)
-    val differentState = new State("", TestCulture, 0, new PoliticalSystem(radicallyDifferentParty))
+    val differentState = new State("", TestCulture, 0, radicallyDifferentParty, 0)
 
     pop.politicalHappiness(differentState) shouldBe 0d
     pop2.politicalHappiness(differentState) shouldBe 0d

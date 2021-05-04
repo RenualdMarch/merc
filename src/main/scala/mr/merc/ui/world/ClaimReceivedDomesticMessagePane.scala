@@ -2,7 +2,7 @@ package mr.merc.ui.world
 
 import mr.merc.diplomacy.Claim
 import mr.merc.diplomacy.Claim.{StrongProvinceClaim, VassalizationClaim, WeakProvinceClaim}
-import mr.merc.economics.Seasons
+import mr.merc.economics.{SeasonOfYear, Seasons}
 import mr.merc.local.Localization
 import mr.merc.politics.State
 import org.tbee.javafx.scene.layout.MigPane
@@ -26,7 +26,7 @@ class ClaimReceivedDomesticMessagePane(receiver: State, claim: Claim) extends Mi
 
       add(new StateComponentColorName(province.owner))
       add(BigText(Localization("messages.claims.until")))
-      add(BigText(Seasons.date(until).localizedString))
+      add(BigText(SeasonOfYear.date(until).localizedString))
 
     case StrongProvinceClaim(state, province) =>
       if (state == receiver) {
@@ -48,6 +48,6 @@ class ClaimReceivedDomesticMessagePane(receiver: State, claim: Claim) extends Mi
       add(BigText(Localization("messages.claims.vassalizationClaim")))
       add(new StateComponentColorName(possibleVassal))
       add(BigText(Localization("messages.claims.until")))
-      add(BigText(Seasons.date(claimTurnEnd).localizedString))
+      add(BigText(SeasonOfYear.date(claimTurnEnd).localizedString))
   }
 }

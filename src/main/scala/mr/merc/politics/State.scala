@@ -1,18 +1,16 @@
 package mr.merc.politics
 
 import mr.merc.economics.Culture
-import mr.merc.economics.TaxPolicy._
 import mr.merc.economics._
 import mr.merc.economics.message.DomesticMailBox
 import mr.merc.local.Localization
-import mr.merc.map.hex.TerrainHex
 import mr.merc.players.Player
 import mr.merc.politics.IssuePosition.MinMax
 import mr.merc.technology.TechnologyLevel
 import scalafx.scene.paint.Color
 
-class State(val initialName: String, val primeCulture:Culture, startingMoney: Double,
-            val politicalSystem: PoliticalSystem, val technologyLevel: TechnologyLevel = new TechnologyLevel(0),
+class State(val initialName: String, val primeCulture:Culture, startingMoney: Double, startingRulingParty: Party,
+            creationTurn:Int, val technologyLevel: TechnologyLevel = new TechnologyLevel(0),
             val color: Color = Color.Black) {
   def name: String = {
     val governmentType = Localization(primeCulture.cultureInfo.stateForm.monarchy)
@@ -20,6 +18,8 @@ class State(val initialName: String, val primeCulture:Culture, startingMoney: Do
   }
 
   val mailBox:DomesticMailBox = new DomesticMailBox()
+
+  val politicalSystem = new PoliticalSystem(startingRulingParty, this, creationTurn)
 
   def rulingParty:Party = politicalSystem.rulingParty
 

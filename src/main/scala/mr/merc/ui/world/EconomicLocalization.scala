@@ -1,7 +1,7 @@
 package mr.merc.ui.world
 
 import mr.merc.army.{Warrior, WarriorCompetence, WarriorType}
-import mr.merc.army.WarriorCompetence.{Militia, Professional}
+import mr.merc.army.WarriorCompetence.{Militia, Professional, Ruler}
 import mr.merc.economics.Products.Ritual
 import mr.merc.economics._
 import mr.merc.local.Localization
@@ -69,6 +69,7 @@ object EconomicLocalization {
   def localizeWarriorCompetence(competence: WarriorCompetence): String = competence match {
     case Militia => Localization("army.militia")
     case Professional => Localization("army.professional")
+    case Ruler => Localization("army.ruler")
   }
 
   def localizeWarriorTypeInOneLine(competence: WarriorCompetence, warriorType: WarriorType): String = {

@@ -15,7 +15,7 @@ class RandomFactoryBuildingAITest extends FunSuite {
     import WorldConstants.Enterprises._
     val ai = new RandomFactoryBuildingAI()
     val state = new State("", LatinHuman, 0,
-      new PoliticalSystem(Party.absolute.copy(economy = StateEconomy)))
+      Party.absolute.copy(economy = StateEconomy), 0)
 
     val region = new EconomicRegion {
       override def owner: State = state

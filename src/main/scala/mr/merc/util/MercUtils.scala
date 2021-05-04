@@ -3,6 +3,7 @@ package mr.merc.util
 
 import scalafx.scene.paint.Color
 
+import java.util
 import scala.util.Random
 
 object MercUtils {
@@ -58,6 +59,38 @@ object MercUtils {
         ((x, y), sum)
       }.minBy(_._2)._1
     }
+  }
 
+  private val romanNumbersMap:util.TreeMap[Int, String] = {
+    val map = new util.TreeMap[Int, String]()
+
+    map.put(1000, "M")
+    map.put(900, "CM")
+    map.put(500, "D")
+    map.put(400, "CD")
+    map.put(100, "C")
+    map.put(90, "XC")
+    map.put(50, "L")
+    map.put(40, "XL")
+    map.put(10, "X")
+    map.put(9, "IX")
+    map.put(5, "V")
+    map.put(4, "IV")
+    map.put(1, "I")
+
+    map
+  }
+
+  implicit class ArabicToRoman[T](x: T)(implicit n:Numeric[T]) {
+
+    def toRomanString: String = {
+      val number = n.toInt(x)
+      val low = romanNumbersMap.floorKey(number)
+      if ( number == low) {
+        romanNumbersMap.get(number)
+      } else {
+        romanNumbersMap.get(low) + toRomanString(number - low)
+      }
+    }
   }
 }

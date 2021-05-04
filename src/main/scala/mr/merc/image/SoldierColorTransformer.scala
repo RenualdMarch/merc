@@ -73,7 +73,6 @@ object SoldierColorTransformer {
     }
     
 	def transformImage(input:Image, desiredColor:Color):Image = {
-	  val anotherPairs = buildColorPairs(desiredColor)
 	  val pairs = buildColorPairs(desiredColor).map{case (k, v) => (k.toArbg, v.toColor)}.toMap
 	  val width = input.width.value.toInt
 	  val height = input.height.value.toInt

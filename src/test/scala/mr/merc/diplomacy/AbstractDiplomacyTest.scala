@@ -2,8 +2,7 @@ package mr.merc.diplomacy
 
 import mr.merc.economics.Culture.{FrenchHuman, GermanHuman, LatinHuman}
 import mr.merc.economics._
-import mr.merc.map.hex.TerrainHex
-import mr.merc.map.terrain.{FourSeasonsTerrainTypes, GreenGrass}
+import mr.merc.map.terrain.FourSeasonsTerrainTypes
 import mr.merc.players.{ColorGenerator, NamesGenerator}
 import mr.merc.politics.{Party, Province, State}
 import org.scalatest.{BeforeAndAfter, FunSuite, Matchers}
@@ -45,7 +44,7 @@ class AbstractDiplomacyTest extends FunSuite with Matchers with BeforeAndAfter {
 
   def generateStates(): Set[State] = {
     (0 until statesCount).zip(cultures).map { case (n, c) =>
-      new State(n.toString, c, 1000, new PoliticalSystem(Party.absolute))
+      new State(n.toString, c, 1000, Party.absolute, 0)
     }.toSet
   }
 

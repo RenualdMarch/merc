@@ -1,6 +1,7 @@
 package mr.merc.economics
 
 import mr.merc.army.WarriorViewNames
+import mr.merc.economics.Culture.LatinHuman
 import scalafx.scene.paint.Color
 import mr.merc.economics.Population.{Capitalists, Humans}
 import mr.merc.economics.Products.{Coal, Grain, Product, Weapons}
@@ -10,8 +11,8 @@ import org.scalatest.FunSuite
 class BusinessProjectTest extends FunSuite {
 
   val culture = new Culture("test", Humans, "testHouse", Color.White) {
-    override val warriorViewNames: WarriorViewNames = null
-    override val cultureInfo: Culture.CultureInfo = null
+    override val warriorViewNames: WarriorViewNames = LatinHuman.warriorViewNames
+    override val cultureInfo: Culture.CultureInfo = LatinHuman.cultureInfo
   }
 
   test("business project flow") {
@@ -86,7 +87,7 @@ class BusinessProjectTest extends FunSuite {
   }
 
   test("state build factory") {
-    val state = new State("", culture, 1000, new PoliticalSystem(Party.absolute))
+    val state = new State("", culture, 1000, Party.absolute, 0)
     val region = new EconomicRegion {
       override def owner: State = state
 

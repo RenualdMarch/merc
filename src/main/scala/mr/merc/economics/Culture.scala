@@ -42,14 +42,15 @@ object Culture {
 
   // desertCity awful in winter - need to put it in desert
 
-  case class StateForm(monarchy: String, democracy: String)
+  case class StateForm(monarchy: String, democracy: String, monarchyTitle: String, democracyTitle: String)
 
-  case class CultureInfo(stateForm: StateForm, cities: List[String], states: List[String])
+  case class CultureInfo(stateForm: StateForm, cities: List[String], states: List[String],
+                         maleNames: List[String])
 
   case object LatinHuman extends Culture("latin", Humans, "humanCity", Color.Red) {
     val warriorViewNames: WarriorViewNames = WarriorViewNames.LatinCulture
 
-    val cultureInfo: CultureInfo = CultureInfo(StateForm("empire", "republic"),
+    val cultureInfo: CultureInfo = CultureInfo(StateForm("empire", "republic", "emperor", "consul"),
       List("Aarhusium",
         "Aemona",
         "Alexandria",
@@ -123,13 +124,23 @@ object Culture {
         "Gallic",
         "Iberian",
         "Latin",
-        "Lux"))
+        "Lux"),
+      List("Augustus",
+        "Tiberius",
+        "Caesar",
+        "Claudius",
+        "Marcus",
+        "Lucius",
+        "Antonius",
+        "Domitian",
+        "Valerian",
+        "Gordian"))
   }
 
   case object FrenchHuman extends Culture("french", Humans, "humanVillage", Color.Blue) {
     val warriorViewNames: WarriorViewNames = WarriorViewNames.WesnothCulture
 
-    val cultureInfo: CultureInfo = CultureInfo(StateForm("kingdom", "republic"),
+    val cultureInfo: CultureInfo = CultureInfo(StateForm("kingdom", "republic", "king", "president"),
       List("Argenroux",
         "Camiers",
         "Dornzis",
@@ -188,13 +199,19 @@ object Culture {
         "Lorraine",
         "Kuteron",
         "Aquitain",
-        "Burgundian"))
+        "Burgundian"),
+      List("Henry",
+        "Louis",
+        "Charles",
+        "Francis",
+        "John",
+        "Philip"))
   }
 
   case object DarkHuman extends Culture("nilf", Humans, "humanCottage", Color.Black) {
     val warriorViewNames: WarriorViewNames = WarriorViewNames.DarkHumanCulture
 
-    val cultureInfo: CultureInfo = CultureInfo(StateForm("empire", "republic"),
+    val cultureInfo: CultureInfo = CultureInfo(StateForm("empire", "republic", "emperor", "president"),
       List("Saalbirge",
         "Kufdorf",
         "Sherpstal",
@@ -244,13 +261,21 @@ object Culture {
         "Spuyrus",
         "Graosalian",
         "Echaitan",
-        "Ublanian"))
+        "Ublanian"),
+      List("Anahid",
+        "Ardal",
+        "Cahir",
+        "Declan",
+        "Ceallach",
+        "Emhyr",
+        "Havart"
+      ))
   }
 
   case object GreekHuman extends Culture("greek", Humans, "humanCity", Color.Gray) {
     val warriorViewNames: WarriorViewNames = WarriorViewNames.GreekDardoCulture
 
-    val cultureInfo: CultureInfo = CultureInfo(StateForm("kingdom", "republic"),
+    val cultureInfo: CultureInfo = CultureInfo(StateForm("kingdom", "republic", "king", "president"),
       List("Pergipolis",
         "Pithendos",
         "Gazegea",
@@ -292,18 +317,29 @@ object Culture {
         "Thermenia",
         "Lapithagra"),
       List("Spartan",
-        "Macedon",
+        "Macedonian",
         "Greek",
         "Beotian",
         "Trojan",
         "Achaean",
-        "Corinthian"))
+        "Corinthian"),
+      List("Alexander",
+        "Perdikkas",
+        "Philip",
+        "Pyrrhos",
+        "Antigonos",
+        "Lysimachos",
+        "Demetrios",
+        "Ptolemy",
+        "Antiochos",
+        "Mithridates"
+      ))
   }
 
   case object GermanHuman extends Culture("german", Humans, "humanVillage", Color.Yellow) {
     val warriorViewNames: WarriorViewNames = WarriorViewNames.ChevalierCulture
 
-    val cultureInfo: CultureInfo = CultureInfo(StateForm("empire", "republic"),
+    val cultureInfo: CultureInfo = CultureInfo(StateForm("empire", "republic", "emperor", "сhancellor"),
       List("Marchbach",
         "Klagensill",
         "Roesden",
@@ -364,13 +400,23 @@ object Culture {
         "Rhine",
         "Voralbergian",
         "German",
-        "Prussian"))
+        "Prussian"),
+      List("Wilhelm",
+        "Friedrich",
+        "Ferdinand",
+        "Eugene",
+        "Karl",
+        "Leopold",
+        "Joseph",
+        "Charles",
+        "Albert"
+      ))
   }
 
   case object SlavicHuman extends Culture("slavic", Humans, "humanHut", Color.Violet) {
     val warriorViewNames: WarriorViewNames = WarriorViewNames.WolfCulture
 
-    val cultureInfo: CultureInfo = CultureInfo(StateForm("principality", "republic"),
+    val cultureInfo: CultureInfo = CultureInfo(StateForm("principality", "republic", "prince", "president"),
       List("Asichow",
         "Stolya",
         "Ederenye",
@@ -415,13 +461,25 @@ object Culture {
         "Belarusian",
         "Galician",
         "Volhynian",
-        "Podolian"))
+        "Podolian"),
+      List("Oleg",
+        "Igor",
+        "Sviatoslav",
+        "Yaropolk",
+        "Vladimir",
+        "Yaroslav",
+        "Iziaslav",
+        "Vsevolod",
+        "Yuri",
+        "Rostislav",
+        "Mstislav"
+      ))
   }
 
   case object ArabHuman extends Culture("arab", Humans, "humanCottage", Color.Green) {
     override val warriorViewNames: WarriorViewNames = WarriorViewNames.ArabCulture
 
-    override val cultureInfo: CultureInfo = CultureInfo(StateForm("caliphate", "republic"),
+    override val cultureInfo: CultureInfo = CultureInfo(StateForm("caliphate", "republic", "caliph", "president"),
       List("Sivrikent",
         "Kagipinari",
         "Jirozeh",
@@ -472,6 +530,17 @@ object Culture {
         "Almohad",
         "Sokoto",
         "Ramazan",
+      ),
+      List(
+        "Abu Bakr",
+        "Umar",
+        "Ali",
+        "Hasan",
+        "Hussein",
+        "Abbas",
+        "Harun",
+        "Ahmad",
+        "Mahmud"
       )
     )
   }
@@ -479,7 +548,7 @@ object Culture {
   case object SpainHuman extends Culture("spanish", Humans, "humanHill", Color.Orange) {
     override val warriorViewNames: WarriorViewNames = WarriorViewNames.LuzCulture
 
-    override val cultureInfo: CultureInfo = CultureInfo(StateForm("kingdom", "republic"),
+    override val cultureInfo: CultureInfo = CultureInfo(StateForm("kingdom", "republic", "king", "president"),
       List("Panoschato",
         "Metakala",
         "Dralfeia",
@@ -527,13 +596,22 @@ object Culture {
         "Cuban",
         "Brazilian",
         "Mexican",
-        "Balearic"))
+        "Balearic"),
+      List(
+        "Felipe",
+        "Juan",
+        "Carlos",
+        "Alfonso",
+        "Fernando",
+        "Jose",
+        "Francisco"
+      ))
   }
 
   case object WoodElves extends Culture(name = "woodElves", Elves, "elvenHouse", Color.LightGreen) {
     override val warriorViewNames: WarriorViewNames = WarriorViewNames.WoodElvesCulture
 
-    override val cultureInfo: CultureInfo = CultureInfo(StateForm("lordship", "federation"),
+    override val cultureInfo: CultureInfo = CultureInfo(StateForm("lordship", "federation", "lord", "secretary"),
       List("Asyhe Belanore",
         "Alm Taesi",
         "Galma Serine",
@@ -571,13 +649,24 @@ object Culture {
         "Telerian",
         "Falmarian",
         "Sindarian",
-        "Nandorian"))
+        "Nandorian"),
+      List(
+        "Aenarion",
+        "Caledor",
+        "Tethlis",
+        "Aethis",
+        "Elrond",
+        "Thranduil",
+        "Celebrimbor",
+        "Beleriand",
+        "Aman"
+      ))
   }
 
   case object DesertElves extends Culture("desertElves", Elves, "elvenHouse", Color.LightYellow) {
     override val warriorViewNames: WarriorViewNames = WarriorViewNames.DesertElvesCulture
 
-    override val cultureInfo: CultureInfo = CultureInfo(StateForm("lordship", "federation"),
+    override val cultureInfo: CultureInfo = CultureInfo(StateForm("lordship", "federation", "lord", "secretary"),
       List(
         "Ellne Esari",
         "Mytren Themar",
@@ -618,14 +707,25 @@ object Culture {
         "Alorian",
         "Ormedoreian",
         "Ullholuman",
-        "Themarian"))
+        "Themarian"),
+      List(
+        "Aldon",
+        "Cirdan",
+        "Earendil",
+        "Elladan",
+        "Gildor",
+        "Haldir",
+        "Halafarin",
+        "Othorion"
+      )
+    )
   }
 
   case object WesnothOrcs extends Culture("orcs", Orcs, "orcCity", Color.DarkRed) {
 
     override val warriorViewNames: WarriorViewNames = WarriorViewNames.WesnothOrcCulture
 
-    override val cultureInfo: CultureInfo = CultureInfo(StateForm("horde", "confederation"),
+    override val cultureInfo: CultureInfo = CultureInfo(StateForm("horde", "confederation", "chief", "president"),
       List(
         "Ukh Murdrerd",
         "Ez Noccokh",
@@ -671,14 +771,24 @@ object Culture {
         "Shadowmoon",
         "Shattered Hand",
         "Stormreaver",
-        "Thunderlord"))
+        "Thunderlord"),
+      List("Supaugh",
+        "Fidgug",
+        "Uzul",
+        "Naguk",
+        "Sugha",
+        "Orgha",
+        "Karthurg",
+        "Vargan",
+        "Zulmthu",
+        "Sogugbu"))
   }
 
   case object LaticOrcs extends Culture("latinOrcs", Orcs, "orcCity", Color.Pink) {
 
     override val warriorViewNames: WarriorViewNames = WarriorViewNames.LatinOrcCulture
 
-    override val cultureInfo: CultureInfo = new CultureInfo(StateForm("empire", "republic"),
+    override val cultureInfo: CultureInfo = CultureInfo(StateForm("empire", "republic", "emperor", "consul"),
       List(
         "Iz Zredka",
         "Bhord Mudzard",
@@ -722,13 +832,25 @@ object Culture {
         "Chirgoldrur",
         "Zrugrogh Zral",
         "Grubrerd Dodh"
+      ),
+      List(
+        "Zaghig",
+        "Umug",
+        "Kabugbu",
+        "Shagol",
+        "Magdud",
+        "Narhbub",
+        "Jregh",
+        "Jokgagu",
+        "Rugdumph",
+        "Toghat"
       )
     )
   }
 
   case object WesnothDwarfes extends Culture("dwarfs", Dwarfs, "dwarfCity", Color.White) {
     override val warriorViewNames: WarriorViewNames = WarriorViewNames.WesnothDwarfCulture
-    override val cultureInfo: CultureInfo = CultureInfo(StateForm("clan", "confederation"),
+    override val cultureInfo: CultureInfo = CultureInfo(StateForm("clan", "confederation", "chieftain", "сhancellor"),
       List(
         "Bag Thurum",
         "Khorn Boldihr",
@@ -770,12 +892,25 @@ object Culture {
         "Khaz Modan",
         "Wildhammer",
         "Grim Batol"
+      ),
+      List(
+        "Salmumin",
+        "Brafraeg",
+        "Dunan",
+        "Bamur",
+        "Balor",
+        "Dwokhumlin",
+        "Malgon",
+        "Glorgan",
+        "Dilur",
+        "Ralvol",
+        "Dranan",
       ))
   }
 
   case object WesnothUndead extends Culture("undead", Undead, "caveCity", Color.Brown) {
     override val warriorViewNames: WarriorViewNames = WarriorViewNames.WesnothUndeadCulture
-    override val cultureInfo: CultureInfo = CultureInfo(StateForm("hegemony", "union"),
+    override val cultureInfo: CultureInfo = CultureInfo(StateForm("hegemony", "union", "magus", "secretary"),
       List(
         "Tugrad",
         "Juchuth",
@@ -819,12 +954,24 @@ object Culture {
         "Zoud Jexrarian",
         "Khiszis Kurian",
         "Toxruss Gourian"
+      ),
+      List(
+        "Pheex'zis",
+        "Czauk'shux",
+        "Xhuxeak",
+        "Jog'voq",
+        "Dhuarrel",
+        "Ath'gez",
+        "Pit'qoucic",
+        "Uc'zurad",
+        "Bod'zulas",
+        "Bamzugruq",
       ))
   }
 
   case object DarkElves extends Culture("darkElves", Elves, "elvenHouse", Color.DarkGray) {
     override val warriorViewNames: WarriorViewNames = WarriorViewNames.DarkElvesCulture
-    override val cultureInfo: CultureInfo = CultureInfo(StateForm("dynasty", "confederation"),
+    override val cultureInfo: CultureInfo = CultureInfo(StateForm("dynasty", "confederation", "patriarch", "secretary"),
       List(
         "Omyne Elunore",
         "Irha Shaeras",
@@ -865,6 +1012,18 @@ object Culture {
         "Xhorhas",
         "Urzin",
         "Dranas"
+      ),
+      List(
+        "Сukliorn",
+        "Ciknimi",
+        "Brakril",
+        "Giomodh",
+        "Chepasce",
+        "Ghumnal",
+        "Imnuro",
+        "Bhelushru",
+        "Grevrael",
+        "Dhanicsu",
       )
     )
   }
@@ -928,4 +1087,7 @@ abstract class Culture(val name: String, val race: Race, val houseStyle: String,
   val warriorViewNames: WarriorViewNames
 
   val cultureInfo: CultureInfo
+
+  import mr.merc.util.MercUtils._
+  def randomMaleName: String = cultureInfo.maleNames.randomElement()
 }

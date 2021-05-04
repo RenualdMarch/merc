@@ -11,7 +11,7 @@ import mr.merc.util.CacheFactoryMap
 import mr.merc.economics.MapUtil.FloatOperations._
 import WorldConstants.Army._
 import mr.merc.army.Warrior.WarriorNeedRecord
-import mr.merc.army.WarriorCompetence.{Militia, Professional}
+import mr.merc.army.WarriorCompetence.{Militia, Professional, Ruler}
 import scalafx.scene.image.Image
 
 object Warrior {
@@ -42,6 +42,7 @@ class Warrior(val warriorType: WarriorType, val competence: WarriorCompetence, v
   def warriorWeight: Double = competence match {
     case Militia => 1
     case Professional => 2
+    case Ruler => 3
   }
 
   def isAlive: Boolean = soldier.hp > 0

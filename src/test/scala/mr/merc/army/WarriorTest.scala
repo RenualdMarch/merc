@@ -1,6 +1,6 @@
 package mr.merc.army
 
-import mr.merc.army.WarriorCompetence.Professional
+import mr.merc.army.WarriorCompetence.{Professional, Ruler}
 import mr.merc.economics.Culture.{CultureInfo, StateForm}
 import mr.merc.economics.{Culture, FulfilledDemandRequest, PoliticalSystem, WarriorDemandRequest}
 import mr.merc.economics.Population.Humans
@@ -31,12 +31,13 @@ class WarriorTest extends FunSuite with Matchers {
   }
 
   val culture = new Culture("testCulture", Humans, "houseStyle", Color.White){
-    override val warriorViewNames: WarriorViewNames = WarriorViewNames(Map((warriorType, Professional) -> "testType1"))
-    override val cultureInfo: Culture.CultureInfo = CultureInfo(StateForm("a", "b"), Nil, Nil)
+    override val warriorViewNames: WarriorViewNames = WarriorViewNames(Map(
+      (warriorType, Professional) -> "testType1", (warriorType, Ruler) -> "testType1"))
+    override val cultureInfo: Culture.CultureInfo = CultureInfo(StateForm("a", "b", "c", "d"), Nil, Nil, List("nameA"))
   }
 
   test("happy flow and healing") {
-    val state = new State("testState", culture, 100000, new PoliticalSystem(Party.absolute))
+    val state = new State("testState", culture, 100000, Party.absolute, 0)
 
     val w = new Warrior(warriorType, Professional, culture, state)
     w.hpPercentage shouldBe 1.0d +- 0.00001
@@ -62,7 +63,7 @@ class WarriorTest extends FunSuite with Matchers {
   }
 
   test("damage") {
-    val state = new State("testState", culture, 100000, new PoliticalSystem(Party.absolute))
+    val state = new State("testState", culture, 100000, Party.absolute, 0)
 
     val w = new Warrior(warriorType, Professional, culture, state)
 

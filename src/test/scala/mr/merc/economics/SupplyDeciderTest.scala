@@ -6,7 +6,7 @@ import org.scalatest.FunSuite
 
 class SupplyDeciderTest extends FunSuite{
 
-  val country: State = new State("", FrenchHuman, 0, new PoliticalSystem(Party.absolute))
+  val country: State = new State("", FrenchHuman, 0, Party.absolute, 0)
   country.taxPolicy.set(TaxPolicy.zeroTaxes.taxPolicyValues)
   country.budget.refreshTaxPolicy()
 

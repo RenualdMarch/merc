@@ -11,10 +11,10 @@ import FourSeasonsTerrainTypes._
 
 class MovementAndBattlesResolverTest extends FunSuite with Matchers {
 
-  val state1:State = new State("1", Culture.LatinHuman, 0, new PoliticalSystem(Party.absolute))
-  val state2:State = new State("2", Culture.LatinHuman, 0, new PoliticalSystem(Party.absolute))
-  val state3:State = new State("3", Culture.LatinHuman, 0, new PoliticalSystem(Party.absolute))
-  val state4:State = new State("4", Culture.LatinHuman, 0, new PoliticalSystem(Party.absolute))
+  val state1:State = new State("1", Culture.LatinHuman, 0, Party.absolute, 0)
+  val state2:State = new State("2", Culture.LatinHuman, 0, Party.absolute, 0)
+  val state3:State = new State("3", Culture.LatinHuman, 0, Party.absolute, 0)
+  val state4:State = new State("4", Culture.LatinHuman, 0, Party.absolute, 0)
 
   var province1:Province = _
   var province2:Province = _

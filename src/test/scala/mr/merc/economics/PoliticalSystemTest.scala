@@ -1,16 +1,18 @@
 package mr.merc.economics
 
-import mr.merc.politics.{Party, PopulationElectionReport, RegionElectionReport, StateElectionReport}
+import mr.merc.politics.{Party, PopulationElectionReport, RegionElectionReport, State, StateElectionReport}
 import org.scalatest.FunSuite
 import Party._
 
 class PoliticalSystemTest extends FunSuite {
 
+  private val state = new State("", Culture.LatinHuman, 0, Party.absolute, 0)
+
   private def electionResults(map:Map[Party, Double]) = StateElectionReport(List(RegionElectionReport(null,
     List(PopulationElectionReport(null, map)))))
 
   test("findCoalition") {
-    val politicalSystem = new PoliticalSystem(conservative)
+    val politicalSystem = new PoliticalSystem(conservative, state, 0)
     val coalition1 = politicalSystem.findCoalition(Map(aristocratic -> 0.51, benevolent -> 0.4, capitalistic -> 0.09))
     assert(coalition1 === Set(aristocratic))
 
@@ -19,7 +21,7 @@ class PoliticalSystemTest extends FunSuite {
   }
 
   test("applyElectionResults") {
-    val politicalSystem = new PoliticalSystem(conservative)
+    val politicalSystem = new PoliticalSystem(conservative, state, 0)
     politicalSystem.applyElectionResults(electionResults(Map(
         manufactorers -> 300,
         capitalistic -> 400,
@@ -32,13 +34,13 @@ class PoliticalSystemTest extends FunSuite {
   }
 
   test("changeAbsoluteRulingParty") {
-    val politicalSystem = new PoliticalSystem(absolute)
+    val politicalSystem = new PoliticalSystem(absolute, state, 0)
     politicalSystem.changeAbsoluteRulingParty(benevolent)
     assert(politicalSystem.rulingParty === benevolent)
     assert(politicalSystem.parliament === None)
 
     intercept[RuntimeException] {
-      val ps2 = new PoliticalSystem(conservative)
+      val ps2 = new PoliticalSystem(conservative, state, 0)
       ps2.changeAbsoluteRulingParty(benevolent)
     }
 
@@ -48,19 +50,19 @@ class PoliticalSystemTest extends FunSuite {
   }
 
   test("usurpPower to absolute") {
-    val politicalSystem = new PoliticalSystem(capitalistic)
+    val politicalSystem = new PoliticalSystem(capitalistic, state, 0)
     politicalSystem.usurpPower(benevolent)
     assert(politicalSystem.parliament === None)
     assert(politicalSystem.rulingParty === benevolent)
 
-    val ps2 = new PoliticalSystem(capitalistic)
+    val ps2 = new PoliticalSystem(capitalistic, state, 0)
     intercept[RuntimeException] {
       ps2.usurpPower(magocratic)
     }
   }
 
   test("usurpPower to constitutional") {
-    val politicalSystem = new PoliticalSystem(conservative)
+    val politicalSystem = new PoliticalSystem(conservative, state, 0)
     politicalSystem.usurpPower(magocratic)
     assert(politicalSystem.parliament.isDefined === true)
     assert(politicalSystem.parliament.get.coalition === Set(magocratic))
@@ -69,13 +71,13 @@ class PoliticalSystemTest extends FunSuite {
 
 
     intercept[RuntimeException] {
-      val ps2 = new PoliticalSystem(conservative)
+      val ps2 = new PoliticalSystem(conservative, state, 0)
       ps2.usurpPower(absolute)
     }
   }
 
   test("giveUpPower to constitutional") {
-    val politicalSystem = new PoliticalSystem(benevolent)
+    val politicalSystem = new PoliticalSystem(benevolent, state, 0)
     politicalSystem.giveUpPower(magocratic, 2)
     assert(politicalSystem.parliament.isDefined === true)
     assert(politicalSystem.parliament.get.coalition === Set(magocratic))
@@ -83,14 +85,14 @@ class PoliticalSystemTest extends FunSuite {
     assert(politicalSystem.rulingParty === magocratic)
 
     intercept[RuntimeException] {
-      val ps2 = new PoliticalSystem(benevolent)
+      val ps2 = new PoliticalSystem(benevolent, state, 0)
       ps2.giveUpPower(conservative, 2)
     }
 
   }
 
   test("giveUpPower to democracy") {
-    val politicalSystem = new PoliticalSystem(magocratic)
+    val politicalSystem = new PoliticalSystem(magocratic, state, 0)
     politicalSystem.giveUpPower(conservative, 2)
     assert(politicalSystem.parliament.isDefined === true)
     assert(politicalSystem.parliament.get.coalition === Set(conservative))
@@ -98,17 +100,17 @@ class PoliticalSystemTest extends FunSuite {
     assert(politicalSystem.rulingParty === conservative)
 
     intercept[RuntimeException] {
-      val ps2 = new PoliticalSystem(magocratic)
+      val ps2 = new PoliticalSystem(magocratic, state, 0)
       ps2.giveUpPower(benevolent,2)
     }
   }
 
   test("new political system") {
-    val ps = new PoliticalSystem(absolute)
+    val ps = new PoliticalSystem(absolute, state, 0)
     assert(ps.parliament === None)
     assert(ps.rulingParty === absolute)
 
-    val ps2 = new PoliticalSystem(magocratic)
+    val ps2 = new PoliticalSystem(magocratic, state, 0)
     assert(ps2.parliament === Some(ParliamentParties(Map(magocratic -> 1d), Set(magocratic))))
   }
 }

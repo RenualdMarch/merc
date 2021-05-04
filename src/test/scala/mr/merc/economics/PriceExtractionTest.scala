@@ -8,7 +8,7 @@ import org.scalatest.{BeforeAndAfter, FunSuite, Matchers}
 
 class PriceExtractionTest extends FunSuite with BeforeAndAfter with Matchers {
 
-  val state = new State("", FrenchHuman, 0, new PoliticalSystem(Party.absolute))
+  val state = new State("", FrenchHuman, 0, Party.absolute, 0)
   state.taxPolicy.set(Map(SalesTax -> 0.5, TransitTax -> 0.1, TariffTax -> 0.2))
   state.budget.refreshTaxPolicy()
 
