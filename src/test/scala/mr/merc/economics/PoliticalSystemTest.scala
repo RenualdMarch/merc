@@ -26,7 +26,7 @@ class PoliticalSystemTest extends FunSuite {
         manufactorers -> 300,
         capitalistic -> 400,
         theocratic -> 300
-      )))
+      )), 0)
     assert(politicalSystem.rulingParty === capitalistic)
     assert(politicalSystem.parliament === Some(ParliamentParties(Map(
       manufactorers -> 0.3, capitalistic -> 0.4, theocratic -> 0.3),
@@ -51,19 +51,19 @@ class PoliticalSystemTest extends FunSuite {
 
   test("usurpPower to absolute") {
     val politicalSystem = new PoliticalSystem(capitalistic, state, 0)
-    politicalSystem.usurpPower(benevolent)
+    politicalSystem.usurpPower(benevolent, 0)
     assert(politicalSystem.parliament === None)
     assert(politicalSystem.rulingParty === benevolent)
 
     val ps2 = new PoliticalSystem(capitalistic, state, 0)
     intercept[RuntimeException] {
-      ps2.usurpPower(magocratic)
+      ps2.usurpPower(magocratic, 0)
     }
   }
 
   test("usurpPower to constitutional") {
     val politicalSystem = new PoliticalSystem(conservative, state, 0)
-    politicalSystem.usurpPower(magocratic)
+    politicalSystem.usurpPower(magocratic, 0)
     assert(politicalSystem.parliament.isDefined === true)
     assert(politicalSystem.parliament.get.coalition === Set(magocratic))
     assert(politicalSystem.parliament.get.parties(magocratic) > 0.5)
@@ -72,7 +72,7 @@ class PoliticalSystemTest extends FunSuite {
 
     intercept[RuntimeException] {
       val ps2 = new PoliticalSystem(conservative, state, 0)
-      ps2.usurpPower(absolute)
+      ps2.usurpPower(absolute, 0)
     }
   }
 

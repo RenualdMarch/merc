@@ -52,7 +52,7 @@ class MailTitles(playerState:State, actions: WorldStateDiplomacyActions) extends
       }
     }
     cellValueFactory = p => p.value match {
-      case Right(dm) => ObjectProperty(BigText(dm.from))
+      case Right(dm) => ObjectProperty(BigText(dm.from.jobTitle))
       case Left(dm) =>
         val node:Node = new StateComponentColorName(dm.from)
         ObjectProperty(node)
@@ -105,8 +105,6 @@ class MailView(actions: WorldStateDiplomacyActions, playerState:State, selectedM
   prop.onChange {
     center = prop.value
   }
-
-
 }
 
 class MessageViewParent(message:DiplomaticMessage) extends BorderPane {

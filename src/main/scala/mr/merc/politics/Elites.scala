@@ -71,9 +71,11 @@ class Elites(state: State, turn: Int, startingRulingParty: Party) {
   }
 
   private def replaceRuler(turn: Int): Unit = {
-    val rulingTime = RulingTime(SeasonOfYear.date(currentRulerStart), SeasonOfYear.date(turn - 1), currentRuler)
-    prevRulers ::= rulingTime
-    currentRulerStart = turn
+    if (currentRulerStart != turn) {
+      val rulingTime = RulingTime(SeasonOfYear.date(currentRulerStart), SeasonOfYear.date(turn - 1), currentRuler)
+      prevRulers ::= rulingTime
+      currentRulerStart = turn
+    }
     currentRuler = newRuler(turn)
   }
 
@@ -92,7 +94,7 @@ class Elites(state: State, turn: Int, startingRulingParty: Party) {
     val (born, death) = Person.generateBirthAndDeath(turn, culture.race)
     val (wt, wc) = culture.warriorViewNames.possibleRulers.keys.randomElement()
     val name = culture.randomMaleName
-    new Monarch(name, monarchNumber(name), state, wt, wc, born, death)
+    new Monarch(name, monarchNumber(name), state, culture.race.randomAgressiveness, wt, wc, born, death)
   }
 
   private def newPresident(turn: Int): President = {
@@ -100,7 +102,7 @@ class Elites(state: State, turn: Int, startingRulingParty: Party) {
     val (born, death) = Person.generateBirthAndDeath(turn, culture.race)
     val (wt, wc) = culture.warriorViewNames.possibleRulers.keys.randomElement()
 
-    new President(culture.randomMaleName, state, wt, wc, born, death)
+    new President(culture.randomMaleName, state, culture.race.randomAgressiveness, wt, wc, born, death)
   }
 
   private def newOfficial(jobTitle: String, turn: Int): Official = {

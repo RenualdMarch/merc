@@ -841,7 +841,7 @@
             <pain sound="horsePain"/>
         </sounds>
     </view>
-    <view name="HumanWesnoth-GrandMarhsal">
+    <view name="HumanWesnoth-GrandMarshal">
         <attack1 imageName="greatsword-human">
             <image name="marshal-attack-sword1"/>
             <image name="marshal-attack-sword2"/>
@@ -2752,7 +2752,7 @@
             <image name="rider-melee-2"/>
         </attack1>
         <defence>
-            <image name="rider-defend2"/>
+            <image name="rider-defend"/>
         </defence>
         <move>
             <image name="rider-moving"/>
@@ -3299,7 +3299,7 @@
             <image name="sovereign-attack-5"/>
         </attack1>
         <stand>
-            <image name="orc-sovereign"/>
+            <image name="sovereign"/>
         </stand>
         <defence>
             <image name="sovereign-defend-1"/>

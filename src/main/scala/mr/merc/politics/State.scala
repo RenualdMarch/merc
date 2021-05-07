@@ -23,6 +23,8 @@ class State(val initialName: String, val primeCulture:Culture, startingMoney: Do
 
   def rulingParty:Party = politicalSystem.rulingParty
 
+  def elites: Elites = politicalSystem.elites
+
   final val taxPolicy: TaxPolicy = {
     val policy = rulingParty.economy
     policy.minTaxPolicy

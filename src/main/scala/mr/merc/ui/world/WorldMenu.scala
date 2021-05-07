@@ -76,11 +76,11 @@ class WorldMenu(parent: WorldFrame) extends MenuBar {
   )
   viewMenu.items.addAll(hideMinimap)
 
-  this.lookupAll(".menu-item").asScala.foreach {n =>
+  this.lookupAll(".menu-item").foreach {n =>
     n.setStyle(s"-fx-font-size: ${Components.largeFontSize};")
   }
 
-  this.lookupAll(".menu-bar").asScala.foreach {n =>
+  this.lookupAll(".menu-bar").foreach {n =>
     n.setStyle(s"-fx-font-size: ${Components.largeFontSize};")
   }
 }

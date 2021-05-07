@@ -422,7 +422,7 @@ class HistoricalEnterpriseRecords(e: Enterprise, p:Province, stage: Stage) exten
       chart.legendVisible = true
       chart.getData.addAll(produced, sold)
 
-      chart.lookupAll(".chart-line-symbol").asScala.foreach { s =>
+      chart.lookupAll(".chart-line-symbol").foreach { s =>
         val dataNumber = s.getStyleClass.find(_.startsWith("data")).get.replace("data", "").toInt + first.turn
         s.onMouseClicked = _ => showProductionDialog(e, dataNumber)
       }

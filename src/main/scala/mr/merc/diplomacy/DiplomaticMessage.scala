@@ -273,12 +273,12 @@ object DiplomaticMessage {
         case lc:LiberateCulture => if (lc.culture != from.primeCulture) {
           diplomacy.increaseBadBoy(from, NoCasusBelliWarBadBoy)
         }
-        case cs:CrackState => if (!diplomacy.hasClaimOverState(from, to)) {
+        case cs:CrackState => if (!diplomacy.hasVassalizationClaimOverState(from, to)) {
           diplomacy.increaseBadBoy(from, NoCasusBelliWarBadBoy)
         }
         case _:TakeMoney => diplomacy.increaseBadBoy(from, NoCasusBelliWarBadBoy)
 
-        case v:Vassalize => if (!diplomacy.hasClaimOverState(from, to)) {
+        case v:Vassalize => if (!diplomacy.hasVassalizationClaimOverState(from, to)) {
           diplomacy.increaseBadBoy(from, NoCasusBelliWarBadBoy)
         }
       }

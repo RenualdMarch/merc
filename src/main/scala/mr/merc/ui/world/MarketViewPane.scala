@@ -124,7 +124,7 @@ class ProductDetailPane(productsInfo: ProductsInfo, province: Province, stage: S
       lineChart.legendVisible = false
       lineChart.getData.add(series)
 
-      lineChart.lookupAll(".chart-line-symbol").asScala.foreach { s =>
+      lineChart.lookupAll(".chart-line-symbol").foreach { s =>
         val dataNumber = s.getStyleClass.find(_.startsWith("data")).get.replace("data", "").toInt + first.turn
         s.onMouseClicked = _ => showSupplyDemandDialog(productsInfo.history(dataNumber - 1), province)
       }
@@ -161,7 +161,7 @@ class ProductDetailPane(productsInfo: ProductsInfo, province: Province, stage: S
 
       chart.getData.addAll(demandSeries, supplySeries)
 
-      chart.lookupAll(".chart-area-symbol").asScala.foreach {s =>
+      chart.lookupAll(".chart-area-symbol").foreach {s =>
         val dataNumber = s.getStyleClass.find(_.startsWith("data")).get.replace("data", "").toInt + first.turn
         s.onMouseClicked = _ => showSupplyDemandDialog(productsInfo.history(dataNumber - 1), province)
       }

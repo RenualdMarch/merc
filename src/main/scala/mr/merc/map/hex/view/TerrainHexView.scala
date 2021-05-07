@@ -1,12 +1,10 @@
 package mr.merc.map.hex.view
 
-import javafx.scene.text.TextAlignment
 import scalafx.scene.canvas.GraphicsContext
 import mr.merc.image.MImage
-import mr.merc.map.terrain._
 import mr.merc.map.hex._
 import scalafx.scene.paint.Color
-import scalafx.scene.text.{Font, FontPosture, FontSmoothingType, FontWeight}
+import scalafx.scene.text.{Font, FontPosture, FontSmoothingType, FontWeight, TextAlignment}
 import scalafx.scene.image.Image
 import mr.merc.ui.common.ImageHelper._
 import mr.merc.unit.SoldierDefence
@@ -247,7 +245,7 @@ class TerrainHexView(val hex: TerrainHex, field: TerrainHexField, fieldView: Ter
         gc.stroke = Color.White
         gc.font = Font.apply(Font.default.family, FontWeight.Bold, Components.largeFontSize * 2)
         gc.textBaseline = VPos.Center
-        gc.textAlign = TextAlignment.CENTER
+        gc.textAlign = TextAlignment.Center
         gc.fill = Color.Black
         gc.setFontSmoothingType(FontSmoothingType.Gray)
         gc.fillText(province.name, this.x + xOffset + side / 2, this.y + yOffset + side)

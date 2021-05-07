@@ -1,15 +1,18 @@
 requirement failed: Buying and selling differ
 
+peaceful neighbours bug
+state hates itself(because of claims?)
+racial hatred - give alignment to cultures
 friendship treaty - prevents creating claims and declaring wars, but can join wars with allies
 friendship treaty - drops all claims
 drop claim button
 after vassalization claims against overlord are dropped
 alliance claims against each other are dropped and not created any more
 ask allies to join your war
+add rulers to map
+add parliament to government pane on diplomacy pane
 
 totally rework AI diplomacy with new features
-
-Add kings and ministry
 
 Map generation scenarios:
 1) Random, as now

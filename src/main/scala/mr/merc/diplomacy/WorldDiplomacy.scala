@@ -135,11 +135,11 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
         val claim = WeakProvinceClaim(p.owner, neig, claimEnd)
         val added = claimsHolder.safelyAddClaim(claim)
         if (added) {
-          p.owner.mailBox.addMessage(new InformationDomesticMessage(Localization("battleReport.sender"), Localization("messages.claims.title")) {
+          p.owner.mailBox.addMessage(new InformationDomesticMessage(p.owner.elites.foreignMinister, Localization("messages.claims.title")) {
             override def body: Region = new ClaimReceivedDomesticMessagePane(p.owner, claim)
           })
 
-          claim.province.owner.mailBox.addMessage(new InformationDomesticMessage(Localization("battleReport.sender"), Localization("messages.claims.title")) {
+          claim.province.owner.mailBox.addMessage(new InformationDomesticMessage(claim.province.owner.elites.foreignMinister, Localization("messages.claims.title")) {
             override def body: Region = new ClaimReceivedDomesticMessagePane(claim.province.owner, claim)
           })
         }
@@ -155,7 +155,7 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
         val claim = WeakProvinceClaim(p.owner, p, claimEnd)
         val added = claimsHolder.safelyAddClaim(claim)
         if (added) {
-          p.owner.mailBox.addMessage(new InformationDomesticMessage(Localization("battleReport.sender"), Localization("messages.claims.title")) {
+          p.owner.mailBox.addMessage(new InformationDomesticMessage(p.owner.elites.foreignMinister, Localization("messages.claims.title")) {
             override def body: Region = new ClaimReceivedDomesticMessagePane(p.owner, claim)
           })
         }
@@ -170,7 +170,7 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
       if (wc.claimTurnEnd == currentTurn + 1) {
         val claim = StrongProvinceClaim(wc.state, wc.province)
         claimsHolder.safelyAddClaim(claim)
-        wc.state.mailBox.addMessage(new InformationDomesticMessage(Localization("battleReport.sender"), Localization("messages.claims.title")) {
+        wc.state.mailBox.addMessage(new InformationDomesticMessage(wc.state.elites.foreignMinister, Localization("messages.claims.title")) {
           override def body: Region = new ClaimReceivedDomesticMessagePane(wc.state, claim)
         })
       }
@@ -184,11 +184,11 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
     }.toSet.contains(province)
   }
 
-  def hasClaimOverState(state: State, targetState: State): Boolean = {
+  def hasVassalizationClaimOverState(state: State, targetState: State): Boolean = {
     val set = claims(state).collect {
       case v: VassalizationClaim => v.targetState
     }.toSet
-    set.contains(targetState) || actions.regions.filter(_.owner == targetState).forall(p => hasClaimOverProvince(state, p))
+    set.contains(targetState)
   }
 
   def addEvent(event: RelationshipEvent): Unit = {
@@ -367,19 +367,19 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
     events.filter(e => e.fromState == from && e.toState == to)
 
   def claimsBonuses(from: State): List[RelationshipBonus] = {
-    claimsHolder.claims.filter(s => s.state == from || s.targetState == from).flatMap {
+    claimsHolder.claims.filter(s => (s.state == from || s.targetState == from) && (s.state != s.targetState)).map {
+      case vc: VassalizationClaim if vc.possibleVassal == from =>
+        RelationshipBonus(vc.possibleVassal, vc.state, VassalizationClaimsOnUsRelationshipChange,
+          Localization("diplomacy.hasVassalizationClaim", vc.state.name, vc.possibleVassal.name))
       case vc: VassalizationClaim =>
-        List(
-          RelationshipBonus(vc.state, vc.possibleVassal, VassalizationClaimsOnThemRelationshipChange,
-            Localization("diplomacy.hasVassalizationClaim", vc.state, vc.possibleVassal)),
-          RelationshipBonus(vc.possibleVassal, vc.state, VassalizationClaimsOnUsRelationshipChange,
-            Localization("diplomacy.hasVassalizationClaim", vc.state, vc.possibleVassal)))
+        RelationshipBonus(vc.state, vc.possibleVassal, VassalizationClaimsOnThemRelationshipChange,
+          Localization("diplomacy.hasVassalizationClaim", vc.state.name, vc.possibleVassal.name))
+      case str: ProvinceClaim if str.state == from =>
+        RelationshipBonus(str.state, str.targetState, ClaimsOnThemRelationshipChange,
+          Localization("diplomacy.hasClaim", str.state.name, str.province.name, str.targetState.name))
       case str: ProvinceClaim =>
-        List(
-          RelationshipBonus(str.state, str.province.owner, ClaimsOnUsRelationshipChange,
-            Localization("diplomacy.hasClaim", str.state.name, str.province.name, str.province.owner)),
-          RelationshipBonus(str.state, str.state, ClaimsOnThemRelationshipChange,
-            Localization("diplomacy.hasClaim", str.state.name, str.province.name, str.province.owner)))
+        RelationshipBonus(str.targetState, str.state, ClaimsOnUsRelationshipChange,
+          Localization("diplomacy.hasClaim", str.state.name, str.province.name, str.targetState.name))
     }.toList
   }
 
@@ -419,8 +419,8 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
       p.neighbours.map(_.owner)
     }.toSet - state
 
-    neighbours.filter { n =>
-      !hasClaimOverState(state, n) && !hasClaimOverState(n, state)
+    neighbours.filterNot { n =>
+      claimsHolder.claims.exists(c => Set(c.targetState, c.state) == Set(state, n))
     }.map { n =>
       RelationshipBonus(state, n, NeighboursWithoutClaimsRelationshipBonus,
         Localization("diplomacy.neigsAtPeace", state.name, n.name))
@@ -524,7 +524,7 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
         }
         Nil
       case cs: CrackState =>
-        if (!hasClaimOverState(cs.demander, cs.giver)) {
+        if (!hasVassalizationClaimOverState(cs.demander, cs.giver)) {
           increaseBadBoy(cs.demander, CrackedStateBadBoy)
         }
         val provinces = if (cs.partiallyApplied) {
@@ -546,7 +546,7 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
         tm.demander.budget.receiveMoneyFromReparations(money)
         Nil
       case v: Vassalize =>
-        if (!hasClaimOverState(v.demander, v.giver)) {
+        if (!hasVassalizationClaimOverState(v.demander, v.giver)) {
           increaseBadBoy(v.demander, VassalizedStateBadBoy)
         }
         List(new VassalAgreement(v.demander, v.giver, currentTurn))

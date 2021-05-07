@@ -12,6 +12,7 @@ import mr.merc.diplomacy.DiplomaticMessage._
 import mr.merc.economics.WorldStateDiplomacyActions.StateInfo
 import mr.merc.local.Localization
 import mr.merc.ui.dialog.ModalDialog
+import mr.merc.ui.world.ParliamentPie.pieByVotes
 import scalafx.scene.control._
 import scalafx.scene.layout.{BorderPane, Pane, Region}
 import scalafx.Includes._
@@ -200,7 +201,13 @@ class StateDiplomacyPane(currentState: State, selectedStateInfo: StateInfo, acti
     content = new StateRelationsToOtherStatesPane(selectedState, actions)
   }
 
-  tabPane.tabs.addAll(relationsTab, actionsPane, claimsPane, allRelations)
+  val leaders = new Tab {
+    text = Localization("elites")
+    style = Components.largeFontStyle
+    content = new ElitesPane(selectedState, actions.turn)
+  }
+
+  tabPane.tabs.addAll(relationsTab, actionsPane, claimsPane, allRelations, leaders)
   add(BigText(selectedState.name), "wrap")
   add(tabPane, "grow, push")
 }
@@ -1015,4 +1022,16 @@ class AllWarsPane(stage: Stage, actions:WorldStateDiplomacyActions) extends Scro
       add(new WarPane(stage, war, actions), "wrap, push, grow")
     }
   }
+}
+
+class ElitesPane(state: State, turn: Int) extends MigPane("") {
+  add(new HeadOfStatePane(state.elites.stateRuler, turn) {
+    getStyleClass.add("borderRightPane")
+  }, "")
+
+  val node = state.politicalSystem.parliament.map(_.parties).map(pieByVotes).getOrElse {
+    BigText(Localization("parliament.noParliament"))
+  }.delegate
+
+  add(node, "wrap, top")
 }

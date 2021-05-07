@@ -13,7 +13,7 @@ import SoldierTypeAttribute._
 abstract class WarriorType(val name: String) {
 
   private def viewName(culture: Culture, competence: WarriorCompetence): String = {
-    culture.warriorViewNames.possibleWarriors(this, competence)
+    culture.warriorViewNames.possible(this, competence)
   }
 
   def baseHp: Int

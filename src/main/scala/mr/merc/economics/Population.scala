@@ -11,6 +11,8 @@ import mr.merc.economics.PopulationMigrationOutsideProvince.PopulationMovementBe
 import mr.merc.economics.WorldConstants.Enterprises.{ChurchRitualEfficiency, ChurchStartingResources}
 import mr.merc.politics.Migration.{ClosedBorders, OpenBorders}
 
+import scala.util.Random
+
 class Population(val culture: Culture, val populationType: PopulationType, private var count: Double,
                  startingMoney: Double, private val startingliterateCount: Int, val politicalViews: PoliticalViews) {
   require(needs.nonEmpty, s"Needs for culture $culture for type $populationType are empty!")
@@ -393,26 +395,27 @@ object Population {
   case class PopulationNeeds(illiterateNeeds: CornerPopulationNeeds, literateNeeds: CornerPopulationNeeds)
 
   // removed sealed for test purposes only
-  abstract class Race(val minAge: Int, val maxAge:Int) extends scala.Product with Serializable {
+  abstract class Race(val minAge: Int, val maxAge:Int, val minLeaderAgressiveness: Int, val maxLeaderAgressiveness: Int) extends scala.Product with Serializable {
     def name: String = productPrefix.toLowerCase
+    def randomAgressiveness:Int = minLeaderAgressiveness + Random.nextInt(maxLeaderAgressiveness - minLeaderAgressiveness)
   }
 
-  case object Humans extends Race(16, 100)
+  case object Humans extends Race(16, 100, 25, 75)
 
   //
   // DISABLED RACES
   //
-  case object Elves extends Race(100, 1000)
+  case object Elves extends Race(100, 1000, 0, 50)
 
-  case object Dwarfs extends Race(50, 500)
+  case object Dwarfs extends Race(50, 500, 25, 75)
 
-  case object Orcs extends Race(16, 100)
+  case object Orcs extends Race(16, 100, 50, 100)
 
   //case object Saurians extends Race
 
   //case object Drakes extends Race
 
-  case object Undead extends Race(50, 500)
+  case object Undead extends Race(50, 500, 25, 75)
 
   //case object Demons extends Race
 

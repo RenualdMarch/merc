@@ -20,20 +20,30 @@ import scalafx.scene.control.{Separator, Tab, TabPane}
 import scalafx.scene.paint.Color
 import scalafx.stage.Stage
 import ModalDialog._
+import scalafx.scene.image.ImageView
 
 class ParliamentPane(sceneManager: SceneManager, worldState: WorldStateParliamentActions) extends BorderPane {
-  left = new RulingPartyParliamentPane(sceneManager, worldState)
+
+  left = new RulingPartyParliamentPane(sceneManager, worldState) with BorderedJavaNode
   center = new ParliamentPie(worldState)
 }
 
-class RulingPartyParliamentPane(sceneManager: SceneManager, worldState: WorldStateParliamentActions) extends MigPane {
+class RulingPartyParliamentPane(sceneManager: SceneManager, worldState: WorldStateParliamentActions) extends MigPane("", "0[]0", "0[]0[]0[]0") {
+
+  private val rulerPane = new HeadOfStatePane(worldState.playerState.politicalSystem.elites.stateRuler, worldState.turn) {
+    getStyleClass.add("borderDownPane")
+  }
 
   private val rulingPartyPane = new TopTitledBorderPane {
+    styleClass.add("borderDownPane")
+
     top = MediumText(Localization("parliament.rulingParty"))
     center = new PartyViewPane(worldState.playerPoliticalSystemProperty.map(_.rulingParty))
   }
 
-  private val actionsPane = new ParliamentActionsPane(sceneManager, worldState)
+  private val actionsPane = new ParliamentActionsPane(sceneManager, worldState) {
+    getStyleClass.add("borderDownPane")
+  }
 
   private val coalitionPaneProp:ReadOnlyObjectProperty[javafx.scene.Node] = worldState.playerPoliticalSystemProperty.map { ps =>
     ps.parliament.map { p =>
@@ -43,14 +53,19 @@ class RulingPartyParliamentPane(sceneManager: SceneManager, worldState: WorldSta
     }.getOrElse(new Pane().delegate)
   }
 
-  add(rulingPartyPane, "wrap")
+  add(rulerPane, "wrap")
+  add(rulingPartyPane, "wrap, growx, pushx")
   add(new BorderPane {
     center <== coalitionPaneProp
   }.delegate, "wrap,grow")
-  add(actionsPane)
+  BorderPane.setAlignment(coalitionPaneProp.value, Pos.Center)
+  coalitionPaneProp.onChange {
+    BorderPane.setAlignment(coalitionPaneProp.value, Pos.Center)
+  }
+  add(actionsPane, "align center, pushx, growx")
 }
 
-class ParliamentActionsPane(sceneManager: SceneManager, worldState: WorldStateParliamentActions) extends MigPane {
+class ParliamentActionsPane(sceneManager: SceneManager, worldState: WorldStateParliamentActions) extends MigPane("", "15%[]15%") {
   private val changeRulingParty = MediumButton(Localization("parliament.changeRulingParty"))
   changeRulingParty.disable <== !worldState.playerCanChangeRulingParty
   changeRulingParty.onAction = { _ =>
@@ -78,9 +93,9 @@ class ParliamentActionsPane(sceneManager: SceneManager, worldState: WorldStatePa
     }
   }
 
-  add(changeRulingParty, "grow,wrap")
-  add(usurpPower, "grow,wrap")
-  add(giveUpPower, "grow,wrap")
+  add(changeRulingParty, "wrap, grow, push, align center")
+  add(usurpPower, "wrap, grow, push, align center")
+  add(giveUpPower, "wrap, grow, push, align center")
 
   def choosePartiesDialog(possibleParties: List[Party]): Option[Party] =
     new SelectPartyPane(possibleParties).showDialog(sceneManager.stage).selected
@@ -241,4 +256,15 @@ class ParliamentCoalitionPane(parties: Map[Party, Double]) extends MigPane() {
     add(MediumText(DoubleFormatter().format(100 * c) + "%"), "wrap")
   }
 
+}
+
+class HeadOfStatePane(ruler: HeadOfState, turn: Int) extends MigPane {
+
+  add(new ImageView(ruler.largeImage), "wrap, span 2, align center")
+  add(BigText(ruler.fullName + " " + Localization("common.of")), "wrap, span 2, align center")
+  add(new StateComponentColorName(ruler.state), "wrap, align center, span 2")
+  add(BigText(Localization("age")), "align center")
+  add(BigText(ruler.age(turn).toString), "align center, wrap")
+  add(BigText(Localization("aggressiveness")), "align center")
+  add(BigText(ruler.aggressiveness.toString), "align center, wrap")
 }

@@ -22,14 +22,14 @@ object PieChartBuilder {
       PieChart.Data(p.label, p.count)
     }
 
-    val chart = PieChart(ObservableBuffer(piesForChart))
+    val chart = PieChart(ObservableBuffer.from(piesForChart))
     chart.startAngle = 90
     chart.labelsVisible = false
     chart.legendSide = Side.Bottom
 
 
     pies.zipWithIndex.foreach { case (p, i) =>
-      chart.lookupAll(s".data$i").asScala.foreach { node: Node =>
+      chart.lookupAll(s".data$i").foreach { node: Node =>
         node.style = s"-fx-pie-color:${MercUtils.colorToStyle(p.color)};"
 
         p.tooltip.foreach { tooltip =>

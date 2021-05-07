@@ -1,21 +1,21 @@
-name:= "Merc"
+name := "Merc"
 
 version := "0.2"
 
 // Add dependency on ScalaFX library
-libraryDependencies += "org.scalafx" %% "scalafx" % "14-R19"
+libraryDependencies += "org.scalafx" %% "scalafx" % "16.0.0-R22"
 
 // Determine OS version of JavaFX binaries
 lazy val osName = System.getProperty("os.name") match {
-  case n if n.startsWith("Linux")   => "linux"
-  case n if n.startsWith("Mac")     => "mac"
+  case n if n.startsWith("Linux") => "linux"
+  case n if n.startsWith("Mac") => "mac"
   case n if n.startsWith("Windows") => "win"
   case _ => throw new Exception("Unknown platform!")
 }
 
 lazy val javaFXModules = Seq("base", "controls", "fxml", "graphics", "media", "swing", "web")
-libraryDependencies ++= javaFXModules.map( m =>
-  "org.openjfx" % s"javafx-$m" % "14.0.1" classifier osName
+libraryDependencies ++= javaFXModules.map(m =>
+  "org.openjfx" % s"javafx-$m" % "16" classifier osName
 )
 
 libraryDependencies += "org.scala-lang" % "scala-reflect" % "2.12.8"
@@ -54,6 +54,22 @@ scalacOptions ++= Seq("-feature", "-deprecation", "-language:postfixOps",
 fork := true
 
 assemblyMergeStrategy in assembly := {
-  case PathList("META-INF", xs @ _*) => MergeStrategy.discard
+  case PathList("META-INF", xs@_*) => MergeStrategy.discard
   case x => MergeStrategy.first
 }
+
+javaOptions ++= Seq(
+  "-Dglass.win.uiScale=100%",
+  "--module-path", (fullClasspath in Runtime).value.files.map(_.getAbsolutePath).
+    filter(_.contains("javafx")).mkString("\"", ";", "\""),
+  "--add-modules", "javafx.controls",
+  "--add-modules", "javafx.fxml",
+  "--add-modules", "javafx.graphics",
+  "--add-modules", "javafx.base",
+  "--add-modules", "javafx.swing",
+  "--add-modules", "javafx.web",
+  "--add-modules", "javafx.media",
+
+)
+
+mainClass in (Compile, run) := Some("mr.merc.main.Main")

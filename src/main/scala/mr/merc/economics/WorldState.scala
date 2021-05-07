@@ -82,7 +82,7 @@ class WorldState(val regions: List[Province], var playerState: State, val worldH
       m.migrateToNeighbours()
     }.foreach(_.applyMovement())
 
-    this.handlePossibleElections()
+    this.handlePossibleElectionsAndRefreshElites()
 
     this.processUnansweredMessages()
     this.diplomacyEngine.improveBadBoyOverTime()
@@ -94,7 +94,7 @@ class WorldState(val regions: List[Province], var playerState: State, val worldH
     }
 
     states.keysIterator.foreach { s =>
-      s.mailBox.addMessage(new InformationDomesticMessage(Localization("battleReport.sender"),
+      s.mailBox.addMessage(new InformationDomesticMessage(s.elites.foreignMinister,
         Localization("messages.events")) {
         override def body: Region = new PastDiplomaticMessagesPane(WorldState.this)
 
@@ -170,7 +170,7 @@ class WorldState(val regions: List[Province], var playerState: State, val worldH
 
   def sendBattleReports(): Unit = {
     states.keysIterator.foreach { state =>
-      state.mailBox.addMessage(new InformationDomesticMessage(Localization("battleReport.sender"),
+      state.mailBox.addMessage(new InformationDomesticMessage(state.elites.foreignMinister,
         Localization("battleReport.title")) {
         override def body: Region = new BattleReportPane(battleReports)
       })
@@ -273,7 +273,7 @@ trait WorldStateParliamentActions {
   }
 
   def usurpPower(state: State, newParty: Party): Unit = {
-    state.politicalSystem.usurpPower(newParty)
+    state.politicalSystem.usurpPower(newParty, turn)
     state.changeBudgetPolicyAfterRulingPartyChange()
     playerPoliticalSystemProperty.forceInvalidation()
   }
@@ -290,15 +290,16 @@ trait WorldStateParliamentActions {
   def possiblePartiesForGivingUpPower(state: State): List[Party] = Party.allParties.filter(
     _.regime == state.rulingParty.regime.freerRegime.get)
 
-  def handlePossibleElections(): Unit = {
+  def handlePossibleElectionsAndRefreshElites(): Unit = {
     import scalafx.Includes._
 
     states.keysIterator.foreach { state =>
+      state.politicalSystem.refreshElites(turn)
       if (state.politicalSystem.isElectionNow(turn)) {
         val electionResults = state.politicalSystem.doElectionsNow(turn,
           state.primeCulture, possibleParties(state.politicalSystem), states(state))
         state.changeBudgetPolicyAfterRulingPartyChange()
-        state.mailBox.addMessage(new InformationDomesticMessage(Localization("election.commission"),
+        state.mailBox.addMessage(new InformationDomesticMessage(state.elites.defenceMinister,
           Localization("election.results")) {
           override def body: Region = new ElectionResultsPane(electionResults, state)
         })

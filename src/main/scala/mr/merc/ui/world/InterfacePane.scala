@@ -46,11 +46,24 @@ trait WorldInterfaceWhiteNode {
   stylesheets.add("/css/worldPane.css")
 }
 
+trait BorderedNode {
+  self: Region =>
+
+  styleClass.add("borderPane")
+  stylesheets.add("/css/worldPane.css")
+}
 
 trait WorldInterfaceJavaNode {
   self: javafx.scene.layout.Region =>
 
   getStyleClass.add("interfacePane")
+  getStylesheets.add("/css/worldPane.css")
+}
+
+trait BorderedJavaNode {
+  self: javafx.scene.layout.Region =>
+
+  getStyleClass.add("borderPane")
   getStylesheets.add("/css/worldPane.css")
 }
 

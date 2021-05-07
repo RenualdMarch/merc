@@ -18,7 +18,7 @@ class PopulationTest extends FunSuite with Matchers {
     RegularNeeds -> Map(Grain -> 3.0, Coal -> 2.0),
     LuxuryNeeds -> Map(Liquor -> 3.0))
 
-  case object TestRace extends Race(16, 100)
+  case object TestRace extends Race(16, 100, 0, 100)
   object TestCulture extends Culture("test",TestRace, "testHouse", Color.Black) {
 
     override val warriorViewNames: WarriorViewNames = LatinHuman.warriorViewNames

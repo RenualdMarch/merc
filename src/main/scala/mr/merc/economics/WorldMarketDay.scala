@@ -173,7 +173,7 @@ class WorldMarketDay(worldState: WorldStateEnterpriseActions with WorldStateDipl
       s.budget.endDay()
 
       val map = stateProjects.getOrElse(s, Map()).asInstanceOf[Map[Province, List[BusinessProject]]]
-      s.mailBox.addMessage(new InformationDomesticMessage(Localization("projectsReport.reporter"),
+      s.mailBox.addMessage(new InformationDomesticMessage(s.elites.economyMinister,
         Localization("projectsReport.title")) {
         override def body: Region = new BusinessProjectsReportPane(map)
       })

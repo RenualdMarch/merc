@@ -8,25 +8,25 @@ object HeadOfState {
   case class RulingTime(from: SeasonOfYear, to:SeasonOfYear, head: HeadOfState)
 }
 
-sealed abstract class HeadOfState(name: String, state: State, wt: WarriorType, wc: WarriorCompetence,
+sealed abstract class HeadOfState(name: String, state: State, val aggressiveness: Int, wt: WarriorType, wc: WarriorCompetence,
                   born: SeasonOfYear, projectedDeath: SeasonOfYear)
   extends Person(name, state, state.primeCulture, wt, wc, born, projectedDeath) {
 }
 
-class Monarch (name: String, number: Int, state: State, wt: WarriorType, wc: WarriorCompetence,
-  born: SeasonOfYear, projectedDeath: SeasonOfYear) extends HeadOfState(name, state, wt, wc, born, projectedDeath) {
+class Monarch (name: String, number: Int, state: State, aggressiveness: Int, wt: WarriorType, wc: WarriorCompetence,
+  born: SeasonOfYear, projectedDeath: SeasonOfYear) extends HeadOfState(name, state, aggressiveness, wt, wc, born, projectedDeath) {
 
   import mr.merc.util.MercUtils._
   override def fullName: String = s"${Localization(state.primeCulture.cultureInfo.stateForm.monarchyTitle)} $name ${number.toRomanString}"
 }
 
-class President(name: String, state: State, wt: WarriorType, wc: WarriorCompetence,
+class President(name: String, state: State, aggressiveness: Int, wt: WarriorType, wc: WarriorCompetence,
                   born: SeasonOfYear, projectedDeath: SeasonOfYear)
-  extends HeadOfState(name, state, wt, wc, born, projectedDeath) {
+  extends HeadOfState(name, state, aggressiveness, wt, wc, born, projectedDeath) {
 
   override def fullName: String = s"${Localization(state.primeCulture.cultureInfo.stateForm.democracyTitle)} $name"
 
-  def toMonarch(number:Int): Monarch = new Monarch(name, number, state, wt, wc, born, projectedDeath)
+  def toMonarch(number:Int): Monarch = new Monarch(name, number, state, aggressiveness, wt, wc, born, projectedDeath)
 }
 
 class Official(name: String, val jobTitle:String, state: State, culture:Culture, wt: WarriorType, wc: WarriorCompetence,
