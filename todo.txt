@@ -1,16 +1,17 @@
 requirement failed: Buying and selling differ
 
-peaceful neighbours bug
-state hates itself(because of claims?)
-racial hatred - give alignment to cultures
 friendship treaty - prevents creating claims and declaring wars, but can join wars with allies
 friendship treaty - drops all claims
 drop claim button
 after vassalization claims against overlord are dropped
 alliance claims against each other are dropped and not created any more
 ask allies to join your war
+destroy all unreachable islands?
+bug with long bridges on world map
 add rulers to map
-add parliament to government pane on diplomacy pane
+bug with drawing single water tile
+
+Move to JOGL?
 
 totally rework AI diplomacy with new features
 

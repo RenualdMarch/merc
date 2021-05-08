@@ -94,14 +94,20 @@ abstract class AbstractHexField[T <: Hex](init: (Int, Int) => T) {
     closest(start).find(predicate)
   }
 
-  def findPath(from: T, to: T, blocking:T => Boolean):Option[List[T]] = {
+  def findPath(from: T, to: T, blocking:T => Boolean, greedy:Boolean = false):Option[List[T]] = {
     val grid = new ShortestGrid[T] {
       override def isBlocked(t: T) = blocking(t)
       override def price(from: T, to: T): Double = 1
       override def neighbours(t: T): List[T] = AbstractHexField.this.neighbours(t)
-      override def heuristic(from: T, to: T): Double = math.abs(from.x - to.x) + math.abs(from.y - to.y)
+      override def heuristic(from: T, to: T): Double = {
+        val a = from.toCubeHex
+        val b = to.toCubeHex
+
+        import scala.math._
+        max(abs(a.x - b.x), max(abs(a.y - b.y), abs(a.z - b.z)))
+      }
     }
 
-    PathFinder.findPath(grid, from, to)
+    PathFinder.findPath(grid, from, to, greedy)
   }
 }

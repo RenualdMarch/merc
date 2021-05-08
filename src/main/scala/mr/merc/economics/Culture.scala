@@ -6,6 +6,10 @@ import mr.merc.economics.Products._
 import mr.merc.economics.WorldConstants.Population.needsQ
 import scalafx.scene.paint.Color
 import MapUtil.FloatOperations._
+import mr.merc.economics.Culture.CultureAlignment.{ColorAlignment, PriorityAlignment}
+import mr.merc.economics.Culture.CultureAlignment.ColorAlignment._
+import mr.merc.economics.Culture.CultureAlignment.PriorityAlignment._
+import mr.merc.local.Localization
 
 object Culture {
 
@@ -47,8 +51,41 @@ object Culture {
   case class CultureInfo(stateForm: StateForm, cities: List[String], states: List[String],
                          maleNames: List[String])
 
+  case class CultureAlignment(religionAlignment: ColorAlignment, priorityAlignment: PriorityAlignment)
+
+  object CultureAlignment {
+
+    sealed trait ColorAlignment extends scala.Product {
+      def localize:String = Localization(this.productPrefix.toLowerCase)
+    }
+
+    object ColorAlignment {
+      case object Light extends ColorAlignment
+
+      case object Gray extends ColorAlignment
+
+      case object Dark extends ColorAlignment
+    }
+
+    sealed trait PriorityAlignment extends scala.Product {
+      def localize:String = Localization(this.productPrefix.toLowerCase)
+    }
+
+    object PriorityAlignment {
+      case object Physical extends PriorityAlignment
+
+      case object Balanced extends PriorityAlignment
+
+      case object Intellectual extends PriorityAlignment
+    }
+  }
+
+  import CultureAlignment._
+
   case object LatinHuman extends Culture("latin", Humans, "humanCity", Color.Red) {
     val warriorViewNames: WarriorViewNames = WarriorViewNames.LatinCulture
+
+    val cultureAlignment: CultureAlignment = CultureAlignment(Gray, Balanced)
 
     val cultureInfo: CultureInfo = CultureInfo(StateForm("empire", "republic", "emperor", "consul"),
       List("Aarhusium",
@@ -124,7 +161,12 @@ object Culture {
         "Gallic",
         "Iberian",
         "Latin",
-        "Lux"),
+        "Lux",
+        "Italian",
+        "Sol",
+        "Invictus",
+        "Aquilan",
+        "Corvus"),
       List("Augustus",
         "Tiberius",
         "Caesar",
@@ -139,6 +181,8 @@ object Culture {
 
   case object FrenchHuman extends Culture("french", Humans, "humanVillage", Color.Blue) {
     val warriorViewNames: WarriorViewNames = WarriorViewNames.WesnothCulture
+
+    val cultureAlignment: CultureAlignment = CultureAlignment(Gray, Balanced)
 
     val cultureInfo: CultureInfo = CultureInfo(StateForm("kingdom", "republic", "king", "president"),
       List("Argenroux",
@@ -200,7 +244,11 @@ object Culture {
         "Kuteron",
         "Aquitain",
         "Burgundian",
-        "French"),
+        "French",
+        "Provancian",
+        "Caledonian",
+        "Frankish"
+      ),
       List("Henry",
         "Louis",
         "Charles",
@@ -211,6 +259,8 @@ object Culture {
 
   case object DarkHuman extends Culture("nilf", Humans, "humanCottage", Color.Black) {
     val warriorViewNames: WarriorViewNames = WarriorViewNames.DarkHumanCulture
+
+    val cultureAlignment: CultureAlignment = CultureAlignment(Dark, Balanced)
 
     val cultureInfo: CultureInfo = CultureInfo(StateForm("empire", "republic", "emperor", "president"),
       List("Saalbirge",
@@ -276,6 +326,8 @@ object Culture {
   case object GreekHuman extends Culture("greek", Humans, "humanCity", Color.Gray) {
     val warriorViewNames: WarriorViewNames = WarriorViewNames.GreekDardoCulture
 
+    val cultureAlignment: CultureAlignment = CultureAlignment(Gray, Balanced)
+
     val cultureInfo: CultureInfo = CultureInfo(StateForm("kingdom", "republic", "king", "president"),
       List("Pergipolis",
         "Pithendos",
@@ -323,7 +375,10 @@ object Culture {
         "Beotian",
         "Trojan",
         "Achaean",
-        "Corinthian"),
+        "Corinthian",
+        "Mikenian",
+        "Hellenic",
+        "Zeusian"),
       List("Alexander",
         "Perdikkas",
         "Philip",
@@ -339,6 +394,8 @@ object Culture {
 
   case object GermanHuman extends Culture("german", Humans, "humanVillage", Color.Yellow) {
     val warriorViewNames: WarriorViewNames = WarriorViewNames.ChevalierCulture
+
+    val cultureAlignment: CultureAlignment = CultureAlignment(Gray, Balanced)
 
     val cultureInfo: CultureInfo = CultureInfo(StateForm("empire", "republic", "emperor", "сhancellor"),
       List("Marchbach",
@@ -397,6 +454,8 @@ object Culture {
       List("Saxonian",
         "Alpian",
         "Franconian",
+        "Bavarian",
+        "Austrian",
         "Saar",
         "Rhine",
         "Voralbergian",
@@ -416,6 +475,8 @@ object Culture {
 
   case object SlavicHuman extends Culture("slavic", Humans, "humanHut", Color.Violet) {
     val warriorViewNames: WarriorViewNames = WarriorViewNames.WolfCulture
+
+    val cultureAlignment: CultureAlignment = CultureAlignment(Gray, Balanced)
 
     val cultureInfo: CultureInfo = CultureInfo(StateForm("principality", "republic", "prince", "president"),
       List("Asichow",
@@ -460,9 +521,14 @@ object Culture {
       List("Ukrainian",
         "Russian",
         "Belarusian",
+        "Serbian",
+        "Bohemian",
         "Galician",
         "Volhynian",
-        "Podolian"),
+        "Podolian",
+        "Zaporozhian",
+        "Danubian"
+      ),
       List("Oleg",
         "Igor",
         "Sviatoslav",
@@ -479,6 +545,8 @@ object Culture {
 
   case object ArabHuman extends Culture("arab", Humans, "humanCottage", Color.Green) {
     override val warriorViewNames: WarriorViewNames = WarriorViewNames.ArabCulture
+
+    val cultureAlignment: CultureAlignment = CultureAlignment(Gray, Balanced)
 
     override val cultureInfo: CultureInfo = CultureInfo(StateForm("caliphate", "republic", "caliph", "president"),
       List("Sivrikent",
@@ -531,6 +599,8 @@ object Culture {
         "Almohad",
         "Sokoto",
         "Ramazan",
+        "Saudian",
+        "Syrian"
       ),
       List(
         "Abu Bakr",
@@ -548,6 +618,8 @@ object Culture {
 
   case object SpainHuman extends Culture("spanish", Humans, "humanHill", Color.Orange) {
     override val warriorViewNames: WarriorViewNames = WarriorViewNames.LuzCulture
+
+    val cultureAlignment: CultureAlignment = CultureAlignment(Gray, Balanced)
 
     override val cultureInfo: CultureInfo = CultureInfo(StateForm("kingdom", "republic", "king", "president"),
       List("Panoschato",
@@ -612,6 +684,8 @@ object Culture {
   case object WoodElves extends Culture(name = "woodElves", Elves, "elvenHouse", Color.LightGreen) {
     override val warriorViewNames: WarriorViewNames = WarriorViewNames.WoodElvesCulture
 
+    val cultureAlignment: CultureAlignment = CultureAlignment(Light, Intellectual)
+
     override val cultureInfo: CultureInfo = CultureInfo(StateForm("lordship", "federation", "lord", "secretary"),
       List("Asyhe Belanore",
         "Alm Taesi",
@@ -666,6 +740,8 @@ object Culture {
 
   case object DesertElves extends Culture("desertElves", Elves, "elvenHouse", Color.LightYellow) {
     override val warriorViewNames: WarriorViewNames = WarriorViewNames.DesertElvesCulture
+
+    val cultureAlignment: CultureAlignment = CultureAlignment(Light, Intellectual)
 
     override val cultureInfo: CultureInfo = CultureInfo(StateForm("lordship", "federation", "lord", "secretary"),
       List(
@@ -725,6 +801,8 @@ object Culture {
   case object WesnothOrcs extends Culture("orcs", Orcs, "orcCity", Color.DarkRed) {
 
     override val warriorViewNames: WarriorViewNames = WarriorViewNames.WesnothOrcCulture
+
+    val cultureAlignment: CultureAlignment = CultureAlignment(Dark, Physical)
 
     override val cultureInfo: CultureInfo = CultureInfo(StateForm("horde", "confederation", "chief", "president"),
       List(
@@ -789,6 +867,8 @@ object Culture {
 
     override val warriorViewNames: WarriorViewNames = WarriorViewNames.LatinOrcCulture
 
+    val cultureAlignment: CultureAlignment = CultureAlignment(Dark, Physical)
+
     override val cultureInfo: CultureInfo = CultureInfo(StateForm("empire", "republic", "emperor", "consul"),
       List(
         "Iz Zredka",
@@ -851,6 +931,9 @@ object Culture {
 
   case object WesnothDwarfes extends Culture("dwarfs", Dwarfs, "dwarfCity", Color.White) {
     override val warriorViewNames: WarriorViewNames = WarriorViewNames.WesnothDwarfCulture
+
+    val cultureAlignment: CultureAlignment = CultureAlignment(Light, Physical)
+
     override val cultureInfo: CultureInfo = CultureInfo(StateForm("clan", "confederation", "chieftain", "сhancellor"),
       List(
         "Bag Thurum",
@@ -892,6 +975,8 @@ object Culture {
         "Ironfists",
         "Khaz Modan",
         "Wildhammer",
+        "Steel Axe",
+        "Rune",
         "Grim Batol"
       ),
       List(
@@ -911,6 +996,9 @@ object Culture {
 
   case object WesnothUndead extends Culture("undead", Undead, "caveCity", Color.Brown) {
     override val warriorViewNames: WarriorViewNames = WarriorViewNames.WesnothUndeadCulture
+
+    val cultureAlignment: CultureAlignment = CultureAlignment(Dark, Intellectual)
+
     override val cultureInfo: CultureInfo = CultureInfo(StateForm("hegemony", "union", "magus", "secretary"),
       List(
         "Tugrad",
@@ -972,6 +1060,9 @@ object Culture {
 
   case object DarkElves extends Culture("darkElves", Elves, "elvenHouse", Color.DarkGray) {
     override val warriorViewNames: WarriorViewNames = WarriorViewNames.DarkElvesCulture
+
+    val cultureAlignment: CultureAlignment = CultureAlignment(Dark, Intellectual)
+
     override val cultureInfo: CultureInfo = CultureInfo(StateForm("dynasty", "confederation", "patriarch", "secretary"),
       List(
         "Omyne Elunore",
@@ -1089,6 +1180,9 @@ abstract class Culture(val name: String, val race: Race, val houseStyle: String,
 
   val cultureInfo: CultureInfo
 
+  def cultureAlignment: CultureAlignment
+
   import mr.merc.util.MercUtils._
+
   def randomMaleName: String = cultureInfo.maleNames.randomElement()
 }

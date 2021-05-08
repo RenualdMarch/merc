@@ -13,7 +13,7 @@ class Election(currentParty: Party, primaryCulture: Culture, possibleParties: Li
 
   def doElections(regions: List[EconomicRegion]): StateElectionReport = {
     val reports = regions.map { r =>
-      val reports = r.regionPopulation.pops.filter(p =>
+      val reports = r.regionPopulation.popsList.filter(p =>
         currentParty.votersPolicy.canVote(p.populationType, p.culture == primaryCulture)).
         map(_.choose(possibleParties))
       RegionElectionReport(r, reports)
@@ -23,7 +23,7 @@ class Election(currentParty: Party, primaryCulture: Culture, possibleParties: Li
 
   def totalPopulationPopularity(regions: List[EconomicRegion]): StateElectionReport = {
     val reports = regions.map { r =>
-      val reports = r.regionPopulation.pops.map(_.choose(Party.allParties))
+      val reports = r.regionPopulation.popsList.map(_.choose(Party.allParties))
       RegionElectionReport(r, reports)
     }
     StateElectionReport(reports)

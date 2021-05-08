@@ -4,7 +4,8 @@ import mr.merc.map.{Grid, PossibleGrid, ShortestGrid, UniversalGrid}
 
 
 object PathFinder extends PathFindingBase {
-  def findPath[T <: AnyRef](grid: ShortestGrid[T], from: T, to: T): Option[List[T]] = {
+
+  def findPath[T <: AnyRef](grid: ShortestGrid[T], from: T, to: T, bestFirst:Boolean = false): Option[List[T]] = {
     grid match {
       case g: UniversalGrid[T] =>
         if (g.cellWhereItIsForbiddenToStop(to)) {
@@ -20,9 +21,13 @@ object PathFinder extends PathFindingBase {
 
             override def neighbours(t: T): List[T] = g.neighbours(t)
           }
-          astar(adapterGrid, from, to)
+          if (bestFirst) greedy(adapterGrid, from, to)
+          else astar(adapterGrid, from, to)
+
         }
-      case g: ShortestGrid[T] => astar(g, from, to)
+      case g: ShortestGrid[T] =>
+        if (bestFirst) greedy(g, from, to)
+        else astar(g, from, to)
     }
   }
 

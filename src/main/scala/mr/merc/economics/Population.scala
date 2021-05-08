@@ -402,20 +402,17 @@ object Population {
 
   case object Humans extends Race(16, 100, 25, 75)
 
-  //
-  // DISABLED RACES
-  //
   case object Elves extends Race(100, 1000, 0, 50)
 
-  case object Dwarfs extends Race(50, 500, 25, 75)
+  case object Dwarfs extends Race(50, 500, 50, 100)
 
   case object Orcs extends Race(16, 100, 50, 100)
+
+  case object Undead extends Race(50, 500, 25, 75)
 
   //case object Saurians extends Race
 
   //case object Drakes extends Race
-
-  case object Undead extends Race(50, 500, 25, 75)
 
   //case object Demons extends Race
 
@@ -524,7 +521,7 @@ class PopulationMigrationInsideProvince(regionPopulation: RegionPopulation, stat
   }
 
   def migrateInsideProvince(): Unit = {
-    val movements = regionPopulation.pops.flatMap { p =>
+    val movements = regionPopulation.popsList.flatMap { p =>
       whereToMigrateInsideProvince(p) ++ assimilationMigration(p)
     }
 
@@ -608,7 +605,7 @@ class PopulationMigrationOutsideProvince(province: Province) extends AbstractPop
   }
 
   def migrateToNeighbours(): List[PopulationMovementBetweenProvinces] = {
-    province.regionPopulation.pops.flatMap { pop =>
+    province.regionPopulation.popsList.flatMap { pop =>
       whereToMigrate(pop).map(tuple => pop -> tuple)
     }.map { case (pop, (targetProvince, targetPop, count)) =>
       PopulationMovementBetweenProvinces(pop, province, targetPop, targetProvince, count)

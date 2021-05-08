@@ -5,6 +5,7 @@ class ScaledMImage(initialImage: Image, factor: Double, xOffset: Int, yOffset: I
 
   override val imagePath:Option[String] = None
 
+  @volatile
   override lazy val image:Image = MImageCache.scale(initialImage, factor)
 
   override def changeAlpha(newAlpha: Float): MImage = new ScaledMImage(initialImage, factor, xOffset, yOffset, newAlpha)

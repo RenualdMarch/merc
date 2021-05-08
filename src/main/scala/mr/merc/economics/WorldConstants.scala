@@ -243,9 +243,12 @@ object WorldConstants {
     val VassalizationClaimsOnUsRelationshipChange = -30
     val VassalizationClaimsOnThemRelationshipChange = -15
 
-    val SameCultureRelationshipBonus = 20
-    val SameRaceRelationshipBonus = 10
-    val DifferentRaceRelationshipBonus = -10
+    val SameReligionRelationshipBonus = 20
+    val SamePriorityRelationshipBonus = 10
+    val NeighbourReligionRelationshipBonus = -5
+    val NeighbourPriorityRelationshipBonus = 0
+    val OppositeReligionRelationshipBonus = -30
+    val OppositePriorityRelationshipBonus = -10
 
     val WarriorPowerMultiplier = 1000
     val GDPPowerMultiplier = 1

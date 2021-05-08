@@ -188,7 +188,7 @@ class WorldGenerator(field:FourSeasonsTerrainHexField) {
     }
 
     result.foreach { case (state, provinces) =>
-      val party = Election.mostPopularParty(provinces.flatMap(_.regionPopulation.pops), Party.allParties)
+      val party = Election.mostPopularParty(provinces.flatMap(_.regionPopulation.popsList), Party.allParties)
       state.politicalSystem.rulingParty = party
     }
 
@@ -197,7 +197,7 @@ class WorldGenerator(field:FourSeasonsTerrainHexField) {
 
   private def mixPopulations(provinces:List[Province]): Unit = {
     provinces.flatMap { province =>
-      province.regionPopulation.pops.flatMap { pop =>
+      province.regionPopulation.popsList.flatMap { pop =>
         val neigbours = province.neighbours
         neigbours.map{ neig =>
           val count = PopMigrationToNeighbourPercentage * pop.populationCount / neigbours.size
@@ -303,7 +303,7 @@ object WorldGenerator extends Logging {
     val r = (generator.generateStateAndProvinces(world.provinces), world.terrain)
     val playerState = r._1.keys.head
     val ws = new WorldState(r._1.values.flatten.toList, playerState, world.terrain, generator.namesGenerators, generator.colorStream)
-    // TODO battles are not played!!! possible source of errors
+
     ws.diplomacyEngine.generateInitialStrongClaimsForOwnedTerritories()
     ws.diplomacyEngine.generateInitialClaimsForNeighbours()
     0 until TradeDaysBeforeStart foreach(_ => ws.nextTurn(false))

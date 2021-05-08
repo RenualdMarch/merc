@@ -3,6 +3,7 @@ package mr.merc.economics
 import mr.merc.army.WarriorViewNames
 import mr.merc.economics.Population._
 import Culture._
+import mr.merc.economics.Culture.CultureAlignment.{ColorAlignment, PriorityAlignment}
 import mr.merc.economics.Products.{Coal, Grain, Liquor}
 import mr.merc.economics.TaxPolicy.MiddleSalaryTax
 import mr.merc.politics._
@@ -20,6 +21,7 @@ class PopulationTest extends FunSuite with Matchers {
 
   case object TestRace extends Race(16, 100, 0, 100)
   object TestCulture extends Culture("test",TestRace, "testHouse", Color.Black) {
+    override def cultureAlignment: Culture.CultureAlignment = CultureAlignment(ColorAlignment.Gray, PriorityAlignment.Balanced)
 
     override val warriorViewNames: WarriorViewNames = LatinHuman.warriorViewNames
     override val cultureInfo: Culture.CultureInfo = LatinHuman.cultureInfo
@@ -186,7 +188,7 @@ class PopulationTest extends FunSuite with Matchers {
         PopulationDemandRequest(pop, Coal, 4000))))
 
     pop.fulfillNeedsUsingAlreadyReceivedProducts()
-    regionPopulation.pops.foreach(_.endOfDay())
+    regionPopulation.popsList.foreach(_.endOfDay())
     assert(pop.currentDayRecord.productFulfillment.needsFulfillment === Map(LifeNeeds -> 1, RegularNeeds -> 1, LuxuryNeeds -> 1))
 
     val ppd = new PopulationMigrationInsideProvince(regionPopulation, new State("1", TestCulture, 0, Party.aristocratic, 0))

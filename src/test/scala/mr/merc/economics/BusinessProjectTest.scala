@@ -1,7 +1,8 @@
 package mr.merc.economics
 
 import mr.merc.army.WarriorViewNames
-import mr.merc.economics.Culture.LatinHuman
+import mr.merc.economics.Culture.CultureAlignment.{ColorAlignment, PriorityAlignment}
+import mr.merc.economics.Culture.{CultureAlignment, LatinHuman}
 import scalafx.scene.paint.Color
 import mr.merc.economics.Population.{Capitalists, Humans}
 import mr.merc.economics.Products.{Coal, Grain, Product, Weapons}
@@ -11,6 +12,8 @@ import org.scalatest.FunSuite
 class BusinessProjectTest extends FunSuite {
 
   val culture = new Culture("test", Humans, "testHouse", Color.White) {
+    override def cultureAlignment: Culture.CultureAlignment = CultureAlignment(ColorAlignment.Gray, PriorityAlignment.Balanced)
+
     override val warriorViewNames: WarriorViewNames = LatinHuman.warriorViewNames
     override val cultureInfo: Culture.CultureInfo = LatinHuman.cultureInfo
   }

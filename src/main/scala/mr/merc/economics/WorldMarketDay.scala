@@ -45,7 +45,7 @@ class WorldMarketDay(worldState: WorldStateEnterpriseActions with WorldStateDipl
     regions.foreach { r =>
       val b = r.bureaucratsPercentageFromMax
       val taxPolicy = r.owner.taxPolicy
-      r.regionPopulation.pops.foreach(_.newDay(taxPolicy, b))
+      r.regionPopulation.popsList.foreach(_.newDay(taxPolicy, b))
       r.enterprises.foreach(_.newDay(taxPolicy, b, turn))
     }
 
@@ -139,7 +139,7 @@ class WorldMarketDay(worldState: WorldStateEnterpriseActions with WorldStateDipl
 
       r.enterprises.foreach(_.reduceStorage())
       r.enterprises.foreach(_.produce())
-      r.regionPopulation.pops.foreach(_.fulfillNeedsUsingAlreadyReceivedProducts())
+      r.regionPopulation.popsList.foreach(_.fulfillNeedsUsingAlreadyReceivedProducts())
       r.regionWarriors.allWarriors.foreach(_.allNeedsReceived(turn))
     }
 
@@ -154,7 +154,7 @@ class WorldMarketDay(worldState: WorldStateEnterpriseActions with WorldStateDipl
         e.endOfDay()
       }
 
-      r.regionPopulation.pops.foreach { p =>
+      r.regionPopulation.popsList.foreach { p =>
         p.payTaxes(r)
         p.endOfDay()
       }
@@ -165,7 +165,8 @@ class WorldMarketDay(worldState: WorldStateEnterpriseActions with WorldStateDipl
       factoryCommands.foreach { c => worldState.applyCommand(c) }
       r.removeBankruptFactories()
       r.regionPopulation.learnLiteracy()
-      r.regionPopulation.pops.foreach(_.grow())
+      r.regionPopulation.grow()
+      r.endTurn()
     }
     val stateProjects = projectsMap.groupBy(_._1.owner)
     states.foreach { s =>

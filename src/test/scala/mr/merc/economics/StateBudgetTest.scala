@@ -1,7 +1,8 @@
 package mr.merc.economics
 
 import mr.merc.army.WarriorViewNames
-import mr.merc.economics.Culture.LatinHuman
+import mr.merc.economics.Culture.CultureAlignment.{ColorAlignment, PriorityAlignment}
+import mr.merc.economics.Culture.{CultureAlignment, LatinHuman}
 import mr.merc.economics.Population._
 import mr.merc.economics.Products.Grain
 import mr.merc.economics.SpendingPolicy.{BureaucratsSalary, Pensions, ScholarsSalary}
@@ -15,6 +16,7 @@ class StateBudgetTest extends FunSuite {
   test("Spending of budget money doesnt create pop") {
 
     val culture = new Culture("testCulture", Humans, "testHouse", Color.Red) {
+      override def cultureAlignment: Culture.CultureAlignment = CultureAlignment(ColorAlignment.Gray, PriorityAlignment.Balanced)
 
 
       override val warriorViewNames: WarriorViewNames = LatinHuman.warriorViewNames
@@ -56,7 +58,7 @@ class StateBudgetTest extends FunSuite {
       override val regionPopulation: RegionPopulation = new RegionPopulation(List(traders, bureaucrats, farmers))
     }
 
-    region.regionPopulation.pops.foreach { p =>
+    region.regionPopulation.popsList.foreach { p =>
       p.newDay(TaxPolicy.zeroTaxes, 1)
     }
 
@@ -72,7 +74,7 @@ class StateBudgetTest extends FunSuite {
 
     budget.spendBudgetMoney(List(region), culture)
 
-    assert(region.regionPopulation.pops.count(_.populationType == Scholars) === 0)
+    assert(region.regionPopulation.popsList.count(_.populationType == Scholars) === 0)
 
     assert(traders.moneyReserves === 0)
     assert(farmers.moneyReserves === 500)
@@ -87,6 +89,8 @@ class StateBudgetTest extends FunSuite {
   test("Spend budget money") {
 
     val culture = new Culture("testCulture", Humans, "testHouse", Color.Red) {
+
+      override def cultureAlignment: Culture.CultureAlignment = CultureAlignment(ColorAlignment.Gray, PriorityAlignment.Balanced)
 
       override val warriorViewNames: WarriorViewNames = LatinHuman.warriorViewNames
       override val cultureInfo: Culture.CultureInfo = LatinHuman.cultureInfo
@@ -128,7 +132,7 @@ class StateBudgetTest extends FunSuite {
 
     val budget = region.owner.budget
 
-    region.regionPopulation.pops.foreach { p =>
+    region.regionPopulation.popsList.foreach { p =>
       p.newDay(TaxPolicy.zeroTaxes, 1)
     }
 
@@ -156,6 +160,7 @@ class StateBudgetTest extends FunSuite {
   test("Not enough money in budget") {
 
     val culture = new Culture("testCulture", Humans, "testHouse", Color.Red) {
+      override def cultureAlignment: Culture.CultureAlignment = CultureAlignment(ColorAlignment.Gray, PriorityAlignment.Balanced)
 
       override val warriorViewNames: WarriorViewNames = LatinHuman.warriorViewNames
       override val cultureInfo: Culture.CultureInfo = LatinHuman.cultureInfo
@@ -195,7 +200,7 @@ class StateBudgetTest extends FunSuite {
       override val regionPopulation: RegionPopulation = new RegionPopulation(List(scholars, bureaucrats, farmers))
     }
 
-    region.regionPopulation.pops.foreach { p =>
+    region.regionPopulation.popsList.foreach { p =>
       p.newDay(TaxPolicy.zeroTaxes, 1)
     }
 

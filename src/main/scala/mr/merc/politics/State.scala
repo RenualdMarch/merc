@@ -72,10 +72,10 @@ class Province(val name: String, var owner: State, val regionMarket: RegionMarke
 
   val regionWarriors = new RegionWarriors(Nil, economicNeighbours)
 
-  def totalPopulation:Int = regionPopulation.pops.map(_.populationCount).sum
+  def totalPopulation:Int = regionPopulation.popsList.map(_.populationCount).sum
 
   def culture:Culture = {
-    val cultures = regionPopulation.pops.groupBy(_.culture).mapValues(_.map(_.populationCount).sum)
+    val cultures = regionPopulation.popsList.groupBy(_.culture).mapValues(_.map(_.populationCount).sum)
     if (cultures.isEmpty) owner.primeCulture
     else cultures.maxBy(_._2)._1
   }

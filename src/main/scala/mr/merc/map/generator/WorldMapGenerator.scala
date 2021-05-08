@@ -63,7 +63,7 @@ object WorldMapGenerator {
   def divideIntoProvinces(field: HexField[FourSeasonsTerrainHex], provinces: Int): Map[FourSeasonsTerrainHex, Set[FourSeasonsTerrainHex]] = {
     val totalHexes = field.hexes.filterNot(_.terrainMap == FourSeasonsWater)
     val firstCapitals = Random.shuffle(totalHexes).take(provinces)
-    val division = 0.until(10).foldLeft(MapDivision(firstCapitals.toSet, totalHexes.toSet)) { case (div, _) =>
+    val division = 0.until(5).foldLeft(MapDivision(firstCapitals.toSet, totalHexes.toSet)) { case (div, _) =>
       val newCapitals = div.lloydRelaxationCapitals
       MapDivision(newCapitals, div.allHexes)
     }
@@ -72,7 +72,7 @@ object WorldMapGenerator {
   }
 
   def addRivers(field: FourSeasonsTerrainHexField): Unit = {
-    val riversCount = (field.width + field.height) / 3
+    val riversCount = (field.width * field.height) / 33
     val hexesPerCurve = 4
 
     val initialRivers = (0 until riversCount).par.flatMap { _ =>
@@ -80,9 +80,9 @@ object WorldMapGenerator {
       val y = Random.nextInt(field.height - 1)
       val from = field.hex(x, y)
 
-      field.findClosest(from, x => x.terrainMap == FourSeasonsWater || x.terrainMap == FourSeasonsRiver).flatMap { target =>
+      field.findClosest(from, x => x.terrainMap == FourSeasonsWater).flatMap { target =>
         field.findPath(from, target, h => h.terrainMap == FourSeasonsCastle ||
-          field.neighbours(h).exists(_.terrainMap == FourSeasonsCastle))
+          field.neighbours(h).exists(_.terrainMap == FourSeasonsCastle), true)
       }
     }
     val blocks = initialRivers.flatMap { river =>
@@ -103,13 +103,22 @@ object WorldMapGenerator {
       override def neighbours(t: FourSeasonsTerrainHex): List[FourSeasonsTerrainHex] = field.neighbours(t)
     }
 
-    val riverHexes = initialRivers.par.flatMap { river =>
+    val riverHexes = initialRivers.par.map { river =>
       val head = river.head
       val last = river.last
-      PathFinder.findPath(pathGrid, head, last).toList.flatten
+      PathFinder.findPath(pathGrid, head, last, true).toList.flatten
     }
 
-    riverHexes.foreach { h =>
+    val seq = riverHexes.seq
+    seq.flatten.foreach { h =>
+      h.terrainMap = FourSeasonsRiver
+    }
+
+    seq.flatMap(_.headOption).filter(_ => Random.nextDouble() > 0.5).foreach(addLake(_, field, 2 + Random.nextInt(8)))
+  }
+
+  def addLake(hex:FourSeasonsTerrainHex, field: FourSeasonsTerrainHexField, size: Int): Unit = {
+    field.closest(hex).filterNot(_.terrainMap == FourSeasonsCastle).take(size).foreach { h =>
       h.terrainMap = FourSeasonsRiver
     }
   }

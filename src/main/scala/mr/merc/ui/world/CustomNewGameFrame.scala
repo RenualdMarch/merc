@@ -207,7 +207,7 @@ class StateSelectionPane extends BorderPane {
   def applyWorldState(ws: WorldState): Unit = {
     val list: List[GeneratedStateData] = ws.states.map { case (st, regions) =>
       GeneratedStateData(st, regions.size,
-        regions.flatMap(_.regionPopulation.pops).map(_.populationCount).sum,
+        regions.flatMap(_.regionPopulation.popsList).map(_.populationCount).sum,
         regions.flatMap(_.regionWarriors.allWarriors).size
       )
     }.toList

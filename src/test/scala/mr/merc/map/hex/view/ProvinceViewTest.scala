@@ -3,6 +3,7 @@ package mr.merc.map.hex.view
 import mr.merc.army.WarriorCompetence.{Militia, Professional, Ruler}
 import mr.merc.army.{Warrior, WarriorViewNames}
 import mr.merc.army.WarriorType.{HeavyBladeInfantry, HeavyMaceInfantry}
+import mr.merc.economics.Culture.CultureAlignment.{ColorAlignment, PriorityAlignment}
 import mr.merc.economics.Culture._
 import mr.merc.economics.Population.Humans
 import mr.merc.economics.Seasons.Summer
@@ -32,6 +33,9 @@ class ProvinceViewTest extends FunSuite with MockitoSugar with BeforeAndAfter wi
   val population = mock[RegionPopulation]
 
   val testCulture = new Culture("testCulture", Humans, "testHouse", Color.White) {
+
+    override def cultureAlignment: Culture.CultureAlignment = CultureAlignment(ColorAlignment.Gray, PriorityAlignment.Balanced)
+
     override val warriorViewNames: WarriorViewNames = WarriorViewNames(Map(
       (HeavyMaceInfantry, Professional) -> "oneImageSoldier",
       (HeavyMaceInfantry, Militia) -> "testSoldier2",

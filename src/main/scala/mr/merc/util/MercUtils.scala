@@ -93,4 +93,13 @@ object MercUtils {
       }
     }
   }
+
+  implicit class AddToMapByKey[K, V](map:Map[K, List[V]]) {
+
+    def addToList(k:K, v:V):Map[K, List[V]] = {
+      val list = map.getOrElse(k, Nil)
+      map + (k -> (v :: list))
+    }
+
+  }
 }

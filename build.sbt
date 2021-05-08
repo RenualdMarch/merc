@@ -26,7 +26,7 @@ libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.3"
 
 libraryDependencies += "org.mockito" % "mockito-core" % "2.23.0" % "test"
 
-libraryDependencies += "com.miglayout" % "miglayout-javafx" % "5.1"
+libraryDependencies += "com.miglayout" % "miglayout-javafx" % "11.0"
 
 libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.0.6"
 

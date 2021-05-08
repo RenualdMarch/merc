@@ -1,7 +1,8 @@
 package mr.merc.army
 
 import mr.merc.army.WarriorCompetence.{Professional, Ruler}
-import mr.merc.economics.Culture.{CultureInfo, StateForm}
+import mr.merc.economics.Culture.CultureAlignment.{ColorAlignment, PriorityAlignment}
+import mr.merc.economics.Culture.{CultureAlignment, CultureInfo, StateForm}
 import mr.merc.economics.{Culture, FulfilledDemandRequest, PoliticalSystem, WarriorDemandRequest}
 import mr.merc.economics.Population.Humans
 import mr.merc.map.objects.House
@@ -31,6 +32,7 @@ class WarriorTest extends FunSuite with Matchers {
   }
 
   val culture = new Culture("testCulture", Humans, "houseStyle", Color.White){
+    override def cultureAlignment: Culture.CultureAlignment = CultureAlignment(ColorAlignment.Gray, PriorityAlignment.Balanced)
     override val warriorViewNames: WarriorViewNames = WarriorViewNames(Map(
       (warriorType, Professional) -> "testType1", (warriorType, Ruler) -> "testType1"))
     override val cultureInfo: Culture.CultureInfo = CultureInfo(StateForm("a", "b", "c", "d"), Nil, Nil, List("nameA"))

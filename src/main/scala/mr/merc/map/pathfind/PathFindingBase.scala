@@ -92,6 +92,36 @@ class PathFindingBase {
     None
   }
 
+  def greedy[T <: AnyRef](grid: ShortestGrid[T], from: T, to: T): Option[List[T]] = {
+    val cameFrom = mutable.AnyRefMap[T, T]()
+
+    val ord: Ordering[(T, Double)] = new Ordering[(T, Double)] {
+      override def compare(x: (T, Double), y: (T, Double)): Int = x._2.compare(y._2)
+    }
+
+    val frontier = mutable.PriorityQueue[(T, Double)]()(ord.reverse)
+    frontier.enqueue((from, 0))
+
+    cameFrom += from -> from
+
+    while(frontier.nonEmpty) {
+      val (current, _) = frontier.dequeue()
+      if (current == to) {
+        return Some(expandCameFrom(from, to, cameFrom))
+      }
+
+      grid.neighbours(current).filterNot(grid.isBlocked).foreach { n =>
+        if (!cameFrom.contains(n)) {
+          val priority = grid.heuristic(n, to)
+          frontier.enqueue((n, priority))
+          cameFrom(n) = current
+        }
+      }
+    }
+
+    None
+  }
+
   @tailrec
   private def expandCameFrom[T](from: T, to: T, cameFrom: mutable.Map[T, T], acc:List[T] = Nil):List[T] = {
     if (from == to) to :: acc

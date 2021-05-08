@@ -9,11 +9,14 @@ import scalafx.scene.paint.Color
 import MapUtil.FloatOperations._
 import javafx.css.Rule
 import mr.merc.army.WarriorCompetence.{Militia, Professional, Ruler}
-import mr.merc.economics.Culture.{CultureInfo, StateForm}
+import mr.merc.economics.Culture.CultureAlignment.{ColorAlignment, PriorityAlignment}
+import mr.merc.economics.Culture.{CultureAlignment, CultureInfo, StateForm}
 
 class RegionWarriorsTest extends FunSuite with Matchers {
 
   val testCulture = new Culture("testCulture", Humans, "testHouse", Color.White) {
+    override def cultureAlignment: Culture.CultureAlignment = CultureAlignment(ColorAlignment.Gray, PriorityAlignment.Balanced)
+
     override val warriorViewNames: WarriorViewNames = WarriorViewNames(Map(
       (HeavyMaceInfantry, Professional) -> "oneImageSoldier",
       (HeavyMaceInfantry, Militia) -> "testSoldier2",

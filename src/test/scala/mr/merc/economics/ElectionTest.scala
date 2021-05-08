@@ -1,6 +1,8 @@
 package mr.merc.economics
 
 import mr.merc.army.WarriorViewNames
+import mr.merc.economics.Culture.CultureAlignment
+import mr.merc.economics.Culture.CultureAlignment.{ColorAlignment, PriorityAlignment}
 import mr.merc.economics.Population.{Aristocrats, Capitalists, Humans, Traders}
 import mr.merc.politics._
 import org.scalatest.FunSuite
@@ -8,10 +10,13 @@ import scalafx.scene.paint.Color
 
 class ElectionTest extends FunSuite {
   val culture = new Culture("test", Humans, "villageHouse", Color.White) {
+    override def cultureAlignment: Culture.CultureAlignment = CultureAlignment(ColorAlignment.Gray, PriorityAlignment.Balanced)
+
     override val warriorViewNames: WarriorViewNames = null
     override val cultureInfo: Culture.CultureInfo = null
   }
   val culture2 = new Culture("test2", Humans, "villageHouse", Color.White) {
+    override def cultureAlignment: Culture.CultureAlignment = CultureAlignment(ColorAlignment.Gray, PriorityAlignment.Balanced)
     override val warriorViewNames: WarriorViewNames = null
     override val cultureInfo: Culture.CultureInfo = null
   }

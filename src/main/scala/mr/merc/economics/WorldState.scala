@@ -27,7 +27,7 @@ import mr.merc.politics.IssuePosition.{EconomyPosition, RegimePosition}
 import mr.merc.politics.Regime.{Absolute, Constitutional, Democracy}
 import mr.merc.politics.{Election, Party, Province, State}
 import mr.merc.technology.TechnologyLevel
-import mr.merc.ui.world.{BattleReportPane, ElectionResultsPane, PastDiplomaticMessagesPane}
+import mr.merc.ui.world.{BattleReportPane, DoubleFormatter, ElectionResultsPane, PastDiplomaticMessagesPane}
 import scalafx.beans.property.ObjectProperty
 import mr.merc.util.FxPropertyUtils.PropertyBindingMap
 import scalafx.scene.layout.Region
@@ -101,7 +101,7 @@ class WorldState(val regions: List[Province], var playerState: State, val worldH
       })
     }
 
-    info(s"Total money is $totalMoney")
+    info(s"Total money is ${DoubleFormatter().format(totalMoney)}")
     info(s"Budgets are: ${states.keySet.map(s => s.name -> s.budget.moneyReserve).toMap}")
 
     if (aiBattlesEnabled) {
@@ -201,7 +201,7 @@ trait WorldStateBudgetActions {
   }
 
   def totalPopMoney: Double = {
-    regions.flatMap(_.regionPopulation.pops).map(_.moneyReserves).sum
+    regions.flatMap(_.regionPopulation.popsList).map(_.moneyReserves).sum
   }
 
   def totalEnterpriseMoney: Double = {
@@ -470,8 +470,8 @@ trait WorldStateDiplomacyActions extends Logging {
       rulingParty = state.politicalSystem.rulingParty,
       literacy = {
         val (lit, pop) = provinces.foldLeft((0, 0)) { case ((l, pop), province) =>
-          val pops = province.regionPopulation.pops.map(_.populationCount).sum
-          val lit = province.regionPopulation.pops.map(_.literateCount).sum
+          val pops = province.regionPopulation.popsList.map(_.populationCount).sum
+          val lit = province.regionPopulation.popsList.map(_.literateCount).sum
           (l + lit, pop + pops)
         }
         lit / pop.toDouble

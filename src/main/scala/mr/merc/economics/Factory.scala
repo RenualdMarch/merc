@@ -268,5 +268,5 @@ class IndustrialFactory(region: EconomicRegion, product: IndustryProduct, var le
     storage = storage.copy(money = 0)
   }
 
-  override def owners: List[Population] = region.regionPopulation.pops.filter(_.populationType == Capitalists)
+  override def owners: List[Population] = region.regionPopulation.popsByType(Capitalists)
 }

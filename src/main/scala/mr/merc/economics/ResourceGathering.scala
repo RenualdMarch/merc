@@ -102,7 +102,7 @@ abstract class ResourceGathering[Prod <: GatheredProduct](val product: Prod, val
     this.unsold = this.unsold * WorldConstants.Enterprises.ResourceGatheringStorageReduction
   }
 
-  override def owners: List[Population] = region.regionPopulation.pops.filter(_.populationType == Aristocrats)
+  override def owners: List[Population] = region.regionPopulation.popsByType(Aristocrats)
 
   override def componentDemandRequests(prices: Map[Products.Product, Double]): Map[Products.Product, DemandRequest] = Map()
 
@@ -147,12 +147,12 @@ class Mine(product: ResourceProduct, region: EconomicRegion, startingProducts: D
 class Church(product: Ritual, region: EconomicRegion, startingProducts: Double, gatheringEfficiencyMultiplier: Double)
   extends ResourceGathering(product, region, startingProducts, gatheringEfficiencyMultiplier) {
   override def possibleWorkers: Population.PopulationType = Clergy
-  override def owners: List[Population] = region.regionPopulation.pops.filter(_.populationType == Clergy)
+  override def owners: List[Population] = region.regionPopulation.popsByType(Clergy)
 }
 
 class MagicGuild(region: EconomicRegion, startingMoney: Double,  startingProducts: Double, gatheringEfficiencyMultiplier: Double)
   extends ResourceGathering(Magic, region, startingProducts, gatheringEfficiencyMultiplier) {
 
   override val possibleWorkers: PopulationType = Mages
-  override def owners: List[Population] = region.regionPopulation.pops.filter(_.populationType == Mages)
+  override def owners: List[Population] = region.regionPopulation.popsByType(Mages)
 }

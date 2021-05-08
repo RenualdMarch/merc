@@ -90,7 +90,7 @@ class StateBudget(startingMoney: Double, val taxPolicy: TaxPolicy) {
 
   private def pensionsMoneyPerNeeds(regions: List[EconomicRegion]): Map[PopulationNeedsType, Double] = {
     regions.flatMap { r =>
-      r.regionPopulation.pops.filter(_.populationType.populationClass == Lower).map(r.moneyToFulfillNeeds)
+      r.regionPopulation.popsList.filter(_.populationType.populationClass == Lower).map(r.moneyToFulfillNeeds)
     }.reduce(_ |+| _)
   }
 
@@ -169,7 +169,7 @@ class StateBudget(startingMoney: Double, val taxPolicy: TaxPolicy) {
 
   private def payPensions(regions: List[EconomicRegion], primaryCulture: Culture, money: Double): Unit = {
     currentReport = currentReport.copy(expenses = currentReport.expenses |+| Pensions -> money)
-    val pops = regions.flatMap(_.regionPopulation.pops).filter(p => p.populationType.populationClass == Lower)
+    val pops = regions.flatMap(_.regionPopulation.popsList).filter(p => p.populationType.populationClass == Lower)
     val totalEff = pops.map(_.totalPopEfficiency).sum
     if (totalEff == 0) {
       val moneyPerRegion = money / regions.size

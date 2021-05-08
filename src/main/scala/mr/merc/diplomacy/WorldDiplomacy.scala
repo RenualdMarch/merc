@@ -5,9 +5,10 @@ import mr.merc.diplomacy.DiplomaticAgreement.WarAgreement._
 import mr.merc.diplomacy.Claim.{ProvinceClaim, StrongProvinceClaim, VassalizationClaim, WeakProvinceClaim}
 import mr.merc.diplomacy.DiplomaticMessage.DeclareWar
 import mr.merc.diplomacy.WorldDiplomacy.RelationshipBonus
+import mr.merc.economics.Culture.CultureAlignment.{ColorAlignment, PriorityAlignment}
 import mr.merc.politics.{ForeignPolicy, Province, State}
 import mr.merc.economics.WorldConstants.Diplomacy._
-import mr.merc.economics.message.{InformationDomesticMessage}
+import mr.merc.economics.message.InformationDomesticMessage
 import mr.merc.economics.{Culture, WorldConstants, WorldStateDiplomacyActions}
 import mr.merc.local.Localization
 import mr.merc.ui.world.ClaimReceivedDomesticMessagePane
@@ -375,10 +376,10 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
         RelationshipBonus(vc.state, vc.possibleVassal, VassalizationClaimsOnThemRelationshipChange,
           Localization("diplomacy.hasVassalizationClaim", vc.state.name, vc.possibleVassal.name))
       case str: ProvinceClaim if str.state == from =>
-        RelationshipBonus(str.state, str.targetState, ClaimsOnThemRelationshipChange,
+        RelationshipBonus(str.state, str.targetState, ClaimsOnUsRelationshipChange,
           Localization("diplomacy.hasClaim", str.state.name, str.province.name, str.targetState.name))
       case str: ProvinceClaim =>
-        RelationshipBonus(str.targetState, str.state, ClaimsOnUsRelationshipChange,
+        RelationshipBonus(str.targetState, str.state, ClaimsOnThemRelationshipChange,
           Localization("diplomacy.hasClaim", str.state.name, str.province.name, str.targetState.name))
     }.toList
   }
@@ -389,12 +390,39 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
     }.toList
   }
 
-  def raceAndCultureBonuses(from: State, to: State): RelationshipBonus = {
-    (from.primeCulture, to.primeCulture) match {
-      case (a, b) if a == b => RelationshipBonus(from, to, SameCultureRelationshipBonus, Localization("diplomacy.sameCulture", from.name, to.name))
-      case (a, b) if a.race == b.race => RelationshipBonus(from, to, SameRaceRelationshipBonus, Localization("diplomacy.sameRace", from.name, to.name))
-      case _ => RelationshipBonus(from, to, DifferentRaceRelationshipBonus, Localization("diplomacy.differentRace", from.name, to.name))
+  def raceAndCultureBonuses(from: State, to: State): List[RelationshipBonus] = {
+    val fromAlignment = from.primeCulture.cultureAlignment
+    val toAlignment = to.primeCulture.cultureAlignment
+
+    def localizationR(a: ColorAlignment, b: ColorAlignment) = {
+      val key = if (a == b) "diplomacy.religionAlignment.same" else "diplomacy.religionAlignment.different"
+      Localization(key, from.name, a.localize, to.name, b.localize)
     }
+
+    def localizationP(a: PriorityAlignment, b: PriorityAlignment) = {
+      val key = if (a == b) "diplomacy.priorityAlignment.same" else "diplomacy.priorityAlignment.different"
+      Localization(key, from.name, a.localize, to.name, b.localize)
+    }
+
+    val religionBonus = (fromAlignment.religionAlignment, toAlignment.religionAlignment) match {
+      case (a, b) if a == b =>
+        RelationshipBonus(from, to, SameReligionRelationshipBonus, localizationR(a, b))
+      case (a, b) if Set(ColorAlignment.Dark, ColorAlignment.Light) == Set(a, b) =>
+        RelationshipBonus(from, to, OppositeReligionRelationshipBonus, localizationR(a, b))
+      case (a, b) =>
+        RelationshipBonus(from, to, NeighbourReligionRelationshipBonus, localizationR(a, b))
+    }
+
+    val priorityBonus = (fromAlignment.priorityAlignment, toAlignment.priorityAlignment) match {
+      case (a, b) if a == b =>
+        RelationshipBonus(from, to, SamePriorityRelationshipBonus, localizationP(a, b))
+      case (a, b) if Set(PriorityAlignment.Intellectual, PriorityAlignment.Physical) == Set(a, b) =>
+        RelationshipBonus(from, to, OppositePriorityRelationshipBonus, localizationP(a, b))
+      case (a, b) =>
+        RelationshipBonus(from, to, NeighbourPriorityRelationshipBonus, localizationP(a, b))
+    }
+
+    List(religionBonus, priorityBonus)
   }
 
   def clearExpiredEvents(currentTurn: Int): Unit = {
@@ -410,7 +438,7 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
   def relationshipsDescribed(state: State, currentTurn: Int): Map[State, List[RelationshipBonus]] = {
     val bonuses = events(state).map(_.relationshipsChange(currentTurn)) ++ neighboursBonuses(state) ++
       agreements(state).flatMap(_.relationshipBonus).filter(_.from == state) ++
-      claimsBonuses(state) ++ reputationBonuses(state) ++ (states - state).map(s => raceAndCultureBonuses(state, s))
+      claimsBonuses(state) ++ reputationBonuses(state) ++ (states - state).flatMap(s => raceAndCultureBonuses(state, s))
     bonuses.groupBy(_.to)
   }
 

@@ -1,6 +1,7 @@
 package mr.merc.unit.view
 
 import mr.merc.image.MImage
+
 import scala.xml.XML
 import scala.xml.Node
 import scala.xml.NodeSeq
@@ -10,6 +11,8 @@ import mr.merc.unit.sound._
 import mr.merc.sound.Sound
 import mr.merc.sound.SoundConfig
 import mr.merc.unit.SoldierType
+
+import scala.concurrent.Future
 
 object SoldierTypeViewInfo {
   val rootPath = "/images/units/"
@@ -119,7 +122,7 @@ object SoldierTypeViewInfo {
 
   private def replaceAbsentFailWithSuccess(map: Map[SoldierViewAttackState, List[MImage]]): Map[SoldierViewAttackState, List[MImage]] = {
     val successes = map.filter(_._1.success)
-    val absent = successes flatMap {case (s, list) =>
+    val absent = successes flatMap { case (s, list) =>
       val st = SoldierViewAttackState(success = false, s.direction, s.number)
       if (map(st).isEmpty) {
         Some(st, list)
@@ -193,7 +196,7 @@ object SoldierTypeViewInfo {
     val alpha = (list zip multiplyers).map(p => p._1 * p._2)
 
     val imagesList = List.fill(size)(stand)
-    (imagesList zip alpha).map{ case (image, a) => image.changeAlpha(a.toFloat)}
+    (imagesList zip alpha).map { case (image, a) => image.changeAlpha(a.toFloat) }
   }
 
   private def parseImagesList(typeName: String, node: NodeSeq, default: List[MImage]): List[MImage] = {
@@ -229,10 +232,15 @@ case class SoldierTypeViewInfo(name: String, images: Map[SoldierViewState, List[
     SoldierTypeViewInfo(name, newImages, sounds, attacks)
   }
 
+  private var eagerLoaded = false
+
   def eagerLoad() {
-    images.flatMap(_._2) foreach { im =>
-      im.loadLazyImage()
-      im.mirrorVertically.loadLazyImage()
+    if (!eagerLoaded) {
+      images.flatMap(_._2).foreach { im =>
+        im.loadLazyImage()
+        im.mirrorVertically.loadLazyImage()
+      }
+      eagerLoaded = true
     }
   }
 }

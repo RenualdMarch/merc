@@ -13,6 +13,7 @@ import mr.merc.economics.EconomicRegion.{ProductTradingInfo, ProductionTradingIn
 import mr.merc.economics.RegionPopulation.Rebellion
 import mr.merc.log.Logging
 import EconomicRegion._
+import mr.merc.util.RecalculatableValue
 
 import scala.util.Random
 
@@ -41,9 +42,9 @@ trait EconomicRegion {
   }
 
   def moneyToFulfillNeeds(populationType: PopulationType): Map[PopulationNeedsType, Double] = {
-    val pops = regionPopulation.pops.filter(_.populationType == populationType)
+    val pops = regionPopulation.popsByType(populationType)
     val currentMoney = pops.map(_.moneyReserves).sum
-    val map = regionPopulation.pops.filter(_.populationType == populationType).map(moneyToFulfillNeeds).
+    val map = regionPopulation.popsByType(populationType).map(moneyToFulfillNeeds).
       foldLeft(Map[PopulationNeedsType, Double]())(_ |+| _).withDefaultValue(0d)
 
     if (currentMoney <= map(LifeNeeds)) {
@@ -103,8 +104,12 @@ trait EconomicRegion {
     }
   }
 
-  def bureaucratsPercentageFromMax:Double = {
-    val totalPopulation = regionPopulation.pops.map(_.populationCount).sum
+  private val bureaucratsPercentageFromMaxVariable = new RecalculatableValue[Double](bureaucratsPercentageFromMaxF)
+
+  def bureaucratsPercentageFromMax:Double = bureaucratsPercentageFromMaxVariable.value
+
+  private def bureaucratsPercentageFromMaxF:Double = {
+    val totalPopulation = regionPopulation.popsList.map(_.populationCount).sum
     val bureaucrats = regionPopulation.popsByType(Bureaucrats).map(_.populationCount).sum
     if (totalPopulation == 0) 0
     else {
@@ -143,6 +148,10 @@ trait EconomicRegion {
   def civilianVictimsOfBattleDied(): Unit = {
     regionPopulation.nonEmptyPops.foreach(_.kill(WorldConstants.Population.BattleVictimsPercentage))
   }
+
+  def endTurn(): Unit = {
+    bureaucratsPercentageFromMaxVariable.clear()
+  }
 }
 
 class EconomicGrid(region:EconomicRegion, diplomacy: WorldStateDiplomacyActions) extends PossibleGrid[EconomicRegion] {
@@ -178,10 +187,12 @@ object RegionPopulation {
 
 class RegionPopulation(initialPops: List[Population]) {
 
-  private var currentPops = initialPops
+  import mr.merc.util.MercUtils._
 
-  def generatePopDemands(prices:Map[Product, Double]):List[PopulationDemandRequest] = {
-    currentPops.flatMap { pop =>
+  private var currentPops = initialPops.groupBy(_.populationType)
+
+  def generatePopDemands(prices:Map[Product, Double]): List[PopulationDemandRequest] = {
+    popsList.flatMap { pop =>
       pop.calculateDemands(prices).map { case (p, c) =>
         PopulationDemandRequest(pop, p, c)
       }
@@ -189,7 +200,7 @@ class RegionPopulation(initialPops: List[Population]) {
   }
 
   def receivePopSalary(popType: PopulationType, money: Double): Unit = {
-    val current = pops.filter(_.populationType == popType)
+    val current = popsByType(popType)
     val total = current.map(p => p.populationCount * p.efficiency).sum
     total match {
       case 0 => current.head.receiveSalary(money)
@@ -200,11 +211,15 @@ class RegionPopulation(initialPops: List[Population]) {
   }
 
   def popsByType(populationType: PopulationType): List[Population] = {
-    pops.filter(_.populationType == populationType)
+    pops.getOrElse(populationType, Nil)
   }
 
   def popsByTypeAndCulture(populationType: PopulationType, culture: Option[Culture]):List[Population] = {
-    pops.filter(_.populationType == populationType).filter(p => culture.forall(_ == p.culture))
+    popsByType(populationType).filter(p => culture.forall(_ == p.culture))
+  }
+
+  def grow(): Unit = {
+    popsList.foreach(_.grow())
   }
 
   def orderPop(populationType: PopulationType, requiredEfficiency: Double, culture: Option[Culture]): Map[Population, Double] = {
@@ -236,12 +251,12 @@ class RegionPopulation(initialPops: List[Population]) {
   }
 
   def pop(p: PopulationType, c: Culture): Population = {
-    pops.find(pop => pop.populationType == p && pop.culture == c) match {
+    popsByType(p).find(_.culture == c) match {
       case Some(x) => x
       case None =>
         val views = PoliticalViews.initPoliticalViews(p)
         val pop = new Population(c, p, 0, 0, 0, views)
-        currentPops = pop :: currentPops
+        currentPops = currentPops.addToList(p, pop)
         pop
     }
   }
@@ -255,36 +270,38 @@ class RegionPopulation(initialPops: List[Population]) {
   }
 
   def getPopTotalEfficiency(populationType: PopulationType): Double =
-    pops.filter(_.populationType == populationType).map(_.totalPopEfficiency).sum
+    popsByType(populationType).map(_.totalPopEfficiency).sum
 
-  def pops:List[Population] = currentPops
+  def pops:Map[PopulationType, List[Population]] = currentPops
 
-  def nonEmptyPops:List[Population] = currentPops.filter(_.populationCount > 0)
+  def popsList:List[Population] = pops.values.flatten.toList
 
-  def cultureMembers:Map[Culture, Int] = pops.groupBy(_.culture).mapValues(_.map(_.populationCount).sum)
+  def nonEmptyPops:List[Population] = popsList.filter(_.populationCount > 0)
+
+  def cultureMembers:Map[Culture, Int] = popsList.groupBy(_.culture).mapValues(_.map(_.populationCount).sum)
 
   def learnLiteracy(): Unit = {
     val scholars = popsByType(Scholars).map(_.populationCount).sum.toDouble
     val literacyIncrease = scholars * ScholarsLiteracyLearningIncreaseMultiplier
-    val totalCount = currentPops.map(_.populationCount).sum.toDouble
-    currentPops.foreach { p =>
+    val totalCount = popsList.map(_.populationCount).sum.toDouble
+    popsList.foreach { p =>
       val perc = literacyIncrease * p.populationCount / totalCount
       p.learnLiteracy(perc)
     }
   }
 
-  def populationCount: Int = pops.map(_.populationCount).sum
+  def populationCount: Int = popsList.map(_.populationCount).sum
 
   private def popsWhoWantToRebel(state: State, random: Random = Random): List[Population] = {
     import WorldConstants.Population._
-    pops.filter(_.salary.size > 2).filter { p =>
+    popsList.filter(_.salary.size > 2).filter { p =>
       val chance = popRebellingChance(p.consumptionHappiness, p.politicalHappiness(state))
       random.nextDouble() < chance
     }
   }
 
   private def partWantsToRebel(rebelPops:List[Population]):Double = {
-    val totalPops = pops.map(_.populationCount).sum
+    val totalPops = popsList.map(_.populationCount).sum
     val rebels = rebelPops.map(_.populationCount).sum
     if (totalPops != 0) rebels.toDouble / totalPops
     else 0d
