@@ -1,7 +1,7 @@
 package mr.merc.ui.world
 
-import mr.merc.economics.{Culture, SeasonOfYear, Seasons, WorldConstants, WorldStateDiplomacyActions}
-import mr.merc.politics.{Province, State}
+import mr.merc.economics.{SeasonOfYear, WorldConstants, WorldStateDiplomacyActions}
+import mr.merc.politics.State
 import mr.merc.util.MercTooltip
 import org.tbee.javafx.scene.layout.MigPane
 import javafx.scene.control.{SelectionMode, TableCell}
@@ -25,9 +25,9 @@ import mr.merc.util.FxPropertyUtils.PropertyBindingMap
 import scalafx.scene.{Node, Scene}
 import scalafx.scene.control.TabPane.TabClosingPolicy
 
-class DiplomacyPane(actions: WorldStateDiplomacyActions, currentState: State, stage: Stage, parentFrame:WorldFrame) extends PaneWithTwoHorizontalChildren(0.45) {
+class DiplomacyPane(actions: WorldStateDiplomacyActions, currentState: State, stage: Stage, parentFrame: WorldFrame) extends PaneWithTwoHorizontalChildren(0.45) {
 
-  private var selectedTab:Int = 0
+  private var selectedTab: Int = 0
 
   private val tablePane = new StatesTablePane(actions, currentState)
   private val property = tablePane.selectedItem
@@ -156,7 +156,7 @@ class StatesTablePane(actions: WorldStateDiplomacyActions, currentState: State) 
   add(statesTable, "grow,push")
 }
 
-class StateDiplomacyPane(currentState: State, selectedStateInfo: StateInfo, actions: WorldStateDiplomacyActions, stage: Stage, parentFrame:WorldFrame) extends MigPane {
+class StateDiplomacyPane(currentState: State, selectedStateInfo: StateInfo, actions: WorldStateDiplomacyActions, stage: Stage, parentFrame: WorldFrame) extends MigPane {
   private val selectedState = selectedStateInfo.state
 
   val tabPane = new TabPane {
@@ -300,7 +300,7 @@ class StateAgreementsPane(stage: Stage, selectedState: State, actions: WorldStat
   }
 }
 
-class StateActionsPane(currentState: State, selectedState: State, actions: WorldStateDiplomacyActions, stage: Stage, parentFrame:WorldFrame) extends MigPane {
+class StateActionsPane(currentState: State, selectedState: State, actions: WorldStateDiplomacyActions, stage: Stage, parentFrame: WorldFrame) extends MigPane {
 
   import ModalDialog._
 
@@ -382,6 +382,15 @@ class StateActionsPane(currentState: State, selectedState: State, actions: World
     }
   }
 
+  private val proposeFriendship = new MediumButton() {
+    text = Localization("diplomacy.proposeFriendship.button")
+    onAction = { _ =>
+      actions.sendMessage(new FriendshipProposal(currentState, selectedState))
+      parentFrame.showDiplomacyPane()
+    }
+
+  }
+
   private val enactSanctions = new MediumButton() {
     text = Localization("diplomacy.sanctions.button")
     onAction = { _ =>
@@ -395,6 +404,22 @@ class StateActionsPane(currentState: State, selectedState: State, actions: World
     onAction = { _ =>
       actions.sendMessage(SanctionsStopped(currentState, selectedState))
       parentFrame.showDiplomacyPane()
+    }
+  }
+
+  private val dropClaims = new MediumButton() {
+    text = Localization("claims.drop")
+    onAction = { _ =>
+      val dialog = new SelectClaimsToDrop(currentState, selectedState,
+        actions.claimsFromAgainst(currentState, selectedState)).showDialog(stage)
+      val set = dialog.dialogResult.getOrElse(Set())
+      set.foreach { claimToDrop =>
+        val msg = new DroppedClaim(currentState, selectedState, claimToDrop)
+        actions.sendMessage(msg)
+      }
+      if (set.nonEmpty) {
+        parentFrame.showDiplomacyPane()
+      }
     }
   }
 
@@ -436,6 +461,10 @@ class StateActionsPane(currentState: State, selectedState: State, actions: World
     add(proposeAlliance, "wrap")
   }
 
+  if (actions.canProposeFriendship(currentState, selectedState)) {
+    add(proposeFriendship, "wrap")
+  }
+
   if (actions.canProposeVassalization(currentState, selectedState)) {
     add(proposeVassalization, "wrap")
     add(demandVassalization, "wrap")
@@ -443,6 +472,10 @@ class StateActionsPane(currentState: State, selectedState: State, actions: World
 
   if (actions.canProposeOverlordship(currentState, selectedState)) {
     add(proposeOverlordship, "wrap")
+  }
+
+  if (actions.hasClaimsOn(currentState, selectedState)) {
+    add(dropClaims, "wrap")
   }
 
   if (callAllyToWarButtons.nonEmpty) {
@@ -469,7 +502,7 @@ class DeclareWarPane(currentState: State, selectedState: State, actions: WorldSt
   override protected def css: Option[String] = None
 }
 
-class AddWarTargetPane(currentState: State, selectedState: State, warAgreement: WarAgreement, actions:WorldStateDiplomacyActions) extends DialogStage[WarTarget] {
+class AddWarTargetPane(currentState: State, selectedState: State, warAgreement: WarAgreement, actions: WorldStateDiplomacyActions) extends DialogStage[WarTarget] {
 
   private lazy val selectWarTarget = new SelectWarTarget(actions.diplomacyEngine.possibleWarTargets(warAgreement, currentState))
 
@@ -486,7 +519,7 @@ class AddWarTargetPane(currentState: State, selectedState: State, warAgreement: 
   override protected def css: Option[String] = None
 }
 
-class SelectWarTarget(possibleWarTargets:Set[WarTarget]) extends MigPane {
+class SelectWarTarget(possibleWarTargets: Set[WarTarget]) extends MigPane {
 
   private abstract class WarTargetSelection extends BorderPane {
     def selectedWarTarget: Option[WarTarget]
@@ -500,7 +533,7 @@ class SelectWarTarget(possibleWarTargets:Set[WarTarget]) extends MigPane {
 
   private class VassalizeTargetKind extends WarTargetKind {
     private val possibleVassalizationTargets = possibleWarTargets.collect {
-      case v:Vassalize => v
+      case v: Vassalize => v
     }
 
     override def component: Option[WarTargetSelection] = {
@@ -533,7 +566,7 @@ class SelectWarTarget(possibleWarTargets:Set[WarTarget]) extends MigPane {
 
   private class DemandMoneyTargetKind extends WarTargetKind {
     private val possibleDemandMoneyTargets = possibleWarTargets.collect {
-      case t:TakeMoney => t
+      case t: TakeMoney => t
     }
 
     override def component: Option[WarTargetSelection] = {
@@ -594,40 +627,6 @@ class SelectWarTarget(possibleWarTargets:Set[WarTarget]) extends MigPane {
     override def label: String = Localization("diplomacy.takeProvince")
   }
 
-  private class CollapseTargetKind extends WarTargetKind {
-    private val possibleTargets = possibleWarTargets.collect {
-      case c: CrackState => c
-    }
-
-    override def component: Option[WarTargetSelection] = if (possibleTargets.nonEmpty) {
-      Some(
-        new WarTargetSelection {
-          private val group = new ToggleGroup()
-
-          override def selectedWarTarget: Option[WarTarget] = Option(group.selectedToggle).flatMap { st =>
-            Option(st.value).map { toggle =>
-              toggle.getUserData.asInstanceOf[CrackState]
-            }
-          }
-
-          center = new MigPane {
-            possibleTargets.foreach { s =>
-              val radio = new RadioButton {
-                text = s.giver.name
-                toggleGroup = group
-                userData = s
-                style = Components.largeFontStyle
-              }
-              add(radio, "wrap")
-            }
-          }
-        }
-      )
-    } else None
-
-    override def label: String = Localization("diplomacy.collapseState")
-  }
-
   private class LiberateCultureTargetKind extends WarTargetKind {
     private val possibleCultures = possibleWarTargets.collect {
       case lc: LiberateCulture => lc.culture
@@ -666,7 +665,6 @@ class SelectWarTarget(possibleWarTargets:Set[WarTarget]) extends MigPane {
     List(new VassalizeTargetKind,
       new DemandMoneyTargetKind,
       new TakeProvinceTargetKind,
-      new CollapseTargetKind,
       new LiberateCultureTargetKind).filter(_.component.nonEmpty)
   }
 
@@ -936,7 +934,7 @@ class WarPane(stage: Stage, war: WarAgreement, diplomacyActions: WorldStateDiplo
 
     val target = new TableColumn[WarTableRow, String] {
       text = Localization("diplomacy.warTarget")
-      style =  "-fx-alignment: center-right;"
+      style = "-fx-alignment: center-right;"
 
       cellValueFactory = p => StringProperty {
         p.value.warTarget match {
@@ -1014,7 +1012,7 @@ class StateRelationsToOtherStatesPane(state: State, actions: WorldStateDiplomacy
   add(table, "grow, push")
 }
 
-class AllWarsPane(stage: Stage, actions:WorldStateDiplomacyActions) extends ScrollPane {
+class AllWarsPane(stage: Stage, actions: WorldStateDiplomacyActions) extends ScrollPane {
   fitToWidth = true
   style = Components.largeFontStyle
   content = new MigPane {
@@ -1034,4 +1032,45 @@ class ElitesPane(state: State, turn: Int) extends MigPane("") {
   }.delegate
 
   add(node, "wrap, top")
+}
+
+class SelectClaimsToDrop(from: State, against: State, claims: List[Claim]) extends DialogStage[Set[Claim]] {
+
+  override protected def dialogContent: Region = {
+
+    val checkboxes = claims.map { c =>
+      val claimCheckBox = new CheckBox {
+        style = Components.largeFontStyle
+        text = c match {
+          case claim: Claim.ProvinceClaim =>
+            claim.province.name
+          case Claim.VassalizationClaim(state, possibleVassal, claimTurnEnd) =>
+            Localization("claims.list.vassalization")
+        }
+        selected.onChange {
+          if (selected.value) {
+            dialogResult = dialogResult.map { set =>
+              set + c
+            }.orElse(Some(Set(c)))
+          } else {
+            dialogResult = dialogResult.map { set =>
+              set.filterNot(_ == c)
+            }
+          }
+        }
+      }
+      claimCheckBox
+    }
+
+    new MigPane {
+      add(BigText(Localization("claims.drop.against")), "wrap")
+      add(new StateComponentColorName(against), "wrap")
+
+      checkboxes.foreach { cb =>
+        add(cb, "wrap")
+      }
+    }
+  }
+
+  override protected def css: Option[String] = None
 }

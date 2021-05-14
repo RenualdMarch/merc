@@ -30,7 +30,7 @@ class SceneManager(val stage: Stage) extends Logging {
 
   def startNewWorld(): Unit = {
     info("starting quick game")
-    val worldState = WorldGenerator.generateWorld(WorldMapCreationConf(40, 40, 100))
+    val worldState = WorldGenerator.generateWorld(WorldMapCreationConf(50, 50, 100))
     sceneRoot = new WorldFrame(this, worldState)
   }
 

@@ -29,7 +29,7 @@ class ProjectileView(start: Option[List[MImage]], move: Option[List[MImage]], en
       case ProjectileStart => Some(ProjectileStartSound)
       case ProjectileEnd => Some(ProjectileEndSound)
       case ProjectileMovement => Some(ProjectileMoveStartSound)
-      case _ => None
+      case ProjectileFinished | ProjectileNotStarted => None
     }
 
     soundState flatMap (s => sounds.get(s)) foreach (_.play())
@@ -64,7 +64,7 @@ class ProjectileView(start: Option[List[MImage]], move: Option[List[MImage]], en
             }
           }
         case ProjectileEnd => this.state = ProjectileFinished
-         case _ => // do nothing in this case
+        case ProjectileNotStarted | ProjectileFinished => // do nothing in this case
       }
     }
 

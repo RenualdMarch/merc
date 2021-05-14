@@ -7,7 +7,7 @@ import mr.merc.army.{Warrior, WarriorCompetence, WarriorType}
 import mr.merc.battle.BattleModel
 import mr.merc.diplomacy.Claim.{StrongProvinceClaim, VassalizationClaim, WeakProvinceClaim}
 import mr.merc.diplomacy.DiplomaticAgreement.{AllianceAgreement, SanctionAgreement, WarAgreement}
-import mr.merc.diplomacy.DiplomaticAgreement.WarAgreement.{CrackState, LiberateCulture, TakeMoney, TakeProvince, WarTarget}
+import mr.merc.diplomacy.DiplomaticAgreement.WarAgreement.{TakeMoney, TakeProvince, WarTarget}
 import mr.merc.diplomacy.DiplomaticMessage._
 import mr.merc.diplomacy.WorldDiplomacy.RelationshipBonus
 import mr.merc.diplomacy._
@@ -453,11 +453,10 @@ trait WorldStateDiplomacyActions extends Logging {
   def playerNeighbours = neighbours(playerState)
 
   def canTrade(from: State, to: State):Boolean = {
-    !diplomacyEngine.agreements(Set(from, to)).exists {
-      case ag: WarAgreement if ag.onDifferentSides(Set(from, to)) => true
-      case s: SanctionAgreement if s.underSanctions == from && s.initiator == to => true
-      case _ => false
-    }
+    diplomacyEngine.agreements(Set(from, to)).collectFirst {
+      case ag: WarAgreement if ag.onDifferentSides(Set(from, to)) => ag
+      case s: SanctionAgreement if s.underSanctions == from && s.initiator == to => s
+    }.isEmpty
   }
 
   def stateInfo: List[StateInfo] = states.toList.map { case (state, provinces) =>
@@ -491,6 +490,8 @@ trait WorldStateDiplomacyActions extends Logging {
   }
 
   def claims(state: State): List[Claim] = diplomacyEngine.claims(state)
+
+  def claimsFromAgainst(from: State, to: State): List[Claim] = diplomacyEngine.claimsFromAgainst(from, to)
 
   def claimsAgainst(state: State): List[Claim] = diplomacyEngine.claimsAgainst(state)
 
@@ -629,6 +630,15 @@ trait WorldStateDiplomacyActions extends Logging {
   def canProposeAlliance(from: State, to: State): Boolean = {
     val message = new AllianceProposal(from, to)
     isPossibleMessage(message)
+  }
+
+  def canProposeFriendship(from: State, to: State): Boolean = {
+    val message = new FriendshipProposal(from, to)
+    isPossibleMessage(message)
+  }
+
+  def hasClaimsOn(from: State, to: State): Boolean = {
+    claimsFromAgainst(from, to).nonEmpty
   }
 
   def canEnactSanctions(from: State, to: State): Boolean = {

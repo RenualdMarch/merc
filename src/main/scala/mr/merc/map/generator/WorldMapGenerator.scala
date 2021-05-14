@@ -26,7 +26,7 @@ object WorldMapGenerator {
 
     def biome(x: Int, y: Int): FourSeasonsTerrainType = {
       biomeNoise(x, width, y, height) match {
-        //case n if n < biomeNoise.percentageBelow(0.2) => DesertSand
+        //case n if n < biomeNoise.percentageBelow(0.2) => FourSeasonsDesert
         case n if n < biomeNoise.percentageBelow(0.6) => FourSeasonsGrass
         case n if n < biomeNoise.percentageBelow(0.85) => FourSeasonsDecForest
         case n if n < biomeNoise.percentageBelow(0.98) => FourSeasonsHill
@@ -114,7 +114,7 @@ object WorldMapGenerator {
       h.terrainMap = FourSeasonsRiver
     }
 
-    seq.flatMap(_.headOption).filter(_ => Random.nextDouble() > 0.5).foreach(addLake(_, field, 2 + Random.nextInt(8)))
+    seq.flatMap(_.headOption).grouped(2).map(_.head).foreach(addLake(_, field, 2 + Random.nextInt(3)))
   }
 
   def addLake(hex:FourSeasonsTerrainHex, field: FourSeasonsTerrainHexField, size: Int): Unit = {

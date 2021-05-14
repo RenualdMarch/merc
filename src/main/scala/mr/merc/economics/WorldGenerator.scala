@@ -140,8 +140,11 @@ class WorldGenerator(field:FourSeasonsTerrainHexField) {
 
     val currentCultures = Random.shuffle(Culture.cultures).take(connectivityMap.size / WorldGenerationConstants.StateAvgProvinces / 2)
 
-    val races = currentCultures.map(_.race).distinct
-    val raceSizes = races zip (connectivityMap.size divList races.size)
+    val (racesList, sizesList) = currentCultures.groupBy(_.race).map { case (r, list) =>
+      r -> math.pow(list.size, 0.7)
+    }.toList.unzip
+
+    val raceSizes = racesList zip (connectivityMap.size divList sizesList)
 
     val racesZipCM = raceSizes.map(_._1) zip divideIntoContinuousParts(connectivityMap, raceSizes.map(_._2))
     racesZipCM.flatMap {case (race, raceMap) =>

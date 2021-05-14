@@ -1,7 +1,7 @@
 package mr.merc.diplomacy
 
+import mr.merc.diplomacy.DiplomaticAgreement.WarAgreement.TakeMoney
 import mr.merc.diplomacy.DiplomaticAgreement.{VassalAgreement, WarAgreement}
-import mr.merc.diplomacy.DiplomaticAgreement.WarAgreement.CrackState
 import mr.merc.diplomacy.DiplomaticMessage._
 
 class WarTest extends AbstractDiplomacyTest {
@@ -9,7 +9,7 @@ class WarTest extends AbstractDiplomacyTest {
   test("simple declare war") {
     val List(first, second, third) = states
 
-    val declareWar = new DeclareWar(first, second, new CrackState(first, second, false), Set())
+    val declareWar = new DeclareWar(first, second, TakeMoney(first, second), Set())
     actions.sendMessage(declareWar)
 
     actions.mailbox(second) shouldBe List(declareWar)
@@ -34,7 +34,7 @@ class WarTest extends AbstractDiplomacyTest {
 
     actions.processUnansweredMessages()
 
-    val declareWar = new DeclareWar(second, first, new CrackState(second, first, false), Set())
+    val declareWar = new DeclareWar(second, first, TakeMoney(second, first), Set())
     actions.sendMessage(declareWar)
 
     actions.mailbox(first) shouldBe List(declareWar)
@@ -71,7 +71,7 @@ class WarTest extends AbstractDiplomacyTest {
 
     actions.processUnansweredMessages()
 
-    val declareWar = new DeclareWar(first, second, new CrackState(first, second, false), Set(third))
+    val declareWar = new DeclareWar(first, second, TakeMoney(first, second), Set(third))
     actions.sendMessage(declareWar)
 
     val List(order) = actions.mailbox(third)
@@ -108,7 +108,7 @@ class WarTest extends AbstractDiplomacyTest {
 
     actions.processUnansweredMessages()
 
-    val declareWar = new DeclareWar(first, second, new CrackState(first, second, false), Set(third))
+    val declareWar = new DeclareWar(first, second, TakeMoney(first, second), Set(third))
     actions.sendMessage(declareWar)
 
     val List(order) = actions.mailbox(third)
@@ -149,7 +149,7 @@ class WarTest extends AbstractDiplomacyTest {
 
     actions.processUnansweredMessages()
 
-    val declareWar = new DeclareWar(first, second, new CrackState(first, second, false), Set(third))
+    val declareWar = new DeclareWar(first, second, TakeMoney(first, second), Set(third))
     actions.sendMessage(declareWar)
 
     val List(order) = actions.mailbox(third)
@@ -194,7 +194,7 @@ class WarTest extends AbstractDiplomacyTest {
     vassalAgreement.overlord shouldBe first
     vassalAgreement.vassal shouldBe third
 
-    val declareWar = new DeclareWar(second, third, new CrackState(second, third, false), Set())
+    val declareWar = new DeclareWar(second, third, TakeMoney(second, third), Set())
     actions.sendMessage(declareWar)
 
     actions.mailbox(third) shouldBe List(declareWar)
@@ -231,7 +231,7 @@ class WarTest extends AbstractDiplomacyTest {
 
     actions.processUnansweredMessages()
 
-    val declareWar = new DeclareWar(third, second, new CrackState(third, second, false), Set(third))
+    val declareWar = new DeclareWar(third, second, TakeMoney(third, second), Set(third))
     actions.sendMessage(declareWar)
 
     actions.mailbox(first) shouldBe Nil
@@ -246,7 +246,7 @@ class WarTest extends AbstractDiplomacyTest {
     sendAndAccept(new AllianceProposal(second, third))
 
     actions.processUnansweredMessages()
-    val declareWar = new DeclareWar(first, second, new CrackState(first, second, false), Set(third))
+    val declareWar = new DeclareWar(first, second, TakeMoney(first, second), Set(third))
     actions.sendMessage(declareWar)
 
     actions.diplomacyEngine.areAllies(first, third) shouldBe true
@@ -282,7 +282,7 @@ class WarTest extends AbstractDiplomacyTest {
     sendAndAccept(new AllianceProposal(second, third))
 
     actions.processUnansweredMessages()
-    val declareWar = new DeclareWar(first, second, new CrackState(first, second, false), Set(third))
+    val declareWar = new DeclareWar(first, second, TakeMoney(first, second), Set(third))
     actions.sendMessage(declareWar)
 
     actions.diplomacyEngine.areAllies(first, third) shouldBe true

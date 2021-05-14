@@ -215,12 +215,17 @@ object WorldConstants {
     val BrokenTruceDuration = 60
 
     val DefaultAllianceDuration = 40
+    val DefaultFriendshipDuration = 40
     val AllianceRelationshipChange:Int = 50
-    val WereTogetherInAllianceTurns = 20
+    val FriendshipRelationshipChange:Int = 40
     val AllianceBetrayalDuration = 20
     val AllianceBetrayalRelationshipsChange = -50
+    val FriendshipBetrayalDuration = 20
+    val FriendshipBetrayalRelationshipsChange = -40
     val AllianceRejectionDuration = 10
+    val FriendshipRejectionDuration = 10
     val AllianceRejectionRelationshipChange = -20
+    val FriendshipRejectionRelationshipChange = -10
     val AllianceHonoredDuration = 20
     val AllianceHonoredRelationshipChange = 30
 
@@ -263,6 +268,13 @@ object WorldConstants {
     val CrackedStateBadBoy = 5
     val VassalizedStateBadBoy = 3
     val LiberateCultureBadBoy = 2
+
+    val ClaimCreationBadBoy = 2
+    val ClaimDroppingBadBoy = 2
+    val LeavingAllianceBadBoy = RefuseAllyCallBadBoy
+    val CancellingFriendshipBadBoy = 3
+
+    val BadBoyToRelationshipConversion = Vector(-10d, -8d, -6d, -4d, -2d)
 
     val ChanceForInitialWeakClaim = 0.1
     val ChanceForWeakClaim = 0.05

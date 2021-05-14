@@ -4,6 +4,7 @@ package mr.merc.util
 import scalafx.scene.paint.Color
 
 import java.util
+import scala.collection.generic.CanBuildFrom
 import scala.util.Random
 
 object MercUtils {

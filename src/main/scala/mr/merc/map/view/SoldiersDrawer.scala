@@ -10,7 +10,7 @@ import scalafx.geometry.Rectangle2D
 import mr.merc.view.{Drawable, Sprite}
 import mr.merc.unit.view.AbstractSoldierView
 
-import scala.reflect.ClassTag
+import scala.reflect.{ClassTag, classTag}
 
 class SoldiersDrawer[T <: AbstractSoldierView: ClassTag] extends Logging {
   private var _soldiers = Set[T]()
@@ -120,7 +120,9 @@ class SoldiersDrawer[T <: AbstractSoldierView: ClassTag] extends Logging {
       }
     }
     val dirtySoldiersNotTakingPartInMovements = dirtySoldiers.filter(ds => !touchedDrawables.contains(ds))
-    val (touchedDirtySoldiers, touchedNotSoldiers) = (dirtyDrawables ++ touchedDrawables).partition(_.isInstanceOf[T])
+    val (touchedDirtySoldiers, touchedNotSoldiers) = (dirtyDrawables ++ touchedDrawables).partition { c =>
+      classTag[T].runtimeClass.isInstance(c)
+    }
     val dirtyAndTouched = (dirtySoldiersNotTakingPartInMovements ++
       touchedDirtySoldiers.map(_.asInstanceOf[T])).toList.sortBy(_.y)
     val drawablesToRedraw: List[Drawable] = dirtyAndTouched.map(_.asInstanceOf[Drawable]) ++ touchedNotSoldiers

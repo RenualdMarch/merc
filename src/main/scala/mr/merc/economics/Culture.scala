@@ -80,8 +80,6 @@ object Culture {
     }
   }
 
-  import CultureAlignment._
-
   case object LatinHuman extends Culture("latin", Humans, "humanCity", Color.Red) {
     val warriorViewNames: WarriorViewNames = WarriorViewNames.LatinCulture
 

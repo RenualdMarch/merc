@@ -1,39 +1,33 @@
 requirement failed: Buying and selling differ
 
-friendship treaty - prevents creating claims and declaring wars, but can join wars with allies
-friendship treaty - drops all claims
-drop claim button
-after vassalization claims against overlord are dropped
-alliance claims against each other are dropped and not created any more
-ask allies to join your war
-destroy all unreachable islands?
+exit friendship button
+exit alliance button
+reputation lost after friendship and alliances and truces are broken, after claims created(and decreased after claims are dropped)
+reputation influence on relationships
+durationEndAgreementEvent for war-agreement
+ask allies to join your war in declare war pane
+vassal asks for freedom and revolts if declined
+totally rework AI diplomacy with new features
 bug with long bridges on world map
 add rulers to map
 bug with drawing single water tile
+state rating pane
+animate healing
 
-Move to JOGL?
-
-totally rework AI diplomacy with new features
-
-Map generation scenarios:
-1) Random, as now
-2) One state per culture
-3) One province per state for culture
-
+Move to JOGL? - for 1.1
 
 Polishing
+destroy all unreachable islands?
 rebalance political parties and views
+allow hire people from other cultures with some political configurations, now it is possible to hire primary culture warrior anywhere
+
 
 Not high priority:
-allow hire people from other cultures with some political configurations, now it is possible to hire primary culture warrior anywhere
 when hiring soldiers, use actual population(manpower pools?)
 make cultures for castles/walls
 check conditional AI logic - unused expression
-state rating pane
-animate healing
 idle animation for soldiers on battle
 idle animation for soldiers on world map
-think about interesting events, look at stellaris
 
 
 add more cultures, at least two cultures per race:
@@ -66,6 +60,8 @@ Dwarfs
 +Nagas
 +Merfolks
 
+++ Reign of Lords Era ++ Reign of Heroes Era
+
 Polishing:
 issues - balance production and needs multipliers
 localization - add parameters order, like %1, %2, %3
@@ -89,7 +85,6 @@ ability to retreat from battle
 change cursor while drag&drop
 
 Dreams:
-strange wooden bridges placement during map creation(MapObject placement)
 water animation
 windmill animation
 Let map reflect actual province factories and resources

@@ -5,7 +5,7 @@ import mr.merc.politics.State
 import mr.merc.economics.WorldConstants.Diplomacy._
 import mr.merc.local.Localization
 
-abstract class RelationshipEvent(val fromState: State, val toState: State, val eventTurn: Int, val duration: Int, val relationshipChange: Int) {
+sealed abstract class RelationshipEvent(val fromState: State, val toState: State, val eventTurn: Int, val duration: Int, val relationshipChange: Int) {
 
   def relationshipsChange(currentTurn: Int): RelationshipBonus = {
     val passedDuration = currentTurn - eventTurn
@@ -23,22 +23,28 @@ abstract class RelationshipEvent(val fromState: State, val toState: State, val e
 
 object RelationshipEvent {
 
-  class WereTogetherInAlliance(fromState: State, toState: State, eventTurn: Int)
-    extends RelationshipEvent(fromState, toState, eventTurn, WereTogetherInAllianceTurns, AllianceRelationshipChange) {
-
-    override def localizeEvent: String = Localization("diplomacy.wereTogetherInAlliance", fromState.name, toState.name)
-  }
-
   class BrokeAlliance(loyal: State, betrayer: State, eventTurn: Int)
     extends RelationshipEvent(loyal, betrayer, eventTurn, AllianceBetrayalDuration, AllianceBetrayalRelationshipsChange) {
 
     override def localizeEvent: String = Localization("diplomacy.brokeAlliance", betrayer.name, loyal.name)
   }
 
+  class BrokeFriendshipTreaty(loyal: State, betrayer: State, eventTurn: Int)
+    extends RelationshipEvent(loyal, betrayer, eventTurn, FriendshipBetrayalDuration, FriendshipBetrayalRelationshipsChange) {
+
+    override def localizeEvent: String = Localization("diplomacy.brokeFriendship", betrayer.name, loyal.name)
+  }
+
   class DeclinedAlliance(proposingState: State, rejectingState: State, eventTurn: Int)
     extends RelationshipEvent(proposingState, rejectingState, eventTurn, AllianceRejectionDuration, AllianceRejectionRelationshipChange) {
 
     override def localizeEvent: String = Localization("diplomacy.rejectedAlliance", rejectingState.name, proposingState.name)
+  }
+
+  class RejectedFriendship(proposingState: State, rejectingState: State, eventTurn: Int)
+    extends RelationshipEvent(proposingState, rejectingState, eventTurn, FriendshipRejectionDuration, FriendshipRejectionRelationshipChange) {
+
+    override def localizeEvent: String = Localization("diplomacy.rejectedFriendship", rejectingState.name, proposingState.name)
   }
 
   class DeclinedVassalization(proposingState: State, rejectingState: State, eventTurn: Int)
@@ -78,9 +84,10 @@ object RelationshipEvent {
     override def localizeEvent: String = Localization("diplomacy.separatePeace", escaping.name, remaining.name)
   }
 
-  class AcceptedJoinWar(warInitiator:State, warJoiner: State, eventTurn: Int)
+  class AcceptedJoinWar(warInitiator: State, warJoiner: State, eventTurn: Int)
     extends RelationshipEvent(warInitiator, warJoiner, eventTurn, AllianceHonoredDuration, AllianceHonoredRelationshipChange) {
 
     override def localizeEvent: String = Localization("diplomacy.joinedWar", warJoiner.name, warInitiator.name)
   }
+
 }

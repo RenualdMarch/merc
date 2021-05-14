@@ -1,7 +1,7 @@
 package mr.merc.diplomacy
 
 import mr.merc.diplomacy.DiplomaticAgreement.{AllianceAgreement, VassalAgreement, WarAgreement}
-import mr.merc.diplomacy.DiplomaticAgreement.WarAgreement.{CrackState, TakeProvince, Vassalize}
+import mr.merc.diplomacy.DiplomaticAgreement.WarAgreement.{TakeProvince, Vassalize}
 import mr.merc.diplomacy.DiplomaticMessage.{AcceptedPeaceProposal, AskJoinWar, DeclareWar, ProposePeace, ProposeSeparatePeace}
 import mr.merc.diplomacy.RelationshipEvent.SeparatePeace
 
@@ -67,44 +67,6 @@ class WarTargetsTest extends AbstractDiplomacyTest {
     val accepted = actions.mailbox(first).head.asInstanceOf[AcceptedPeaceProposal]
     accepted.from shouldBe second
     accepted.to shouldBe first
-  }
-
-  test("war with cracking state") {
-    val List(first, second, _) = states
-
-    val List(firstProvince1, firstProvince2) = actions.regions.filter(_.owner == first)
-    val List(secondProvince1, secondProvince2) = actions.regions.filter(_.owner == second)
-
-    actions.sendMessage(new DeclareWar(first, second, CrackState(first, second, false), Set()))
-    actions.processUnansweredMessages()
-
-    val agreement = actions.agreements(first).head.asInstanceOf[WarAgreement]
-    sendAndAccept(new ProposePeace(first, second, agreement, agreement.targets))
-
-    val newState = (actions.regions.map(_.owner).toSet -- Set(first, second)).head
-
-    newState.primeCulture shouldBe second.primeCulture
-    newState.politicalSystem.rulingParty shouldBe first.politicalSystem.rulingParty
-
-    firstProvince1.owner shouldBe first
-    firstProvince2.owner shouldBe first
-    firstProvince1.controller shouldBe first
-    firstProvince2.controller shouldBe first
-
-    if (secondProvince1.owner == newState) {
-      secondProvince1.controller shouldBe newState
-      secondProvince2.controller shouldBe second
-      secondProvince1.owner shouldBe newState
-      secondProvince2.owner shouldBe second
-    } else if (secondProvince2.owner == newState) {
-      secondProvince1.controller shouldBe second
-      secondProvince2.controller shouldBe newState
-      secondProvince1.owner shouldBe second
-      secondProvince2.owner shouldBe newState
-    } else {
-      fail("Didn't find province for newState")
-    }
-
   }
 
   test("war with vassalization") {

@@ -1,6 +1,6 @@
 package mr.merc.diplomacy
 
-import mr.merc.diplomacy.DiplomaticAgreement.{AllianceAgreement, SanctionAgreement, TruceAgreement, VassalAgreement, WarAgreement}
+import mr.merc.diplomacy.DiplomaticAgreement.{AllianceAgreement, FriendshipAgreement, SanctionAgreement, TruceAgreement, VassalAgreement, WarAgreement}
 import mr.merc.diplomacy.DiplomaticAgreement.WarAgreement._
 import mr.merc.diplomacy.Claim.{ProvinceClaim, StrongProvinceClaim, VassalizationClaim, WeakProvinceClaim}
 import mr.merc.diplomacy.DiplomaticMessage.DeclareWar
@@ -102,6 +102,14 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
           actualStates.contains(state) && actualStates.contains(possibleVassal)
       }
     }
+
+    def dropClaims(claims: Traversable[Claim]): Unit = {
+      _claims --= claims
+    }
+
+    def dropClaim(claim: Claim): Unit = {
+      dropClaims(List(claim))
+    }
   }
 
   private val claimsHolder = new ClaimsHolder()
@@ -130,7 +138,7 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
   private def generateClaimsForNeighbours(percentage: Double, claimEnd: Int): Unit = {
     for {
       p <- regions if p.owner.politicalSystem.rulingParty.foreignPolicy == ForeignPolicy.Expansionism
-      neig <- p.neighbours if neig.owner != p.owner
+      neig <- p.neighbours if neig.owner != p.owner && !areAllies(neig.owner, p.owner) && !areFriends(neig.owner, p.owner)
     } {
       if (Random.nextDouble() < percentage) {
         val claim = WeakProvinceClaim(p.owner, neig, claimEnd)
@@ -143,6 +151,8 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
           claim.province.owner.mailBox.addMessage(new InformationDomesticMessage(claim.province.owner.elites.foreignMinister, Localization("messages.claims.title")) {
             override def body: Region = new ClaimReceivedDomesticMessagePane(claim.province.owner, claim)
           })
+
+          increaseBadBoy(p.owner, ClaimCreationBadBoy)
         }
       }
     }
@@ -178,6 +188,15 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
     }
   }
 
+  def dropAllClaimsAgainst(whoDrops: State, againstWho: State): Unit = {
+    this.claimsHolder.dropClaims(this.claimsHolder.claims.filter(c => c.state == whoDrops && c.targetState == againstWho))
+  }
+
+  def dropClaim(claim: Claim): Unit = {
+    decreaseBadBoy(claim.state, ClaimDroppingBadBoy)
+    this.claimsHolder.dropClaim(claim)
+  }
+
   def hasClaimOverProvince(state: State, province: Province): Boolean = {
     claims(state).collect {
       case w: WeakProvinceClaim => w.province
@@ -201,10 +220,9 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
   def generateNewWarName(attacker: State, defender: State, target: WarTarget): String = {
     val newWarName = target match {
       case takeProvince: TakeProvince =>
-        if (allClaims.exists {
-          case StrongProvinceClaim(state, province) => state == attacker && province == takeProvince.province
-          case _ => false
-        }) {
+        if (allClaims.collectFirst {
+          case sc@StrongProvinceClaim(state, province) if state == attacker && province == takeProvince.province => sc
+        } nonEmpty) {
           Localization("diplomacy.warName.liberation", takeProvince.demander.initialName, takeProvince.giver.initialName, takeProvince.province.name)
         } else {
           Localization("diplomacy.warName.conquest", takeProvince.demander.initialName, takeProvince.giver.initialName, takeProvince.province.name)
@@ -212,8 +230,6 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
       case culture: LiberateCulture =>
         Localization("diplomacy.warName.cultureLiberation", culture.demander.initialName,
           Localization(culture.culture.cultureNameKey), culture.giver.initialName)
-      case state: CrackState =>
-        Localization("diplomacy.warName.crackState", state.demander.initialName, state.giver.initialName)
       case money: TakeMoney =>
         Localization("diplomacy.warName.demandMoney", money.demander.initialName, money.giver.initialName)
       case vassalize: Vassalize =>
@@ -227,15 +243,17 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
   }
 
   def improveBadBoyOverTime(): Unit = {
-    _badBoy = _badBoy.map { case (k, v) =>
-      val newV = if (v > BadBoyTurnRecovery) v - BadBoyTurnRecovery else 0
-      k -> newV
-    }.withDefaultValue(0d)
+    _badBoy.keys.foreach(s => decreaseBadBoy(s, BadBoyTurnRecovery))
   }
 
   def increaseBadBoy(state: State, value: Double): Unit = {
     val current = _badBoy.getOrElse(state, 0d) + value
     _badBoy = _badBoy + (state -> current)
+  }
+
+  def decreaseBadBoy(state: State, value: Double): Unit ={
+    val current = _badBoy.getOrElse(state, 0d) - value
+    _badBoy = _badBoy + (state -> (if (current < 0) 0 else current))
   }
 
   def addAgreement(agreement: DiplomaticAgreement): Unit = {
@@ -336,17 +354,21 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
     agreements.filter(a => sides.subsetOf(a.sides))
 
   def areAllies(first: State, second: State): Boolean = {
-    agreements(Set(first, second)).exists {
-      case aa: AllianceAgreement if aa.sides == Set(first, second) => true
-      case _ => false
-    }
+    agreements(Set(first, second)).collectFirst {
+      case aa: AllianceAgreement if aa.sides == Set(first, second) => aa
+    }.nonEmpty
+  }
+
+  def areFriends(first: State, second: State): Boolean = {
+    agreements(Set(first, second)).collectFirst {
+      case fa: FriendshipAgreement if fa.sides == Set(first, second) => fa
+    }.nonEmpty
   }
 
   def isVassal(overlord: State, vassal: State): Boolean = {
-    agreements(Set(overlord, vassal)).exists {
-      case va: VassalAgreement if va.overlord == overlord && va.vassal == vassal => true
-      case _ => false
-    }
+    agreements(Set(overlord, vassal)).collectFirst {
+      case va: VassalAgreement if va.overlord == overlord && va.vassal == vassal => va
+    } nonEmpty
   }
 
   def getOverlord(vassal: State): Option[State] = {
@@ -471,6 +493,8 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
 
   def claimsAgainst(state: State): List[Claim] = claimsHolder.claims.filter(c => c.targetState == state && c.state != state).toList
 
+  def claimsFromAgainst(from: State, to: State): List[Claim] = claimsHolder.claims.filter(c => c.targetState == to && c.state == from).toList
+
   def joinWar(wa: WarAgreement, ally: State, newSide: State, currentTurn: Int): Unit = {
     if (wa.defenders.contains(ally)) {
       wa.defenders += newSide
@@ -551,24 +575,6 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
           giveAllMoneyToAnnexor(lc.giver, lc.demander)
         }
         Nil
-      case cs: CrackState =>
-        if (!hasVassalizationClaimOverState(cs.demander, cs.giver)) {
-          increaseBadBoy(cs.demander, CrackedStateBadBoy)
-        }
-        val provinces = if (cs.partiallyApplied) {
-          actions.regions.filter(ow => ow.owner == cs.giver && ow.controller != ow.owner)
-        } else {
-          actions.states(cs.giver)
-        }
-
-        val max = provinces.maxBy(_.regionPopulation.populationCount)
-        max.controller = max.owner
-        provinces.filterNot(_ == max).foreach { p =>
-          val newState = actions.generateNewState(p.culture, cs.demander.rulingParty, cs.giver.technologyLevel.technologyLevel, 0)
-          p.owner = newState
-          p.controller = newState
-        }
-        Nil
       case tm: TakeMoney =>
         val money = tm.giver.budget.spendMoneyOnReparations(tm.giver.budget.moneyReserve)
         tm.demander.budget.receiveMoneyFromReparations(money)
@@ -605,6 +611,9 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
         else None
       case sanctionAgreement: SanctionAgreement =>
         if (sanctionAgreement.sides != actual(sanctionAgreement.sides)) Some(sanctionAgreement)
+        else None
+      case friendshipAgreement: FriendshipAgreement =>
+        if (friendshipAgreement.sides != actual(friendshipAgreement.sides)) Some(friendshipAgreement)
         else None
     }.toSet
 
@@ -650,7 +659,7 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
     } ++ possibleCulturesToLiberate(defender).map { c =>
       val provinces = regions.filter(_.owner == defender).filter(_.culture == c)
       LiberateCulture(attacker, defender, c, provinces.toSet)
-    } ++ List(CrackState(attacker, defender, false), TakeMoney(attacker, defender))
+    } ++ List(TakeMoney(attacker, defender))
   }.toSet
 
   def possibleWarTargets(warAgreement: WarAgreement, state: State): Set[WarTarget] = {
@@ -658,7 +667,6 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
     val allies = warAgreement.sideByState(state)
     val possible: Set[WarTarget] = enemies.flatMap { en =>
       List(
-        CrackState(state, en, false),
         Vassalize(state, en),
         TakeMoney(state, en)) ++
         regions.filter(r => r.owner == en && allies.contains(r.controller)).map { r =>
@@ -699,8 +707,6 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
         war.sideByState(demander).contains(province.controller)
       case WarAgreement.LiberateCulture(demander, giver, culture, provinces) =>
         provinces.exists(p => war.sideByState(demander).contains(p.controller))
-      case WarAgreement.CrackState(demander, giver, _) =>
-        actions.states(giver).exists(p => war.sideByState(demander).contains(p.controller))
       case _: WarAgreement.TakeMoney => false
       case _: WarAgreement.Vassalize => false
     }.foreach {
@@ -709,8 +715,8 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
         val controlled = provinces.filter(p => war.sideByState(demander).contains(p.controller))
         val newTarget = LiberateCulture(demander, giver, culture, controlled)
         applyWarTarget(war, newTarget, actions.turn)
-      case cs: CrackState =>
-        applyWarTarget(war, cs.copy(partiallyApplied = true), actions.turn)
+      case _:TakeMoney => sys.error("Impossible case")
+      case _:Vassalize => sys.error("Impossible case")
     }
 
   }

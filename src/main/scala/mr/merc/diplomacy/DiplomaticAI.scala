@@ -168,9 +168,6 @@ class DiplomaticAI(state: State, actions: WorldStateDiplomacyActions) extends Lo
       case v: Vassalize => enemyArmyDomination && actions.regions.filter(_.owner == v.giver).forall { p =>
         enemySide.contains(p.controller) && stateAndVassals.contains(p.owner)
       }
-      case cs: CrackState => enemyArmyDomination && actions.regions.filter(_.owner == cs.giver).forall { p =>
-        enemySide.contains(p.controller) && stateAndVassals.contains(p.owner)
-      }
     }
   }
 
@@ -187,9 +184,6 @@ class DiplomaticAI(state: State, actions: WorldStateDiplomacyActions) extends Lo
       }
       case tm: TakeMoney => enemyArmyDomination
       case v: Vassalize => enemyArmyDomination && actions.regions.filter(_.owner == v.giver).forall { p =>
-        enemySide.contains(p.controller)
-      }
-      case cs: CrackState => enemyArmyDomination && actions.regions.filter(_.owner == cs.giver).forall { p =>
         enemySide.contains(p.controller)
       }
     }
@@ -260,8 +254,6 @@ class DiplomaticAI(state: State, actions: WorldStateDiplomacyActions) extends Lo
         demanderSide.contains(province.controller)
       case LiberateCulture(_, _, _, provinces) =>
         provinces.forall (p => demanderSide.contains(p.controller))
-      case CrackState(_, giver, _) =>
-        actions.regions.filter(_.owner == giver).forall(p => demanderSide.contains(p.controller))
       case TakeMoney(_, _) => true
       case Vassalize(_, giver) =>
         actions.regions.filter(_.owner == giver).forall(p => demanderSide.contains(p.controller))
