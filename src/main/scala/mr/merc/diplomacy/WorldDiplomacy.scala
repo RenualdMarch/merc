@@ -15,6 +15,7 @@ import mr.merc.ui.world.ClaimReceivedDomesticMessagePane
 import scalafx.scene.layout.Region
 import scalafx.Includes._
 
+import scala.annotation.tailrec
 import scala.util.Random
 
 
@@ -39,6 +40,57 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
   def badBoy: Map[State, Double] = _badBoy
 
   private var mailbox: Map[State, List[DiplomaticMessage]] = Map()
+
+  def distancesToAllOtherReachableStates(state: State, maxDistance:Option[Int]): Map[State, Int] = {
+    val streams = actions.states(state).map { province =>
+      maxDistance match {
+        case Some(value) => neighboursStream(province).takeWhile(_._1 <= value)
+        case None => neighboursStream(province)
+      }
+    }
+    streams.flatten.filterNot(_._2.owner == state).map { case (d, p) =>
+      p.owner -> d
+    }.groupBy(_._1).map { case (k, v) =>
+      k -> v.map(_._2).min
+    }
+  }
+
+  def distanceFromStateToState(from: State, to: State): Option[Int] = {
+    actions.states(from).flatMap { province =>
+      neighboursStream(province).find(_._2.owner == to).map(_._1)
+    } match {
+      case Nil => None
+      case list => Some(list.min)
+    }
+  }
+
+  private def neighboursStream(startingProvince: Province):Stream[(Int, Province)] = {
+
+    def nextNeighbours(currentCircle:Set[Province], alreadySent:Set[Province]):Set[Province] = {
+      val present = currentCircle & alreadySent
+      currentCircle.flatMap(_.neighbours) -- present
+    }
+
+    def unfold[A, S](z: S)(f: S => Option[(A, S)]): Stream[A] = {
+      f(z) match {
+        case None => Stream.Empty
+        case Some((a, s)) => Stream.cons(a, unfold(s) (f))
+      }
+    }
+
+    case class StreamState(step: Int, circle: Set[Province], sent: Set[Province])
+
+    unfold[Set[(Int, Province)], StreamState](StreamState(0, Set(startingProvince), Set())) { case StreamState(step, circle, sent) =>
+      val newCircle = nextNeighbours(circle, sent)
+      if (newCircle.nonEmpty) {
+        val stream = newCircle.map(c => (step + 1) -> c)
+        val ss = StreamState(step + 1, newCircle, circle & sent)
+        Some((stream, ss))
+      } else {
+        None
+      }
+    }.flatten
+  }
 
   private class ClaimsHolder {
     private var _claims: Set[Claim] = Set()
@@ -347,38 +399,42 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
     }
   }
 
-  def agreements(from: State): List[DiplomaticAgreement] =
-    agreements.filter(_.sides.contains(from))
+  def agreementsAnd(sides: State*): List[DiplomaticAgreement] = {
+    val set = sides.toSet
+    agreements.filter(a => set.subsetOf(a.sides))
+  }
 
-  def agreements(sides: Set[State]): List[DiplomaticAgreement] =
-    agreements.filter(a => sides.subsetOf(a.sides))
+  def agreementsOr(sides: State*): List[DiplomaticAgreement] = {
+    val set = sides.toSet
+    agreements.filter(a => set.intersect(a.sides).nonEmpty)
+  }
 
   def areAllies(first: State, second: State): Boolean = {
-    agreements(Set(first, second)).collectFirst {
+    agreementsAnd(first, second).collectFirst {
       case aa: AllianceAgreement if aa.sides == Set(first, second) => aa
     }.nonEmpty
   }
 
   def areFriends(first: State, second: State): Boolean = {
-    agreements(Set(first, second)).collectFirst {
+    agreementsAnd(first, second).collectFirst {
       case fa: FriendshipAgreement if fa.sides == Set(first, second) => fa
     }.nonEmpty
   }
 
   def isVassal(overlord: State, vassal: State): Boolean = {
-    agreements(Set(overlord, vassal)).collectFirst {
+    agreementsAnd(overlord, vassal).collectFirst {
       case va: VassalAgreement if va.overlord == overlord && va.vassal == vassal => va
     } nonEmpty
   }
 
   def getOverlord(vassal: State): Option[State] = {
-    agreements(vassal).collect {
+    agreementsAnd(vassal).collect {
       case va: VassalAgreement if va.vassal == vassal => va
     }.map(_.overlord).headOption
   }
 
   def getVassals(overlord: State): List[State] = {
-    agreements(overlord).collect {
+    agreementsAnd(overlord).collect {
       case va: VassalAgreement if va.overlord == overlord => va
     }.map(_.vassal)
   }
@@ -459,7 +515,7 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
 
   def relationshipsDescribed(state: State, currentTurn: Int): Map[State, List[RelationshipBonus]] = {
     val bonuses = events(state).map(_.relationshipsChange(currentTurn)) ++ neighboursBonuses(state) ++
-      agreements(state).flatMap(_.relationshipBonus).filter(_.from == state) ++
+      agreementsAnd(state).flatMap(_.relationshipBonus).filter(_.from == state) ++
       claimsBonuses(state) ++ reputationBonuses(state) ++ (states - state).flatMap(s => raceAndCultureBonuses(state, s))
     bonuses.groupBy(_.to)
   }

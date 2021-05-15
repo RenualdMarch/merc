@@ -453,7 +453,7 @@ trait WorldStateDiplomacyActions extends Logging {
   def playerNeighbours = neighbours(playerState)
 
   def canTrade(from: State, to: State):Boolean = {
-    diplomacyEngine.agreements(Set(from, to)).collectFirst {
+    diplomacyEngine.agreementsAnd(from, to).collectFirst {
       case ag: WarAgreement if ag.onDifferentSides(Set(from, to)) => ag
       case s: SanctionAgreement if s.underSanctions == from && s.initiator == to => s
     }.isEmpty
@@ -574,7 +574,7 @@ trait WorldStateDiplomacyActions extends Logging {
     diplomacyEngine.processAllUnansweredMessages(turn)
   }
 
-  def agreements(state: State): List[DiplomaticAgreement] = diplomacyEngine.agreements(state)
+  def agreements(state: State): List[DiplomaticAgreement] = diplomacyEngine.agreementsAnd(state)
 
   def attackerLeader(warAgreement: WarAgreement): State = warAgreement.attackersLeader(diplomacyEngine)
 
@@ -637,6 +637,16 @@ trait WorldStateDiplomacyActions extends Logging {
     isPossibleMessage(message)
   }
 
+  def canBreakFriendship(from: State, to: State): Boolean = {
+    val message = new BreakFriendshipTreaty(from, to)
+    isPossibleMessage(message)
+  }
+
+  def canBreakAlliance(from: State, to: State): Boolean = {
+    val message = new BreakAllianceTreaty(from, to)
+    isPossibleMessage(message)
+  }
+
   def hasClaimsOn(from: State, to: State): Boolean = {
     claimsFromAgainst(from, to).nonEmpty
   }
@@ -656,7 +666,7 @@ trait WorldStateDiplomacyActions extends Logging {
   }
 
   def allies(state: State): List[State] = {
-    diplomacyEngine.agreements(state).collect {
+    diplomacyEngine.agreementsAnd(state).collect {
       case aa: AllianceAgreement => aa.sides - state
     }.flatten
   }

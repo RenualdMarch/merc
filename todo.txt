@@ -1,20 +1,17 @@
 requirement failed: Buying and selling differ
 
-exit friendship button
-exit alliance button
-reputation lost after friendship and alliances and truces are broken, after claims created(and decreased after claims are dropped)
 reputation influence on relationships
 durationEndAgreementEvent for war-agreement
 ask allies to join your war in declare war pane
 vassal asks for freedom and revolts if declined
+regroup buttons on diplomacy pane
 totally rework AI diplomacy with new features
 bug with long bridges on world map
 add rulers to map
 bug with drawing single water tile
 state rating pane
 animate healing
-
-Move to JOGL? - for 1.1
+Move to JOGL
 
 Polishing
 destroy all unreachable islands?
@@ -52,8 +49,6 @@ Dwarfs
 +Saurian
 +Drakes
 +Trolls
-
-
 +Aquana
 +Minotaurs
 +Frozen

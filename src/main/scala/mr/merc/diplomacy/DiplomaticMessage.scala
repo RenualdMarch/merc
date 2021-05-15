@@ -18,8 +18,6 @@ sealed trait DiplomaticMessage {
 
   def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean
 
-  def sendTitle: Option[String]
-
   def messageTitle: String
 
   def body: String
@@ -61,17 +59,14 @@ object DiplomaticMessage {
     }
 
     override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean = {
-      val agreements = diplomacy.agreements(from) ::: diplomacy.agreements(to)
+      val agreements = diplomacy.agreementsAnd(from) ::: diplomacy.agreementsAnd(to)
       !agreements.exists {
-        case v: VassalAgreement if Set(v.overlord, v.vassal) == Set(from, to) => true
         case v: VassalAgreement if Set(from, to).contains(v.vassal) => true
         case aa: AllianceAgreement if aa.sides == Set(from, to) => true
         case wa: WarAgreement => wa.onDifferentSides(Set(from, to))
         case _ => false
       }
     }
-
-    override def sendTitle: Option[String] = Some(Localization("diplomacy.proposeAlliance.button"))
 
     override def messageTitle: String = Localization("diplomacy.proposeAlliance.title", from.name)
 
@@ -86,8 +81,6 @@ object DiplomaticMessage {
     override def ok(diplomacy: WorldDiplomacy, currentTurn: Int): Unit = {}
 
     override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean = true
-
-    override def sendTitle: Option[String] = None
 
     override def messageTitle: String = Localization("diplomacy.acceptedAlliance.title", from.name)
 
@@ -106,8 +99,6 @@ object DiplomaticMessage {
     override def ok(diplomacy: WorldDiplomacy, currentTurn: Int): Unit = {}
 
     override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean = true
-
-    override def sendTitle: Option[String] = None
 
     override def messageTitle: String = Localization("diplomacy.rejectedAlliance.title", from.name)
 
@@ -131,9 +122,8 @@ object DiplomaticMessage {
     }
 
     override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean = {
-      val agreements = diplomacy.agreements(from) ::: diplomacy.agreements(to)
+      val agreements = diplomacy.agreementsAnd(from) ::: diplomacy.agreementsAnd(to)
       !agreements.exists {
-        case v: VassalAgreement if Set(v.overlord, v.vassal) == Set(from, to) => true
         case v: VassalAgreement if Set(from, to).contains(v.vassal) => true
         case aa: AllianceAgreement if aa.sides == Set(from, to) => true
         case fa: FriendshipAgreement if fa.sides == Set(from, to) => true
@@ -141,8 +131,6 @@ object DiplomaticMessage {
         case _ => false
       }
     }
-
-    override def sendTitle: Option[String] = Some(Localization("diplomacy.proposeFriendship.button"))
 
     override def messageTitle: String = Localization("diplomacy.proposeFriendship.title", from.name)
 
@@ -157,8 +145,6 @@ object DiplomaticMessage {
     override def ok(diplomacy: WorldDiplomacy, currentTurn: Int): Unit = {}
 
     override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean = true
-
-    override def sendTitle: Option[String] = None
 
     override def messageTitle: String = Localization("diplomacy.acceptedFriendship.title")
 
@@ -178,8 +164,6 @@ object DiplomaticMessage {
     override def ok(diplomacy: WorldDiplomacy, currentTurn: Int): Unit = {}
 
     override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean = true
-
-    override def sendTitle: Option[String] = None
 
     override def messageTitle: String = Localization("diplomacy.rejectedFriendship.title")
 
@@ -204,7 +188,7 @@ object DiplomaticMessage {
     }
 
     override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean = {
-      val agreements = diplomacy.agreements(from) ::: diplomacy.agreements(to)
+      val agreements = diplomacy.agreementsAnd(from) ::: diplomacy.agreementsAnd(to)
       !agreements.exists {
         case v: VassalAgreement if Set(v.overlord, v.vassal) == Set(from, to) => true
         case v: VassalAgreement if Set(from, to).contains(v.vassal) => true
@@ -212,8 +196,6 @@ object DiplomaticMessage {
         case _ => false
       }
     }
-
-    override def sendTitle: Option[String] = Some(Localization("diplomacy.proposeVassalization.button"))
 
     override def messageTitle: String = Localization("diplomacy.proposeVassalization.title", from.name)
 
@@ -228,8 +210,6 @@ object DiplomaticMessage {
     override def ok(diplomacy: WorldDiplomacy, currentTurn: Int): Unit = {}
 
     override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean = true
-
-    override def sendTitle: Option[String] = None
 
     override def messageTitle: String = Localization("diplomacy.acceptedVassalization.title", from.name)
 
@@ -248,8 +228,6 @@ object DiplomaticMessage {
     override def ok(diplomacy: WorldDiplomacy, currentTurn: Int): Unit = {}
 
     override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean = true
-
-    override def sendTitle: Option[String] = None
 
     override def messageTitle: String = Localization("diplomacy.rejectedVassalization.title", from.name)
 
@@ -273,7 +251,7 @@ object DiplomaticMessage {
     }
 
     override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean = {
-      val agreements = diplomacy.agreements(from) ::: diplomacy.agreements(to)
+      val agreements = diplomacy.agreementsAnd(from) ::: diplomacy.agreementsAnd(to)
       !agreements.exists {
         case v: VassalAgreement if Set(v.overlord, v.vassal) == Set(from, to) => true
         case v: VassalAgreement if Set(from, to).contains(v.vassal) => true
@@ -281,8 +259,6 @@ object DiplomaticMessage {
         case _ => false
       }
     }
-
-    override def sendTitle: Option[String] = Some(Localization("diplomacy.proposeOverlordship.button"))
 
     override def messageTitle: String = Localization("diplomacy.proposeOverlordship.title", from.name)
 
@@ -297,8 +273,6 @@ object DiplomaticMessage {
     override def ok(diplomacy: WorldDiplomacy, currentTurn: Int): Unit = {}
 
     override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean = true
-
-    override def sendTitle: Option[String] = None
 
     override def messageTitle: String = Localization("diplomacy.acceptedOverlordship.title", from.name)
 
@@ -317,8 +291,6 @@ object DiplomaticMessage {
     override def ok(diplomacy: WorldDiplomacy, currentTurn: Int): Unit = {}
 
     override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean = true
-
-    override def sendTitle: Option[String] = None
 
     override def messageTitle: String = Localization("diplomacy.rejectedOverlordship.title", from.name)
 
@@ -382,7 +354,7 @@ object DiplomaticMessage {
     }
 
     override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean = {
-      val agreements = diplomacy.agreements(from) ::: diplomacy.agreements(to)
+      val agreements = diplomacy.agreementsAnd(from) ::: diplomacy.agreementsAnd(to)
 
       !agreements.exists {
         case v: VassalAgreement if v.vassal == from => true
@@ -394,8 +366,6 @@ object DiplomaticMessage {
         case _ => false
       }
     }
-
-    override def sendTitle: Option[String] = Some("diplomacy.declareWar.button")
 
     override def messageTitle: String = Localization("diplomacy.declareWar.title", from.name)
 
@@ -420,24 +390,21 @@ object DiplomaticMessage {
 
     override def decline(diplomacy: WorldDiplomacy, currentTurn: Int): Unit = {
       diplomacy.sendMessage(new DeclineJoinWar(to, from, warAgreement), currentTurn)
-      diplomacy.agreements(from).collectFirst {
-        case aa: AllianceAgreement if aa.sides == Set(from, to) => aa
+      diplomacy.agreementsAnd(from, to).collectFirst {
+        case aa: AllianceAgreement => aa
       }.foreach { a =>
         diplomacy.cancelAgreement(to, a, currentTurn)
+        diplomacy.increaseBadBoy(from, RefuseAllyCallBadBoy)
       }
-      diplomacy.increaseBadBoy(from, RefuseAllyCallBadBoy)
     }
 
     override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean = {
-      val agreements = diplomacy.agreements(from) ::: diplomacy.agreements(to)
-      agreements.collectFirst {
+      diplomacy.agreementsAnd(from).collectFirst {
         case wa: WarAgreement if Set(from, to).subsetOf(wa.sides) => wa
-      }.isEmpty && agreements.collectFirst {
-        case aa: AllianceAgreement if aa.sides == Set(from, to) => aa
+      }.isEmpty && diplomacy.agreementsAnd(from, to).collectFirst {
+        case aa: AllianceAgreement => aa
       }.nonEmpty
     }
-
-    override def sendTitle: Option[String] = None
 
     override def messageTitle: String = Localization("diplomacy.askJoinWar.title", from.name)
 
@@ -454,16 +421,12 @@ object DiplomaticMessage {
     }
 
     override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean = {
-      val agreements = diplomacy.agreements(from) ::: diplomacy.agreements(to)
-      agreements.collectFirst {
+      diplomacy.agreementsAnd(from).collectFirst {
         case wa: WarAgreement if Set(from, to).subsetOf(wa.sides) => wa
-      }.isEmpty && agreements.collectFirst {
-        case va: VassalAgreement if
-          va.vassal == to && va.overlord == from || va.overlord == to && va.vassal == from => va
+      }.isEmpty && diplomacy.agreementsAnd(from, to).collectFirst {
+        case va: VassalAgreement => va
       }.nonEmpty
     }
-
-    override def sendTitle: Option[String] = None
 
     override def messageTitle: String = Localization("diplomacy.orderJoinWar.title", from.name)
 
@@ -488,8 +451,6 @@ object DiplomaticMessage {
 
     override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean = true
 
-    override def sendTitle: Option[String] = None
-
     override def messageTitle: String = Localization("diplomacy.agreeJoinWar.title", from.name)
 
     override def body: String = Localization("diplomacy.agreeJoinWar.body", from.name, warAgreement.localizeWar)
@@ -511,8 +472,6 @@ object DiplomaticMessage {
     override def ok(diplomacy: WorldDiplomacy, currentTurn: Int): Unit = {}
 
     override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean = true
-
-    override def sendTitle: Option[String] = None
 
     override def messageTitle: String = Localization("diplomacy.declineJoinWar.title", from.name)
 
@@ -548,9 +507,6 @@ object DiplomaticMessage {
     override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean =
       diplomacy.wars.exists(wa => Set(wa.attackersLeader(diplomacy), wa.defendersLeader(diplomacy)) == Set(from, to))
 
-
-    override def sendTitle: Option[String] = Some(Localization("diplomacy.proposePeace.button"))
-
     override def messageTitle: String = Localization("diplomacy.proposePeace.title", from.name)
 
     override def body: String = Localization("diplomacy.proposePeace.body", from.name,
@@ -566,8 +522,6 @@ object DiplomaticMessage {
     override def ok(diplomacy: WorldDiplomacy, currentTurn: Int): Unit = {}
 
     override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean = true
-
-    override def sendTitle: Option[String] = None
 
     override def messageTitle: String = Localization("diplomacy.peaceAccepted.title", from.name)
 
@@ -591,8 +545,6 @@ object DiplomaticMessage {
 
     override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean = true
 
-    override def sendTitle: Option[String] = None
-
     override def messageTitle: String = Localization("diplomacy.otherPeaceAccepted.title", from.name)
 
     override def body: String = Localization("diplomacy.otherPeaceAccepted.body", from.name,
@@ -612,8 +564,6 @@ object DiplomaticMessage {
     override def ok(diplomacy: WorldDiplomacy, currentTurn: Int): Unit = {}
 
     override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean = true
-
-    override def sendTitle: Option[String] = None
 
     override def messageTitle: String = Localization("diplomacy.peaceDeclined.title", from.name)
 
@@ -654,8 +604,6 @@ object DiplomaticMessage {
       possibleSeparateStates.contains(separateState)
     }
 
-    override def sendTitle: Option[String] = Some(Localization("proposeSeparatePeace.button"))
-
     override def messageTitle: String = Localization("proposeSeparatePeace.title", separateState.name)
 
     override def body: String = if (from == separateState)
@@ -675,8 +623,6 @@ object DiplomaticMessage {
     override def ok(diplomacy: WorldDiplomacy, currentTurn: Int): Unit = {}
 
     override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean = true
-
-    override def sendTitle: Option[String] = None
 
     override def messageTitle: String = Localization("diplomacy.separatePeaceAccepted.title", from.name)
 
@@ -698,8 +644,6 @@ object DiplomaticMessage {
 
     override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean = true
 
-    override def sendTitle: Option[String] = None
-
     override def messageTitle: String = Localization("diplomacy.separatePeaceDeclined.title", from.name)
 
     override def body: String = Localization("diplomacy.separatePeaceDeclined.body", from.name,
@@ -715,8 +659,6 @@ object DiplomaticMessage {
 
     override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean = true
 
-    override def sendTitle: Option[String] = None
-
     override def messageTitle: String = Localization("diplomacy.otherSeparatePeaceAccepted.title", from.name)
 
     override def body: String = Localization("diplomacy.otherSeparatePeaceAccepted.body", from.name,
@@ -731,8 +673,6 @@ object DiplomaticMessage {
     override def ok(diplomacy: WorldDiplomacy, currentTurn: Int): Unit = {}
 
     override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean = true
-
-    override def sendTitle: Option[String] = None
 
     override def messageTitle: String = Localization("diplomacy.stalledPeace.title", from.name)
 
@@ -759,7 +699,7 @@ object DiplomaticMessage {
     override def ok(diplomacy: WorldDiplomacy, currentTurn: Int): Unit = {}
 
     override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean = {
-      !diplomacy.agreements(Set(from, to)).exists {
+      !diplomacy.agreementsAnd(from, to).exists {
         case _: VassalAgreement => true
         case _: AllianceAgreement => true
         case _: SanctionAgreement => true
@@ -767,8 +707,6 @@ object DiplomaticMessage {
         case _ => false
       }
     }
-
-    override def sendTitle: Option[String] = Some(Localization("diplomacy.sanctions.button"))
 
     override def messageTitle: String = Localization("diplomacy.sanctions.title")
 
@@ -786,7 +724,7 @@ object DiplomaticMessage {
   case class SanctionsStopped(from: State, to: State) extends DiplomaticDeclaration {
 
     override def beforeSendAction(diplomacy: WorldDiplomacy, currentTurn: Int): Unit = {
-      diplomacy.agreements(Set(from, to)).collect {
+      diplomacy.agreementsAnd(from, to).collect {
         case ag: SanctionAgreement if ag.initiator == from && ag.underSanctions == to => ag
       }.foreach { da =>
         diplomacy.cancelAgreement(from, da, currentTurn)
@@ -796,12 +734,10 @@ object DiplomaticMessage {
     override def ok(diplomacy: WorldDiplomacy, currentTurn: Int): Unit = {}
 
     override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean = {
-      diplomacy.agreements(Set(from, to)).collectFirst {
+      diplomacy.agreementsAnd(from, to).collectFirst {
         case ag: SanctionAgreement if ag.initiator == from && ag.underSanctions == to => ag
       }.nonEmpty
     }
-
-    override def sendTitle: Option[String] = Some(Localization("diplomacy.cancelSanctions.button"))
 
     override def messageTitle: String = Localization("diplomacy.cancelSanctions.title")
 
@@ -830,17 +766,13 @@ object DiplomaticMessage {
     }
 
     override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean = {
-      val agreements = diplomacy.agreements(from) ::: diplomacy.agreements(to)
-      !agreements.exists {
-        case v: VassalAgreement if Set(v.overlord, v.vassal) == Set(from, to) => true
+      !diplomacy.agreementsOr(from, to).exists {
         case v: VassalAgreement if Set(from, to).contains(v.vassal) => true
         case fa: FriendshipAgreement if Set(from, to) == fa.sides => true
         case wa: WarAgreement => wa.onDifferentSides(Set(from, to))
         case _ => false
       }
     }
-
-    override def sendTitle: Option[String] = Some(Localization("diplomacy.demandVassalization.button"))
 
     override def messageTitle: String = Localization("diplomacy.demandVassalization.title", from.name)
 
@@ -855,8 +787,6 @@ object DiplomaticMessage {
     override def ok(diplomacy: WorldDiplomacy, currentTurn: Int): Unit = {}
 
     override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean = true
-
-    override def sendTitle: Option[String] = None
 
     override def messageTitle: String = Localization("diplomacy.demandVassalizationRejected.title", from.name)
 
@@ -881,8 +811,6 @@ object DiplomaticMessage {
 
     override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean = true
 
-    override def sendTitle: Option[String] = None
-
     override def messageTitle: String = Localization("claims.drop.title")
 
     override def body: String = claim match {
@@ -905,6 +833,72 @@ object DiplomaticMessage {
         add(new StateComponentColorName(to))
       })
     }
+
+    override def shouldRefreshMapAfterAnswer: Boolean = false
+  }
+
+  class BreakFriendshipTreaty(val from: State, val to: State) extends DiplomaticDeclaration {
+
+    override def beforeSendAction(diplomacy: WorldDiplomacy, currentTurn: Int): Unit = {
+      super.beforeSendAction(diplomacy, currentTurn)
+      diplomacy.agreementsAnd(from, to).collectFirst {
+        case agreement: FriendshipAgreement => agreement
+      }.foreach { ag =>
+        diplomacy.cancelAgreement(from, ag, currentTurn)
+        diplomacy.increaseBadBoy(from, CancellingFriendshipBadBoy)
+      }
+    }
+
+    override def ok(diplomacy: WorldDiplomacy, currentTurn: Int): Unit = {}
+
+    override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean = {
+      diplomacy.agreementsAnd(from, to).collectFirst {
+        case agreement: FriendshipAgreement => agreement
+      }.nonEmpty
+    }
+
+    override def messageTitle: String = Localization("diplomacy.breakFriendship.title", from.name)
+
+    override def body: String = Localization("diplomacy.breakFriendship.body", from.name)
+
+    override def renderInReport: Option[Node] = Some(new MigPane {
+      add(new StateComponentColorName(from))
+      add(BigText(Localization("diplomacy.breakFriendship.report")))
+      add(new StateComponentColorName(to))
+    })
+
+    override def shouldRefreshMapAfterAnswer: Boolean = false
+  }
+
+  class BreakAllianceTreaty(val from: State, val to: State) extends DiplomaticDeclaration {
+
+    override def beforeSendAction(diplomacy: WorldDiplomacy, currentTurn: Int): Unit = {
+      super.beforeSendAction(diplomacy, currentTurn)
+      diplomacy.agreementsAnd(from, to).collectFirst {
+        case agreement: AllianceAgreement => agreement
+      }.foreach { ag =>
+        diplomacy.cancelAgreement(from, ag, currentTurn)
+        diplomacy.increaseBadBoy(from, LeavingAllianceBadBoy)
+      }
+    }
+
+    override def ok(diplomacy: WorldDiplomacy, currentTurn: Int): Unit = {}
+
+    override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean = {
+      diplomacy.agreementsAnd(from, to).collectFirst {
+        case agreement: AllianceAgreement => agreement
+      }.nonEmpty
+    }
+
+    override def messageTitle: String = Localization("diplomacy.breakAlliance.title")
+
+    override def body: String = Localization("diplomacy.breakAlliance.body")
+
+    override def renderInReport: Option[Node] = Some(new MigPane {
+      add(new StateComponentColorName(from))
+      add(BigText(Localization("diplomacy.breakAlliance.report")))
+      add(new StateComponentColorName(to))
+    })
 
     override def shouldRefreshMapAfterAnswer: Boolean = false
   }

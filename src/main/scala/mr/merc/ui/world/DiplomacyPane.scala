@@ -388,7 +388,22 @@ class StateActionsPane(currentState: State, selectedState: State, actions: World
       actions.sendMessage(new FriendshipProposal(currentState, selectedState))
       parentFrame.showDiplomacyPane()
     }
+  }
 
+  private val breakFriendship = new MediumButton() {
+    text = Localization("diplomacy.breakFriendship.button")
+    onAction = { _ =>
+      actions.sendMessage(new BreakFriendshipTreaty(currentState, selectedState))
+      parentFrame.showDiplomacyPane()
+    }
+  }
+
+  private val breakAlliance = new MediumButton() {
+    text = Localization("diplomacy.breakAlliance.button")
+    onAction = { _ =>
+      actions.sendMessage(new BreakAllianceTreaty(currentState, selectedState))
+      parentFrame.showDiplomacyPane()
+    }
   }
 
   private val enactSanctions = new MediumButton() {
@@ -463,6 +478,14 @@ class StateActionsPane(currentState: State, selectedState: State, actions: World
 
   if (actions.canProposeFriendship(currentState, selectedState)) {
     add(proposeFriendship, "wrap")
+  }
+
+  if (actions.canBreakFriendship(currentState, selectedState)) {
+    add(breakAlliance, "wrap")
+  }
+
+  if (actions.canBreakFriendship(currentState, selectedState)) {
+    add(breakFriendship, "wrap")
   }
 
   if (actions.canProposeVassalization(currentState, selectedState)) {
