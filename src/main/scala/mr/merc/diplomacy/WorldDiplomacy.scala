@@ -41,7 +41,7 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
 
   private var mailbox: Map[State, List[DiplomaticMessage]] = Map()
 
-  def distancesToAllOtherReachableStates(state: State, maxDistance:Option[Int]): Map[State, Int] = {
+  def distancesToAllOtherReachableStates(state: State, maxDistance: Option[Int]): Map[State, Int] = {
     val streams = actions.states(state).map { province =>
       maxDistance match {
         case Some(value) => neighboursStream(province).takeWhile(_._1 <= value)
@@ -64,9 +64,9 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
     }
   }
 
-  private def neighboursStream(startingProvince: Province):Stream[(Int, Province)] = {
+  private def neighboursStream(startingProvince: Province): Stream[(Int, Province)] = {
 
-    def nextNeighbours(currentCircle:Set[Province], alreadySent:Set[Province]):Set[Province] = {
+    def nextNeighbours(currentCircle: Set[Province], alreadySent: Set[Province]): Set[Province] = {
       val present = currentCircle & alreadySent
       currentCircle.flatMap(_.neighbours) -- present
     }
@@ -74,7 +74,7 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
     def unfold[A, S](z: S)(f: S => Option[(A, S)]): Stream[A] = {
       f(z) match {
         case None => Stream.Empty
-        case Some((a, s)) => Stream.cons(a, unfold(s) (f))
+        case Some((a, s)) => Stream.cons(a, unfold(s)(f))
       }
     }
 
@@ -303,7 +303,7 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
     _badBoy = _badBoy + (state -> current)
   }
 
-  def decreaseBadBoy(state: State, value: Double): Unit ={
+  def decreaseBadBoy(state: State, value: Double): Unit = {
     val current = _badBoy.getOrElse(state, 0d) - value
     _badBoy = _badBoy + (state -> (if (current < 0) 0 else current))
   }
@@ -462,12 +462,6 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
     }.toList
   }
 
-  def reputationBonuses(from: State): List[RelationshipBonus] = {
-    _badBoy.filter(_._1 != from).map { case (state, bb) =>
-      RelationshipBonus(from, state, (bb * BadBoyToRelationsPenalty).toInt, Localization("diplomacy.reputation"))
-    }.toList
-  }
-
   def raceAndCultureBonuses(from: State, to: State): List[RelationshipBonus] = {
     val fromAlignment = from.primeCulture.cultureAlignment
     val toAlignment = to.primeCulture.cultureAlignment
@@ -518,6 +512,17 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
       agreementsAnd(state).flatMap(_.relationshipBonus).filter(_.from == state) ++
       claimsBonuses(state) ++ reputationBonuses(state) ++ (states - state).flatMap(s => raceAndCultureBonuses(state, s))
     bonuses.groupBy(_.to)
+  }
+
+  def reputationBonuses(state: State): List[RelationshipBonus] = {
+    val maxDistance = WorldConstants.Diplomacy.BadBoyToRelationshipConversion.size
+    distancesToAllOtherReachableStates(state, Some(maxDistance)).flatMap { case (to, dist) =>
+      badBoy.get(to).filterNot(_ == 0).map { bb =>
+        val result = bb * WorldConstants.Diplomacy.BadBoyToRelationshipConversion(dist - 1)
+        RelationshipBonus(state, to, result.toInt,
+          Localization("diplomacy.reputation.relationshipBonus", to.name))
+      }
+    }.toList
   }
 
   def neighboursBonuses(state: State): List[RelationshipBonus] = {
@@ -771,8 +776,8 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
         val controlled = provinces.filter(p => war.sideByState(demander).contains(p.controller))
         val newTarget = LiberateCulture(demander, giver, culture, controlled)
         applyWarTarget(war, newTarget, actions.turn)
-      case _:TakeMoney => sys.error("Impossible case")
-      case _:Vassalize => sys.error("Impossible case")
+      case _: TakeMoney => sys.error("Impossible case")
+      case _: Vassalize => sys.error("Impossible case")
     }
 
   }

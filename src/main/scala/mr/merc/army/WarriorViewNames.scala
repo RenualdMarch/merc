@@ -48,7 +48,7 @@ object WarriorViewNames {
     (PikeCavalry, Professional) -> "HumanWesnoth-Knight",
 
     (PikeCavalry, Ruler) -> "HumanWesnoth-GrandKnight",
-    (HeavyBladeInfantry, Ruler) -> "HumanWesnoth-GrandMarhsal",
+    (HeavyBladeInfantry, Ruler) -> "HumanWesnoth-GrandMarshal",
     (FireWizard, Ruler) -> "HumanWesnoth-GreatMage"
 
   ))

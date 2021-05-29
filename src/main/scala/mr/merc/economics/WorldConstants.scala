@@ -210,7 +210,11 @@ object WorldConstants {
     val SanctionsRelationshipChange = -30
 
     val TruceDuration = 12
-    val TruceRelationshipChange = -100
+    val TruceRelationshipChange = -10
+
+    val WereInWarDuration = 40
+    val WereInWarRelationshipChange = -80
+
     val BrokenTruceRelationshipChange = -200
     val BrokenTruceDuration = 60
 
@@ -229,6 +233,7 @@ object WorldConstants {
     val AllianceHonoredDuration = 20
     val AllianceHonoredRelationshipChange = 30
 
+    val VassalizationClaimTurns:Int = 20
     val VassalRelationshipChange:Int = 100
     val OverlordRelationshipChange:Int = 100
     val SetVassalFreeDuration = 40

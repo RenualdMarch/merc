@@ -1,22 +1,20 @@
 requirement failed: Buying and selling differ
 
-reputation influence on relationships
-durationEndAgreementEvent for war-agreement
-ask allies to join your war in declare war pane
-vassal asks for freedom and revolts if declined
-regroup buttons on diplomacy pane
+add relations bonus - enemy of the enemy - if not enemy
+starting bad boy - where it come from?
 totally rework AI diplomacy with new features
 bug with long bridges on world map
-add rulers to map
 bug with drawing single water tile
 state rating pane
 animate healing
-Move to JOGL
+
 
 Polishing
 destroy all unreachable islands?
 rebalance political parties and views
 allow hire people from other cultures with some political configurations, now it is possible to hire primary culture warrior anywhere
+add rulers to map
+Move to JOGL
 
 
 Not high priority:

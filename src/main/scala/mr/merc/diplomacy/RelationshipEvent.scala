@@ -78,6 +78,12 @@ object RelationshipEvent {
     override def localizeEvent: String = Localization("diplomacy.brokenTruce", breaker.name, victim.name)
   }
 
+  class WereInWar(first: State, second: State, eventTurn: Int)
+    extends RelationshipEvent(first, second, eventTurn, WereInWarDuration, WereInWarRelationshipChange) {
+
+    override def localizeEvent: String = Localization("diplomacy.wereInWar", first.name, second.name)
+  }
+
   class SeparatePeace(escaping: State, remaining: State, eventTurn: Int)
     extends RelationshipEvent(remaining, escaping, eventTurn, SeparatePeaceDuration, SeparatePeaceRelationshipChange) {
 

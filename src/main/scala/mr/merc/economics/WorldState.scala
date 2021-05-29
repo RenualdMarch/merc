@@ -622,6 +622,16 @@ trait WorldStateDiplomacyActions extends Logging {
     isPossibleMessage(message)
   }
 
+  def canStopBeingVassal(from: State, to:State): Boolean = {
+    val message = new StopBeingVassal(from, to)
+    isPossibleMessage(message)
+  }
+
+  def canReleaseVassal(from: State, to: State): Boolean = {
+    val message = new ReleaseVassal(from, to)
+    isPossibleMessage(message)
+  }
+
   def canProposeOverlordship(from: State, to: State): Boolean = {
     val message = new OverlordshipProposal(from, to)
     isPossibleMessage(message)

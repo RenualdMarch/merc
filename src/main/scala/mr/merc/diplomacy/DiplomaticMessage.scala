@@ -1,5 +1,6 @@
 package mr.merc.diplomacy
 
+import mr.merc.diplomacy.Claim.VassalizationClaim
 import mr.merc.diplomacy.DiplomaticAgreement.WarAgreement._
 import mr.merc.diplomacy.DiplomaticAgreement.{AllianceAgreement, FriendshipAgreement, SanctionAgreement, TruceAgreement, VassalAgreement, WarAgreement}
 import mr.merc.diplomacy.RelationshipEvent._
@@ -890,9 +891,9 @@ object DiplomaticMessage {
       }.nonEmpty
     }
 
-    override def messageTitle: String = Localization("diplomacy.breakAlliance.title")
+    override def messageTitle: String = Localization("diplomacy.breakAlliance.title", from.name)
 
-    override def body: String = Localization("diplomacy.breakAlliance.body")
+    override def body: String = Localization("diplomacy.breakAlliance.body", from.name)
 
     override def renderInReport: Option[Node] = Some(new MigPane {
       add(new StateComponentColorName(from))
@@ -902,4 +903,72 @@ object DiplomaticMessage {
 
     override def shouldRefreshMapAfterAnswer: Boolean = false
   }
+}
+
+class ReleaseVassal(val from: State, val to: State) extends DiplomaticDeclaration {
+
+  override def beforeSendAction(diplomacy: WorldDiplomacy, currentTurn: Int): Unit = {
+    super.beforeSendAction(diplomacy, currentTurn)
+
+    diplomacy.agreementsAnd(from, to).collectFirst {
+      case a: VassalAgreement if a.overlord == from && a.vassal == to => a
+    }.foreach { ag =>
+      diplomacy.cancelAgreement(from, ag, currentTurn)
+    }
+  }
+
+  override def ok(diplomacy: WorldDiplomacy, currentTurn: Int): Unit = {}
+
+  override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean = {
+    diplomacy.agreementsAnd(from, to).collectFirst {
+      case a: VassalAgreement if a.overlord == from && a.vassal == to => a
+    }.nonEmpty
+  }
+
+  override def messageTitle: String = Localization("diplomacy.releaseVassal.title", from.name)
+
+  override def body: String = Localization("diplomacy.releaseVassal.body", from.name)
+
+
+  override def renderInReport: Option[Node] = Some(new MigPane {
+    add(new StateComponentColorName(from))
+    add(BigText(Localization("diplomacy.releaseVassal.report")))
+    add(new StateComponentColorName(to))
+  })
+
+  override def shouldRefreshMapAfterAnswer: Boolean = false
+}
+
+class StopBeingVassal(val from: State, val to: State) extends DiplomaticDeclaration {
+
+  override def beforeSendAction(diplomacy: WorldDiplomacy, currentTurn: Int): Unit = {
+    super.beforeSendAction(diplomacy, currentTurn)
+
+    diplomacy.agreementsAnd(from, to).collectFirst {
+      case a: VassalAgreement if a.overlord == to && a.vassal == from => a
+    }.foreach { ag =>
+      diplomacy.cancelAgreement(from, ag, currentTurn)
+    }
+    diplomacy.addClaim(VassalizationClaim(to, from, currentTurn + VassalizationClaimTurns))
+  }
+
+  override def ok(diplomacy: WorldDiplomacy, currentTurn: Int): Unit = {}
+
+  override def isPossible(diplomacy: WorldDiplomacy, currentTurn: Int): Boolean = {
+    diplomacy.agreementsAnd(from, to).collectFirst {
+      case a: VassalAgreement if a.overlord == to && a.vassal == from => a
+    }.nonEmpty
+  }
+
+  override def messageTitle: String = Localization("diplomacy.stopBeingVassal.title", from.name)
+
+  override def body: String = Localization("diplomacy.stopBeingVassal.body", from.name)
+
+  override def renderInReport: Option[Node] = Some(new MigPane {
+    add(new StateComponentColorName(from))
+    add(BigText(Localization("diplomacy.stopBeingVassal.report")))
+    add(new StateComponentColorName(to))
+  })
+
+  override def shouldRefreshMapAfterAnswer: Boolean = false
 }
