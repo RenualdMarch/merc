@@ -279,7 +279,8 @@ object WorldConstants {
     val LeavingAllianceBadBoy = RefuseAllyCallBadBoy
     val CancellingFriendshipBadBoy = 3
 
-    val BadBoyToRelationshipConversion = Vector(-10d, -8d, -6d, -4d, -2d)
+    val RivalOfRivalRelationshipBonus = 30
+    val BadBoyToRelationshipConversion = Vector(-5d, -4d, -3d, -2d, -1d)
 
     val ChanceForInitialWeakClaim = 0.1
     val ChanceForWeakClaim = 0.05

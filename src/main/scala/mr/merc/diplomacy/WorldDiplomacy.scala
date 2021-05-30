@@ -462,6 +462,16 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
     }.toList
   }
 
+  def rivalOfRivalBonus(from: State): List[RelationshipBonus] = {
+    val enemies = actions.situation.rivals(from)
+    val exclusionSet = enemies.toSet + from
+    val rivalsOfRivals = enemies.flatMap(e => actions.situation.rivals(e).map(e -> _))
+    rivalsOfRivals.filterNot{case (_, ee) => exclusionSet.contains(ee)}.map { case (rival, rivalOfRival) =>
+      RelationshipBonus(from, rivalOfRival, RivalOfRivalRelationshipBonus,
+        Localization("diplomacy.rivalOfRival", rivalOfRival.name, from.name, rival.name))
+    }
+  }
+
   def raceAndCultureBonuses(from: State, to: State): List[RelationshipBonus] = {
     val fromAlignment = from.primeCulture.cultureAlignment
     val toAlignment = to.primeCulture.cultureAlignment
@@ -509,7 +519,7 @@ class WorldDiplomacy(actions: WorldStateDiplomacyActions) {
 
   def relationshipsDescribed(state: State, currentTurn: Int): Map[State, List[RelationshipBonus]] = {
     val bonuses = events(state).map(_.relationshipsChange(currentTurn)) ++ neighboursBonuses(state) ++
-      agreementsAnd(state).flatMap(_.relationshipBonus).filter(_.from == state) ++
+      agreementsAnd(state).flatMap(_.relationshipBonus).filter(_.from == state) ++ rivalOfRivalBonus(state) ++
       claimsBonuses(state) ++ reputationBonuses(state) ++ (states - state).flatMap(s => raceAndCultureBonuses(state, s))
     bonuses.groupBy(_.to)
   }

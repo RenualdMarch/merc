@@ -1,7 +1,5 @@
 requirement failed: Buying and selling differ
 
-add relations bonus - enemy of the enemy - if not enemy
-starting bad boy - where it come from?
 totally rework AI diplomacy with new features
 bug with long bridges on world map
 bug with drawing single water tile
