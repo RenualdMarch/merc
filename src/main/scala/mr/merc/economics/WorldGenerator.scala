@@ -9,7 +9,7 @@ import mr.merc.politics.{Election, Party, PoliticalViews, Province, State}
 import mr.merc.util.WeightedRandom
 import WorldConstants.Enterprises._
 import WorldGenerationConstants._
-import mr.merc.army.WarriorCompetence.Professional
+import mr.merc.army.WarriorCompetence.{Militia, Professional}
 import mr.merc.army.{Warrior, WarriorType}
 import mr.merc.economics.PopulationMigrationOutsideProvince.PopulationMovementBetweenProvinces
 import mr.merc.map.terrain.FourSeasonsTerrainTypes._
@@ -83,7 +83,7 @@ class WorldGenerator(field:FourSeasonsTerrainHexField) {
     val possibleWarriors = culture.warriorViewNames.possibleWarriors.keySet.map(_._1)
     val random = new WeightedRandom[WarriorType](possibleWarriors.map(_ -> 1d).toMap)
     val count = province.regionPopulation.populationCount / WarriorPerPopulation
-    random.nextRandomItems(count).map(wt => new Warrior(wt, Professional, culture, province.owner))
+    random.nextRandomItems(count).map(wt => new Warrior(wt, Militia, culture, province.owner))
   }
 
   private def generateRegionPops(culture: Culture): RegionPopulation = {
@@ -317,8 +317,11 @@ object WorldGenerator extends Logging {
 
   def buildConnectivityMap(field:FourSeasonsTerrainHexField, map:Map[FourSeasonsTerrainHex, Set[FourSeasonsTerrainHex]]):Map[FourSeasonsTerrainHex, Set[FourSeasonsTerrainHex]] = {
     map.map { case (capital, provinceHexes) =>
-      val allNeigs = provinceHexes.filterNot(_.terrainMap == FourSeasonsWater).flatMap(h => field.neighbours(h)) -- provinceHexes
-      capital -> allNeigs.flatMap {n =>
+      val allNeigs = provinceHexes.filterNot(_.terrainMap == FourSeasonsWater).flatMap{ h =>
+        field.neighbours(h).filterNot(_.terrainMap == FourSeasonsWater)
+      } -- provinceHexes
+
+      capital -> allNeigs.flatMap { n =>
         map.find(_._2.contains(n)).map(_._1)
       }
     }

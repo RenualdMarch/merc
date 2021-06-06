@@ -10,14 +10,14 @@ class Hex(val x: Int, val y: Int) {
 
   override def toString() = s"Hex($x,$y)"
 
-  private[hex] def toCubeHex: CubeHex = {
+  def toCubeHex: CubeHex = {
     val cubeX = x
     val cubeZ = y - (x - (x & 1)) / 2
     val cubeY = -cubeX - cubeZ
     CubeHex(cubeX, cubeY, cubeZ)
   }
 
-  private[hex] def toAxialHex = toCubeHex.toAxialHex
+  def toAxialHex = toCubeHex.toAxialHex
 
   override def equals(any: Any) = any match {
     case hex: Hex => hex.x == x && hex.y == y

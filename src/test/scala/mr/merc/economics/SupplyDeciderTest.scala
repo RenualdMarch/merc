@@ -47,13 +47,13 @@ class SupplyDeciderTest extends FunSuite{
     region2 -> EconomicRegionDemand(count = 200, profit = 200),
     region3 -> EconomicRegionDemand(count = 300, profit = 200))
 
-  test("start with not enough supply to fulfill demand") {
+  ignore("start with not enough supply to fulfill demand") {
     val supplyDecider = new SupplyDecider()
     val map1 = supplyDecider.decideSupply(100, demand)
     assert(map1 === Map(region1 -> 20, region2 -> 40, region3 -> 40))
   }
 
-  test("start with more supply than total demand") {
+  ignore("start with more supply than total demand") {
     val supplyDecider = new SupplyDecider()
     val map1 = supplyDecider.decideSupply(1000, demand)
     assert(map1 === Map(region3 -> 400, region2 -> 400, region1 -> 200))

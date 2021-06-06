@@ -1,18 +1,17 @@
 requirement failed: Buying and selling differ
 
-totally rework AI diplomacy with new features
-bug with long bridges on world map
 bug with drawing single water tile
+aristocrats investing into capitalists
 state rating pane
 animate healing
 
 
 Polishing
-destroy all unreachable islands?
 rebalance political parties and views
 allow hire people from other cultures with some political configurations, now it is possible to hire primary culture warrior anywhere
 add rulers to map
 Move to JOGL
+Other languages?
 
 
 Not high priority:

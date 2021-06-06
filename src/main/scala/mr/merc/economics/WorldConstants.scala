@@ -150,22 +150,25 @@ object WorldConstants {
   }
 
   object Army {
-    private val supply = Map(Weapons -> 50d, Clothes -> 50d, Grain -> 50d)
-    private val recruitmentCost = Map[Product, Double](Weapons -> 50d, Clothes -> 100d)
+    private val militiaSupply = Map(Iron -> 50d, Clothes -> 50d, Grain -> 50d)
+    private val proSupply = Map(Weapons -> 200d, Clothes -> 200d, Grain -> 200d)
+
+    private val militiaRecruitmentCost = Map[Product, Double](Iron -> 50d, Clothes -> 50d)
+    private val proRecruitmentCost = Map[Product, Double](Weapons -> 200d, Clothes -> 200d)
 
     import WorldConstants.Technology.increaseValue
 
     @transient lazy val SoldierSupply: ((WarriorCompetence, Int)) => Map[Product, Double] = CacheFactoryMap.memo[(WarriorCompetence, Int), Map[Product, Double]] {
       case (wc, level) => wc match {
-        case WarriorCompetence.Militia => supply |*| increaseValue(1d, level)
-        case WarriorCompetence.Professional => supply |*| increaseValue(4d, level)
+        case WarriorCompetence.Militia => militiaSupply |*| increaseValue(1d, level)
+        case WarriorCompetence.Professional => proSupply |*| increaseValue(1d, level)
         case WarriorCompetence.Ruler => Map()
       }
     }
 
     val SoldierRecruitmentCost:Map[WarriorCompetence, Map[Product, Double]] = Map(
-      Professional -> (recruitmentCost |*| 4),
-      Militia -> recruitmentCost
+      Professional -> proRecruitmentCost,
+      Militia -> militiaRecruitmentCost
     )
 
     def NeedsToHP(d:Double):Double = {
@@ -306,16 +309,24 @@ object WorldConstants {
   object AI {
     val MaxMessagesPerTurn = 3
     val PowerDifferenceForVassalization = 5
+    val PowerDifferenceForStoppingBeingAVassal = 2
     val MinRelationshipForVassalization = 20
     val EnemyPowerDifferenceForHelpAlly = 2
     val MinRelationshipForHelpAlly = 20
     val RelationshipForHate = -50
-    val MinRelationshipToStartAlliance = 10
+    val MinRelationshipToStartAlliance = 50
+    val MinRelationshipForStartFriendship = 0
+    val MaxRelationshipToStopFriendship = 0
+    val MaxRelationshipToStopAlliance = 0
     val PowerDifferenceForPeace = 4
     val PowerDifferenceForWhitePeace = 2
     val PowerDifferenceToStartWar = 3
     val MaxBudgetSpendingOnWarriors = 0.3
     val TotalArmySumToBeTiredOfWar = 5
+
+    def MinRelationsToStartWar(aggressiveness: Int): Int = {
+      aggressiveness - 50
+    }
   }
 
   object Animation {
@@ -357,8 +368,8 @@ object WorldGenerationConstants {
     Weapons -> 1
   )
 
-  val MinFactoriesPerRegion = 2
-  val MaxFactoriesPerRegion = 4
+  val MinFactoriesPerRegion = 1
+  val MaxFactoriesPerRegion = 2
 
   val FactoryStartingMoney = 10000
   val FactoryStartingLevel = 1
@@ -388,17 +399,11 @@ object WorldGenerationConstants {
   val PopMigrationToNeighbourPercentage = 0.2
   val PopMigrationsToNeighbours = 1
 
-  val LandPercentage = 0.7
+  val LandPercentage = 0.75
 
   val PoliticalIssueVariation = 0.2
 
-/*
-  val WorldMapWidth = 50
-  val WorldMapHeight = 50
-  val HexesPerProvince = 100
 
-  val Provinces = (WorldMapHeight * WorldMapWidth * LandPercentage / HexesPerProvince).toInt
-  */
   case class WorldMapCreationConf(width: Int, height: Int, hexesPerProvince: Int) {
     val provinces: Int = (width * height * LandPercentage / hexesPerProvince).toInt
   }

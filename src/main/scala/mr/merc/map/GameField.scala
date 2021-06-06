@@ -23,7 +23,13 @@ class GameField(val hexField: TerrainHexField, val players: List[Player], val si
       override def cellWhereMovementMustBeStopped(t: TerrainHex) = mustStopHere.contains(t)
       override def cellWhereItIsForbiddenToStop(t: TerrainHex) = t.soldier.map(_ != soldier).getOrElse(false)
 
-      override def heuristic(from: TerrainHex, to: TerrainHex): Double = math.abs(from.x - to.x) + math.abs(from.y - to.y)
+      override def heuristic(from: TerrainHex, to: TerrainHex): Double = {
+        val a = from.toCubeHex
+        val b = to.toCubeHex
+
+        import scala.math._
+        max(abs(a.x - b.x), max(abs(a.y - b.y), abs(a.z - b.z)))
+      }
     }
   }
 

@@ -1,11 +1,11 @@
 package mr.merc.map.hex.view
 
-import org.scalatest.FunSuite
+import org.scalatest.{FunSuite, Matchers}
 import mr.merc.map.hex._
 import mr.merc.map.terrain._
 import mr.merc.map.terrain.TerrainType._
 
-class TerrainHexAdditiveRuleTest extends FunSuite {
+class TerrainHexAdditiveRuleTest extends FunSuite with Matchers {
   val rule = new TerrainHexViewAdditiveRule
 
   test("filtering test") {
@@ -35,7 +35,10 @@ class TerrainHexAdditiveRuleTest extends FunSuite {
     val add = new TerrainHexViewAdditive(N, NW, ShallowWater, BankInside)
     val elements = rule.additivesToElements(add)
 
-    assert(elements === List(TerrainHexViewAdditiveElement(BankInside,NW,N)))
+    assert(elements === List(
+      TerrainHexViewAdditiveElement(BankInside,SW,NW),
+      TerrainHexViewAdditiveElement(BankInside,SE,S),
+      TerrainHexViewAdditiveElement(BankInside,N,NE)))
   }
 
   test("overlapping elements") {
@@ -61,5 +64,12 @@ class TerrainHexAdditiveRuleTest extends FunSuite {
     val result = rule.transform(list)
     assert(result.size === 1)
     assert(result.contains(TerrainHexViewAdditiveElement(GreenGrass, NE, NE)))
+  }
+
+  test("single water tile") {
+    val additive = TerrainHexViewAdditive(N,NW,ShallowWater,BankInside)
+    val elements = rule.additivesToElements(additive)
+    val sum = elements.map(e => DirectionsRange(e.from, e.to)).reduce(_ + _)
+    sum shouldBe DirectionsRange(N, NW)
   }
 }

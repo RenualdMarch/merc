@@ -2,25 +2,47 @@ package mr.merc.economics
 
 class SupplyDecider {
 
-  private val maxSupply = 10
+  private var yesterdayResults: Option[Map[EconomicRegion, FulfilledSupplyRequest]] = None
 
   def decideSupply(produced: Double, profits: Map[EconomicRegion, EconomicRegionDemand]): Map[EconomicRegion, Double] = {
+
     if (profits.isEmpty) {
       return Map()
     }
 
-    val sortedByProfit = profits.filter(_._2.profit > 0).toList.sortBy(-_._2.profit).take(maxSupply)
+    val actualProfits = profits.filter(_._2.profit > 0).toList.map { case (region, demand) =>
+      val actualProfit = yesterdayResults.flatMap(_.get(region)) match {
+        case Some(value) =>
+          val total = value.request.count
+          if (total != 0) {
+            demand.profit * value.sold / total
+          } else {
+            demand.profit
+          }
 
-    val profitSum = sortedByProfit.map(_._2.profit).sum
+        case None => demand.profit
+      }
+      (region, demand, actualProfit)
+    }
 
-    sortedByProfit.map { case (region, demand) =>
-      region -> (demand.profit / profitSum * produced)
-    }.toMap
+    val total = actualProfits.map { case (_, demand, actualProfit) =>
+      actualProfit * demand.count
+    }.sum
+
+    if (total == 0) {
+      Map()
+    } else {
+      actualProfits.map { case (region, demand, actualProfit) =>
+        region -> (produced * actualProfit * demand.count / total)
+      }.toMap
+    }
   }
 
-  def decideProduction(capacity: Double, inStorage:Double): Double = {
-    if (inStorage > capacity) 0 else capacity
+  def receiveSupplyResults(fulfilledSupply: Map[EconomicRegion, FulfilledSupplyRequest]): Unit = {
+    yesterdayResults = Some(yesterdayResults.getOrElse(Map()) ++ fulfilledSupply)
   }
+
+  def decideProduction(capacity: Double, unsoldProducts: Double): Double = capacity
 }
 
 case class EconomicRegionDemand(count: Double, profit: Double)

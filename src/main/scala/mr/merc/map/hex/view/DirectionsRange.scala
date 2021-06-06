@@ -21,7 +21,8 @@ object DirectionsRange {
       if (fromInt < toInt) {
         DirectionsRange(BitSet() ++ number(from).to(number(to)))
       } else {
-        DirectionsRange(BitSet() ++ number(to).to(number(from) + 6).map(_ % 6))
+        val newToInt = toInt + 6
+        DirectionsRange(BitSet() ++ fromInt.to(newToInt).map(_ % 6))
       }
     }
   }

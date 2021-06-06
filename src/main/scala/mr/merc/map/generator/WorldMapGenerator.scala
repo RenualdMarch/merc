@@ -1,7 +1,7 @@
 package mr.merc.map.generator
 
 import mr.merc.economics.{FourSeasonsTerrainHex, FourSeasonsTerrainHexField, WorldGenerator}
-import mr.merc.map.ShortestGrid
+import mr.merc.map.{PossibleGrid, ShortestGrid}
 import mr.merc.map.hex._
 import mr.merc.map.pathfind.PathFinder
 import mr.merc.map.terrain._
@@ -41,6 +41,7 @@ object WorldMapGenerator {
     }
 
     val terrainField = new FourSeasonsTerrainHexField(width, height, f)
+    destroyIslands(terrainField)
 
     val provincesMap = divideIntoProvinces(terrainField, provinces)
     provincesMap.keys.foreach { h =>
@@ -58,6 +59,24 @@ object WorldMapGenerator {
       case (capital, hexes) =>
         terrainField.hex(capital.x, capital.y) -> hexes.map(h => terrainField.hex(h.x, h.y))
     })
+  }
+
+  def destroyIslands(field: FourSeasonsTerrainHexField): Unit = {
+    val center = field.closest(field.hex(field.width / 2, field.height / 2)).find(_.terrainMap != FourSeasonsWater).get
+    val possibleCellsSet = PathFinder.calculatePossible[FourSeasonsTerrainHex](new PossibleGrid[FourSeasonsTerrainHex] {
+
+      override def cellWhereMovementMustBeStopped(t: FourSeasonsTerrainHex): Boolean = false
+
+      override def cellWhereItIsForbiddenToStop(t: FourSeasonsTerrainHex): Boolean = false
+
+      override def isBlocked(t: FourSeasonsTerrainHex): Boolean = t.terrainMap == FourSeasonsWater
+
+      override def price(from: FourSeasonsTerrainHex, to: FourSeasonsTerrainHex): Double = 1
+
+      override def neighbours(t: FourSeasonsTerrainHex): List[FourSeasonsTerrainHex] = field.neighbours(t)
+    }, center, field.width + field.height, false).keySet
+
+    field.hexes.filterNot(possibleCellsSet.contains).foreach(_.terrainMap = FourSeasonsWater)
   }
 
   def divideIntoProvinces(field: HexField[FourSeasonsTerrainHex], provinces: Int): Map[FourSeasonsTerrainHex, Set[FourSeasonsTerrainHex]] = {
@@ -93,7 +112,11 @@ object WorldMapGenerator {
 
     val pathGrid = new ShortestGrid[FourSeasonsTerrainHex] {
       override def heuristic(from: FourSeasonsTerrainHex, to: FourSeasonsTerrainHex): Double = {
-        math.abs(from.x - to.x) + math.abs(from.y - to.y)
+        val a = from.toCubeHex
+        val b = to.toCubeHex
+
+        import scala.math._
+        max(abs(a.x - b.x), max(abs(a.y - b.y), abs(a.z - b.z)))
       }
 
       override def isBlocked(t: FourSeasonsTerrainHex): Boolean = t.terrainMap == FourSeasonsCastle || neighbours(t).exists(_.terrainMap == FourSeasonsCastle) || blocks.contains(t)
