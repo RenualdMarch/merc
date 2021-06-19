@@ -26,3 +26,13 @@
   -fx-border-width: 1;
   -fx-border-style: hidden solid hidden hidden;
 }
+
+.borderUpPane {
+  -fx-border-color: black;
+  -fx-border-width: 1;
+  -fx-border-style: solid hidden hidden hidden;
+}
+
+.noBorder {
+  -fx-border-style: hidden hidden hidden hidden;
+}

@@ -69,7 +69,6 @@ javaOptions ++= Seq(
   "--add-modules", "javafx.swing",
   "--add-modules", "javafx.web",
   "--add-modules", "javafx.media",
-
 )
 
 mainClass in (Compile, run) := Some("mr.merc.main.Main")

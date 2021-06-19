@@ -12,12 +12,17 @@ import scalafx.scene.control.{ScrollPane, Separator, Slider}
 import scalafx.scene.layout.{BorderPane, Pane}
 import scalafx.util.StringConverter
 import scalafx.Includes._
+import scalafx.collections.ObservableBuffer
 import scalafx.geometry.{Orientation, Pos}
 
 class BudgetPane(worldState: WorldStateBudgetActions) extends TopTitledBorderPane with WorldInterfaceNode {
   private val state = worldState.playerState
 
-  top = BigText(Localization("budget.title", state.name))
+  top = new MigPane {
+    getStyleClass.add("borderDownPane")
+    add(BigText(Localization("budget.title", state.name)), "center, pushx, growx")
+  }
+
   private val income = new IncomePane(worldState)
   private val spending = new SpendingPane(worldState)
   center = PaneWithTwoHorizontalChildren(income, spending)
@@ -25,6 +30,7 @@ class BudgetPane(worldState: WorldStateBudgetActions) extends TopTitledBorderPan
 }
 
 class SpendingPane(worldState: WorldStateBudgetActions) extends TopTitledBorderPane with WorldInterfaceNode {
+  styleClass.add("noBorder")
   top = BigText(Localization("budget.spending"))
   private val config = new SpendingConfiguration(worldState)
   center = PaneWithTwoVerticalChildren(config, new SpendingReportPane(worldState.playerState.budget))
@@ -33,6 +39,7 @@ class SpendingPane(worldState: WorldStateBudgetActions) extends TopTitledBorderP
 }
 
 class SpendingReportPane(budget: StateBudget) extends TopTitledBorderPane with WorldInterfaceNode {
+  styleClass.add("noBorder")
   top = MediumText(Localization("budget.spendingReport"))
   center = {
     def spending(report: Spending): String = {
@@ -63,6 +70,7 @@ class SpendingReportPane(budget: StateBudget) extends TopTitledBorderPane with W
 }
 
 class SpendingConfiguration(worldState: WorldStateBudgetActions) extends TopTitledBorderPane with WorldInterfaceNode {
+  styleClass.add("borderDownPane")
   top = MediumText(Localization("budget.spendingConfig"))
   val conf = worldState.playerState.budget.spendingPolicyConfig
 
@@ -128,6 +136,7 @@ class SpendingConfiguration(worldState: WorldStateBudgetActions) extends TopTitl
 }
 
 class IncomePane(worldState: WorldStateBudgetActions) extends TopTitledBorderPane with WorldInterfaceNode {
+  styleClass.add("borderRightPane")
   top = BigText(Localization("budget.income"))
   private val conf = new TaxesConfigurationPane(worldState)
   center = PaneWithTwoVerticalChildren(conf, new IncomeReportPane(worldState.playerState.budget))
@@ -136,6 +145,8 @@ class IncomePane(worldState: WorldStateBudgetActions) extends TopTitledBorderPan
 }
 
 class IncomeReportPane(budget: StateBudget) extends TopTitledBorderPane with WorldInterfaceNode {
+  styleClass.add("noBorder")
+
   top = MediumText(Localization("budget.incomeReport"))
   center = {
     def income(report: Income): String = {
@@ -170,6 +181,8 @@ class IncomeReportPane(budget: StateBudget) extends TopTitledBorderPane with Wor
 }
 
 class TaxesConfigurationPane(worldState: WorldStateBudgetActions) extends TopTitledBorderPane with WorldInterfaceNode {
+  styleClass.add("borderDownPane")
+
   top = MediumText(Localization("budget.incomeConfig"))
 
   private val state = worldState.playerState
@@ -254,6 +267,7 @@ class TaxesConfigurationPane(worldState: WorldStateBudgetActions) extends TopTit
 }
 
 class BudgetBottomProjectionPane(reserves: Double, income: DoubleProperty, expenses: DoubleProperty) extends TopTitledBorderPane with WorldInterfaceNode {
+  styleClass.add("borderUpPane")
   center = {
     val pane = new MigPane()
     pane.add(MediumText(Localization("budget.projected.gain")))

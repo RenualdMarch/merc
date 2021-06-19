@@ -1,25 +1,26 @@
 requirement failed: Buying and selling differ
 
-bug with drawing single water tile
 aristocrats investing into capitalists
 state rating pane
 animate healing
 
 
-Polishing
+Testing and Polishing:
 rebalance political parties and views
-allow hire people from other cultures with some political configurations, now it is possible to hire primary culture warrior anywhere
-add rulers to map
-Move to JOGL
-Other languages?
+
 
 
 Not high priority:
+Move to JOGL
+allow hire people from other cultures with some political configurations, now it is possible to hire primary culture warrior anywhere
+add rulers to map
 when hiring soldiers, use actual population(manpower pools?)
 make cultures for castles/walls
 check conditional AI logic - unused expression
 idle animation for soldiers on battle
 idle animation for soldiers on world map
+Other languages
+++ Reign of Lords Era ++ Reign of Heroes Era for kings
 
 
 add more cultures, at least two cultures per race:
@@ -50,13 +51,10 @@ Dwarfs
 +Nagas
 +Merfolks
 
-++ Reign of Lords Era ++ Reign of Heroes Era
 
 Polishing:
-issues - balance production and needs multipliers
 localization - add parameters order, like %1, %2, %3
 soldiers and battles and wars
-when armies move they should try move near middle borders
 
 //"-Dglass.win.uiScale=100%"
 
@@ -66,7 +64,6 @@ For M9
 Consider following:
 
 less or more products - refactor needs
-technologies
 smarter capitalists when creating and expanding factories
 terrain additives specifically for given terrain types
 corruption and tax evasion
