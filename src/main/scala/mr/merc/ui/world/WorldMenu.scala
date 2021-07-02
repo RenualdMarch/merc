@@ -41,7 +41,11 @@ class WorldMenu(parent: WorldFrame) extends MenuBar {
     parent.showForeignTradePane()
   }
 
-  diplomacyMenu.items.addAll(emailMenu, relations, allWars, foreignTradeMenu, techs, army)
+  val ratingMenu = new MenuItem(Localization("rating"))
+  ratingMenu.onAction = { _ =>
+    parent.showRatingPane()
+  }
+  diplomacyMenu.items.addAll(emailMenu, relations, allWars, foreignTradeMenu, techs, army, ratingMenu)
 
   val budgetMenu = new MenuItem(Localization("menu.budget"))
   budgetMenu.onAction = { _ =>

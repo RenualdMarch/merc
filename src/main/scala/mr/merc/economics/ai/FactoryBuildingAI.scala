@@ -26,19 +26,14 @@ class RandomFactoryBuildingAI extends FactoryBuildingAI {
     val factoryExpandCost = state.factoryExpandCost(currentRegion.owner) dot prices
     val maxTask = Math.max(factoryBuildCost, factoryExpandCost)
 
-    val capInvestors = currentRegion.regionPopulation.popsByType(Capitalists)
-    val capMoneyForNeeds = currentRegion.moneyToFulfillNeeds(Capitalists).values.sum
-    val capTotalMoney = Math.max(0, capInvestors.map(_.moneyReserves).sum - capMoneyForNeeds)
-    val (investors, totalMoney) = if (capTotalMoney / maxTask.toInt == 0) {
-      val investors = capInvestors //++ currentRegion.regionPopulation.popsByType(Aristocrats)
-      val moneyForNeeds = capMoneyForNeeds //+ currentRegion.moneyToFulfillNeeds(Aristocrats).values.sum
-      val totalMoney = Math.max(0, investors.map(_.moneyReserves).sum - moneyForNeeds)
-      (investors, totalMoney)
-    } else (capInvestors, capTotalMoney)
+    val investors = currentRegion.regionPopulation.popsByType(Capitalists)
+    val moneyForNeeds = currentRegion.moneyToFulfillNeeds(Capitalists).values.sum
+    val totalMoney = Math.max(0, investors.map(_.moneyReserves).sum - moneyForNeeds)
 
     val projects = currentRegion.projects.collect {
       case p:PopulationBusinessProject => p
     }.size
+
     val productsSize = Math.max(0, (totalMoney / maxTask).toInt - projects)
     val random = new WeightedRandom(Products.IndustryProducts.map(p => p -> 1d).toMap)
     val productsToChange = random.nextRandomItems(productsSize).groupBy(identity).mapValues(_.size) -- noNeedToAddMore(currentRegion)

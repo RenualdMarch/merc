@@ -1,7 +1,5 @@
 requirement failed: Buying and selling differ
 
-aristocrats investing into capitalists
-state rating pane
 animate healing
 
 
